@@ -4,7 +4,6 @@
   box-sizing: border-box;
   user-select: none;
   touch-action: none;
-  cursor: none;
   font-family: Arial, Helvetica, sans-serif;
 }
 body {
@@ -17,10 +16,22 @@ body {
   background: rgb(40, 42, 56);
 }
 canvas {
+  position: absolute;
+  top: 0;
   border-radius: 5px;
   border: solid 3px #00ff00;
   border-bottom: solid 3px #f00;
 }
+#touch-fild {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  cursor: none;
+}
+
 #home, #rs-window{
   position: fixed;
   width: 100vw;
@@ -30,7 +41,6 @@ canvas {
   display: grid;
   place-items: center;
   background: rgba(40, 42, 56, 1);
-  cursor: auto;
   z-index: -10;
   opacity: 0;
   transition: linear 0.3s all;
@@ -79,7 +89,6 @@ canvas {
   backdrop-filter: blur(3px);
   grid-template-rows: 10fr 20fr;
   place-items: center;
-  cursor: auto;
 }
 #rs-window #restart p {
   width: 50%;
@@ -90,12 +99,10 @@ canvas {
   justify-content: center;
   align-items: center;
   margin-top: 10%;
-  cursor: auto;
 }
 #rs-window #restart p #score {
   margin-left: 5px;
   color: #0000ff;
-  cursor: auto;
 }
 #rs-window #restart #rs-button {
   width: 70%;
