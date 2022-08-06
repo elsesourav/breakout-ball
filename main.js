@@ -29,7 +29,7 @@ class Pad {
     curve(this.x, this.y, this.x + this.w, this.y, 3 * SCALE, this.topR * SCALE, true);
     color();
     rect(this.x, this.y, this.w, this.h);
-    color(0.02)
+    color(0.2)
     rect(this.tx, this.y - 2 * SCALE, this.w, this.h + 2 * SCALE);
   }
 
@@ -241,7 +241,7 @@ const obstacleCollision = () => {
           b.vy = - b.vy;
           b.y = b.py;
         }
-        let len = Math.floor(Math.random() * 10 + 10);
+        let len = Math.floor(Math.random() * 15 + 20);
         for (let j = 0; j < len; j++) {
           particles.push(new Particle(ran(o[i].x, o[i].w), ran(o[i].y, o[i].h), o[i].color));
         }
