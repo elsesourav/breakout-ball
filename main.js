@@ -455,16 +455,23 @@ function animation() {
 
 };
 
-
+let px = 0;
+const start_ = (x) => {
+  px = x;
+}
 const move = (x) => {
-  if (x <= WIDTH - PAD_W && x >= 0) {
-    pad.tx = x;
+  let nx = (x - px) * SCALE  *  1.3;
+  if (0 < pad.tx + nx && WIDTH > (pad.tx + PAD_W) + nx) {
+    pad.tx += nx;
     padCollision();
   }
+  px = x;
 }
 
-touchFild.addEventListener("touchmove", (e) => move(e.touches[0].clientX * 6));
-touchFild.addEventListener("mousemove", (e) => move(e.offsetX * 4));
+touchFild.addEventListener("touchestart", (e) => start_(e.touches[0].clientX));
+touchFild.addEventListener("touchmove", (e) => move(e.touches[0].clientX));
+touchFild.addEventListener("mousedown", (e) => start_(e.clientX));
+touchFild.addEventListener("mousemove", (e) => move(e.clientX));
 
 
 function loop() {
