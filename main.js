@@ -29,8 +29,8 @@ class Pad {
     curve(this.x, this.y, this.x + this.w, this.y, 3 * SCALE, this.topR * SCALE, true);
     color();
     rect(this.x, this.y, this.w, this.h);
-    color(0.2)
-    rect(this.tx, this.y - 2 * SCALE, this.w, this.h + 2 * SCALE);
+    // color(0.2)
+    // rect(this.tx, this.y - 2 * SCALE, this.w, this.h + 2 * SCALE);
   }
 
   update() {
@@ -68,10 +68,11 @@ class Ball {
 }
 
 class Obstacle {
-  constructor(x, y, w, h, color, stroke) {
+  constructor(x, y, w, h, helth, color, stroke) {
     this.x = x;
     this.y = y;
     this.w = w;
+    this.helth = helth;
     this.h = h;
     this.color = color;
     this.stroke = stroke;
@@ -79,8 +80,8 @@ class Obstacle {
   }
 
   draw() {
-    ctx.fillStyle = this.color;
-    ctx.strokeStyle = this.stroke;
+    ctx.fillStyle = this.color[this.helth - 1];
+    ctx.strokeStyle = this.stroke[this.helth - 1];
     rect(this.x, this.y, this.w, this.h, true, true, this.boder);
   }
 }
@@ -197,9 +198,9 @@ const createObstacles = () => {
         obstacles.push(new Obstacle(
           col * sclX + (sclX - w) / 2,
           row * sclY + (sclY - h) / 2,
-          w, h, gm.color, gm.stroke))
-      } else if (gm.type == "$") {
-        blocks.push(new Obstacle(col * sclX, row * sclY, sclX, sclY, gm.color, gm.stroke))
+          w, h, gm.helth, gm.color, gm.stroke))
+      } else if (gm.type == "$") { 
+        blocks.push(new Obstacle(col * sclX, row * sclY, sclX, sclY, gm.helth, gm.color, gm.stroke))
       }
     }
   }
@@ -241,19 +242,23 @@ const obstacleCollision = () => {
           b.vy = - b.vy;
           b.y = b.py;
         }
+        obstacles[i].helth--;
+
         let len = Math.floor(Math.random() * 15 + 20);
         for (let j = 0; j < len; j++) {
-          particles.push(new Particle(ran(o[i].x, o[i].w), ran(o[i].y, o[i].h), o[i].color));
+          particles.push(new Particle(ran(o[i].x, o[i].w), ran(o[i].y, o[i].h), o[i].color[o[i].helth]));
         }
 
-        if (Math.random() > power_ret) {
+        if (!obstacles[i].helth && Math.random() > power_ret) {
           const prs = [["💖", "life"], ["💊", "ball"], ["💊", "ball"], ["🧭", "slow"], ["🧭", "slow"]];
           const one = prs[Math.floor(Math.random() * prs.length)];
           powers.push(new AddBallPower(o[i].x, o[i].y, o[i].w, one[0], one[1]));
         }
         score += 5;
-        obstacles.splice(i, 1);
-        Sounds.destroy();
+        if (!obstacles[i].helth){
+          obstacles.splice(i, 1);
+          Sounds.destroy();
+        }
 
         if (o.length === 0) {
           balls = [];
