@@ -33,7 +33,7 @@ class Ball {
     this.r = r;
     this.px = this.x;
     this.py = this.y;
-    this.speed = speed / 20;
+    this.speed = speed / 5;
     this.vx = this.speed * random(-1, 1);
     this.vy = -this.speed;
     this.setupLevel = setupLevel;
@@ -46,7 +46,7 @@ class Ball {
   }
 
   update() {
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 30; i++) {
       this.px = this.x;
       this.py = this.y;
       this.x += this.vx;
@@ -138,7 +138,6 @@ class Power {
     font(`${this.size}px Arial`)
     text(this.text, (this.x + this.w / 2) - this.size / 2, (this.y + this.w / 2) - this.size / 2)
     this.y += this.vy;
-    console.log(this.particles);
     this.particles.forEach(p => {
       p.draw(this.x, this.y);
     })

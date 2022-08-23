@@ -190,7 +190,7 @@ const gameMaps = [
     height: 85,
     width: 85,
     padSpeed: 5,
-    ballSize: 5,
+    ballSize: 4,
     ballSpeed: 0.7,
     powerRet: 0.2,
     map: [
