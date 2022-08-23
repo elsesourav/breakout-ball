@@ -180,6 +180,53 @@ window.jsfxr = function (e) {
       h = h + (x[j >> 18] + x[(j >> 12) & 63] + x[(j >> 6) & 63] + x[j & 63]);
   return h;
 };
+
+// -----------------------------------------------------------
+
+let keys = {
+  do: 261.6,
+  re: 293.71,
+  mi: 329.6
+}
+const actx = new (AudioContext || webkitAudioContext || window.webkitAudioContext)();
+function playNote(key, duration) {
+  const osc = actx.createOscillator();
+  osc.frequency.value = key;
+  osc.start(actx.currentTime);
+  osc.stop(actx.currentTime + duration / 1000);
+
+  const envelope = actx.createGain();
+  osc.connect(envelope);
+  osc.type = "triangle";
+  envelope.connect(actx.destination);
+  envelope.gain.setValueAtTime(0, actx.currentTime);
+  envelope.gain.linearRampToValueAtTime(0.5, actx.currentTime + 0.1);
+  envelope.gain.linearRampToValueAtTime(0, actx.currentTime + duration / 1000);
+  setTimeout(() => {
+    osc.disconnect();
+  }, duration);
+}
+
+function playMelody(array) {
+  if (array.length < 1) return;
+
+  this.ary = [...array];
+  let pd = this.ary.shift();
+  playNote(pd[0], pd[1]);
+  setTimeout(() => {
+    playMelody(this.ary);
+  }, pd[1]);
+}
+
+const win = [
+  [keys.mi, 300],
+  [keys.re, 150],
+  [keys.do, 300],
+  [keys.re, 150],
+  [keys.mi, 600],
+]
+
+/* --------------------------------------------------------- */
 const fxr = jsfxr;
 
 
@@ -189,7 +236,7 @@ const destroy = new Audio(
 destroy.volume = 0.3;
 
 const hitWall = new Audio(
-  fxr([2, 0.0102, 0.066, 0.539, 0.1037, 0.239, , -0.189, -0.322, , , 0.8999, , , , , , , 1, , , , , 0.5])
+  fxr([2, 0.0102, 0.066, 0.539, 0.1037, 0.239, , -0.189, -0.322, , , 0.8999, , , , , , , 1, , , , , 1])
 )
 hitWall.volume = 1;
 
@@ -212,36 +259,46 @@ const point = new Audio(
 point.volume = 1;
 
 const death = new Audio(
-  fxr([0, 0, 0.962846403849094, 0.2509507171809999, 0.911206040945938, 0.19255692561524382, 0, 0, 0, 0, 0, 0, 0.8914785273122342, 0.5731390851889171, 0, 0, 0, 0, 0.21690619953980544, -0.15692520215284977, 0.8898730458441626, 0, 0, 0.5]))
-death.volume = 0.5;
+  fxr([0, 0, 0.962846403849094, 0.2509507171809999, 0.911206040945938, 0.19255692561524382, 0, 0, 0, 0, 0, 0, 0.8914785273122342, 0.5731390851889171, 0, 0, 0, 0, 0.21690619953980544, -0.15692520215284977, 0.8898730458441626, 0, 0, 0.1]))
+death.volume = 0.1;
+
+let audioMuted = false;
 
 const Sounds = {
   destroy() {
-    destroy.play()
+    !audioMuted && destroy.play()
     destroy.currentTime = 0;
   },
   hitWall() {
-    hitWall.play()
+    !audioMuted && hitWall.play()
     hitWall.currentTime = 0;
   },
   death() {
-    death.play()
+    !audioMuted && death.play()
     death.currentTime = 0;
   },
   win() {
-    winLevel.play()
-    winLevel.currentTime = 0;
+    !audioMuted && playMelody(win);
   },
   padHit() {
-    padHit.play()
+    !audioMuted && padHit.play()
     padHit.currentTime = 0;
   },
   gameOverAudio() {
-    gover.play()
+    !audioMuted && gover.play()
     gover.currentTime = 0;
   },
   point() {
-    point.play(); 
+    !audioMuted && point.play();
     point.currentTime = 0;
   }
 }
+
+const backgroundAudio = new Audio()
+backgroundAudio.volume = 0.1; 
+backgroundAudio.src = "back.mp3";
+
+document.addEventListener("click", () => {
+  backgroundAudio.play();
+  backgroundAudio.loop = true;
+}, { once: true });

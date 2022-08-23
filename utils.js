@@ -1,7 +1,5 @@
 "use strict"
 const SCALE = 4;
-// const winw = window.innerWidth;
-// const winh = window.innerHeight;
 const winw = 350;
 const winh = 650;
 const cvs = document.createElement("canvas");
@@ -14,11 +12,50 @@ const ctx = cvs.getContext("2d");
 
 ctx.fillStyle = "#000";
 ctx.fillRect(0, 0, winw, winh);
+ctx.scale(SCALE, SCALE);
 
+//  resize windwo 
+let winWidth = window.innerWidth;
+let winHeight = window.innerHeight;
+const root = document.querySelector(":root");
+root.style.setProperty("--winWidth", `${winWidth}px`);
+root.style.setProperty("--winHeight", `${winHeight}px`);
+
+window.addEventListener("resize", (e) => {
+  winWidth = window.innerWidth;
+  winHeight = window.innerHeight;
+  root.style.setProperty("--winWidth", `${winWidth}px`);
+  root.style.setProperty("--winHeight", `${winHeight}px`);
+});
+
+/* ---------- math ---------- */
 const PI = Math.PI;
+const sin = x => Math.sin(x);
+const cos = y => Math.cos(y);
+const atan2 = (y, x) => Math.atan2(y, x);
+const abs = n => Math.abs(n);
 
+const toRadian = degree => (degree * Math.PI) / 180;// degree convert to radian
+const toDegree = radian => (radian * 180) / Math.PI;// radian convert to Degree
+
+const random = (start = 0, end = 1, int_floor = false) => {
+  const result = start + (Math.random() * (end - start));
+  return int_floor ? Math.floor(result) : result;
+}
+
+/* e.x 
+(0 start) -------.------ (10 end) input . = 5
+(10 min) ----------------.---------------- (30 max) output . = 20
+*/
+const map = (point, start, end, min, max) => {
+  const per = (point - start) / (end - start);
+  return ((max - min) * per) + min;
+}
+
+
+/* ------------- canvas ------------ */
 const color = (r = false, g = false, b = false, a = false) => {
- if (a || a === 0) {
+  if (a || a === 0) {
     ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   } else if (b || b === 0) {
@@ -36,7 +73,7 @@ const color = (r = false, g = false, b = false, a = false) => {
   }
 }
 
-const stroke = (r = false, g = false, b = false, a = false) => {
+const strokeStyle = (r = false, g = false, b = false, a = false) => {
   if (a || a === 0) {
     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
     return `rgba(${r}, ${g}, ${b}, ${a})`;
@@ -73,6 +110,7 @@ const transform = (ox, nx, oy, ny) => {
 }
 const font = (font) => {
   ctx.font = font;
+  ctx.textAlign = "center";
 }
 const text = (text, x, y, w) => {
   ctx.fillText(text, x, y, w);
@@ -83,58 +121,68 @@ const save = () => {
 const restore = () => {
   ctx.restore();
 }
-const line = (sx, sy, ex, ey, w = 1, round = false) => {
+const rotate = (angle) => {
+  ctx.rotate(angle);
+}
+const scale = (x, y) => ctx.scale(x, y);
+const line = (sx, sy, ex, ey, width = 1, round = false, lineDash = []) => {
   ctx.beginPath();
-  ctx.lineWidth = w;
+  ctx.lineWidth = width;
   if (round) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
   }
+  lineDash && ctx.setLineDash(lineDash);
   ctx.moveTo(sx, sy);
   ctx.lineTo(ex, ey);
+  ctx.stroke();
   ctx.closePath();
 }
-const curve = (sx, sy, ex, ey, width = 1, radius = 20, fill = false) => {
+
+const moveTo = (x, y) => {
   ctx.beginPath();
-  ctx.lineWidth = width;
+  ctx.moveTo(x, y);
+};
+const lineTo = (x, y) => ctx.lineTo(x, y);
+
+const stroke = (strokeWidth) => {
+  ctx.lineWidth = strokeWidth;
+  ctx.stroke();
+}
+
+const curve = (sx, sy, ex, ey, lineWidth = 1, radius = 20, fill = false) => {
+  ctx.beginPath();
+  ctx.lineWidth = lineWidth;
   ctx.moveTo(sx, sy);
   const midx = sx + (ex - sx) / 2;
   const midy = sy + (ey - sy) / 2;
   ctx.quadraticCurveTo(midx, midy - radius, ex, ey);
   ctx.stroke();
-  if (fill) {
-    ctx.fill();
-  }
+  fill && ctx.fill();
+  ctx.closePath();
 }
 
-const rect = (x, y, w, h, fill = true, outline = false, lineWidth = 1) => {
-  ctx.beginPath(); 
+const rect = (x, y, w, h, fill = true, lineWidth = 0) => {
+  ctx.beginPath();
   ctx.rect(x, y, w, h);
-  if (fill) {
-    ctx.fill();
-  }
-  if (outline) {
-    ctx.stroke();
-    ctx.lineWidth = lineWidth;
-  }
+  fill && ctx.fill();
+  ctx.lineWidth = lineWidth;
+  lineWidth && ctx.stroke();
   ctx.closePath();
 }
 
 const fillRect = (x, y, w, h) => {
-  ctx.fillRect(x, y, w, h);
-}
-const arc = (x, y, r, fill = true, outline = false, lineWidth = 1) => {
   ctx.beginPath();
-  const nr = outline ? r - outline : r;
-  ctx.arc(x, y, nr, 0, PI * 2, false);
+  ctx.fillRect(x, y, w, h);
   ctx.closePath();
-  if (fill) {
-    ctx.fill();
-  }
-  if (outline) {
-    ctx.lineWidth = lineWidth;
-    ctx.stroke();
-  }
+}
+const arc = (x, y, r, fill = true, lineWidth = 0) => {
+  ctx.beginPath();
+  const nr = lineWidth ? r - lineWidth : r;
+  ctx.arc(x, y, nr, 0, PI * 2, false);
+  fill && ctx.fill();
+  ctx.lineWidth = lineWidth;
+  lineWidth && ctx.stroke();
   ctx.closePath();
 }
 
@@ -189,30 +237,50 @@ function removeClass(array, className = "active") {
   }
 }
 
-// always positive
-function sr(val) {
-  return Math.sqrt(Math.pow(val, 2));
+const createEle = (elementName, className = null, appendParentName = null, inrHtml = null) => {
+  const e = document.createElement(elementName);
+  if (className) e.classList.add(className);
+  if (inrHtml) e.innerHTML = inrHtml;
+  if (appendParentName) appendParentName.appendChild(e);
+  e.on = (event, callBackFun) => {
+    if (typeof event != "string") {
+      e.addEventListener("click", event);
+    } else {
+      e.addEventListener(event, callBackFun);
+    }
+  }
+  return e;
 }
 
-// degree convert to radian
-function toRadian(degree) {
-  return (degree * Math.PI) / 180;
+
+function hover(element, name = "hover") {
+  const namerun = `${name}-n`
+  element.classList.add(namerun);
+  element.classList.remove(name);
+  const addHover = () => {
+    element.classList.add(name);
+    element.classList.remove(namerun);
+  }
+  const removeHover = () => {
+    element.classList.remove(name);
+    element.classList.add(namerun);
+  }
+  element.addEventListener("touchstart", addHover);
+  element.addEventListener("mouseenter", addHover);
+
+  element.addEventListener("touchend", removeHover);
+  element.addEventListener("mouseleave", removeHover);
 }
 
-// radian convert to Degree
-function toDegree(radian) {
-  return (radian * 180) / Math.PI;
+window.onload = () => {
+  document.querySelectorAll(".hover").forEach((h) => {
+    hover(h);
+  })
 }
 
-const random = (start = 0, end = 1) => {
-  return start + (Math.random() * (end - start));
-}
-
-const map = (point, start, end, min, max) => {
-  const per = (point - start) / (end - start);
-  return ((max - min) * per) + min;
-}
-
-const ran = (v, max) => {
-  return (v + Math.random() * max);
+const animation = (fps, fun) => {
+  setTimeout(() => {
+    fun();
+    animation(fps, fun);
+  }, 1000 / fps)
 }

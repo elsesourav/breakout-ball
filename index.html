@@ -1,28 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Breakout Ball</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="game.js"></script>
-  <script defer src="audio.js"></script>
-  <script defer src="libarary.js"></script>
-  <script defer src="main.js"></script>
-</head>
-<body>
-  <div id="touch-fild"></div>
-  <div id="home" class="active">
-    <div id="start-box">
-      <div id="start">▷ START</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breakout Ball</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="utils.js"></script>
+    <script defer src="audio.js"></script>
+    <script defer src="map.js"></script>
+    <script defer src="control.js"></script>
+    <script defer src="class.js"></script>
+    <script defer src="levelSetup.js"></script>
+    <script defer src="main.js"></script>
+  </head>
+  <body>
+    <div id="loading-window" class="active">
+      <div id="loadeing-circle">
+        <div class="lds-roller">
+          <p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+        </div>
+      </div>
+      <div class="copy-r-l"><x>&#169;</x> TeamSourav2022</div>
     </div>
-  </div>
-  <div id="rs-window" class="">
-    <div id="restart">
-      <p>SCORE : <x id="score">0</x></p>
-      <div id="rs-button">↻ RESTART</div>
+    <div id="level-window" class="active">
+      <div class="title">T<br>E<br>A<br>M<br><br>S<br>T<br>A<br>R<br>S</div>
+      <div id="scroll-list">
+      </div> 
+      <div class="audio-opt active">
+        <span>🔊</span>
+        <span>🔇</span>
+      </div>
     </div>
-  </div>
-</body>
+    <div id="touch-fild" class=""> 
+      <div class="play hover"></div>
+      <div class="pous hover"></div>
+      <div id="loby-btn">↩</div>
+      <div id="restart-btn">↻</div>
+      <div class="audio-opt active">
+        <span>🔊</span>
+        <span>🔇</span>
+      </div>
+    </div>
+    <div id="win-window" class="">
+      <div class="box">
+        <div class="win-title">✨Win✨</div>
+        <p>SCORE : <x id="score-w">0</x></p>
+        <span>
+          <div id="menu">↩ MENU</div>
+          <div id="rs-w">↻ RESTART</div>
+        </span>
+      </div>
+    </div> 
+    <div id="rs-window" class="">
+      <div class="box">
+        <p>SCORE : <x id="score-r">0</x></p>
+        <div id="rs-r">↻ RESTART</div>
+      </div>
+    </div> 
+  </body>
 </html>
