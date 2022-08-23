@@ -26,7 +26,7 @@ class SetupLevel {
 
     this.score = 0;
     this.padW = 60;
-    this.padH = 6;
+    this.padH = 8;
     this.level = level;
     this.life = life;
     this.row = row;
@@ -49,7 +49,7 @@ class SetupLevel {
 
     this.pad = new Pad(
       winw / 2 - this.padW / 2,
-      winh / 1.1,
+      winh / 1.03,
       this.padW,
       this.padH,
       this.pSpeed
@@ -138,7 +138,7 @@ class SetupLevel {
             }
 
             // set powers points
-            if (random() > this.pRet) {
+            if (random() < this.pRet) {
               const _l = ["💖", "life"];
               const _b = ["💊", "ball"];
               const _s = ["🧭", "slow"];
@@ -293,13 +293,6 @@ class SetupLevel {
     }
   }
 
-  drawScoreAndLife() {
-    font(`${25}px Arial`);
-    color();
-    text(`${this.life}💖`, winw - 25, winh / 1.02);
-    text(`🎖${this.score}`, winw - 325, winh / 1.02);
-  }
-
   draw() {
     this.pad.draw();
     this.balls.forEach(ball => { ball.draw(); });
@@ -307,7 +300,8 @@ class SetupLevel {
     this.obstacles.forEach(obstacle => { obstacle.draw(); })
     this.blocks.forEach(block => { block.draw(); })
     this.powers.forEach(power => { power.draw(); })
-    this.drawScoreAndLife();
+    ID("helth").innerText = this.life;
+    ID("score").innerText = this.score; 
     this.text.forEach(txt => { !txt.complete && txt.draw(); })
   }
 

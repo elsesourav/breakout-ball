@@ -7,9 +7,7 @@ const levelWindow = ID("level-window");
 const scrollList = ID("scroll-list");
 
 const play = _$(".play")[0];
-const pous = _$(".pous")[0];
 hover(play)
-hover(pous)
 
 
 const audioOpt = _$(".audio-opt");
@@ -54,14 +52,15 @@ levels.forEach((lvl, i) => {
   })
 });
 
+const pous = ID("pous-icon");
+hover(pous);
+pous.on("click", () => {
+  touchFild.classList.add("active");
+  lvl.run = false;
+  play.classList.add("active");
+})
 
 function setup() {
-  document.body.addEventListener("dblclick", () => {
-    touchFild.classList.add("active");
-    lvl.run = false;
-    play.classList.add("active");
-  })
-
   levelWindow.classList.toggle("active", false);
   lvl = new SetupLevel(currentLevel, currentLevelIndex);
   lvl.createObstacles();
@@ -107,9 +106,7 @@ ID("rs-w").on("click", () => {
 
 play.addEventListener("click", () => {
   play.classList.remove("active");
-  pous.classList.add("active");
   setTimeout(() => {
-    pous.classList.remove("active");
     touchFild.classList.remove("active");
     lvl.run = true;
   }, 500);
@@ -123,7 +120,6 @@ loby.on("click", () => {
   play.classList.remove("active");
   levelWindow.classList.toggle("active", true);
 })
-
 
 /* ----------- windwo lode ------------- */
 window.onload = () => {

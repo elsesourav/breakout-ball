@@ -1,9 +1,9 @@
 "use strict"
 const SCALE = 4;
 const winw = 350;
-const winh = 650;
+const winh = 620;
 const cvs = document.createElement("canvas");
-document.body.appendChild(cvs);
+document.body.appendChild(cvs); 
 cvs.setAttribute("width", winw * SCALE);
 cvs.setAttribute("height", winh * SCALE);
 cvs.style.width = `${winw}px`;

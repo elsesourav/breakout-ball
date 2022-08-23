@@ -27,15 +27,39 @@ body {
   overflow: hidden;
   background: rgb(40, 42, 56);
 }
+
+#option {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  display: grid;
+  grid-template-columns: 5fr 15fr 5fr;
+  place-items: center;
+}
+#option #pous-icon {
+  font-size: 1.7rem;
+}
+#helth-icon,
+#score-icon {
+  display: flex;
+  color: #fff;
+  font-size: 1.5rem;
+  gap: 3px;
+}
+#helth-icon p,
+#score-icon p {
+  transform: translateY(3px);
+}
 canvas {
   position: absolute;
-  top: 0;
+  top: 40px;
   border-radius: 5px;
   border: solid 3px #00ff00;
   border-bottom: solid 3px #f00;
 }
 
-#rs-window, #win-window {
+#rs-window,
+#win-window {
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -49,7 +73,8 @@ canvas {
   opacity: 0;
   transition: linear 0.3s all;
 }
-#rs-window.active, #win-window.active {
+#rs-window.active,
+#win-window.active {
   opacity: 1;
   transition: linear 0.3s all;
   z-index: 10;
@@ -62,10 +87,15 @@ canvas {
   box-shadow: 0 0 5px #000;
   overflow: hidden;
   display: grid;
+  grid-template-rows: 1fr 1fr 4fr;
   background: #fff;
   backdrop-filter: blur(3px);
-  grid-template-rows: 10fr 20fr;
+  padding: 5px;
   place-items: center;
+}
+.box #go-title {
+  font-weight: 900;
+  font-size: 1.2rem;
 }
 .box p {
   width: 50%;
@@ -77,9 +107,9 @@ canvas {
   align-items: center;
   margin-top: 10%;
 }
-.box p #score {
-  margin-left: 5px;
-  color: #0000ff;
+.box p #score-r {
+  margin-left: 3px;
+  color: #ff9000;
 }
 #rs-window .box #rs-r {
   width: 70%;
@@ -100,10 +130,6 @@ canvas {
 }
 #rs-window .box #rs-r:hover {
   font-size: 1.1rem;
-}
-color {
-  color: #00ff00;
-  color: #00a900;
 }
 
 /* ------------ win button ------------- */
@@ -127,7 +153,8 @@ color {
   align-items: flex-start;
 }
 
-#win-window .box p x{
+#win-window .box p x {
+  margin-left: 3px;
   color: #ff9000;
 }
 #win-window .box span {
@@ -157,22 +184,6 @@ color {
   font-size: 0.9rem;
   transition: linear 0.1s;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #level-window {
   transition: linear 0.5s;
@@ -323,7 +334,7 @@ color {
 }
 #scroll-list .level span {
   position: absolute;
-  transform: translateY(-4px);
+  transform: translateY(-1px);
   font-size: 70px;
 }
 #scroll-list .level p {
@@ -374,7 +385,7 @@ color {
 }
 .audio-opt span {
   position: relative;
-  transform: translateY(-3px);
+  transform: translateY(-1px);
   border-radius: 100px;
   display: block;
   z-index: -1;
@@ -519,8 +530,8 @@ color {
   z-index: 10;
 }
 
-
-.play, .pous {
+.play,
+.pous {
   position: relative;
   width: 75px;
   height: 75px;
@@ -529,15 +540,27 @@ color {
   place-items: center;
   border-radius: 10px;
   border: solid 2px #ff9000;
-  cursor: pointer; 
+  cursor: pointer;
 }
 
-.play.active, .pous.active {
+.pous {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(90deg, #b800a2, #008da5);
+  place-items: center;
+  border-radius: 10px;
+  border: solid 2px #ff9000;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.play.active {
   display: grid;
 }
 
-.play::before { 
-  content: '';
+.play::before {
+  content: "";
   position: absolute;
   margin-left: 3px;
   scale: 1.5;
@@ -548,8 +571,9 @@ color {
   border-radius: 3px;
   border-left: 30px solid #00ffff;
 }
-.pous::before, .pous::after { 
-  content: '';
+.pous::before,
+.pous::after {
+  content: "";
   scale: 1.5;
   position: absolute;
   border-radius: 10px;
@@ -563,7 +587,8 @@ color {
   right: 20px;
 }
 
-#loby-btn, #restart-btn {
+#loby-btn,
+#restart-btn {
   position: absolute;
   width: 50px;
   height: 50px;
@@ -574,7 +599,7 @@ color {
   place-items: center;
   font-size: 2rem;
   color: #ffffff;
-  text-shadow: 0 0 1px #fff, 0 0 3px #fff; 
+  text-shadow: 0 0 1px #fff, 0 0 3px #fff;
   border: solid 1px #000;
   box-shadow: 0 0 3px #fff;
   backdrop-filter: blur(3px);
@@ -584,4 +609,9 @@ color {
 
 #restart-btn {
   left: auto;
+}
+
+color {
+  color: #ff2f00;
+  color: #ff5e2e;
 }
