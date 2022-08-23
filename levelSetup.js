@@ -9,7 +9,7 @@ class GameText {
 
   draw() {
     color();
-    font(`${this.text}px bold Arial, sans-serif`);
+    font(`${this.tSize}px bold Arial, sans-serif`);
     text(this.text, winw / 2, winh / 2, winw);
   }
 
@@ -52,7 +52,7 @@ class SetupLevel {
       winh / 1.03,
       this.padW,
       this.padH,
-      this.pSpeed
+      this.pSpeed,
     );
 
     this.text.push(new GameText(`Level ${this.level + 1}`, 30, 1000));
@@ -119,8 +119,8 @@ class SetupLevel {
 
         if (this.crcAndRectCollision(ball.x, ball.y, ball.r, obt.x, obt.y, obt.w, obt.h)) {
           const xy = this.collisionXorY(ball.x, ball.y, ball.r, obt.x, obt.y, obt.w, obt.h);
-          ball.x += (ball.px - ball.x) * 10;
-          ball.y += (ball.py - ball.y) * 10;
+          ball.x += (ball.px - ball.x) * 5;
+          ball.y += (ball.py - ball.y) * 5;
           xy == "x" && (ball.vx = -ball.vx);
           xy == "y" && (ball.vy = -ball.vy);
           obt.ht--;
@@ -141,11 +141,29 @@ class SetupLevel {
             if (random() < this.pRet) {
               const _l = ["💖", "life"];
               const _b = ["💊", "ball"];
-              const _s = ["🧭", "slow"];
+              const _s = ["⚡", "speed"];
               const prs = [_l, _b, _s, _b, _s];
 
               const one = prs[random(0, prs.length, true)];
-              this.powers.push(new Power(obt.x, obt.y, obt.w, one[0], one[1]));
+              const pow = new Power(obt.x, obt.y, obt.w, one[0], one[1]);
+              this.powers.push(pow);
+
+              const ln = random(20, 30);
+              for (let i = 0; i < ln; i++) {
+                const x = random(-5, 25);
+                const y = random(-15, 15);
+                const c = ["#f00", "#ff0", "#0f0", "#0ff"];
+                const rc = random(0, c.length - 1, true);
+                pow.particles.push(
+                  new Particle(
+                    x, y,
+                    c[rc], random(-1, 1),
+                    random(-1, 1),
+                    1,
+                    true
+                  )
+                );
+              }
             }
 
             // delete obstacle 
@@ -161,6 +179,16 @@ class SetupLevel {
                 ID("score-w").innerText = ` ${this.score}`;
               }, 500);
             }
+          } else {
+            // set distroy particle
+            const len = random(5, 15);
+            for (let j = 0; j < len; j++) {
+              this.particles.push(new Particle(
+                random(obt.x, obt.x + obt.w),
+                random(obt.y, obt.y + obt.h),
+                obt.cr[obt.ht]
+              ));
+            }
           }
           break;
         }
@@ -171,8 +199,8 @@ class SetupLevel {
         const block = this.blocks[i];
         if (this.crcAndRectCollision(ball.x, ball.y, ball.r, block.x, block.y, block.w, block.h)) {
           const xy = this.collisionXorY(ball.x, ball.y, ball.r, block.x, block.y, block.w, block.h);
-          ball.x += (ball.px - ball.x) * 10;
-          ball.y += (ball.py - ball.y) * 10;
+          ball.x += (ball.px - ball.x) * 5;
+          ball.y += (ball.py - ball.y) * 5;
           xy == "x" && (ball.vx = -ball.vx);
           xy == "y" && (ball.vy = -ball.vy);
           Sounds.hitWall();
@@ -184,8 +212,8 @@ class SetupLevel {
       const pad = this.pad;
       if (this.crcAndRectCollision(ball.x, ball.y, ball.r, pad.x, pad.y, pad.w, pad.h)) {
         const xy = this.collisionXorY(ball.x, ball.y, ball.r, pad.x, pad.y, pad.w, pad.h);
-        ball.x += (ball.px - ball.x) * 10;
-        ball.y += (ball.py - ball.y) * 10;
+        ball.x += (ball.px - ball.x) * 5;
+        ball.y += (ball.py - ball.y) * 5;
 
         if (xy == "y") {
           const collisionPoint = ball.x - (pad.x + pad.w / 2);
@@ -265,11 +293,13 @@ class SetupLevel {
           ));
         } else if (power.type === "life") {
           this.life++;
-        } else if (power.type === "slow" && this.bSpeed > 0.7) {
-          this.balls.forEach((e) => {
-            e.speed -= 0.05;
-          })
-          this.bSpeed -= 0.05;
+        } else if (power.type === "speed") {
+          this.pad.vx += 5;
+          this.pad.color = "#f00";
+          setTimeout(() => {
+            this.pad.color = "#fff";
+            this.pad.vx -= 5;
+          }, 10000)
         }
         break;
       }
@@ -301,7 +331,7 @@ class SetupLevel {
     this.blocks.forEach(block => { block.draw(); })
     this.powers.forEach(power => { power.draw(); })
     ID("helth").innerText = this.life;
-    ID("score").innerText = this.score; 
+    ID("score").innerText = this.score;
     this.text.forEach(txt => { !txt.complete && txt.draw(); })
   }
 

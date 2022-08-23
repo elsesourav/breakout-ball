@@ -6,6 +6,7 @@ class Pad {
     this.w = w;
     this.h = h;
     this.vx = speed;
+    this.color = "#fff";
     this.top = 5;
 
     this.ctl = new Control();
@@ -15,7 +16,7 @@ class Pad {
     color(255, 255, 1);
     strokeStyle(255, 255, 1);
     curve(this.x, this.y, this.x + this.w, this.y, 3, this.top, true);
-    color();
+    ctx.fillStyle = this.color;
     rect(this.x, this.y, this.w, this.h);
   }
 
@@ -41,7 +42,7 @@ class Ball {
   draw() {
     color();
     strokeStyle(255, 255, 0, 1);
-    arc(this.x, this.y, this.r, true, 1);
+    arc(this.x, this.y, this.r + 4, true, 1);
   }
 
   update() {
@@ -102,21 +103,22 @@ class Block {
 }
 
 class Particle {
-  constructor(x, y, color) {
+  constructor(x, y, color, vx = random(-2, 2), vy = random(-1, 3), r = random(4), sizeFix = false) {
     this.x = x;
     this.y = y;
     this.color = color;
-    this.r = random(4);
-    this.vx = random(-2, 2);
-    this.vy = random(-1, 3);
+    this.r = r;
+    this.vx = vx;
+    this.vy = vy;
+    this.sizeFix = sizeFix;
   }
 
-  draw() {
+  draw(x = 0, y = 0) {
     ctx.fillStyle = this.color;
-    arc(this.x, this.y, this.r);
+    arc(x + this.x, y + this.y, this.r);
     this.x += this.vx;
     this.y += this.vy;
-    this.r /= 1.03;
+    this.sizeFix || (this.r /= 1.03);
   }
 }
 
@@ -128,6 +130,7 @@ class Power {
     this.type = type;
     this.size = 15;
     this.vy = 4;
+    this.particles = [];
     this.text = text;
   }
 
@@ -135,5 +138,9 @@ class Power {
     font(`${this.size}px Arial`)
     text(this.text, (this.x + this.w / 2) - this.size / 2, (this.y + this.w / 2) - this.size / 2)
     this.y += this.vy;
+    console.log(this.particles);
+    this.particles.forEach(p => {
+      p.draw(this.x, this.y);
+    })
   }
 }
