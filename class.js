@@ -10,6 +10,9 @@ class Pad {
     this.top = 5;
 
     this.ctl = new Control();
+    setTimeout(() => {
+      this.ctl.gyroscope(this);
+    }, 1000);
   }
 
   draw() {
