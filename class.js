@@ -10,6 +10,9 @@ class Pad {
     this.top = 5;
 
     this.ctl = new Control();
+    setTimeout(() => {
+      this.ctl.gyroscope(this);
+    })
   }
 
   draw() {
@@ -77,6 +80,7 @@ class Obstacle {
 
 class Block {
   constructor(x, y, w, h, obj, scale) {
+    this.invisibel = false;
     this.scale = scale;
     this.x = x + this.scale;
     this.y = y + this.scale;

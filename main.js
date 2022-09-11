@@ -34,7 +34,9 @@ audioOpt.forEach(ao => {
   ao.addEventListener("click", () => {
     audioMuted = audioMuted ? false : true;
     backgroundAudio.muted = audioMuted;
-    ao.classList.toggle("active");
+    audioOpt.forEach((a) => {
+      a.classList.toggle("active", !audioMuted);
+    })
   })
 })
 
@@ -83,8 +85,7 @@ restartBtn.on("click", () => {
 
 function gameStart() {  animation(FPS, () => {
     if (lvl.run) {
-      clrScr();
-      fill();
+      background(0, 0, 0, 0.7);
       lvl.draw();
       lvl.update();
     }

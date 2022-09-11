@@ -23,6 +23,24 @@ class Control {
       this.right = false;
       this.left = false;
     })
-    
+  }
+
+  gyroscope(pad) {
+    if (window.DeviceOrientationEvent) {
+      console.log("gyro control");
+      window.addEventListener("deviceorientation", (e) => {
+        const {beta, gamma} = e;
+        const s = 10;
+        const g = (gamma * s * winw / 2) - pad.w / 2;
+
+        if (g >= 0 && winw - pad.w >= g) {
+          if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
+            pad.x = (winw - pad.w) - g;
+          } else {
+            pad.x = g;
+          }
+        }
+      }, false);
+    }
   }
 }
