@@ -49,7 +49,7 @@ class SetupLevel {
 
     this.pad = new Pad(
       winw / 2 - this.padW / 2,
-      winh / 1.03,
+      winh / 1.01,
       this.padW,
       this.padH,
       this.pSpeed,
@@ -89,25 +89,27 @@ class SetupLevel {
     }
   }
 
-  collisionXorY = (cx, cy, cr, rx, ry, rw, rh) => {
-    const extra = rw > rh ? rw - rh : rh - rw;
-    const right = Math.max(rx + rw, cx + cr);
-    const left = Math.min(rx, cx - cr);
-    const bottom = Math.max(ry + rh, cy + cr);
-    const top = Math.min(ry, cy - cr);
+  circleAndRectCollision = (cir, rect) => {
+    const { x, y, w, h } = rect;
+    let cx = cir.x, cy = cir.y, cr = cir.r;
 
-    const vartical = rw > rh ? (right - left) - extra : right - left;
-    const horizontal = rw < rh ? (bottom - top) - extra : bottom - top;
+    if (x <= cx + cr && x + w >= cx - cr &&
+      y <= cy + cr && y + h >= cy - cr) {
 
-    return vartical > horizontal ? "x" : "y";
+      const extra = w > h ? w - h : h - w;
+      const right = Math.max(x + w, cx + cr);
+      const left = Math.min(x, cx - cr);
+      const bottom = Math.max(y + h, cy + cr);
+      const top = Math.min(y, cy - cr);
+
+      const vartical = w > h ? (right - left) - extra : right - left;
+      const horizontal = w < h ? (bottom - top) - extra : bottom - top;
+
+      return vartical > horizontal ? "x" : "y";
+    }
+    return null;
   }
 
-  crcAndRectCollision = (cx, cy, cr, rx, ry, rw, rh) => {
-    return (rx <= cx + cr &&
-      rx + rw >= cx - cr &&
-      ry <= cy + cr &&
-      ry + rh >= cy - cr);
-  }
 
   collision() {
     for (let _i = 0; _i < this.balls.length; _i++) {
@@ -116,13 +118,12 @@ class SetupLevel {
       // obstacle collision
       for (let i = 0; i < this.obstacles.length; i++) {
         const obt = this.obstacles[i];
-
-        if (this.crcAndRectCollision(ball.x, ball.y, ball.r, obt.x, obt.y, obt.w, obt.h)) {
-          const xy = this.collisionXorY(ball.x, ball.y, ball.r, obt.x, obt.y, obt.w, obt.h);
+        const __is__ = this.circleAndRectCollision(ball, obt);
+        if (__is__) {
           ball.x += (ball.px - ball.x) * 5;
           ball.y += (ball.py - ball.y) * 5;
-          xy == "x" && (ball.vx = -ball.vx);
-          xy == "y" && (ball.vy = -ball.vy);
+          __is__ == "x" && (ball.vx = -ball.vx);
+          __is__ == "y" && (ball.vy = -ball.vy);
           obt.ht--;
           this.score += 5;
 
@@ -197,25 +198,30 @@ class SetupLevel {
       // block collution
       for (let i = 0; i < this.blocks.length; i++) {
         const block = this.blocks[i];
-        if (this.crcAndRectCollision(ball.x, ball.y, ball.r, block.x, block.y, block.w, block.h)) {
-          const xy = this.collisionXorY(ball.x, ball.y, ball.r, block.x, block.y, block.w, block.h);
+        if (block.invisibel) continue;
+        const __is__ = this.circleAndRectCollision(ball, block);
+        if (__is__) {
           ball.x += (ball.px - ball.x) * 5;
           ball.y += (ball.py - ball.y) * 5;
-          xy == "x" && (ball.vx = -ball.vx);
-          xy == "y" && (ball.vy = -ball.vy);
+          __is__ == "x" && (ball.vx = -ball.vx);
+          __is__ == "y" && (ball.vy = -ball.vy);
           Sounds.hitWall();
+          block.invisibel = true;
+          setTimeout(() => {
+            block.invisibel = false;
+          }, 100);
           break;
         }
       }
 
       // game pad collision
       const pad = this.pad;
-      if (this.crcAndRectCollision(ball.x, ball.y, ball.r, pad.x, pad.y, pad.w, pad.h)) {
-        const xy = this.collisionXorY(ball.x, ball.y, ball.r, pad.x, pad.y, pad.w, pad.h);
+      const __is__ = this.circleAndRectCollision(ball, pad);
+      if (__is__) {
         ball.x += (ball.px - ball.x) * 5;
         ball.y += (ball.py - ball.y) * 5;
 
-        if (xy == "y") {
+        if (__is__ == "y") {
           const collisionPoint = ball.x - (pad.x + pad.w / 2);
           let angle = collisionPoint / (pad.w / 2);
           angle = angle * PI / 3;

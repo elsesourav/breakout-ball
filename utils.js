@@ -92,6 +92,23 @@ const strokeStyle = (r = false, g = false, b = false, a = false) => {
   }
 }
 
+const background = (r = false, g = false, b = false, a = false) => {
+  if (typeof a === "number") {
+    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
+  } else if (typeof b === "number") {
+    ctx.fillStyle = `rgba(${r}, ${g}, ${0}, ${b})`;
+  } else if (typeof g === "number") {
+    ctx.fillStyle = `rgba(${r}, ${0}, ${0}, ${g})`;
+  } else if (typeof r === "string") {
+    ctx.fillStyle = r;
+  } else if (typeof r === "number") {
+    ctx.fillStyle = `rgba(${r}, ${r}, ${r}, ${1})`;
+  } else {
+    ctx.fillStyle = `rgba(${0}, ${0}, ${0}, ${1})`;
+  }
+  ctx.fillRect(0, 0, cvs.width, cvs.height);
+}
+
 const clrScr = () => {
   ctx.clearRect(0, 0, cvs.width, cvs.height);
 }

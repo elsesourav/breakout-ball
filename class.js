@@ -12,7 +12,11 @@ class Pad {
     this.ctl = new Control();
     setTimeout(() => {
       this.ctl.gyroscope(this);
+<<<<<<< HEAD
+    })
+=======
     }, 1000);
+>>>>>>> 4de1e8c8d074b54d48d49074e8ca656ffa7b865d
   }
 
   draw() {
@@ -80,6 +84,7 @@ class Obstacle {
 
 class Block {
   constructor(x, y, w, h, obj, scale) {
+    this.invisibel = false;
     this.scale = scale;
     this.x = x + this.scale;
     this.y = y + this.scale;
