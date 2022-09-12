@@ -9,12 +9,12 @@ const scrollList = ID("scroll-list");
 const play = _$(".play")[0];
 hover(play)
 
-
+const gyroOpt = _$(".gyro-opt");
 const audioOpt = _$(".audio-opt");
 audioOpt.forEach(ao => {
   hover(ao);
 })
-
+hover(gyroOpt[0]);
 
 // set levels 
 let levels = [];
@@ -38,8 +38,30 @@ audioOpt.forEach(ao => {
       a.classList.toggle("active", !audioMuted);
     })
   })
+});
+
+const settingClose = ID("setting-close");
+const setting = ID("setting");
+const settingOpen = ID("setting-open");
+
+
+gyroOpt[0].addEventListener("click", () => {
+  useGyro = useGyro ? false : true;
+  console.log(useGyro);
+  gyroOpt[0].classList.toggle("active", !useGyro);
 })
 
+settingOpen.addEventListener("click", () => {
+  setting.classList.add("active");
+})
+hover(settingOpen);
+
+hover(settingClose);
+settingClose.addEventListener("click", () => {
+  setTimeout(() => {
+    setting.classList.remove("active");
+  }, 100);
+})
 
 let currentLevel;
 let currentLevelIndex;
@@ -60,7 +82,7 @@ pous.on("click", () => {
   touchFild.classList.add("active");
   lvl.run = false;
   play.classList.add("active");
-})
+});
 
 function setup() {
   levelWindow.classList.toggle("active", false);

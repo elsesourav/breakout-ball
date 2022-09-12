@@ -14,6 +14,7 @@ ctx.fillStyle = "#000";
 ctx.fillRect(0, 0, winw, winh);
 ctx.scale(SCALE, SCALE);
 
+
 //  resize windwo 
 let winWidth = window.innerWidth;
 let winHeight = window.innerHeight;

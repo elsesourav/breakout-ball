@@ -54,6 +54,8 @@ class SetupLevel {
       this.padH,
       this.pSpeed,
     );
+    
+    
 
     this.text.push(new GameText(`Level ${this.level + 1}`, 30, 1000));
     setTimeout(() => {
@@ -64,7 +66,7 @@ class SetupLevel {
         this.bSpeed,
         this
       ));
-    }, 1000)
+    }, 1000);
   }
 
   createObstacles() {
