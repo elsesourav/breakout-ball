@@ -30,15 +30,16 @@ class Pad {
 }
 
 class Ball {
-  constructor(x, y, r, speed, setupLevel) {
+  constructor(x, y, r, speed, setupLevel, onlyY = true) {
     this.x = x;
     this.y = y;
     this.r = r;
     this.px = this.x;
     this.py = this.y;
-    this.speed = speed / 5;
+    this.s = speed;
+    this.speed = this.s / 5;
     this.vx = this.speed * random(-1, 1);
-    this.vy = -this.speed;
+    this.vy = onlyY ? -this.speed : -this.speed * (random() > 0.5 ? 1 : -1);
     this.setupLevel = setupLevel;
   }
 

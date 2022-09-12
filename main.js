@@ -30,15 +30,34 @@ setLevels();
 
 const FPS = 60;
 
+let mutedClick = false;
 audioOpt.forEach(ao => {
   ao.addEventListener("click", () => {
     audioMuted = audioMuted ? false : true;
+    mutedClick = audioMuted;
     backgroundAudio.muted = audioMuted;
     audioOpt.forEach((a) => {
       a.classList.toggle("active", !audioMuted);
     })
   })
 });
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    audioMuted = true;
+    backgroundAudio.muted = audioMuted;
+    audioOpt.forEach((a) => {
+      a.classList.toggle("active", !audioMuted);
+    })
+  } else {
+    if (mutedClick) return;
+    audioMuted = false;
+    backgroundAudio.muted = audioMuted;
+    audioOpt.forEach((a) => {
+      a.classList.toggle("active", !audioMuted);
+    })
+  }
+})
 
 const settingClose = ID("setting-close");
 const setting = ID("setting");

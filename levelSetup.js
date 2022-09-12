@@ -293,12 +293,13 @@ class SetupLevel {
           this.particles.push(new Particle(power.x + power.w / 2, power.y, "#0ff"));
 
         if (power.type === "ball") {
-          this.balls.push(new Ball(
-            this.pad.x + this.padW / 2,
-            this.pad.y - this.padH * 2,
-            this.bSize,
-            this.bSpeed
-          ));
+          let temp = [];
+          this.balls.forEach(ball => {
+            temp.push(new Ball(ball.x, ball.y, ball.r, ball.s, ball.setupLevel, false))
+          })
+          temp.forEach(ball => {
+            this.balls.push(ball);
+          })
         } else if (power.type === "life") {
           this.life++;
         } else if (power.type === "speed") {
