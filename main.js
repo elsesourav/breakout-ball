@@ -16,12 +16,28 @@ audioOpt.forEach(ao => {
 })
 hover(gyroOpt[0]);
 
+let winLevels = [];
+
+try {
+  winLevels = getDataToLocalStorage("teamSourav-bb");
+} catch (error) {
+  gameMaps.forEach(() => {
+    winLevels.push({win: false, score: 0});
+    setDataToLocalStorage("teamSourav-bb", winLevels);
+  });
+  console.log("no-data first time open"); 
+}
+
+
 // set levels 
 let levels = [];
 function setLevels() {
   scrollList.innerHTML = "";
   for (let i = 0; i < gameMaps.length; i++) {
-    const lvl = createEle("div", "level", scrollList, `<span>🌟</span><p>${i + 1}</p>`);
+    const lvl = createEle("div", "level", scrollList, `<span>🌟</span><p>${i + 1}</p> ${winLevels[i].score && `<h4>🎖${winLevels[i].score}</h4>`}`);
+    if (winLevels[i].win) {
+      lvl.classList.add("win");
+    }
     hover(lvl);
     levels.push(lvl);
   }
@@ -123,7 +139,7 @@ restartBtn.on("click", () => {
 gameStart();
 function gameStart() {  animation(FPS, () => {
     if (lvl && lvl.run) {
-      background(0, 0, 0, 0.7);
+      background(0, 0, 0, 0.6);
       lvl.draw();
       lvl.update();
     }

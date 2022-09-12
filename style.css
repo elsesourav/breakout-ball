@@ -330,6 +330,9 @@ canvas {
   display: grid;
   place-items: center;
 }
+#scroll-list .level.win {
+  background: #fffa;
+}
 #scroll-list .level span {
   position: absolute;
   transform: translateY(-1px);
@@ -343,6 +346,20 @@ canvas {
   color: #fff;
   text-shadow: 0 0 2px #000, 0 0 3px #000, 0 0 1px #000, 0 0 6px #000;
   border-radius: 100px;
+}
+#scroll-list .level h4{
+  position: absolute;
+  bottom: -20px;
+  width: 70px;
+  text-align: center;
+  border-radius: 15px;
+  padding: 2px;
+  background: #000e;
+  box-shadow: 2px 0 2px #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  font-weight: 500; 
+  color: #ffff;
 }
 
 .hover-n, .hover-n::after, .hover-n::before {

@@ -31,16 +31,16 @@ class Control {
       console.log("gyro control");
       window.addEventListener("deviceorientation", (e) => {
         const {beta, gamma} = e;
-        const s = 10;
-        const g = (gamma * s * winw / 2) - pad.w / 2;
-        if (g >= 0 && winw - pad.w >= g) {
+        
+        const g = map(gamma * 10, -winw / 2, winw / 2, 0, winw - pad.w / (2 * SCALE));
+        if (gyro && 0 <= g && winw - pad.w >= g) {
           if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
             pad.x = (winw - pad.w) - g;
           } else {
             pad.x = g;
           }
         }
-      }, false);
+      });
     }
   }
 }

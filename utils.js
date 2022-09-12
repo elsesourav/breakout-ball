@@ -3,7 +3,7 @@ const SCALE = 4;
 const winw = 350;
 const winh = 620;
 const cvs = document.createElement("canvas");
-document.body.appendChild(cvs); 
+document.body.appendChild(cvs);
 cvs.setAttribute("width", winw * SCALE);
 cvs.setAttribute("height", winh * SCALE);
 cvs.style.width = `${winw}px`;
@@ -295,7 +295,7 @@ function hover(element) {
   });
   element.addEventListener("mouseleave", () => {
     !isMobile && removeHover();
-  }); 
+  });
 }
 
 
@@ -304,4 +304,12 @@ const animation = (fps, fun) => {
     fun();
     animation(fps, fun);
   }, 1000 / fps)
+}
+
+function setDataToLocalStorage(key, object) {
+  var data = JSON.stringify(object);
+  localStorage.setItem(key, data);
+}
+function getDataToLocalStorage(key) {
+  return JSON.parse(localStorage.getItem(key))
 }

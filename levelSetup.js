@@ -176,6 +176,10 @@ class SetupLevel {
             // check level is conplete 
             if (this.obstacles.length <= 0) {
               Sounds.win();
+              if (winLevels[this.level].score < this.score) {
+                winLevels[this.level].score = this.score;
+                setDataToLocalStorage("teamSourav-bb", winLevels);
+              }
               setTimeout(() => {
                 this.run = false;
                 ID("win-window").classList.add("active");
