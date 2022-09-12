@@ -270,31 +270,34 @@ const createEle = (elementName, className = null, appendParentName = null, inrHt
   return e;
 }
 
+const isMobile = localStorage.mobile || window.navigator.maxTouchPoints > 1;
+function hover(element) {
+  element.classList.add("hover-n");
+  element.classList.remove("hover");
 
-function hover(element, name = "hover") {
-  const namerun = `${name}-n`
-  element.classList.add(namerun);
-  element.classList.remove(name);
   const addHover = () => {
-    element.classList.add(name);
-    element.classList.remove(namerun);
+    element.classList.add("hover");
+    element.classList.remove("hover-n");
   }
   const removeHover = () => {
-    element.classList.remove(name);
-    element.classList.add(namerun);
+    element.classList.remove("hover");
+    element.classList.add("hover-n");
   }
-  element.addEventListener("touchstart", addHover);
-  element.addEventListener("mouseenter", addHover);
+  element.addEventListener("touchstart", () => {
+    isMobile && addHover();
+  });
+  element.addEventListener("mouseenter", () => {
+    !isMobile && addHover();
+  });
 
-  element.addEventListener("touchend", removeHover);
-  element.addEventListener("mouseleave", removeHover);
+  element.addEventListener("touchend", () => {
+    isMobile && removeHover();
+  });
+  element.addEventListener("mouseleave", () => {
+    !isMobile && removeHover();
+  }); 
 }
 
-window.onload = () => {
-  document.querySelectorAll(".hover").forEach((h) => {
-    hover(h);
-  })
-}
 
 const animation = (fps, fun) => {
   setTimeout(() => {

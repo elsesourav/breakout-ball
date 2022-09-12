@@ -60,7 +60,7 @@ hover(settingClose);
 settingClose.addEventListener("click", () => {
   setTimeout(() => {
     setting.classList.remove("active");
-  }, 100);
+  }, 200);
 })
 
 let currentLevel;

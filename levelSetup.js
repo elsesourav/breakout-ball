@@ -143,7 +143,7 @@ class SetupLevel {
             // set powers points
             if (random() < this.pRet) {
               const _l = ["💖", "life"];
-              const _b = ["💊", "ball"];
+              const _b = ["🎭", "ball"];
               const _s = ["⚡", "speed"];
               const prs = [_l, _b, _s, _b, _s];
 
