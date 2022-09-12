@@ -11,7 +11,7 @@ class Pad {
 
     this.ctl = new Control();
     setTimeout(() => {
-      this.ctl.gyroscope(this, useGyro);
+      useGyro && this.ctl.gyroscope(this);
     }, 1000);
   }
 

@@ -19,13 +19,21 @@ hover(gyroOpt[0]);
 let winLevels = [];
 
 try {
-  winLevels = getDataToLocalStorage("teamSourav-bb");
+  let temp = getDataToLocalStorage("teamSourav-bb");
+  if (temp.length === gameMaps.length) {
+    winLevels = temp;
+  } else {
+    gameMaps.forEach(() => {
+      winLevels.push({ win: false, score: 0 });
+    });
+    setDataToLocalStorage("teamSourav-bb", winLevels);
+  }
 } catch (error) {
   gameMaps.forEach(() => {
-    winLevels.push({win: false, score: 0});
+    winLevels.push({ win: false, score: 0 });
     setDataToLocalStorage("teamSourav-bb", winLevels);
   });
-  console.log("no-data first time open"); 
+  console.log("no-data first time open");
 }
 
 
@@ -137,7 +145,8 @@ restartBtn.on("click", () => {
   setup();
 });
 gameStart();
-function gameStart() {  animation(FPS, () => {
+function gameStart() {
+  animation(FPS, () => {
     if (lvl && lvl.run) {
       background(0, 0, 0, 0.6);
       lvl.draw();
@@ -152,12 +161,12 @@ ID("menu").on("click", () => {
   lvl.run = false;
   winWindow.classList.remove("active");
   levelWindow.classList.toggle("active", true);
-}) 
+})
 hover(ID("rs-w"));
 ID("rs-w").on("click", () => {
   winWindow.classList.remove("active");
   setup();
-}) 
+})
 
 play.addEventListener("click", () => {
   play.classList.remove("active");

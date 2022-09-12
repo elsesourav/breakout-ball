@@ -26,14 +26,13 @@ class Control {
     })
   }
 
-  gyroscope(pad, gyro) {
+  gyroscope(pad) {
     if (window.DeviceOrientationEvent) {
-      console.log("gyro control");
       window.addEventListener("deviceorientation", (e) => {
         const {beta, gamma} = e;
         
         const g = map(gamma * 10, -winw / 2, winw / 2, 0, winw - pad.w / (2 * SCALE));
-        if (gyro && 0 <= g && winw - pad.w >= g) {
+        if (0 <= g && winw - pad.w >= g) {
           if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
             pad.x = (winw - pad.w) - g;
           } else {

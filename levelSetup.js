@@ -178,7 +178,9 @@ class SetupLevel {
               Sounds.win();
               if (winLevels[this.level].score < this.score) {
                 winLevels[this.level].score = this.score;
+                winLevels[this.level].win = true;
                 setDataToLocalStorage("teamSourav-bb", winLevels);
+                setLevels();
               }
               setTimeout(() => {
                 this.run = false;
