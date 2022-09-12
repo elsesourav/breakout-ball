@@ -409,13 +409,13 @@ canvas {
   text-transform: uppercase;
   color: #ffffff;
   display: grid;
-  grid-template-columns: 10fr 2fr;
+  grid-template-columns: 10fr 1fr;
   border-bottom: solid 1px #999999;
 }
 #setting-title #setting-close {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   border-radius: 10px;
   background: #ffffff33;
   display: grid;
@@ -428,7 +428,7 @@ canvas {
   width: 10%;
   height: 80%;
   border-radius: 5px;
-  background: #fff;
+  background: #ff0000;
   rotate: 45deg;
 }
 
@@ -468,16 +468,16 @@ canvas {
   font-size: 1.8rem;
 }
 .audio-opt span:last-child,
-.gyro-opt span:last-child,
 .audio-opt.active span:first-child,
-.gyro-opt.active span:first-child{
+.gyro-opt span:first-child,
+.gyro-opt.active span:last-child {
   display: block;
 }
 
 .audio-opt span:first-child,
 .audio-opt.active span:last-child,
-.gyro-opt span:first-child,
-.gyro-opt.active span:last-child {
+.gyro-opt span:last-child,
+.gyro-opt.active span:first-child {
   display: none;
 }
 

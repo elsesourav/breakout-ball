@@ -47,7 +47,6 @@ const settingOpen = ID("setting-open");
 
 gyroOpt[0].addEventListener("click", () => {
   useGyro = useGyro ? false : true;
-  console.log(useGyro);
   gyroOpt[0].classList.toggle("active", !useGyro);
 })
 
@@ -65,14 +64,13 @@ settingClose.addEventListener("click", () => {
 
 let currentLevel;
 let currentLevelIndex;
-let lvl;
+let lvl = null;
 
-levels.forEach((lvl, i) => {
-  lvl.addEventListener("click", () => {
+levels.forEach((l, i) => {
+  l.addEventListener("click", () => {
     currentLevel = gameMaps[i];
     currentLevelIndex = i;
     setup();
-    gameStart();
   })
 });
 
@@ -103,10 +101,9 @@ restartBtn.on("click", () => {
   play.classList.remove("active");
   setup();
 });
-
-
+gameStart();
 function gameStart() {  animation(FPS, () => {
-    if (lvl.run) {
+    if (lvl && lvl.run) {
       background(0, 0, 0, 0.7);
       lvl.draw();
       lvl.update();
