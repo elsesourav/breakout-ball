@@ -144,7 +144,7 @@ class SetupLevel {
             if (random() < this.pRet) {
               const _l = ["💖", "life"];
               const _b = ["🎭", "ball"];
-              const _s = ["⚡", "speed"];
+              const _s = ["⚜", "big_pad"];
               const prs = [_l, _b, _s, _b, _s];
 
               const one = prs[random(0, prs.length, true)];
@@ -308,12 +308,16 @@ class SetupLevel {
           })
         } else if (power.type === "life") {
           this.life++;
-        } else if (power.type === "speed") {
-          this.pad.vx += 5;
-          this.pad.color = "#f00";
+        } else if (power.type === "big_pad") {
+          this.pad.w += 20;
+          this.pad.x -= 10;
+          this.pad.color = "#ff0";
+          this.pad.lastPowerUse = new Date();
           setTimeout(() => {
-            this.pad.color = "#fff";
-            this.pad.vx -= 5;
+            let dt = new Date();
+            if (dt - this.pad.lastPowerUse >= 10000)  this.pad.color = "#fff";
+            this.pad.w -= 20;
+            this.pad.x += 10;
           }, 10000)
         }
         break;

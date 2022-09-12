@@ -8,6 +8,7 @@ class Pad {
     this.vx = speed;
     this.color = "#fff";
     this.top = 5;
+    this.lastPowerUse;
 
     this.ctl = new Control();
     setTimeout(() => {
