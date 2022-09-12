@@ -33,10 +33,6 @@ class Control {
         const {beta, gamma} = e;
         const s = 10;
         const g = (gamma * s * winw / 2) - pad.w / 2;
-<<<<<<< HEAD
-=======
-
->>>>>>> 89b360a833f872fc6741c26320f409d0bce32b44
         if (g >= 0 && winw - pad.w >= g) {
           if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
             pad.x = (winw - pad.w) - g;
