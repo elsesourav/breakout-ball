@@ -401,8 +401,8 @@ canvas {
   position: absolute;
   width: 300px;
   min-height: 200px; 
-  right: calc(50vw - 160px);
-  bottom: calc(50vh - 105px);
+  right: -40vw;
+  bottom: -15vh;
   display: grid;
   grid-template-rows: 10fr 8fr 8fr 2fr;
   place-items: center;
@@ -412,9 +412,11 @@ canvas {
   background: rgba(40, 42, 56, 0.99);
   backdrop-filter: blur(3px);
   scale: 0;
-  transition: 0.3s linear scale;
+  transition: 0.3s linear all;
 }
 #setting.active #setting-window {
+  right: calc(50vw - 160px);
+  bottom: calc(50vh - 105px);
   scale: 1;
 }
 #setting-title {

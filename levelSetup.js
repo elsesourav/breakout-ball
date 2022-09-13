@@ -54,8 +54,8 @@ class SetupLevel {
       this.padH,
       this.pSpeed,
     );
-    
-    
+
+
 
     this.text.push(new GameText(`Level ${this.level + 1}`, 30, 1000));
     setTimeout(() => {
@@ -144,8 +144,9 @@ class SetupLevel {
             if (random() < this.pRet) {
               const _l = ["💖", "life"];
               const _b = ["🎭", "ball"];
-              const _s = ["⚜", "big_pad"];
-              const prs = [_l, _b, _s, _b, _s];
+              const _bp = ["⚜", "big_pad"];
+              const _bb = ["🌌", "big_ball"];
+              const prs = [_l, _b, _bp, _b, _bp, _bb, _bb];
 
               const one = prs[random(0, prs.length, true)];
               const pow = new Power(obt.x, obt.y, obt.w, one[0], one[1]);
@@ -301,7 +302,7 @@ class SetupLevel {
         if (power.type === "ball") {
           let temp = [];
           this.balls.forEach(ball => {
-            temp.push(new Ball(ball.x, ball.y, ball.r, ball.s, ball.setupLevel, false))
+            temp.push(new Ball(ball.x, ball.y, ball.fr, ball.s, ball.setupLevel, false))
           })
           temp.forEach(ball => {
             this.balls.push(ball);
@@ -315,10 +316,22 @@ class SetupLevel {
           this.pad.lastPowerUse = new Date();
           setTimeout(() => {
             let dt = new Date();
-            if (dt - this.pad.lastPowerUse >= 10000)  this.pad.color = "#fff";
+            if (dt - this.pad.lastPowerUse >= 10000) this.pad.color = "#fff";
             this.pad.w -= 20;
             this.pad.x += 10;
           }, 10000)
+        } else if (power.type === "big_ball") {
+          this.balls.forEach(ball => {
+            ball.r += 3;
+            ball.color = "#0000ff";
+            ball.lastPowerUse = new Date();
+            setTimeout(() => {
+              let dt = new Date();
+              if (dt - ball.lastPowerUse >= 10000)
+                ball.color = "#ffffff";
+              ball.r -= 3;
+            }, 10000)
+          })
         }
         break;
       }
