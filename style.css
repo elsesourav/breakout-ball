@@ -411,13 +411,13 @@ canvas {
   border: solid 1px #999999;
   background: rgba(40, 42, 56, 0.99);
   backdrop-filter: blur(3px);
-  scale: 0;
+  transform: scale(0);
   transition: 0.3s linear all;
 }
 #setting.active #setting-window {
   right: calc(50vw - 160px);
   bottom: calc(50vh - 105px);
-  scale: 1;
+  transform: scale(1);
 }
 #setting-title {
   position: relative;
