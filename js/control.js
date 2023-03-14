@@ -24,6 +24,14 @@ class Control {
       pad.x = e.touches[0].clientX - bound.left - pad.w / 2;
     })
 
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        touchFild.classList.add("active");
+        lvl.run = false;
+        play.classList.add("active");
+      }
+    })
+
   }
 
   gyroscope() {
