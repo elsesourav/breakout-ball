@@ -4,15 +4,17 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" type="image/png" href="src/img/icon_icon_icon_.png">
     <title>Breakout Ball</title>
+    <link rel="stylesheet" href="icons/css/icon.css">
     <link rel="stylesheet" href="style.css" />
-    <script defer src="utils.js"></script>
-    <script defer src="audio.js"></script>
-    <script defer src="map.js"></script>
-    <script defer src="control.js"></script>
-    <script defer src="class.js"></script>
-    <script defer src="levelSetup.js"></script>
-    <script defer src="main.js"></script>
+    <script defer src="js/utils.js"></script>
+    <script defer src="js/audio.js"></script>
+    <script defer src="js/map.js"></script>
+    <script defer src="js/control.js"></script>
+    <script defer src="js/class.js"></script>
+    <script defer src="js/levelSetup.js"></script>
+    <script defer src="js/main.js"></script>
   </head>
   <body>
     <div id="option">
@@ -20,7 +22,7 @@
         💖
         <p id="helth">3</p>
       </div>
-      <div id="pous-icon">⏸</div>
+      <div id="pous-icon"><i class="sbi-motion_photos_paused"></i></div>
       <div id="score-icon">
         <p id="score">100</p>
         🎖
@@ -42,29 +44,33 @@
           <p></p>
         </div>
       </div>
-      <div class="copy-r-l"><x>&#169;</x> TeamSourav2022</div>
+      <div class="copy-r-l"><x>&#169;</x> SouravBarui2023</div>
     </div>
     <div id="level-window" class="active">
       <div class="title">
-        T<br />E<br />A<br />M<br /><br />S<br />T<br />A<br />R<br />S
+        T<br />E<br />A<br />M<br /><br />S<br />O<br />U<br />R<br />A<br />V
       </div>
 
       <div id="setting">
-        <div id="setting-open">🕹</div>
+        <div id="setting-open">
+          <i class="sbi-settings"></i>
+        </div>
         <div id="setting-window">
-          <div id="setting-title">Setting <div id="setting-close"></div></div>
+          <div id="setting-title">Setting <div id="setting-close">
+            <i class="sbi-highlight_remove"></i>
+          </div></div>
           <div class="audio-opt active">
             <p>Audio</p>
             <div>
-              <span>🔊</span>
-              <span>🔇</span>
+              <span><i class="sbi-volume_up"></i></span>
+              <span><i class="sbi-volume_off"></i></span>
             </div>
           </div>
-          <div class="gyro-opt">
+          <div class="gyro-opt active">
             <p>Gyroscope</p>
             <div>
-              <span>📱</span>
-              <span>📴</span>
+              <span><i class="sbi-mobile_friendly"></i></i></span>
+              <span><i class="sbi-mobile_off"></i></span>
             </div>
           </div>
         </div>
@@ -73,12 +79,12 @@
       <div id="scroll-list"></div>
     </div>
     <div id="touch-fild" class="">
-      <div class="play"></div>
-      <div id="loby-btn">↩</div>
-      <div id="restart-btn">↻</div>
+      <div class="play"><i class="sbi-play_circle_outline"></i></div>
+      <div id="loby-btn"><i class="sbi-back"></i></div>
+      <div id="restart-btn"><i class="sbi-autorenew"></i></div>
       <div class="audio-opt active">
-        <span>🔊</span>
-        <span>🔇</span>
+        <span><i class="sbi-volume_up"></i></span>
+        <span><i class="sbi-volume_off"></i></span>
       </div>
     </div>
     <div id="win-window" class="">
@@ -86,8 +92,8 @@
         <div class="win-title">✨Win✨</div>
         <p>SCORE : <x id="score-w">0</x></p>
         <span>
-          <div id="menu">↩ MENU</div>
-          <div id="rs-w">↻ RESTART</div>
+          <div id="menu"><i class="sbi-back"></i> MENU</div>
+          <div id="rs-w"><i class="sbi-autorenew"></i> RESTART</div>
         </span>
       </div>
     </div>
@@ -95,7 +101,7 @@
       <div class="box">
         <div id="go-title">💫Game Over!💫</div>
         <p>SCORE : <x id="score-r">0</x></p>
-        <div id="rs-r">↻ RESTART</div>
+        <div id="rs-r"><i class="sbi-autorenew"></i> RESTART</div>
       </div>
     </div>
   </body>

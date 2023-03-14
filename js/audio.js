@@ -295,9 +295,9 @@ const Sounds = {
 }
 
 const backgroundAudio = new Audio()
-backgroundAudio.volume = 0.3; 
 
-backgroundAudio.src = "back.mp3";
+backgroundAudio.src = "src/audio/back.mp3";
+backgroundAudio.volume = 0.1; 
 document.addEventListener("click", () => {
   backgroundAudio.play();
   backgroundAudio.loop = true;

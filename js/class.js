@@ -10,9 +10,9 @@ class Pad {
     this.top = 5;
     this.lastPowerUse;
 
-    this.ctl = new Control();
+    this.ctl = new Control(this, cvs);
     setTimeout(() => {
-      useGyro && this.ctl.gyroscope(this);
+      useGyro && this.ctl.gyroscope();
     }, 1000);
   }
 

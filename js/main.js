@@ -22,7 +22,6 @@ try {
   let temp = getDataToLocalStorage("teamSourav-bb");
   if (temp.length === gameMaps.length) {
     winLevels = temp;
-    console.log(winLevels);
   } else {
     gameMaps.forEach(() => {
       winLevels.push({ win: false, score: 0 });
