@@ -70,31 +70,31 @@ class Obstacle {
     this.y = y;
     this.w = w;
     this.h = h;
-    this.ht = obj.helth;
+    this.ht = obj.health;
     this.cr = obj.color;
     this.sk = obj.stroke;
-    this.boder = 2;
+    this.border = 2;
   }
 
   draw() {
     ctx.fillStyle = this.cr[this.ht - 1];
     ctx.strokeStyle = this.sk[this.ht - 1];
-    rect(this.x, this.y, this.w, this.h, true, this.boder);
+    rect(this.x, this.y, this.w, this.h, true, this.border);
   }
 }
 
 class Block {
   constructor(x, y, w, h, obj, scale) {
-    this.invisibel = false;
+    this.invisible = false;
     this.scale = scale;
     this.x = x + this.scale;
     this.y = y + this.scale;
     this.w = w - this.scale * 2;
     this.h = h - this.scale * 2;
-    this.ht = obj.helth;
+    this.ht = obj.health;
     this.cr = obj.color;
     this.sk = obj.stroke;
-    this.boder = 2;
+    this.border = 2;
   }
 
   draw() {
@@ -106,7 +106,7 @@ class Block {
       this.w + this.scale * 2,
       this.h + this.scale * 2,
       true,
-      this.boder
+      this.border
     );
   }
 }

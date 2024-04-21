@@ -26,12 +26,11 @@ class Control {
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") {
-        touchFild.classList.add("active");
+        touchField.classList.add("active");
         lvl.run = false;
         play.classList.add("active");
       }
     })
-
   }
 
   gyroscope() {

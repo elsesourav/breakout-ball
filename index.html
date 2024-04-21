@@ -4,40 +4,27 @@
       <meta charset="UTF-8" />
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link
-         rel="shortcut icon"
-         type="image/png"
-         href="src/img/icon_icon_icon_.png"
-      />
+      <link rel="shortcut icon" type="image/png" href="src/img/icon.png" />
       <title>Breakout Ball</title>
       <link rel="stylesheet" href="icons/css/icon.css" />
-      <link rel="stylesheet" href="style.css" />
+      <link rel="stylesheet" href="icons/css/font.css" />
+      <!-- <link rel="stylesheet" href="./style.css" /> -->
+      <link rel="stylesheet" href="./css/home.css" />
+      <link rel="stylesheet" href="./css/game-designer.css" />
+      <link rel="stylesheet" href="./css/lavel.css" />
       <script defer src="js/utils.js"></script>
-      <script defer src="js/audio.js"></script>
-      <script defer src="js/map.js"></script>
-      <script defer src="js/control.js"></script>
-      <script defer src="js/class.js"></script>
-      <script defer src="js/levelSetup.js"></script>
+      <!-- <script defer src="js/audio.js"></script> -->
+      <!-- <script defer src="js/map.js"></script> -->
+      <!-- <script defer src="js/control.js"></script> -->
+      <!-- <script defer src="js/class.js"></script> -->
+      <!-- <script defer src="js/levelSetup.js"></script> -->
+
+      <script defer src="js/particle.js"></script>
+      <script defer src="js/block.js"></script>
       <script defer src="js/main.js"></script>
    </head>
    <body>
-      <div id="option">
-         <div id="helth-icon">
-            💖
-            <p id="helth">3</p>
-         </div>
-         <div id="pous-icon">
-            <i class="sbi-motion_photos_paused"></i>
-         </div>
-         <div id="score-icon">
-            <p id="score">100</p>
-            🎖
-         </div>
-      </div>
-      
-      <!-- canvas -->
-
-      <div id="loading-window" class="active">
+      <!-- <div id="loading-window" class="active">
          <div id="loadeing-circle">
             <div class="lds-roller">
                <p></p>
@@ -50,69 +37,164 @@
             </div>
          </div>
          <div class="copy-r-l"><x>&#169;</x> SouravBarui2023</div>
-      </div>
+      </div> -->
 
-      <div id="level-window" class="active">
-         <div class="title">
-            T<br />E<br />A<br />M<br /><br />S<br />O<br />U<br />R<br />A<br />V
-         </div>
+      <main>
+         <header></header>
 
-         <div id="setting">
-            <div id="setting-open">
-               <i class="sbi-settings"></i>
-            </div>
-            <div id="setting-window">
-               <div id="setting-title">
-                  <p>Setting</p>
-                  <div id="setting-close">
-                     <i class="sbi-highlight_remove"></i>
+         <div id="levelsMap" class="">
+            <div class="level complete">
+               <div class="top">
+                  <div class="hashtag">
+                     <i class="sbi-leaderboard"></i>
+                     <p>10</p>
+                  </div>
+                  <div class="is-lock-or-complete">
+                     <i class="sbi-lock-outline lock"></i>
+                     <i class="sbi-check-circle-outline check"></i>
                   </div>
                </div>
-               <div class="audio-opt active">
-                  <p>Audio</p>
-                  <div>
-                     <span><i class="sbi-volume_up"></i></span>
-                     <span><i class="sbi-volume_off"></i></span>
-                  </div>
+               <div class="icon-and-no">
+                  <i class="sbi-fire"></i>
+                  <p class="no">1</p>
                </div>
-               <div class="gyro-opt active">
-                  <p>Gyroscope</p>
-                  <div>
-                     <span><i class="sbi-mobile_friendly"></i></span>
-                     <span><i class="sbi-mobile_off"></i></span>
-                  </div>
+               <div class="complete-time">
+                  <i class="sbi-stopwatch1"></i>
+                  <p class="time">119</p>
+                  <span>s</span>
                </div>
             </div>
+
+            <div class="level">
+               <div class="top">
+                  <div class="hashtag">
+                     <i class="sbi-leaderboard"></i>
+                     <p>10</p>
+                  </div>
+                  <div class="is-lock-or-complete">
+                     <i class="sbi-lock-outline lock"></i>
+                     <i class="sbi-check-circle-outline check"></i>
+                  </div>
+               </div>
+               <div class="icon-and-no">
+                  <i class="sbi-fire"></i>
+                  <p class="no">2</p>
+               </div>
+               <div class="complete-time">
+                  <i class="sbi-stopwatch1"></i>
+                  <p class="time">119</p>
+                  <span>s</span>
+               </div>
+            </div>
+
+            <div class="level lock">
+               <div class="top">
+                  <div class="hashtag">
+                     <i class="sbi-leaderboard"></i>
+                     <p>10</p>
+                  </div>
+                  <div class="is-lock-or-complete">
+                     <i class="sbi-lock-outline lock"></i>
+                     <i class="sbi-check-circle-outline check"></i>
+                  </div>
+               </div>
+               <div class="icon-and-no">
+                  <i class="sbi-fire"></i>
+                  <p class="no">3</p>
+               </div>
+               <div class="complete-time">
+                  <i class="sbi-stopwatch1"></i>
+                  <p class="time">119</p>
+                  <span>s</span>
+               </div>
+            </div>
+
+            <div class="level lock">
+               <div class="top">
+                  <div class="hashtag">
+                     <i class="sbi-leaderboard"></i>
+                     <p>10</p>
+                  </div>
+                  <div class="is-lock-or-complete">
+                     <i class="sbi-lock-outline lock"></i>
+                     <i class="sbi-check-circle-outline check"></i>
+                  </div>
+               </div>
+               <div class="icon-and-no">
+                  <i class="sbi-fire"></i>
+                  <p class="no">4</p>
+               </div>
+               <div class="complete-time">
+                  <i class="sbi-stopwatch1"></i>
+                  <p class="time">119</p>
+                  <span>s</span>
+               </div>
+            </div>
          </div>
 
-         <div id="scroll-list"></div>
-      </div>
+         <canvas id="myCanvas"> </canvas>
 
-      <div id="touch-fild" class="">
-         <div class="play"><i class="sbi-play_circle_outline"></i></div>
-         <div id="loby-btn"><i class="sbi-back"></i></div>
-         <div id="restart-btn"><i class="sbi-autorenew"></i></div>
-         <div class="audio-opt active">
-            <span><i class="sbi-volume_up"></i></span>
-            <span><i class="sbi-volume_off"></i></span>
+         <div id="gameDesigner" class="active">
+            <div class="selection">
+               <p>BLOCKS</p>
+               <div class="options">
+                  <div class="option">
+                     <div class="block">1</div>
+                     <span class="tool-tip-text"></span>
+                  </div>
+                  <div class="option">
+                     <div class="block">2</div>
+                     <span class="tool-tip-text"></span>
+                  </div>
+                  <div class="option">
+                     <div class="block">3</div>
+                     <span class="tool-tip-text"></span>
+                  </div>
+                  <div class="option">
+                     <div class="block">4</div>
+                     <span class="tool-tip-text"></span>
+                  </div>
+                  <div class="option">
+                     <div class="block">5</div>
+                     <span class="tool-tip-text"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="selection">
+               <div class="names">
+                  <p>WALL</p>
+                  <p>ERASER</p>
+               </div>
+               <div class="options">
+                  <div class="option">
+                     <div class="block no-effect"></div>
+                     <span class="tool-tip-text"></span>
+                  </div>
+                  <div class="option">
+                     <i class="sbi-eraser1 block no-effect"></i>
+                     <span class="tool-tip-text"></span>
+                  </div>
+               </div>
+            </div>
+            <div class="buttons">
+               <button class="btn">
+                  <i class="sbi-undo"></i>
+                  <div class="tool-tip-text"></div>
+               </button>
+               <button class="btn">
+                  <i class="sbi-redo"></i>
+                  <div class="tool-tip-text"></div>
+               </button>
+               <button class="btn">
+                  <i class="sbi-save2"></i>
+                  <div class="tool-tip-text"></div>
+               </button>
+               <button class="btn">
+                  <i class="sbi-close"></i>
+                  <div class="tool-tip-text"></div>
+               </button>
+            </div>
          </div>
-      </div>
-      <div id="win-window" class="">
-         <div class="box">
-            <div class="win-title">✨Win✨</div>
-            <p>SCORE : <x id="score-w">0</x></p>
-            <span>
-               <div id="menu"><i class="sbi-back"></i> MENU</div>
-               <div id="rs-w"><i class="sbi-autorenew"></i> RESTART</div>
-            </span>
-         </div>
-      </div>
-      <div id="rs-window" class="">
-         <div class="box">
-            <div id="go-title">💫Game Over!💫</div>
-            <p>SCORE : <x id="score-r">0</x></p>
-            <div id="rs-r"><i class="sbi-autorenew"></i> RESTART</div>
-         </div>
-      </div>
+      </main>
    </body>
 </html>

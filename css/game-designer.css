@@ -1,0 +1,182 @@
+.tool-tip-text {
+   visibility: hidden;
+   width: 120px;
+   background-color: #ffffff;
+   color: #fff;
+   text-align: center;
+   border-radius: 6px;
+   padding: 5px 0;
+   position: absolute;
+   z-index: 1;
+   bottom: 150%;
+   left: 50%;
+   margin-left: -60px;
+}
+
+.tool-tip-text::after {
+   content: "";
+   position: absolute;
+   top: 100%;
+   left: 50%;
+   margin-left: -5px;
+   border-width: 5px;
+   border-style: solid;
+   border-color: #ffffff transparent transparent transparent;
+}
+
+*:has(> .tool-tip-text):hover .tool-tip-text {
+   visibility: visible;
+}
+
+#gameDesigner {
+   position: absolute;
+   width: 100%;
+   left: 0;
+   bottom: 0;
+   padding: var(--gap);
+   display: grid;
+   row-gap: var(--gap);
+   z-index: 1;
+
+   p {
+      position: relative;
+      color: #fff;
+      font-family: f1b;
+      padding: calc(var(--gap));
+      font-size: calc(var(--s) * 0.5);
+   }
+
+   .selection {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      z-index: 3;
+
+      .names {
+         position: relative;
+         display: grid;
+         width: 100%;
+         grid-template-columns: 1fr 1fr;
+         place-items: center;
+      }
+
+      .options {
+         position: relative;
+         display: grid;
+         width: 100%;
+         grid-template-columns: repeat(5, 1fr);
+         place-items: center;
+
+         .option {
+            position: relative;
+            width: calc(var(--s));
+            height: calc(var(--s) * 0.75);
+            display: grid;
+            place-items: center;
+            outline: solid 4px transparent;
+            border: solid 1px #000000;
+            transition: ease-in-out outline 300ms;
+            cursor: ;
+
+            &.active {
+               outline: solid 4px #ffffff;
+            }
+
+            .block {
+               position: relative;
+               width: 100%;
+               height: 100%;
+               border-radius: 5px;
+               display: flex;
+               justify-content: center;
+               color: #ffffff;
+               font-family: f7;
+               text-shadow: 0 1px 1px #000000;
+               
+               &:not(.no-effect)::after {
+                  --offset: 2px;
+                  position: absolute;
+                  content: "";
+                  height: 55%;
+                  width: calc(100% - var(--offset) * 2);
+                  background: #fff3;
+                  top: var(--offset);
+                  border-radius: 4px;
+               }
+               
+            }
+         }
+      }
+
+      &:nth-child(1) .options .option {
+         .block {
+            border-width: 1.5px;
+            border-style: solid;
+         }
+
+         &:nth-child(1) .block{
+            background: var(--color1-bg);
+            border-color: var(--color1-br);
+         }
+
+         &:nth-child(2) .block{
+            background: var(--color2-bg);
+            border-color: var(--color2-br);
+         }
+
+         &:nth-child(3) .block{
+            background: var(--color3-bg);
+            border-color: var(--color3-br);
+         }
+
+         &:nth-child(4) .block{
+            background: var(--color4-bg);
+            border-color: var(--color4-br);
+         }
+
+         &:nth-child(5) .block{
+            background: var(--color5-bg);
+            border-color: var(--color5-br);
+         }
+      }
+
+      &:nth-child(2) .options {
+         grid-template-columns: 1fr 1fr;
+         
+         .option {
+            background: #ffffff;
+         }
+
+         .option:last-child {
+
+            i {
+               display: grid;
+               place-items: center;
+               color: #ff0000;
+               transform: rotate(10deg);
+               font-size: calc(var(--s) * 0.7);
+            }
+         }
+      }
+   }
+
+   .buttons {
+      position: relative;
+      padding: var(--gap);
+      display: flex;
+      justify-content: space-evenly;
+
+      .btn {
+         border: none;
+         padding: 0;
+         outline: 0;
+         width: calc(var(--s));
+         height: calc(var(--s) * 0.8);
+         font-size: calc(var(--s) * 0.5);
+         border-radius: var(--gap);
+
+      }
+   }
+}

@@ -5,7 +5,7 @@
   user-select: none;
   touch-action: none;
   font-family: Arial, Helvetica, sans-serif;
-  -ms-oveflow-style: none; /*IE and Edge*/
+  -ms-overflow-style: none; /*IE and Edge*/
   scrollbar-width: none; /*Firefox*/
   cursor: auto;
   /* outline: solid 1px #f00; */
@@ -15,17 +15,20 @@
 }
 
 :root {
-  --winWidth: 100vw;
-  --winHeight: 100vh;
+  --window-width: 100vw;
+  --window-height: 100vh;
 }
 body {
   position: relative;
-  min-height: 100vh;
-  width: 100vw;
+  min-height: 100svh;
+  width: 100svw;
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: rgb(40, 42, 56);
+  background: url(./src/img/bg.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 #option {
@@ -36,7 +39,7 @@ body {
   grid-template-columns: 5fr 15fr 5fr;
   place-items: center;
 }
-#option #pous-icon {
+#option #pause-button {
   color: #00ffee;
   font-size: 1.8rem;
 }
@@ -185,15 +188,15 @@ canvas {
 
 #level-window {
   transition: linear 0.5s;
-  transform: translateY(calc(var(--winHeight) * 1.1));
+  transform: translateY(calc(var(--window-height) * 1.1));
   z-index: 101;
 }
 
 #level-window.active {
   position: fixed;
   inset: 0;
-  width: var(--winWidth);
-  height: var(--winHeight);
+  width: var(--window-width);
+  height: var(--window-height);
   background: rgba(40, 42, 56, 1);
   display: grid;
   place-items: center;
@@ -306,8 +309,8 @@ canvas {
 #level-window #scroll-list {
   position: relative;
   margin: 20px;
-  width: calc(var(--winWidth) - 40px);
-  height: calc(var(--winHeight) - 40px);
+  width: calc(var(--window-width) - 40px);
+  height: calc(var(--window-height) - 40px);
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(2px);
   border-radius: 5px;
@@ -513,8 +516,8 @@ canvas {
 #loading-window {
   position: fixed;
   inset: 0;
-  width: var(--winWidth);
-  height: var(--winHeight);
+  width: var(--window-width);
+  height: var(--window-height);
   background: #282a38;
   opacity: 0;
   z-index: -100;
@@ -625,8 +628,8 @@ canvas {
 #touch-fild.active {
   position: fixed;
   inset: 0;
-  width: var(--winWidth);
-  height: var(--winHeight);
+  width: var(--window-width);
+  height: var(--window-height);
   background: #000000bb;
   display: flex;
   justify-content: center;

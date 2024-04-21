@@ -362,7 +362,7 @@ class SetupLevel {
     this.obstacles.forEach(obstacle => { obstacle.draw(); })
     this.blocks.forEach(block => { block.draw(); })
     this.powers.forEach(power => { power.draw(); })
-    ID("helth").innerText = this.life;
+    ID("health").innerText = this.life;
     ID("score").innerText = this.score;
     this.text.forEach(txt => { !txt.complete && txt.draw(); })
   }
