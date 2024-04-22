@@ -1,16 +1,23 @@
 .tool-tip-text {
-   visibility: hidden;
-   width: 120px;
-   background-color: #ffffff;
-   color: #fff;
-   text-align: center;
-   border-radius: 6px;
-   padding: 5px 0;
    position: absolute;
-   z-index: 1;
+   visibility: hidden;
+   width: 100px;
+   background-color: #ffffff;
+   display: flex;
+   flex-direction: column;
+   text-align: center;
+   gap: calc(var(--gap) * 0.6);
+   border-radius: 6px;
+   padding: var(--gap);
+   z-index: 5;
    bottom: 150%;
    left: 50%;
-   margin-left: -60px;
+   margin-left: -50px;
+
+   i {
+      color: #000000;
+      font-size: calc(var(--s) * 0.25);
+   }
 }
 
 .tool-tip-text::after {
@@ -33,9 +40,16 @@
    width: 100%;
    left: 0;
    bottom: 0;
-   padding: var(--gap);
+   background: radial-gradient(
+      circle,
+      #0d0098 0%,
+      #03001f 100%
+   );
+   border: solid 1px #ffffff;
+   border-top: none;
    display: grid;
-   row-gap: var(--gap);
+   padding: calc(var(--gap) * 4);
+   row-gap: calc(var(--gap) * 5);
    z-index: 1;
 
    p {
@@ -75,13 +89,32 @@
             height: calc(var(--s) * 0.75);
             display: grid;
             place-items: center;
-            outline: solid 4px transparent;
-            border: solid 1px #000000;
-            transition: ease-in-out outline 300ms;
-            cursor: ;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px #000000, 0 1px 3px #000000;
+            opacity: 0.4;
+            transition: ease-in-out box-shadow 300ms, ease-in-out opacity 300ms;
+            cursor: var(--cursor);
 
-            &.active {
-               outline: solid 4px #ffffff;
+            &::before {
+               position: absolute;
+               content: "";
+               width: calc(100% + 8px);
+               height: calc(100% + 8px);
+               background: transparent;
+               border-radius: inherit;
+               z-index: -1;
+               transition: ease-in-out background 300ms;
+            }
+
+            &.active::before,
+            &:hover::before {
+               background: #000000;
+            }
+
+            &.active,
+            &:hover {
+               box-shadow: 0 1px 2px #000000;
+               opacity: 1;
             }
 
             .block {
@@ -94,7 +127,7 @@
                color: #ffffff;
                font-family: f7;
                text-shadow: 0 1px 1px #000000;
-               
+
                &:not(.no-effect)::after {
                   --offset: 2px;
                   position: absolute;
@@ -105,7 +138,6 @@
                   top: var(--offset);
                   border-radius: 4px;
                }
-               
             }
          }
       }
@@ -116,27 +148,27 @@
             border-style: solid;
          }
 
-         &:nth-child(1) .block{
+         &:nth-child(1) .block {
             background: var(--color1-bg);
             border-color: var(--color1-br);
          }
 
-         &:nth-child(2) .block{
+         &:nth-child(2) .block {
             background: var(--color2-bg);
             border-color: var(--color2-br);
          }
 
-         &:nth-child(3) .block{
+         &:nth-child(3) .block {
             background: var(--color3-bg);
             border-color: var(--color3-br);
          }
 
-         &:nth-child(4) .block{
+         &:nth-child(4) .block {
             background: var(--color4-bg);
             border-color: var(--color4-br);
          }
 
-         &:nth-child(5) .block{
+         &:nth-child(5) .block {
             background: var(--color5-bg);
             border-color: var(--color5-br);
          }
@@ -144,20 +176,17 @@
 
       &:nth-child(2) .options {
          grid-template-columns: 1fr 1fr;
-         
+
          .option {
             background: #ffffff;
          }
 
-         .option:last-child {
-
-            i {
-               display: grid;
-               place-items: center;
-               color: #ff0000;
-               transform: rotate(10deg);
-               font-size: calc(var(--s) * 0.7);
-            }
+         .option:last-child > i {
+            display: grid;
+            place-items: center;
+            color: #ff0000;
+            transform: rotate(10deg);
+            font-size: calc(var(--s) * 0.7);
          }
       }
    }
@@ -169,6 +198,7 @@
       justify-content: space-evenly;
 
       .btn {
+         position: relative;
          border: none;
          padding: 0;
          outline: 0;
@@ -176,7 +206,29 @@
          height: calc(var(--s) * 0.8);
          font-size: calc(var(--s) * 0.5);
          border-radius: var(--gap);
+         cursor: var(--cursor);
+         background: #333333;
+         border: solid 1px #555555;
 
+         & > i {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            display: grid;
+            place-items: center;
+            font-size: calc(var(--s) * 0.5);
+            text-shadow: 0 1px 1px #000000;
+         }
+         &:has(:first-child, :nth-child(2)) > i {
+            color: #7c90ff;
+         }
+         &:nth-child(3) > i {
+            color: #ffb700;
+            font-size: calc(var(--s) * 0.6);
+         }
+         &:nth-child(4) > i {
+            color: #ff0000;
+         }
       }
    }
 }

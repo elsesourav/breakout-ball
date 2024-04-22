@@ -8,13 +8,14 @@
    -webkit-user-select: none;
    font-family: f3;
 
-   outline: solid 1px #f00;
+   /* outline: solid 1px #f00; */
 }
 
 :root {
    --window-width: 100svw;
    --window-height: 100svh;
    --level-s: 90px;
+   --cursor: auto;
    --gap: 5px;
    --s: 0;
 

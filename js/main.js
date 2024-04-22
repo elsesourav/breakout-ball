@@ -10,10 +10,10 @@ const row = 9;
 const col = 10;
 const FPS = 60;
 
-const root = document.querySelector(":root");
-root.style.setProperty("--window-width", `${WIDTH}px`);
-root.style.setProperty("--window-height", `${HEIGHT}px`);
-root.style.setProperty("--s", `${DELTA_SIZE}px`);
+rootStyle.setProperty("--window-width", `${WIDTH}px`);
+rootStyle.setProperty("--window-height", `${HEIGHT}px`);
+rootStyle.setProperty("--s", `${DELTA_SIZE}px`);
+if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
 
 const CVS = $("#myCanvas");
 const ctx = CVS.getContext("2d");
@@ -27,7 +27,7 @@ let currentHover = [null, null];
 
 function setup() {
    levelMap = levelMap.map((col, j) =>
-      col.map((_, i) => new Block(i, j, SCALE, SCALE_H, 1))
+      col.map((_, i) => new Block(i, j, SCALE, SCALE_H, 5))
    );
    levelMap[9][4].isDestroyed = false;
 }
@@ -62,7 +62,7 @@ function putHoverEffect(offX, offY, isPut = false) {
             currentHover = [x, y];
             if (isPut) {
                if (!saveMap.some((b) => b.x === x && b.y === y)) {
-                  saveMap.push(new Block(x, y, SCALE, SCALE_H, 0));
+                  saveMap.push(new Block(x, y, SCALE, SCALE_H, 1));
                }
             }
             return true;
@@ -92,6 +92,13 @@ function loop() {
 loop();
 const animation = new Animation(FPS, loop);
 // animation.start();
+
+
+const lvlOptions = $$("#gameDesigner .option");
+lvlOptions.click((ele) => {
+   lvlOptions.each(e => e.classList.remove("active"));
+   ele.classList.add("active");
+})
 
 // const rsWindow = $("#rs-window");
 // const rsButton = $("#rs-r");

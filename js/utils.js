@@ -2,7 +2,7 @@
 "use strict";
 
 //use cssRoot.style.setProperty("key", "value");
-const cssRoot = document.querySelector(":root");
+const rootStyle = document.querySelector(":root").style;
 
 // when run this app in mobile is return true
 const isMobile = localStorage.mobile || navigator.maxTouchPoints > 1;
@@ -70,8 +70,10 @@ class Animation {
    }
 
    start() {
-      this.run = true;
-      this.#animate(this.fun);
+      if (!this.run) {
+         this.run = true;
+         this.#animate(this.fun);
+      }
    }
 
    stop() {
@@ -101,7 +103,7 @@ const $$ = (selector) => {
    };
    self.click = (fun) => {
       self.forEach((element) => {
-         element.addEventListener("click", fun);
+         element.addEventListener("click", (e) => fun(element, e));
       });
    };
    self.each = (fun) => self.forEach(fun);

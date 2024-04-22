@@ -7,7 +7,7 @@ class Block {
       this.r = 6;
       this.health = health - 1;
       this.onlyOutline = onlyOutline;
-      this.isDestroyed = true;
+      this.isDestroyed = false;
       this.colors = [
          ["#00bcb9", "#4ffffc"],
          ["#bfc200", "#fcff59"],
@@ -116,3 +116,47 @@ class Block {
       }
    }
 }
+
+
+
+/* layer character.
+
+temp) make in 10 word                                   202(1.23%)
+"Health variable determines object durability and destruction in game mechanics."
+
+temp) how to make undo redo operation in js make for array
+To implement undo and redo operations for an array in JavaScript, you can create an array to store the state history, along with pointers to track the current state. Here's a simplified example to demonstrate this concept:
+
+```javascript
+let state = []; // Array to store state history
+let currentState = -1; // Pointer to track current state
+
+function updateState(newState) {
+   currentState++;
+   state = state.slice(0, currentState); // Reset future states
+   state.push(newState);
+}
+
+function undo() {
+   if (currentState > 0) {
+      currentState--;
+      return state[currentState];
+   }
+   return state[currentState];
+}
+
+function redo() {
+   if (currentState < state.length - 1) {
+      currentState++;
+      return state[currentState];
+   }
+   return state[currentState];
+}
+
+// Sample Usage
+updateState([1, 2, 3]); // Initial state
+updateState([4, 5, 6]); // New state
+console.log(state); // Output: [[1, 2, 3], [4, 5, 6]]
+
+console.log(undo()); // Output: [1, 2, 3]
+console.log(redo()); // Output: [4, 5, 6] */
