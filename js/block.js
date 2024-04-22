@@ -22,9 +22,12 @@ class Block {
       this.particles = [];
    }
 
-   setHealth(health, outlineOn = true) {
+   setHealth(health) {
       this.health = health - 1;
-      if (!outlineOn) this.onlyOutline = false;
+   }
+
+   setOnlyOutline(onlyOutline) {
+      this.onlyOutline = onlyOutline;  
    }
 
    #setupPath() {
@@ -69,11 +72,12 @@ class Block {
       this.path = [path1, path2];
    }
 
-   #setParticle(offset) {
+   #setParticle(gap) {
       const { x, y, w, h } = this;
+      const offset = 2 + 0.5 * 6;
 
-      for (let i = offset; i < h - offset * 2; i += 2) {
-         for (let j = offset; j < w - offset * 2; j += 2) {
+      for (let i = offset; i < h - offset * 2; i += gap) {
+         for (let j = offset; j < w - offset * 2; j += gap) {
             const px = x * w + j;
             const py = y * h + i;
             this.particles.push(new Particle(px, py, 1, this.colors[0][0]));
@@ -97,7 +101,7 @@ class Block {
 
 
    drawOutline(ctx) {
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1;
       ctx.strokeStyle = "#ffffff";
       ctx.stroke(this.path[0]);
    }

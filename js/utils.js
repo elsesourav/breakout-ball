@@ -106,8 +106,8 @@ const $$ = (selector) => {
       });
    };
    self.click = (fun) => {
-      self.forEach((element) => {
-         element.addEventListener("click", (e) => fun(element, e));
+      self.forEach((element, i) => {
+         element.addEventListener("click", (e) => fun(e, element, i));
       });
    };
    self.each = (fun) => self.forEach(fun);

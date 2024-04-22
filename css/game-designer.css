@@ -93,7 +93,7 @@
             border-radius: 6px;
             box-shadow: 0 2px 5px #000000, 0 1px 3px #000000;
             opacity: 0.4;
-            transition: ease-in-out box-shadow 300ms, ease-in-out opacity 300ms;
+            transition: ease-in-out box-shadow 200ms, ease-in-out opacity 200ms;
             cursor: var(--cursor);
 
             &::before {
@@ -104,7 +104,7 @@
                background: transparent;
                border-radius: inherit;
                z-index: -1;
-               transition: ease-in-out background 300ms;
+               transition: ease-in-out background 200ms;
             }
 
             &.active::before,
@@ -128,6 +128,7 @@
                color: #ffffff;
                background: #ffffff;
                font-family: f7;
+               font-size: calc(var(--s) * 0.5);
                text-shadow: 0 1px 1px #000000;
 
                &:not(.no-effect)::after {
@@ -207,7 +208,7 @@
          background: #333333;
          box-shadow: 0 1px 2px #000000;
          border: solid 1px #555555;
-         transition: ease-in-out 300ms background;
+         transition: ease-in-out 200ms background;
 
          &:hover {
             background: #666666;

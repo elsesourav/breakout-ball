@@ -10,23 +10,24 @@ class LevelMaker {
       this.state = [];
       this.map = [];
       this.currentState = -1;
-      this.healthSelected = 1;
+      this.selectedHealth = 1;
+      this.eraserSelected = false;
       this.hoverLocation = [null, null];
       this.#eventHandler();
       this.setup();
    }
-   
+
    setup() {
       this.blocks = [];
       this.state = [];
       this.map = [];
       this.hoverLocation = [null, null];
-      const { w, h, rows, cols, healthSelected } = this;
+      const { w, h, rows, cols, selectedHealth } = this;
 
       for (let i = 0; i < cols; i++) {
          this.map[i] = [];
          for (let j = 0; j < rows; j++) {
-            this.map[i][j] = new Block(j, i, w, h, healthSelected, true);
+            this.map[i][j] = new Block(j, i, w, h, selectedHealth, true);
          }
       }
    }
@@ -36,32 +37,47 @@ class LevelMaker {
       const ratio = this.cvs.width / width;
       const NX = Math.floor(((offX - left) * ratio) / SCALE);
       const NY = Math.floor(((offY - top) * ratio) / SCALE_H);
-   
+      let isFind = true;
+
       this.map.some((cols) =>
          cols.some((block) => {
             const { x, y } = block;
 
             if (NX === x && NY === y) {
-               this.hoverLocation = [x, y];
-               // console.log(block);
+               isFind = false;
+               if (!this.eraserSelected) {
+                  this.hoverLocation = [x, y];
 
-               if (isPut) {
-                  if (!this.blocks.some((b) => b.x === x && b.y === y)) {
-                     this.blocks.push({
-                        x, y,
-                        w: this.w,
-                        h: this.h,
-                        health: this.healthSelected
-                     });
-                     block.setHealth(this.healthSelected, false);
+                  if (isPut) {
+                     if (!this.blocks.some((b) => b.x === x && b.y === y)) {
+                        this.blocks.push({
+                           x,
+                           y,
+                           w: this.w,
+                           h: this.h,
+                           health: this.selectedHealth + 1,
+                        });
+                        this.#updateState(this.blocks);
+                        block.setHealth(this.selectedHealth);
+                        block.setOnlyOutline(false);
+                     }
                   }
+               } else if (isPut) {
+                  block.setOnlyOutline(true);
+                  this.blocks = this.blocks.filter(
+                     (b) => !(b.x === x && b.y === y)
+                  );
+                  this.#updateState(this.blocks);
                }
+
                return true;
             }
          })
       );
+
+      if (isFind) this.hoverLocation = [null, null];
    }
- 
+
    #eventHandler() {
       this.cvs.click(({ clientX, clientY }) => {
          this.#createBlock(clientX, clientY, true);
@@ -84,7 +100,8 @@ class LevelMaker {
          cols.forEach((block, X) => {
             if (!block.onlyOutline) {
                block.draw(ctx);
-            } else if (X === x && Y === y) { 
+            } else if (X === x && Y === y) {
+               block.setHealth(this.selectedHealth);
                ctx.globalAlpha = 0.5;
                block.draw(ctx);
                ctx.globalAlpha = 1;
@@ -95,33 +112,57 @@ class LevelMaker {
       });
    }
 
-   setHealth(health) {
-      this.healthSelected = health;
+   selectHealth(health) {
+      this.selectedHealth = health;
+      this.eraserSelected = false;
    }
 
    selectWall() {
-      this.healthSelected = 6;
+      this.selectedHealth = 6;
+      this.eraserSelected = false;
    }
 
    selectEraser() {
-      
+      this.eraserSelected = true;
+   }
+
+   #updateState(newState) {
+      this.currentState++;
+      this.state = this.state.slice(0, this.currentState);
+      this.state.push([...newState ]);
+   }
+
+   #updateMap() {
+      this.map.map((cl) => cl.map((blk) => blk.setOnlyOutline(true)));
+
+      this.blocks.forEach((block) => {
+         const { x, y } = block;
+         this.map[y][x].setOnlyOutline(false);
+         this.map[y][x].setHealth(block.health - 1);
+      });
+   }
+
+   undo() {
+      if (this.currentState > 0) {
+         this.blocks = this.state[--this.currentState];
+      } else {
+         this.blocks = [];
+      }
+      this.#updateMap();
+   }
+
+   redo() {
+      if (this.currentState < this.state.length - 1) {
+         this.blocks = this.state[this.currentState++];
+      } else {
+         this.blocks = this.state[this.currentState];
+      }
+      this.#updateMap();
    }
 
    getLevel() {
       return this.blocks;
+      console.log();
    }
 }
-
-
-
-
-
-const lvlOptions = $$("#levelDesigner .option");
-lvlOptions.click((ele) => {
-   lvlOptions.each(e => e.classList.remove("active"));
-   ele.classList.add("active");
-});
-
-
-
 

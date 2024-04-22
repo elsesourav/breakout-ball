@@ -21,7 +21,6 @@ CVS.width = SCALE * 9;
 CVS.height = SCALE * 16;
 ctx.imageSmoothingQuality = "high";
 
-
 const level = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
 
 function lvlEditor() {
@@ -29,7 +28,6 @@ function lvlEditor() {
 }
 
 let fun = lvlEditor;
-
 
 function loop() {
    ctx.clearRect(0, 0, CVS.width, CVS.height);
@@ -39,7 +37,65 @@ loop();
 const animation = new Animation(FPS, loop);
 animation.start();
 
+const lvlOptions = $$("#levelDesigner .option");
+lvlOptions.click((_, ele, i) => {
+   lvlOptions.each((e) => e.classList.remove("active"));
+   ele.classList.add("active");
 
+   if (i <= 4) level.selectHealth(i + 1);
+   else if (i === 5) level.selectWall(i + 1);
+   else if (i === 6) level.selectEraser(i + 1);
+});
+
+let spaceIsDown = false;
+
+addEventListener("keydown", ({ keyCode }) => {
+   if (keyCode === 32) spaceIsDown = true;
+
+   if (spaceIsDown) {
+      // get value 1 to 5 (e.g: 49 - 48 = 1, 50 - 48 = 2, ...)
+      if (keyCode >= 49 && keyCode <= 53) {
+         const i = keyCode - 48;
+         lvlOptions.each((e) => e.classList.remove("active"));
+         lvlOptions[i-1].classList.add("active");
+         level.selectHealth(i);
+
+      } else if (keyCode === 87) { // wall
+         lvlOptions.each((e) => e.classList.remove("active"));
+         lvlOptions[5].classList.add("active");
+         level.selectWall();
+
+      } else if (keyCode === 69) { // eraser
+         lvlOptions.each((e) => e.classList.remove("active"));
+         lvlOptions[6].classList.add("active");
+         level.selectEraser();
+      } else if (keyCode === 90) { // undo
+         level.undo();
+      } else if (keyCode === 89) { // redo
+         level.redo();
+      } else if (keyCode === 83) { // save
+
+      } else if (keyCode === 67) { // close
+         
+      }
+
+   }
+});
+
+addEventListener("keyup", ({ keyCode }) => {
+   if (keyCode === 32) spaceIsDown = false;
+});
+
+$("#undoBtn").click(() => {
+   level.undo();
+});
+
+$("#redoBtn").click(() => {
+   level.redo();
+});
+
+$("#saveBtn").click(() => {});
+$("#closeBtn").click(() => {});
 
 // const rsWindow = $("#rs-window");
 // const rsButton = $("#rs-r");
