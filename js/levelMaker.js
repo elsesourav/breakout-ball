@@ -129,7 +129,7 @@ class LevelMaker {
    #updateState(newState) {
       this.currentState++;
       this.state = this.state.slice(0, this.currentState);
-      this.state.push([...newState ]);
+      this.state.push([...newState]);
    }
 
    #updateMap() {
@@ -161,8 +161,8 @@ class LevelMaker {
    }
 
    getLevel() {
+      alert(JSON.stringify(this.blocks));
+      console.log(`"${JSON.stringify(this.blocks)}"`);
       return this.blocks;
-      console.log();
    }
 }
-

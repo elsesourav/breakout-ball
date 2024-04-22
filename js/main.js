@@ -57,28 +57,29 @@ addEventListener("keydown", ({ keyCode }) => {
       if (keyCode >= 49 && keyCode <= 53) {
          const i = keyCode - 48;
          lvlOptions.each((e) => e.classList.remove("active"));
-         lvlOptions[i-1].classList.add("active");
+         lvlOptions[i - 1].classList.add("active");
          level.selectHealth(i);
-
-      } else if (keyCode === 87) { // wall
+      } else if (keyCode === 87) {
+         // wall
          lvlOptions.each((e) => e.classList.remove("active"));
          lvlOptions[5].classList.add("active");
          level.selectWall();
-
-      } else if (keyCode === 69) { // eraser
+      } else if (keyCode === 69) {
+         // eraser
          lvlOptions.each((e) => e.classList.remove("active"));
          lvlOptions[6].classList.add("active");
          level.selectEraser();
-      } else if (keyCode === 90) { // undo
+      } else if (keyCode === 90) {
+         // undo
          level.undo();
-      } else if (keyCode === 89) { // redo
+      } else if (keyCode === 89) {
+         // redo
          level.redo();
-      } else if (keyCode === 83) { // save
-
-      } else if (keyCode === 67) { // close
-         
+      } else if (keyCode === 83) {
+         // save
+      } else if (keyCode === 67) {
+         // close
       }
-
    }
 });
 
@@ -96,6 +97,17 @@ $("#redoBtn").click(() => {
 
 $("#saveBtn").click(() => {});
 $("#closeBtn").click(() => {});
+
+fetch("./levels.json")
+   .then((response) => response.json())
+   .then((data) => {
+      
+      console.log(data);
+      
+   })
+   .catch((error) => {
+      console.error("Error loading JSON file:", error);
+   });
 
 // const rsWindow = $("#rs-window");
 // const rsButton = $("#rs-r");
