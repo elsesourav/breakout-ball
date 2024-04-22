@@ -35,7 +35,7 @@
    visibility: visible;
 }
 
-#gameDesigner {
+#levelDesigner {
    position: absolute;
    width: 100%;
    left: 0;
@@ -50,6 +50,7 @@
    display: grid;
    padding: calc(var(--gap) * 4);
    row-gap: calc(var(--gap) * 5);
+   border-top: solid 1px #0d0098;
    z-index: 1;
 
    p {
@@ -125,6 +126,7 @@
                display: flex;
                justify-content: center;
                color: #ffffff;
+               background: #ffffff;
                font-family: f7;
                text-shadow: 0 1px 1px #000000;
 
@@ -177,15 +179,10 @@
       &:nth-child(2) .options {
          grid-template-columns: 1fr 1fr;
 
-         .option {
-            background: #ffffff;
-         }
-
          .option:last-child > i {
             display: grid;
             place-items: center;
             color: #ff0000;
-            transform: rotate(10deg);
             font-size: calc(var(--s) * 0.7);
          }
       }
@@ -208,7 +205,13 @@
          border-radius: var(--gap);
          cursor: var(--cursor);
          background: #333333;
+         box-shadow: 0 1px 2px #000000;
          border: solid 1px #555555;
+         transition: ease-in-out 300ms background;
+
+         &:hover {
+            background: #666666;
+         }
 
          & > i {
             position: relative;
@@ -223,7 +226,7 @@
             color: #7c90ff;
          }
          &:nth-child(3) > i {
-            color: #ffb700;
+            color: #bbf9ff;
             font-size: calc(var(--s) * 0.6);
          }
          &:nth-child(4) > i {

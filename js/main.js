@@ -6,8 +6,8 @@ const WIDTH = DELTA_SIZE * 9;
 const HEIGHT = DELTA_SIZE * 16;
 const SCALE = 64;
 const SCALE_H = 48;
-const row = 9;
-const col = 10;
+const rows = 9;
+const cols = 10;
 const FPS = 60;
 
 rootStyle.setProperty("--window-width", `${WIDTH}px`);
@@ -21,84 +21,25 @@ CVS.width = SCALE * 9;
 CVS.height = SCALE * 16;
 ctx.imageSmoothingQuality = "high";
 
-let levelMap = array2d(col, row);
-let saveMap = [];
-let currentHover = [null, null];
 
-function setup() {
-   levelMap = levelMap.map((col, j) =>
-      col.map((_, i) => new Block(i, j, SCALE, SCALE_H, 5))
-   );
-   levelMap[9][4].isDestroyed = false;
-}
-setup();
+const level = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
 
-function drawGideLine(ctx) {
-   const [x, y] = currentHover;
-   levelMap.forEach((col) => {
-      col.forEach((block) => {
-         if (block.x === x && block.y === y) {
-            block.draw(ctx, "#0f07");
-         } else {
-            block.draw(ctx, "#fff0");
-         }
-      });
-   });
-   saveMap.forEach((block) => {
-      block.draw(ctx);
-   });
+function lvlEditor() {
+   level.draw(ctx);
 }
 
-function putHoverEffect(offX, offY, isPut = false) {
-   const { left, top, width } = CVS.getBoundingClientRect();
-   const ratio = CVS.width / width;
-   const NX = Math.floor(((offX - left) * ratio) / SCALE);
-   const NY = Math.floor(((offY - top) * ratio) / SCALE_H);
+let fun = lvlEditor;
 
-   levelMap.some((c) =>
-      c.some((block) => {
-         const { x, y } = block;
-         if (NX === x && NY === y) {
-            currentHover = [x, y];
-            if (isPut) {
-               if (!saveMap.some((b) => b.x === x && b.y === y)) {
-                  saveMap.push(new Block(x, y, SCALE, SCALE_H, 1));
-               }
-            }
-            return true;
-         }
-      })
-   );
-}
-
-CVS.click(({ clientX, clientY }) => {
-   putHoverEffect(clientX, clientY, true);
-});
-
-CVS.on("mousemove", ({ clientX, clientY }) => {
-   putHoverEffect(clientX, clientY);
-});
-CVS.on("touchstart", ({ touches }) => {
-   putHoverEffect(touches[0].clientX, touches[0].clientY);
-});
-CVS.on("touchmove", ({ touches }) => {
-   putHoverEffect(touches[0].clientX, touches[0].clientY);
-});
 
 function loop() {
    ctx.clearRect(0, 0, CVS.width, CVS.height);
-   drawGideLine(ctx);
+   fun();
 }
 loop();
 const animation = new Animation(FPS, loop);
-// animation.start();
+animation.start();
 
 
-const lvlOptions = $$("#gameDesigner .option");
-lvlOptions.click((ele) => {
-   lvlOptions.each(e => e.classList.remove("active"));
-   ele.classList.add("active");
-})
 
 // const rsWindow = $("#rs-window");
 // const rsButton = $("#rs-r");

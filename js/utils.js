@@ -60,6 +60,10 @@ class Animation {
       this.fps = fps;
    }
 
+   updateFunction(fun) {
+      this.fun = fun;
+   }
+
    #animate() {
       setTimeout(() => {
          if (this.run) {
