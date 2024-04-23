@@ -5,6 +5,8 @@ function lvlEditor() {
 function playGame() {
    playLevel.update();
    playLevel.draw(ctx, CVS.width, CVS.height);
+
+   pad.draw(ctx);
 }
 
 
@@ -19,6 +21,11 @@ function playGame() {
          currentSelectedLevel = levels[i];
       });
    });
+
+   CVS.classList.add("active");
+   startPreview.classList.remove("active");
+   playLevel.setup(levels[0]);
+   animation.start(playGame);
    
    
    // animation.start(fun);

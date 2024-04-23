@@ -22,6 +22,29 @@ pCtx.imageSmoothingQuality = "high";
 const animation = new Animation(FPS);
 const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
 const playLevel = new PlayLevel();
+const pad = new Pad(400, 800, 80, 40, CVS);
+
+
+if (window.DeviceOrientationEvent) {
+   mobileErr.innerHTML = "true"
+   window.addEventListener("deviceorientation", (e) => {
+      const { beta, gamma } = e;
+
+      mobileErr.innerHTML += `beta: ${beta}; gamma: ${gamma}\n`;
+
+      // const g = map(gamma * 10, -winw / 2, winw / 2, 0, winw - this.pad.w / (2 * SCALE));
+      // this.x += gamma;
+      // );
+      // if (0 <= g && winw - this.pad.w >= g) {
+      //    if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
+      //       this.pad.x = winw - this.pad.w - g;
+      //    } else {
+      //       this.pad.x = g;
+      //    }
+      // }
+   });
+}
+
 let levels = [];
 let currentSelectedLevel; // store level map
 
