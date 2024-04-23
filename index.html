@@ -19,11 +19,13 @@
       
       <!-- all scripts -->
       <script defer src="js/utils.js"></script>
+      <script defer src="js/levelMaker.js"></script>
+      <script defer src="js/playLevel.js"></script>
       <script defer src="js/variables.js"></script>
       <script defer src="js/particle.js"></script>
       <script defer src="js/block.js"></script>
-      <script defer src="js/levelMaker.js"></script>
       <script defer src="js/startPreview.js"></script>
+      <script defer src="js/eventListener.js"></script>
       <script defer src="js/setup.js"></script>
       <script defer src="js/main.js"></script>
 
@@ -45,15 +47,18 @@
                   <div class="lvl-details">
                      <div class="flex selected-lvl">
                         <p>Level</p>
-                        <span id="lvlId">1</span>
+                        <div id="lvlNo">1</div>
                      </div>
                      <div class="flex rank">
-                        <p>Rank: </p>
-                        <span id="lvl-no">1</span>
+                        <p>Your Rank </p>
+                        <div id="lvlRank">∞</div>
                      </div>
                      <div class="flex time">
-                        <p>Your Best: </p>
-                        <span id="lvl-score">000<pre>s</pre></span>
+                        <i class="sbi-stopwatch1"></i>
+                        <div>
+                           <p id="lvlTime">∞</p>
+                           <span>s</span>
+                        </div>
                      </div>
                   </div>
                </div>

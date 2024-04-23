@@ -93,9 +93,10 @@ class LevelMaker {
       });
    }
 
-   draw(ctx) {
+   draw(ctx, cWidth, cHeight) {
       const [x, y] = this.hoverLocation;
 
+      ctx.clearRect(0, 0, cWidth, cHeight);
       this.map.forEach((cols, Y) => {
          cols.forEach((block, X) => {
             if (!block.onlyOutline) {

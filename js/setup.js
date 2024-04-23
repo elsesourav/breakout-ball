@@ -19,10 +19,11 @@ previewCanvas.height = SCALE_H * cols * pScale;
 ctx.imageSmoothingQuality = "high";
 pCtx.imageSmoothingQuality = "high";
 
-
-const previewClose = $("#previewClose");
-const startPreview = $("#startPreview");
-previewClose.click(() => startPreview.classList.remove("active"));
+const animation = new Animation(FPS);
+const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
+const playLevel = new PlayLevel();
+let levels = [];
+let currentSelectedLevel; // store level map
 
 function createHtmlLevels(levels, levelsMap) {
    levelsMap.innerHTML = "";

@@ -2,12 +2,8 @@
    position: relative;
    width: 100%;
    height: 100%;
-   background: rgba(100, 100, 100, 0.3);
-   backdrop-filter: blur(3px);
-   -webkit-backdrop-filter: blur(3px);
    display: none;
    place-items: center;
-   border-radius: 5px;
    gap: calc(calc(var(--s) * 1.5) / 4);
    padding: calc(calc(var(--s) * 1.5) / 4);
    grid-template-columns: repeat(auto-fill, minmax(calc(var(--s) * 2.5), 1fr));

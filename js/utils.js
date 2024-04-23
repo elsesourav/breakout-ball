@@ -73,7 +73,8 @@ class Animation {
       }, 1000 / this.fps);
    }
 
-   start() {
+   start(fun = this.fun) {
+      this.fun = fun;
       if (!this.run) {
          this.run = true;
          this.#animate(this.fun);
