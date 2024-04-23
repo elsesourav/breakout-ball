@@ -45,7 +45,7 @@ class LevelMaker {
 
             if (NX === x && NY === y) {
                isFind = false;
-               if (!this.eraserSelected) {
+               if (!this.eraserSelected && !isMobile) {
                   this.hoverLocation = [x, y];
 
                   if (isPut) {
@@ -55,7 +55,7 @@ class LevelMaker {
                            y,
                            w: this.w,
                            h: this.h,
-                           health: this.selectedHealth + 1,
+                           health: this.selectedHealth,
                         });
                         this.#updateState(this.blocks);
                         block.setHealth(this.selectedHealth);
@@ -161,7 +161,6 @@ class LevelMaker {
    }
 
    getLevel() {
-      alert(JSON.stringify(this.blocks));
       console.log(`"${JSON.stringify(this.blocks)}"`);
       return this.blocks;
    }

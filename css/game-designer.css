@@ -1,40 +1,3 @@
-.tool-tip-text {
-   position: absolute;
-   visibility: hidden;
-   width: 100px;
-   background-color: #ffffff;
-   display: flex;
-   flex-direction: column;
-   text-align: center;
-   gap: calc(var(--gap) * 0.6);
-   border-radius: 6px;
-   padding: var(--gap);
-   z-index: 5;
-   bottom: 150%;
-   left: 50%;
-   margin-left: -50px;
-
-   i {
-      color: #000000;
-      font-size: calc(var(--s) * 0.25);
-   }
-}
-
-.tool-tip-text::after {
-   content: "";
-   position: absolute;
-   top: 100%;
-   left: 50%;
-   margin-left: -5px;
-   border-width: 5px;
-   border-style: solid;
-   border-color: #ffffff transparent transparent transparent;
-}
-
-*:has(> .tool-tip-text):hover .tool-tip-text {
-   visibility: visible;
-}
-
 #levelDesigner {
    position: absolute;
    width: 100%;
@@ -47,11 +10,15 @@
    );
    border: solid 1px #ffffff;
    border-top: none;
-   display: grid;
+   display: none;
    padding: calc(var(--gap) * 4);
    row-gap: calc(var(--gap) * 5);
    border-top: solid 1px #0d0098;
    z-index: 1;
+
+   &.active {
+      display: grid;
+   }
 
    p {
       position: relative;

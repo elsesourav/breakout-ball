@@ -111,10 +111,12 @@ class Block {
          const [color, stroke] = this.colors[this.health];
 
          ctx.lineWidth = 2;
-         ctx.fillStyle = color;
          ctx.strokeStyle = stroke;
-         ctx.fill(this.path[0]);
          ctx.stroke(this.path[0]);
+
+         ctx.fillStyle = color;
+         ctx.fill(this.path[0]);
+
          ctx.fillStyle = "#fff4";
          ctx.fill(this.path[1]);
       
@@ -133,37 +135,3 @@ class Block {
       }
    }
 }
-
-/* 
-let state = []; // Array to store state history
-let currentState = -1; // Pointer to track current state
-
-function updateState(newState) {
-   currentState++;
-   state = state.slice(0, currentState); // Reset future states
-   state.push(newState);
-}
-
-function undo() {
-   if (currentState > 0) {
-      currentState--;
-      return state[currentState];
-   }
-   return state[currentState];
-}
-
-function redo() {
-   if (currentState < state.length - 1) {
-      currentState++;
-      return state[currentState];
-   }
-   return state[currentState];
-}
-
-// Sample Usage
-updateState([1, 2, 3]); // Initial state
-updateState([4, 5, 6]); // New state
-console.log(state); // Output: [[1, 2, 3], [4, 5, 6]]
-
-console.log(undo()); // Output: [1, 2, 3]
-console.log(redo()); // Output: [4, 5, 6] */

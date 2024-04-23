@@ -6,136 +6,114 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" type="image/png" href="src/img/icon.png" />
       <title>Breakout Ball</title>
+
+      <!-- font and icon stylesheet -->
       <link rel="stylesheet" href="icons/css/icon.css" />
       <link rel="stylesheet" href="icons/css/font.css" />
-      <!-- <link rel="stylesheet" href="./style.css" /> -->
+      
+      <!-- design stylesheet -->
       <link rel="stylesheet" href="./css/home.css" />
+      <link rel="stylesheet" href="./css/start-preview.css" />
       <link rel="stylesheet" href="./css/game-designer.css" />
       <link rel="stylesheet" href="./css/lavel.css" />
+      
+      <!-- all scripts -->
       <script defer src="js/utils.js"></script>
-      <!-- <script defer src="js/audio.js"></script> -->
-      <!-- <script defer src="js/map.js"></script> -->
-      <!-- <script defer src="js/control.js"></script> -->
-      <!-- <script defer src="js/class.js"></script> -->
-      <!-- <script defer src="js/levelSetup.js"></script> -->
-
+      <script defer src="js/variables.js"></script>
       <script defer src="js/particle.js"></script>
       <script defer src="js/block.js"></script>
       <script defer src="js/levelMaker.js"></script>
+      <script defer src="js/startPreview.js"></script>
+      <script defer src="js/setup.js"></script>
       <script defer src="js/main.js"></script>
+
    </head>
    <body>
-      <!-- <div id="loading-window" class="active">
-         <div id="loadeing-circle">
-            <div class="lds-roller">
-               <p></p>
-               <p></p>
-               <p></p>
-               <p></p>
-               <p></p>
-               <p></p>
-               <p></p>
-            </div>
-         </div>
-         <div class="copy-r-l"><x>&#169;</x> SouravBarui2023</div>
-      </div> -->
-
       <main>
          <header></header>
+         <div id="levelsMap" class="active"></div>
+         <canvas id="myCanvas" class=""></canvas>
 
-         <div id="levelsMap" class="">
-            <div class="level complete">
-               <div class="top">
-                  <div class="hashtag">
-                     <i class="sbi-leaderboard"></i>
-                     <p>10</p>
-                  </div>
-                  <div class="is-lock-or-complete">
-                     <i class="sbi-lock-outline lock"></i>
-                     <i class="sbi-check-circle-outline check"></i>
-                  </div>
-               </div>
-               <div class="icon-and-no">
-                  <i class="sbi-fire"></i>
-                  <p class="no">1</p>
-               </div>
-               <div class="complete-time">
-                  <i class="sbi-stopwatch1"></i>
-                  <p class="time">119</p>
-                  <span>s</span>
-               </div>
-            </div>
+         <div id="startPreview" class="">
+            <button id="previewClose">
+               <i class="sbi-cross"></i>
+            </button>
 
-            <div class="level">
-               <div class="top">
-                  <div class="hashtag">
-                     <i class="sbi-leaderboard"></i>
-                     <p>10</p>
-                  </div>
-                  <div class="is-lock-or-complete">
-                     <i class="sbi-lock-outline lock"></i>
-                     <i class="sbi-check-circle-outline check"></i>
-                  </div>
-               </div>
-               <div class="icon-and-no">
-                  <i class="sbi-fire"></i>
-                  <p class="no">2</p>
-               </div>
-               <div class="complete-time">
-                  <i class="sbi-stopwatch1"></i>
-                  <p class="time">119</p>
-                  <span>s</span>
-               </div>
-            </div>
-
-            <div class="level lock">
-               <div class="top">
-                  <div class="hashtag">
-                     <i class="sbi-leaderboard"></i>
-                     <p>10</p>
-                  </div>
-                  <div class="is-lock-or-complete">
-                     <i class="sbi-lock-outline lock"></i>
-                     <i class="sbi-check-circle-outline check"></i>
+            <div class="rapper">
+               <div class="canvas-and-lvl-details">
+                  <canvas id="preview"></canvas>
+                  <div class="lvl-details">
+                     <div class="flex selected-lvl">
+                        <p>Level</p>
+                        <span id="lvlId">1</span>
+                     </div>
+                     <div class="flex rank">
+                        <p>Rank: </p>
+                        <span id="lvl-no">1</span>
+                     </div>
+                     <div class="flex time">
+                        <p>Your Best: </p>
+                        <span id="lvl-score">000<pre>s</pre></span>
+                     </div>
                   </div>
                </div>
-               <div class="icon-and-no">
-                  <i class="sbi-fire"></i>
-                  <p class="no">3</p>
+               <div class="btn">
+                  <button id="startButton">START</button> 
                </div>
-               <div class="complete-time">
-                  <i class="sbi-stopwatch1"></i>
-                  <p class="time">119</p>
-                  <span>s</span>
-               </div>
-            </div>
-
-            <div class="level lock">
-               <div class="top">
-                  <div class="hashtag">
-                     <i class="sbi-leaderboard"></i>
-                     <p>10</p>
+               <div class="leaderboard">
+                  <div class="title">
+                     <i class="sbi-trophy2"></i>
+                     <p>Players Ranking</p>
                   </div>
-                  <div class="is-lock-or-complete">
-                     <i class="sbi-lock-outline lock"></i>
-                     <i class="sbi-check-circle-outline check"></i>
+                  <div class="ranking-table">
+                     <table>
+                        <tr>
+                           <td>Rank</td>
+                           <td>Name</td>
+                           <td>Time</td>
+                        </tr>
+                        <tr>
+                           <td>1</td>
+                           <td>Sourav</td>
+                           <td>96<span>s</span></td>
+                        </tr>
+                        <tr>
+                           <td>2</td>
+                           <td>Pubali</td>
+                           <td>102<span>s</span></td>
+                        </tr>
+                        <tr>
+                           <td>3</td>
+                           <td>Subrata</td>
+                           <td>104<span>s</span></td>
+                        </tr>
+                        <tr>
+                           <td>4</td>
+                           <td>Name</td>
+                           <td>110<span>s</span></td>
+                        </tr>
+                        <tr>
+                           <td>4</td>
+                           <td>Name</td>
+                           <td>110<span>s</span></td>
+                        </tr>
+                        <tr>
+                           <td>4</td>
+                           <td>Name</td>
+                           <td>110<span>s</span></td>
+                        </tr>
+                        <tr>
+                           <td>4</td>
+                           <td>Name</td>
+                           <td>110<span>s</span></td>
+                        </tr>
+                     </table>
                   </div>
-               </div>
-               <div class="icon-and-no">
-                  <i class="sbi-fire"></i>
-                  <p class="no">4</p>
-               </div>
-               <div class="complete-time">
-                  <i class="sbi-stopwatch1"></i>
-                  <p class="time">119</p>
-                  <span>s</span>
                </div>
             </div>
          </div>
 
-         <canvas id="myCanvas"></canvas>
-
-         <div id="levelDesigner" class="active">
+         <div id="levelDesigner" class="">
             <div class="selection">
                <p>BLOCKS</p>
                <div class="options">
