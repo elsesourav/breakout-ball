@@ -8,6 +8,10 @@
    -webkit-user-select: none;
    font-family: f3;
 
+   color: #ffa600;
+   color: #a60000;
+   color: #0000ff;
+   color: #65f2ff;
    /* outline: solid 1px #f00; */
 }
 
@@ -115,7 +119,7 @@ main {
    }
 }
 
-#mobileErr {
+/* #mobileErr {
    position: fixed;
    z-index: 1000;
    color: #000000;
@@ -124,4 +128,5 @@ main {
    max-width: 100vw;
    max-height: 50vh;
    background-color: #fff;
-}
+   display: none;
+} */

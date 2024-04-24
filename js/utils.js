@@ -134,23 +134,12 @@ function removeClass(array, className = "active") {
    }
 }
 
-const createEle = (
-   elementName,
-   className = null,
-   appendParentName = null,
-   inrHtml = null
-) => {
-   const e = document.createElement(elementName);
-   if (className) e.classList.add(className);
+// create element
+const CE = (tagName, className = [], inrHtml = "", parent = null) => {
+   const e = document.createElement(tagName);
+   if (className) e.classList.add(...className);
    if (inrHtml) e.innerHTML = inrHtml;
-   if (appendParentName) appendParentName.appendChild(e);
-   e.on = (event, callBackFun) => {
-      if (typeof event != "string") {
-         e.addEventListener("click", event);
-      } else {
-         e.addEventListener(event, callBackFun);
-      }
-   };
+   if (parent) parent.appendChild(e);
    return e;
 };
 
@@ -189,13 +178,19 @@ function getDataToLocalStorage(key) {
    return JSON.parse(localStorage.getItem(key));
 }
 
-function array2d(nRow, nCol) {
-   const ary = [];
-   for (let i = 0; i < nRow; i++) {
-      ary.push([]);
-      for (let _ = 0; _ < nCol; _++) {
-         ary[i].push(0);
-      }
-   }
-   return ary;
+function create2dRoundedRectPath(x, y, w, h, r) {
+   const path = new Path2D();
+   path.moveTo(x + r, y);
+   path.lineTo(x + w - r, y);
+   path.arcTo(x + w, y, x + w, y + r, r);
+   path.lineTo(x + w, y + h - r);
+   path.arcTo(x + w, y + h, x + w - r, y + h, r);
+   path.lineTo(x + r, y + h);
+   path.arcTo(x, y + h, x, y + h - r, r);
+   path.lineTo(x, y + r);
+   path.arcTo(x, y, x + r, y, r);
+   path.closePath();
+   return path;
 }
+
+

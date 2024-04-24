@@ -38,36 +38,15 @@ class Block {
       const W = w - 2 * offset;
       const H = h - 2 * offset;
 
-      const path1 = new Path2D();
-      const path2 = new Path2D();
-
-      path1.moveTo(X + r, Y);
-      path1.lineTo(X + W - r, Y);
-      path1.arcTo(X + W, Y, X + W, Y + r, r);
-      path1.lineTo(X + W, Y + H - r);
-      path1.arcTo(X + W, Y + H, X + W - r, Y + H, r);
-      path1.lineTo(X + r, Y + H);
-      path1.arcTo(X, Y + H, X, Y + H - r, r);
-      path1.lineTo(X, Y + r);
-      path1.arcTo(X, Y, X + r, Y, r);
-      path1.closePath();
-
+      const path1 = create2dRoundedRectPath(X, Y, W, H, r);
+      
       const inOffset = 3;
       const inX = X + inOffset;
       const inY = Y + inOffset;
       const inW = W - inOffset * 2;
       const inH = H / 1.5 - inOffset * 2;
-
-      path2.moveTo(inX + r, inY);
-      path2.lineTo(inX + inW - r, inY);
-      path2.arcTo(inX + inW, inY, inX + inW, inY + r, r);
-      path2.lineTo(inX + inW, inY + inH - r);
-      path2.arcTo(inX + inW, inY + inH, inX + inW - r, inY + inH, r);
-      path2.lineTo(inX + r, inY + inH);
-      path2.arcTo(inX, inY + inH, inX, inY + inH - r, r);
-      path2.lineTo(inX, inY + r);
-      path2.arcTo(inX, inY, inX + r, inY, r);
-      path2.closePath();
+      
+      const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r);
 
       this.path = [path1, path2];
    }

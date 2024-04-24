@@ -1,7 +1,8 @@
 class PlayLevel {
-   constructor() {
+   constructor(pad) {
       this.blocks = [];
       this.walls = [];
+      this.pad = pad;
    }
 
    setup(level = this.level) {
@@ -26,6 +27,7 @@ class PlayLevel {
          console.log("Game is Over!");
          animation.stop();
       }
+      this.pad.update();
    }
 
    draw(ctx, cWidth, cHeight) {
@@ -36,5 +38,6 @@ class PlayLevel {
       this.walls.forEach((wall) => {
          wall.draw(ctx);
       });
+      this.pad.draw(ctx);
    }
 }

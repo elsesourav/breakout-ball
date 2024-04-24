@@ -11,8 +11,8 @@ const previewCanvas = $("#preview");
 const pCtx = previewCanvas.getContext("2d");
 const ctx = CVS.getContext("2d");
 
-CVS.width = SCALE * 9;
-CVS.height = SCALE * 16;
+CVS.width = CVS_W;
+CVS.height = CVS_H;
 previewCanvas.width = SCALE * rows * pScale;
 previewCanvas.height = SCALE_H * cols * pScale;
 
@@ -21,29 +21,8 @@ pCtx.imageSmoothingQuality = "high";
 
 const animation = new Animation(FPS);
 const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
-const playLevel = new PlayLevel();
-const pad = new Pad(400, 800, 80, 40, CVS);
-
-
-if (window.DeviceOrientationEvent) {
-   mobileErr.innerHTML = "true"
-   window.addEventListener("deviceorientation", (e) => {
-      const { beta, gamma } = e;
-
-      mobileErr.innerHTML += `beta: ${beta}; gamma: ${gamma}\n`;
-
-      // const g = map(gamma * 10, -winw / 2, winw / 2, 0, winw - this.pad.w / (2 * SCALE));
-      // this.x += gamma;
-      // );
-      // if (0 <= g && winw - this.pad.w >= g) {
-      //    if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
-      //       this.pad.x = winw - this.pad.w - g;
-      //    } else {
-      //       this.pad.x = g;
-      //    }
-      // }
-   });
-}
+const pad = new Pad(CVS_W / 2, CVS_H - FOOTER_HEIGHT, PAD_WIDTH, PAD_HEIGHT, CVS);
+const playLevel = new PlayLevel(pad);
 
 let levels = [];
 let currentSelectedLevel; // store level map
@@ -54,64 +33,29 @@ function createHtmlLevels(levels, levelsMap) {
    const htmlLevels = [];
 
    for (let i = 0; i < levels.length; i++) {
-      const mainEle = document.createElement("div");
-      mainEle.classList.add("level", "lock");
+      const mainEle = CE("div", ["level", "lock"]);
 
-      const top = document.createElement("div");
-      top.classList.add("top");
+      const top = CE("div", ["top"], "", mainEle);
+      const hashtag = CE("div", ["hashtag"], top);
 
-      const hashtag = document.createElement("div");
-      hashtag.classList.add("hashtag");
+      CE("i", ["sbi-trophy2"], "", hashtag);
+      const p = CE("p", [], "00", hashtag);
 
-      const hashtagIcon = document.createElement("i");
-      hashtagIcon.classList.add("sbi-trophy2");
-      const p = document.createElement("p");
-      p.innerHTML = "00";
+      const lockComplete = CE("div", ["is-lock-or-complete"], "", top);
+      CE("i", ["sbi-lock-outline", "lock"], "", lockComplete);
+      CE("i", ["sbi-check-circle-outline", "check"], "", lockComplete);
 
-      const isLockOrComplete = document.createElement("div");
-      isLockOrComplete.classList.add("is-lock-or-complete");
-      const lock = document.createElement("i");
-      lock.classList.add("sbi-lock-outline", "lock");
-      const check = document.createElement("i");
-      check.classList.add("sbi-check-circle-outline", "check");
+      const iconAndNo = CE("div", ["icon-and-no"], "", mainEle);
+      CE("i", ["sbi-fire"], "", iconAndNo);
+      const no = CE("p", ["no"], i + 1, iconAndNo);
 
-      const iconAndNo = document.createElement("div");
-      iconAndNo.classList.add("icon-and-no");
-      const icon = document.createElement("i");
-      icon.classList.add("sbi-fire");
-      const no = document.createElement("p");
-      no.classList.add("no");
-      no.innerHTML = i + 1;
+      const completeTime = CE("div", ["complete-time"], "", mainEle);
+      CE("i", ["sbi-stopwatch1"], "", completeTime);
+      const time = CE("p", ["time"], "000", completeTime);
+      CE("span", [], "s", completeTime);
 
-      const completeTime = document.createElement("div");
-      completeTime.classList.add("complete-time");
-      const timeIcon = document.createElement("i");
-      timeIcon.classList.add("sbi-stopwatch1");
-      const time = document.createElement("p");
-      time.classList.add("time");
-      time.innerHTML = "000";
-      const s = document.createElement("span");
-      s.innerHTML = "s";
-
-      mainEle.appendChild(top);
-      top.appendChild(hashtag);
-      hashtag.appendChild(hashtagIcon);
-      hashtag.appendChild(p);
-      top.appendChild(isLockOrComplete);
-      isLockOrComplete.appendChild(lock);
-      isLockOrComplete.appendChild(check);
-
-      mainEle.appendChild(iconAndNo);
-      iconAndNo.appendChild(icon);
-      iconAndNo.appendChild(no);
-
-      mainEle.appendChild(completeTime);
-      completeTime.appendChild(timeIcon);
-      completeTime.appendChild(time);
-      completeTime.appendChild(s);
-
-      htmlLevels.push([mainEle, no, time]);
       levelsMap.appendChild(mainEle);
+      htmlLevels.push([mainEle, p, no, time]);
    }
    htmlLevels[0][0].classList.remove("lock");
    return htmlLevels;
