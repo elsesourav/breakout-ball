@@ -48,7 +48,7 @@ class Pad {
          window.addEventListener("deviceorientation", (e) => {
             const { beta, gamma } = e;
 
-            mobileErr.innerHTML += `beta: ${beta}; gamma: ${gamma}\n`;
+            mobileErr.innerHTML = `beta: ${beta}; gamma: ${gamma}\n`;
 
             // const g = map(gamma * 10, -winw / 2, winw / 2, 0, winw - this.pad.w / (2 * SCALE));
             this.x += gamma;
