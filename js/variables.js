@@ -15,4 +15,10 @@ const pScale = 0.7;
 const FOOTER_HEIGHT = SCALE_H * 2.4;
 const PAD_WIDTH = SCALE * 2.4;
 const PAD_HEIGHT = SCALE_H * 0.6;
+const BALL_RADIUS = SCALE_H * 0.4;
+
+const CVS = $("#myCanvas");
+const previewCanvas = $("#preview");
+const pCtx = previewCanvas.getContext("2d");
+const ctx = CVS.getContext("2d");
 

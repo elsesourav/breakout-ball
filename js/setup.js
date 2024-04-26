@@ -6,11 +6,6 @@ rootStyle.setProperty("--cols", cols * SCALE_H / SCALE);
 rootStyle.setProperty("--pScale", pScale);
 if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
 
-const CVS = $("#myCanvas");
-const previewCanvas = $("#preview");
-const pCtx = previewCanvas.getContext("2d");
-const ctx = CVS.getContext("2d");
-
 CVS.width = CVS_W;
 CVS.height = CVS_H;
 previewCanvas.width = SCALE * rows * pScale;
@@ -21,8 +16,7 @@ pCtx.imageSmoothingQuality = "high";
 
 const animation = new Animation(FPS);
 const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
-const pad = new Pad(CVS_W / 2, CVS_H - FOOTER_HEIGHT, PAD_WIDTH, PAD_HEIGHT, CVS);
-const playLevel = new PlayLevel(pad);
+const playLevel = new PlayLevel();
 
 let levels = [];
 let currentSelectedLevel; // store level map

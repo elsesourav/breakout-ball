@@ -1,8 +1,9 @@
 class PlayLevel {
-   constructor(pad) {
+   constructor() {
       this.blocks = [];
       this.walls = [];
-      this.pad = pad;
+      this.pad = new Pad(CVS_W / 2, CVS_H - FOOTER_HEIGHT, PAD_WIDTH, PAD_HEIGHT, CVS);
+      this.ball = new Ball(CVS_W / 2, CVS_H - FOOTER_HEIGHT, BALL_RADIUS); 
    }
 
    setup(level = this.level) {
@@ -19,7 +20,7 @@ class PlayLevel {
             this.blocks.push(new Block(x, y, w, h, health));
          }
       }
-      console.log(this.blocks);
+      
    }
 
    update() {
@@ -29,6 +30,7 @@ class PlayLevel {
          animation.stop();
       }
       this.pad.update();
+      this.ball.update();
    }
 
    draw(ctx, cWidth, cHeight) {
@@ -40,5 +42,6 @@ class PlayLevel {
          wall.draw(ctx);
       });
       this.pad.draw(ctx);
+      this.ball.draw(ctx);
    }
 }

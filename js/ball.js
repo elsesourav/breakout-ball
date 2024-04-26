@@ -1,33 +1,27 @@
 class Ball {
-   constructor(x, y, r, speed, setupLevel, onlyY = true) {
+   constructor(x, y, r, speed) {
       this.x = x;
       this.y = y;
-      this.fr = r;
       this.r = r;
+      this.s = speed;
       this.px = this.x;
       this.py = this.y;
-      this.s = speed;
-      this.speed = this.s / 5;
-      this.vx = this.speed * random(-1, 1);
-      this.vy = onlyY ? -this.speed : -this.speed * (random() > 0.5 ? 1 : -1);
-      this.setupLevel = setupLevel;
-      this.lastPowerUse;
-      this.color = "#ffffff";
+      this.vx = speed * Math.random(-1, 1);
+      this.vy = -speed * (Math.random() > 0.5 ? 1 : -1);
    }
 
-   draw() {
-      ctx.fillStyle = color;
-      strokeStyle(255, 255, 0, 1);
-      arc(this.x, this.y, this.r + 4, true, 1);
+   draw(ctx) {
+      ctx.fillStyle = "#ffffff77";
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.arc(this.x, this.y, this.r - this.r * 0.2, 0, Math.PI * 2, false);
    }
 
    update() {
-      for (let i = 0; i < 30; i++) {
-         this.px = this.x;
-         this.py = this.y;
-         this.x += this.vx;
-         this.y += this.vy;
-         this.setupLevel && this.setupLevel.collision();
-      }
+      this.px = this.x;
+      this.py = this.y;
+      this.x += this.vx;
+      this.y += this.vy;
    }
 }
