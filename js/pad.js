@@ -1,5 +1,5 @@
 class Pad {
-   constructor(x, y, w, h, canvas, gyroSen = 1) {
+   constructor(x, y, w, h, canvas, gyroSen = 10) {
       this.x = x;
       this.y = y;
       this.w = w;
@@ -91,7 +91,7 @@ class Pad {
          window.addEventListener("deviceorientation", (e) => {
             const { beta, gamma } = e;
 
-            const deltaGamma = gamma - this.oldGamma;
+            const deltaGamma = (gamma - this.oldGamma) * this.gyroSen;
 
             if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
                this.tx -= deltaGamma;
