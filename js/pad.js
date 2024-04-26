@@ -27,22 +27,6 @@ class Pad {
       const X = x - w / 2;
       const sideW = w / 4;
 
-      ctx.fillStyle = "#ffa600";
-      ctx.fill(create2dRoundedRectPath(x - sideW * 2, y, sideW, h, r));
-
-      ctx.fillStyle = "#ffa600";
-      ctx.fill(create2dRoundedRectPath(x + sideW, y, sideW, h, r));
-
-      ctx.fillStyle = "#a60000";
-      ctx.fill(
-         create2dRoundedRectPath(x - sideW * 2 + 10, y, sideW / 3, h, r / 2)
-      );
-
-      ctx.fillStyle = "#a60000";
-      ctx.fill(
-         create2dRoundedRectPath(X + w - 10 - sideW / 3, y, sideW / 3, h, r / 2)
-      );
-
       ctx.fillStyle = "#0000ff77";
       ctx.fill(
          create2dRoundedRectPath(
@@ -54,9 +38,25 @@ class Pad {
          )
       );
 
+      ctx.fillStyle = "#a60000";
+      ctx.fill(
+         create2dRoundedRectPath(X + w - 10 - sideW / 3, y, sideW / 3, h, r / 2)
+      );
+
       ctx.fillStyle = "#65f2ff";
       ctx.fill(
          create2dRoundedRectPath(x - sideW, y + h * 0.1, sideW * 2, h * 0.8, 4)
+      );
+
+      ctx.fillStyle = "#ffa600";
+      ctx.fill(create2dRoundedRectPath(x - sideW * 2, y, sideW, h, r));
+
+      ctx.fillStyle = "#ffa600";
+      ctx.fill(create2dRoundedRectPath(x + sideW, y, sideW, h, r));
+
+      ctx.fillStyle = "#a60000";
+      ctx.fill(
+         create2dRoundedRectPath(x - sideW * 2 + 10, y, sideW / 3, h, r / 2)
       );
 
       ctx.fillStyle = "#ffffff66";
@@ -94,9 +94,9 @@ class Pad {
             const deltaGamma = (gamma - this.oldGamma) * this.gyroSen;
 
             if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
-               this.x = this.tx -= deltaGamma;
+               this.tx -= deltaGamma;
             } else {
-               this.x = this.tx += deltaGamma;
+               this.tx += deltaGamma;
             }
 
             this.oldGamma = gamma;
@@ -124,8 +124,10 @@ class Pad {
          this.x += (tx - x) * 0.3;
       } else if (tx < w / 2) {
          this.x += (w / 2 - this.x) * 0.3;
+         this.tx = 0;
       } else if (tx > cvs.width - w / 2) {
          this.x += (cvs.width - w / 2 - this.x) * 0.3;
+         this.tx = cvs.width;
       }
    }
 }

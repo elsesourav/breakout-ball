@@ -3,7 +3,7 @@ class PlayLevel {
       this.blocks = [];
       this.walls = [];
       this.pad = new Pad(CVS_W / 2, CVS_H - FOOTER_HEIGHT, PAD_WIDTH, PAD_HEIGHT, CVS);
-      this.ball = new Ball(CVS_W / 2, CVS_H - FOOTER_HEIGHT, BALL_RADIUS); 
+      this.ball = new Ball(CVS_W / 2, CVS_H - FOOTER_HEIGHT, BALL_RADIUS, 1); 
    }
 
    setup(level = this.level) {

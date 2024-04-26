@@ -6,6 +6,7 @@ class Ball {
       this.s = speed;
       this.px = this.x;
       this.py = this.y;
+      this.g = 0.05;
       this.vx = speed * Math.random(-1, 1);
       this.vy = -speed * (Math.random() > 0.5 ? 1 : -1);
    }
@@ -23,5 +24,6 @@ class Ball {
       this.py = this.y;
       this.x += this.vx;
       this.y += this.vy;
+      this.y += this.g;
    }
 }
