@@ -27,7 +27,7 @@ class Block {
    }
 
    setOnlyOutline(onlyOutline) {
-      this.onlyOutline = onlyOutline;  
+      this.onlyOutline = onlyOutline;
    }
 
    #setupPath() {
@@ -39,13 +39,13 @@ class Block {
       const H = h - 2 * offset;
 
       const path1 = create2dRoundedRectPath(X, Y, W, H, r);
-      
+
       const inOffset = 3;
       const inX = X + inOffset;
       const inY = Y + inOffset;
       const inW = W - inOffset * 2;
       const inH = H / 1.5 - inOffset * 2;
-      
+
       const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r);
 
       this.path = [path1, path2];
@@ -78,7 +78,6 @@ class Block {
       this.#setupPath();
    }
 
-
    drawOutline(ctx) {
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#ffffff";
@@ -98,19 +97,17 @@ class Block {
 
          ctx.fillStyle = "#fff4";
          ctx.fill(this.path[1]);
-      
-      } else {
-         this.particles.forEach((particle) => {
-            particle.draw(ctx);
-            particle.update();
-         });
-         this.particles = this.particles.filter(
-            (particle) => !particle.isDestroyed
-         );
+      }
+      this.particles.forEach((particle) => {
+         particle.draw(ctx);
+         particle.update();
+      });
+      this.particles = this.particles.filter(
+         (particle) => !particle.isDestroyed
+      );
 
-         if (this.health === 0 && this.particles.length === 0) {
-            this.isComplete = true;
-         }
+      if (this.health === 0 && this.particles.length === 0) {
+         this.isComplete = true;
       }
    }
 }

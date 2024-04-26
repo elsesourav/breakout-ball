@@ -36,8 +36,8 @@ function createHtmlLevels(levels, levelsMap) {
       const mainEle = CE("div", ["level", "lock"]);
 
       const top = CE("div", ["top"], "", mainEle);
-      const hashtag = CE("div", ["hashtag"], top);
 
+      const hashtag = CE("div", ["hashtag"], "", top);
       CE("i", ["sbi-trophy2"], "", hashtag);
       const p = CE("p", [], "00", hashtag);
 

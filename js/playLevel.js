@@ -19,10 +19,11 @@ class PlayLevel {
             this.blocks.push(new Block(x, y, w, h, health));
          }
       }
+      console.log(this.blocks);
    }
 
    update() {
-      this.blocks = this.blocks.filter(block => !block.isComplete);
+      // this.blocks = this.blocks.filter(block => !block.isComplete);
       if (this.blocks.length === 0) {
          console.log("Game is Over!");
          animation.stop();

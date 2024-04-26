@@ -5,8 +5,6 @@ function lvlEditor() {
 function playGame() {
    playLevel.update();
    playLevel.draw(ctx, CVS.width, CVS.height);
-
-   pad.draw(ctx);
 }
 
 
