@@ -56,7 +56,7 @@
 
                p {
                   color: #ffffff;
-                  text-shadow: 0 1px 1px #000000;
+                  /* text-shadow: 0 1px 1px #000000; */
                }
 
                i {
@@ -100,14 +100,14 @@
             cursor: var(--cursor);
 
             display: inline-block;
-            box-shadow: inset 2px 2px 2px 0px #ffffff80,
-               7px 7px 20px 0px #0000001a, 4px 4px 5px 0px #0000001a;
+            /* box-shadow: inset 2px 2px 2px 0px #ffffff80,
+               7px 7px 20px 0px #0000001a, 4px 4px 5px 0px #0000001a; */
             color: #000000;
             background: #fb2175;
             background: linear-gradient(0deg, #fb2175 0%, #ea4c89 100%);
             color: #ffffff;
             font-size: calc(var(--s) * 0.5);
-            text-shadow: 0 1px 1px #000000;
+            /* text-shadow: 0 1px 1px #000000; */
             font-family: f1b;
             z-index: 2;
             overflow: hidden;
@@ -135,7 +135,7 @@
          -webkit-backdrop-filter: blur(3px);
          padding: calc(var(--s) * 0.1);
          border-radius: calc(var(--s) * 0.3);
-         box-shadow: inset 0 0 calc(var(--s) * 0.2) #00000099;
+         /* box-shadow: inset 0 0 calc(var(--s) * 0.2) #00000099; */
 
          .title {
             position: relative;
@@ -194,13 +194,13 @@
                      justify-content: center;
                      gap: calc(var(--s) * 0.05);
                   }
-               }
 
-               tr:first-child {
-                  font-weight: bold;
-                  color: #ff5500;
+                  &:first-child * {
+                     font-weight: bold;
+                     font-family: f5;
+                     color: #ff5500;
+                  }
                }
-
             }
          }
       }
@@ -220,8 +220,7 @@
       background: #ff000066;
       border: none;
       outline: solid 1px #ff0000;
-      box-shadow: 0 1px 3px #000000;
-      text-shadow: 0 0 1px #000000;
+      /* text-shadow: 0 1px #000000; */
       cursor: var(--cursor);
    }
 }
@@ -238,7 +237,7 @@
    z-index: 5;
    animation: shiny-btn1 3s ease-in-out infinite;
 }
-
+/* 
 @-webkit-keyframes shiny-btn1 {
    0% {
       -webkit-transform: scale(0) rotate(45deg);
@@ -276,4 +275,4 @@
       transform: scale(50) rotate(45deg);
       opacity: 0;
    }
-}
+} */

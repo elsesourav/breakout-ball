@@ -90,21 +90,21 @@ class Paddle {
          moveHandler(e.touches[0].clientX);
       });
 
-      if (window.DeviceOrientationEvent) {
-         window.addEventListener("deviceorientation", (e) => {
-            const { beta, gamma } = e;
+      // if (window.DeviceOrientationEvent) {
+      //    window.addEventListener("deviceorientation", (e) => {
+      //       const { beta, gamma } = e;
 
-            const deltaGamma = (gamma - this.oldGamma) * this.gyroSen;
+      //       const deltaGamma = (gamma - this.oldGamma) * this.gyroSen;
 
-            if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
-               this.tx -= deltaGamma;
-            } else {
-               this.tx += deltaGamma;
-            }
+      //       if ((beta > 120 && beta < 180) || (beta > 120 && beta < 180)) {
+      //          this.tx -= deltaGamma;
+      //       } else {
+      //          this.tx += deltaGamma;
+      //       }
 
-            this.oldGamma = gamma;
-         });
-      }
+      //       this.oldGamma = gamma;
+      //    });
+      // }
    }
 
    draw(ctx) {

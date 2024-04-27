@@ -59,7 +59,8 @@ class Block {
          for (let j = offset; j < w - offset * 2; j += gap) {
             const px = x * w + j;
             const py = y * h + i;
-            this.particles.push(new Particle(px, py, 1, this.colors[this.health + 1][0]));
+            const size = Math.ceil(Math.random() * gap);
+            this.particles.push(new Particle(px, py, size, this.colors[this.health + 1][0]));
          }
       }
    }
@@ -70,9 +71,9 @@ class Block {
       this.health--;
       if (this.health < 0) {
          this.isVisible = false;
-         this.#setParticle(2);
+         this.#setParticle(8);
       } else {
-         this.#setParticle(4);
+         this.#setParticle(16);
       }
       this.#setupPath();
    }

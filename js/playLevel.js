@@ -13,11 +13,11 @@ class PlayLevel {
 
       for (const key in this.level) {
          const element = this.level[key];
-         const { x, y, w, h, health } = element;
+         const { x, y, health } = element;
          if (health === 6) {
-            this.walls.push(new Block(x, y, w, h, health));
+            this.walls.push(new Block(x, y, SCALE, SCALE_H, health));
          } else {
-            this.blocks.push(new Block(x, y, w, h, health));
+            this.blocks.push(new Block(x, y, SCALE, SCALE_H, health));
          }
       }
    }
