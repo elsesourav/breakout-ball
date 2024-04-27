@@ -20,10 +20,10 @@ function playGame() {
       });
    });
 
-   CVS.classList.add("active");
-   startPreview.classList.remove("active");
-   playLevel.setup(levels[0]);
-   animation.start(playGame);
+   // CVS.classList.add("active");
+   // startPreview.classList.remove("active");
+   // playLevel.setup(levels[0]);
+   // animation.start(playGame);
    
    
    // animation.start(fun);

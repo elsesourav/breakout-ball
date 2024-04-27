@@ -1,5 +1,5 @@
-class Pad {
-   constructor(x, y, w, h, canvas, gyroSen = 10) {
+class Paddle {
+   constructor(x, y, w, h, canvas, gyroSen = 20) {
       this.x = x;
       this.y = y;
       this.w = w;
@@ -27,7 +27,7 @@ class Pad {
       const X = x - w / 2;
       const sideW = w / 4;
 
-      ctx.fillStyle = "#0000ff77";
+      ctx.fillStyle = "#0000ff88";
       ctx.fill(
          create2dRoundedRectPath(
             x - sideW - sideW * 0.3,
@@ -36,11 +36,6 @@ class Pad {
             h * 1.2,
             4
          )
-      );
-
-      ctx.fillStyle = "#a60000";
-      ctx.fill(
-         create2dRoundedRectPath(X + w - 10 - sideW / 3, y, sideW / 3, h, r / 2)
       );
 
       ctx.fillStyle = "#65f2ff";
@@ -59,8 +54,16 @@ class Pad {
          create2dRoundedRectPath(x - sideW * 2 + 10, y, sideW / 3, h, r / 2)
       );
 
+      ctx.fillStyle = "#a60000";
+      ctx.fill(
+         create2dRoundedRectPath(X + w - 10 - sideW / 3, y, sideW / 3, h, r / 2)
+      );
+
       ctx.fillStyle = "#ffffff66";
-      ctx.fill(create2dRoundedRectPath(X, y + h * 0.25, w, h / 2, r));
+      ctx.fill(create2dRoundedRectPath(X, y + h * 0.1, w, h / 3, r));
+
+      ctx.fillStyle = "#00000033";
+      ctx.fill(create2dRoundedRectPath(X, y + h * 0.8, w, h / 5, r / 2));
    }
 
    #eventListener() {

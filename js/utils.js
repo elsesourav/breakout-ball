@@ -10,8 +10,8 @@ const isMobile = localStorage.mobile || navigator.maxTouchPoints > 1;
 // minimum window size
 const minSize = innerWidth > innerHeight ? innerHeight : innerWidth;
 
-const toRadian = (degree) => (degree * Math.PI) / 180; // degree to radian
-const toDegree = (radian) => (radian * 180) / Math.PI; // radian to Degree
+const toRadians = (degree) => (degree * Math.PI) / 180; // degree to radian
+const toDegrees = (radian) => (radian * 180) / Math.PI; // radian to Degree
 
 const rnd = (start = 0, end = 1, int_floor = false) => {
    const result = start + Math.random() * (end - start);
@@ -192,5 +192,3 @@ function create2dRoundedRectPath(x, y, w, h, r) {
    path.closePath();
    return path;
 }
-
-

@@ -2,8 +2,8 @@ class PlayLevel {
    constructor() {
       this.blocks = [];
       this.walls = [];
-      this.pad = new Pad(CVS_W / 2, CVS_H - FOOTER_HEIGHT, PAD_WIDTH, PAD_HEIGHT, CVS);
-      this.ball = new Ball(CVS_W / 2, CVS_H - FOOTER_HEIGHT, BALL_RADIUS, 1); 
+      this.pad = new Paddle(CVS_W / 2, CVS_H - FOOTER_HEIGHT, PAD_WIDTH, PAD_HEIGHT, CVS);
+      this.ball = new Ball(CVS_W / 2, CVS_H - FOOTER_HEIGHT - BALL_RADIUS, BALL_RADIUS, 10, CVS);
    }
 
    setup(level = this.level) {
@@ -20,17 +20,16 @@ class PlayLevel {
             this.blocks.push(new Block(x, y, w, h, health));
          }
       }
-      
    }
 
    update() {
-      // this.blocks = this.blocks.filter(block => !block.isComplete);
+      this.blocks = this.blocks.filter(block => !block.isComplete);
       if (this.blocks.length === 0) {
-         console.log("Game is Over!");
+         console.log("Win!");
          animation.stop();
       }
       this.pad.update();
-      this.ball.update();
+      this.ball.update(this.pad, [...this.blocks,...this.walls]);
    }
 
    draw(ctx, cWidth, cHeight) {
@@ -41,7 +40,7 @@ class PlayLevel {
       this.walls.forEach((wall) => {
          wall.draw(ctx);
       });
-      this.pad.draw(ctx);
       this.ball.draw(ctx);
+      this.pad.draw(ctx);
    }
 }

@@ -7,7 +7,7 @@ class Block {
       this.r = 6;
       this.health = health - 1;
       this.onlyOutline = onlyOutline;
-      this.isDestroyed = false;
+      this.isVisible = true;
       this.isComplete = false;
       this.colors = [
          ["#00bcb9", "#4ffffc"],
@@ -59,18 +59,17 @@ class Block {
          for (let j = offset; j < w - offset * 2; j += gap) {
             const px = x * w + j;
             const py = y * h + i;
-            this.particles.push(new Particle(px, py, 1, this.colors[0][0]));
+            this.particles.push(new Particle(px, py, 1, this.colors[this.health + 1][0]));
          }
       }
    }
 
    damage() {
-      if (this.health === this.colors.length - 2) return;
+      if (this.health === this.colors.length - 1) return;
 
       this.health--;
       if (this.health < 0) {
-         this.isDestroyed = true;
-         this.health = 0;
+         this.isVisible = false;
          this.#setParticle(2);
       } else {
          this.#setParticle(4);
@@ -85,7 +84,7 @@ class Block {
    }
 
    draw(ctx) {
-      if (!this.isDestroyed) {
+      if (this.isVisible) {
          const [color, stroke] = this.colors[this.health];
 
          ctx.lineWidth = 2;
@@ -102,11 +101,9 @@ class Block {
          particle.draw(ctx);
          particle.update();
       });
-      this.particles = this.particles.filter(
-         (particle) => !particle.isDestroyed
-      );
+      this.particles = this.particles.filter((particle) => !particle.isVisible);
 
-      if (this.health === 0 && this.particles.length === 0) {
+      if (!this.isVisible && this.particles.length == 0) {
          this.isComplete = true;
       }
    }

@@ -130,7 +130,7 @@ class SetupLevel {
           this.score += 5;
 
           if (!obt.ht) {
-            // set distroy particle
+            // set destroy particle
             const len = random(20, 35);
             for (let j = 0; j < len; j++) {
               this.particles.push(new Particle(

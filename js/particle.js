@@ -9,7 +9,7 @@ class Particle {
       this.speedX = Math.random() * 4 - 2;
       this.speedY = Math.random() * 4 - 2;
       this.alpha = Math.random() * 2;
-      this.isDestroyed = false;
+      this.isVisible = false;
    }
 
    update() {
@@ -21,7 +21,7 @@ class Particle {
       this.speedY += this.gravity;
       this.alpha -= 0.01;
       if (this.alpha < 0.02) {
-         this.isDestroyed = true;
+         this.isVisible = true;
          this.alpha = 0;
       }
    }
