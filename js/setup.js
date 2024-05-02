@@ -2,7 +2,7 @@ rootStyle.setProperty("--window-width", `${WIDTH}px`);
 rootStyle.setProperty("--window-height", `${HEIGHT}px`);
 rootStyle.setProperty("--s", `${DELTA_SIZE}px`);
 rootStyle.setProperty("--rows", rows);
-rootStyle.setProperty("--cols", cols * SCALE_H / SCALE);
+rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
 rootStyle.setProperty("--pScale", pScale);
 if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
 
@@ -16,7 +16,20 @@ pCtx.imageSmoothingQuality = "high";
 
 const animation = new Animation(FPS);
 const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
-const playLevel = new PlayLevel();
+const playLevel = new PlayLevel({
+   padX: CVS_W / 2,
+   padY: CVS_H - FOOTER_HEIGHT,
+   padW: PAD_WIDTH,
+   padH: PAD_HEIGHT,
+   ballX: CVS_W / 2,
+   ballY: CVS_H - FOOTER_HEIGHT - BALL_RADIUS,
+   ballR: BALL_RADIUS,
+   ballS: BALL_SPEED,
+   cvs: CVS,
+   blockW: SCALE,
+   blockH: SCALE_H,
+   fps: FPS,
+});
 
 let levels = [];
 let currentSelectedLevel; // store level map

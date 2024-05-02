@@ -192,3 +192,23 @@ function create2dRoundedRectPath(x, y, w, h, r) {
    path.closePath();
    return path;
 }
+
+
+const _cvs_ = document.createElement('canvas');
+document.body.appendChild(_cvs_);
+_cvs_.style.display = 'none';
+const _ctx_ = _cvs_.getContext('2d');
+
+function createCanvasImage(drawFunction, width, height) {
+   _cvs_.width = width;
+   _cvs_.height = height;
+   drawFunction(_ctx_);
+
+   const image = new Image();
+   image.src = _cvs_.toDataURL('image/png');
+
+   const imgData = _ctx_.getImageData(0, 0, _cvs_.width, _cvs_.height);
+    _ctx_.putImageData(imgData, 0, 0);
+
+   return image;
+}

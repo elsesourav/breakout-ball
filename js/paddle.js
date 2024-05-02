@@ -12,23 +12,39 @@ class Paddle {
       this.lh = canvas.height - y - h - 10;
 
       this.vx = 1;
-      this.path = [];
+      this.paths = [];
+      this.pathColors = [];
+      this.isPointerLock = false;
+      this.percentage = isMobile ? 0.3 : 0.2;
       this.setup();
       this.#eventListener();
    }
 
    setup(gyroSen = this.gyroSen) {
-      this.path = [];
       this.gyroSen = gyroSen;
+
+      this.paths = [];
+      this.#createPath();
+      this.pathColors = [
+         "#0000ff88",
+         "#65f2ff",
+         "#ffa600",
+         "#ffa600",
+         "#a60000",
+         "#a60000",
+         "#ffffff66",
+         "#00000033",
+      ];
    }
 
-   #drawPath(ctx) {
-      const { x, y, w, h, r } = this;
+   #createPath() {
+      const { w, h, r } = this;
+      const x = 0,
+         y = 0;
       const X = x - w / 2;
       const sideW = w / 4;
 
-      ctx.fillStyle = "#0000ff88";
-      ctx.fill(
+      this.paths.push(
          create2dRoundedRectPath(
             x - sideW - sideW * 0.3,
             y - h * 0.1,
@@ -38,51 +54,115 @@ class Paddle {
          )
       );
 
-      ctx.fillStyle = "#65f2ff";
-      ctx.fill(
+      this.paths.push(
          create2dRoundedRectPath(x - sideW, y + h * 0.1, sideW * 2, h * 0.8, 4)
       );
 
-      ctx.fillStyle = "#ffa600";
-      ctx.fill(create2dRoundedRectPath(x - sideW * 2, y, sideW, h, r));
+      this.paths.push(create2dRoundedRectPath(x - sideW * 2, y, sideW, h, r));
 
-      ctx.fillStyle = "#ffa600";
-      ctx.fill(create2dRoundedRectPath(x + sideW, y, sideW, h, r));
+      this.paths.push(create2dRoundedRectPath(x + sideW, y, sideW, h, r));
 
-      ctx.fillStyle = "#a60000";
-      ctx.fill(
+      this.paths.push(
          create2dRoundedRectPath(x - sideW * 2 + 10, y, sideW / 3, h, r / 2)
       );
 
-      ctx.fillStyle = "#a60000";
-      ctx.fill(
+      this.paths.push(
          create2dRoundedRectPath(X + w - 10 - sideW / 3, y, sideW / 3, h, r / 2)
       );
 
-      ctx.fillStyle = "#ffffff66";
-      ctx.fill(create2dRoundedRectPath(X, y + h * 0.1, w, h / 3, r));
+      this.paths.push(create2dRoundedRectPath(X, y + h * 0.1, w, h / 3, r));
 
-      ctx.fillStyle = "#00000033";
-      ctx.fill(create2dRoundedRectPath(X, y + h * 0.8, w, h / 5, r / 2));
+      this.paths.push(create2dRoundedRectPath(X, y + h * 0.8, w, h / 5, r / 2));
+   }
+
+   #drawPath(ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      for (let i = 0; i < this.paths.length; i++) {
+         ctx.fillStyle = this.pathColors[i];
+         ctx.fill(this.paths[i]);
+      }
+      ctx.restore();
    }
 
    #eventListener() {
       const { cvs } = this;
       const { left, width } = cvs.getBoundingClientRect();
       const scale = cvs.width / width;
+      const cw = cvs.width;
+      const hw = this.w / 2;
 
       const moveHandler = (x) => {
-         let t = (x - left) * scale;
-         t = t < 0 ? 0 : t;
-         this.tx = t > cvs.width ? cvs.width : t;
+         this.tx = (x - left) * scale;
+         if (!(this.tx > hw && this.tx < cw - hw)) {
+            this.tx = this.tx <= hw ? hw : cw - hw;
+         }
       };
 
+      const pcMoveHandler = (dx) => {
+         this.tx += dx * 3;
+         if (!(this.tx > hw && this.tx < cw - hw)) {
+            this.tx = this.tx <= hw ? hw : cw - hw;
+         }
+      };
+
+      document.body.addEventListener(
+         "click",
+         (e) => {
+            if (!this.isPointerLock) {
+               this.isPointerLock = true;
+               if (CVS.requestPointerLock) {
+                  CVS.requestPointerLock();
+               } else if (CVS.webkitRequestPointerLock) {
+                  CVS.webkitRequestPointerLock();
+               } else if (CVS.mozRequestPointerLock) {
+                  CVS.mozRequestPointerLock();
+               } else {
+                  console.warn("Pointer locking not supported");
+                  this.isPointerLock = false;
+               }
+            } else {
+               document.exitPointerLock =
+                  document.exitPointerLock || document.mozExitPointerLock;
+               document.exitPointerLock();
+               this.isPointerLock = false;
+            }
+         },
+         false
+      );
+
+      document.addEventListener("pointerlockchange", pointerLockChange, false);
+      document.addEventListener(
+         "mozpointerlockchange",
+         pointerLockChange,
+         false
+      );
+
+      function pointerLockChange() {
+         if (
+            document.pointerLockElement === CVS ||
+            document.mozPointerLockElement === CVS
+         ) {
+            CVS.style.curser = "none";
+         } else {
+            CVS.style.curser = "move";
+         }
+      }
+
       this.cvs.addEventListener("mouseenter", (e) => {
-         moveHandler(e.clientX);
+         this.isPointerLock && pcMoveHandler(e.movementX);
       });
       this.cvs.addEventListener("mousemove", (e) => {
-         moveHandler(e.clientX);
+         this.isPointerLock && pcMoveHandler(e.movementX);
       });
+
+      this.cvs.addEventListener("mouseenter", (e) => {
+         !this.isPointerLock && moveHandler(e.clientX);
+      });
+      this.cvs.addEventListener("mousemove", (e) => {
+         !this.isPointerLock && moveHandler(e.clientX);
+      });
+
       this.cvs.addEventListener("touchstart", (e) => {
          moveHandler(e.touches[0].clientX);
       });
@@ -107,6 +187,10 @@ class Paddle {
       // }
    }
 
+   update() {
+      this.x += (this.tx - this.x) * this.percentage;
+   }
+
    draw(ctx) {
       const { cvs } = this;
       this.#drawPath(ctx);
@@ -118,19 +202,5 @@ class Paddle {
       ctx.fillRect(0, cvs.height - this.lh, cvs.width, this.lh / 6);
       ctx.fillStyle = "#00000005";
       ctx.fillRect(0, cvs.height - this.lh / 1.2, cvs.width, this.lh / 2);
-   }
-
-   update() {
-      const { x, tx, w, cvs } = this;
-
-      if (tx >= w / 2 && tx <= cvs.width - w / 2) {
-         this.x += (tx - x) * 0.3;
-      } else if (tx < w / 2) {
-         this.x += (w / 2 - this.x) * 0.3;
-         this.tx = 0;
-      } else if (tx > cvs.width - w / 2) {
-         this.x += (cvs.width - w / 2 - this.x) * 0.3;
-         this.tx = cvs.width;
-      }
    }
 }

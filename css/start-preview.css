@@ -137,6 +137,13 @@
          border-radius: calc(var(--s) * 0.3);
          /* box-shadow: inset 0 0 calc(var(--s) * 0.2) #00000099; */
 
+         & * {
+            touch-action: auto;
+            -ms-touch-action: auto;
+            -webkit-touch-callout: auto;
+            -ms-touch-select: auto;
+         }
+
          .title {
             position: relative;
             width: 100%;

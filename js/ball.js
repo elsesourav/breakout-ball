@@ -15,15 +15,11 @@ class Ball {
       this.vy = -this.s * Math.sin(angle);
    }
 
-   #addPadForce() {
-      this.vy = -this.s;
-   }
-
    destroy() {
       // add particles
    }
 
-   update(paddle, blocks) {
+   update(paddle, blocks, walls) {
       const { x: padX, y: padY, w: padW, h: padH } = paddle;
       let _vx = this.vx / this.s;
       let _vy = this.vy / this.s;
@@ -71,6 +67,7 @@ class Ball {
                   this.y + this.r >= y * h &&
                   this.y - this.r <= y * h + h
             );
+            
             if (block) {
                const { x, y, w, h } = block;
 
@@ -82,6 +79,28 @@ class Ball {
                   this.vx *= -1;
                }
                block.damage();
+               isBreak = true;
+               break;
+            }
+
+            // wall collision detection
+            const wall = walls.find(
+               ({ x, y, w, h }) =>
+                  this.x + this.r >= x * w &&
+                  this.x - this.r <= x * w + w &&
+                  this.y + this.r >= y * h &&
+                  this.y - this.r <= y * h + h
+            );
+            if (wall) {
+               const { x, y, w, h } = wall;
+
+               if (this.y <= y * h || this.y >= y * h + h) {
+                  this.vy *= -1;
+               }
+               
+               if (this.x <= x * w || this.x >= x * w + w) {
+                  this.vx *= -1;
+               }
                isBreak = true;
                break;
             }

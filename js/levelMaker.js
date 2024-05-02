@@ -162,7 +162,8 @@ class LevelMaker {
    }
 
    getLevel() {
-      console.log(`"${JSON.stringify(this.blocks)}"`);
-      return this.blocks;
+      const { x, y, health } = this.blocks;
+      alert(`"${JSON.stringify({ x, y, health })}"`);
+      return { x, y, health };
    }
 }

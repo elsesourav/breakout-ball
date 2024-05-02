@@ -20,10 +20,30 @@ function playGame() {
       });
    });
 
-   // CVS.classList.add("active");
-   // startPreview.classList.remove("active");
-   // playLevel.setup(levels[0]);
-   // animation.start(playGame);
+   CVS.classList.add("active");
+   startPreview.classList.remove("active");
+   playLevel.setup(levels[0]);
+   animation.start(playGame);
+
+
+
+   // function anim() {
+   //    playGame();
+   //    requestAnimationFrame(anim);
+   // }
+   // anim();
+   // let count = 0;
+   // setInterval(() => {
+   //    mobileErr.innerHTML = count; 
+   //    count = 0;
+   // }, 1000);
+
+   // function check() {
+   //    console.log("loop");
+   //    count++;
+   //    requestAnimationFrame(check);
+   // }
+   // check();
    
    
    // animation.start(fun);

@@ -1,54 +1,15 @@
 class Block {
-   constructor(x, y, w, h, health, onlyOutline = false) {
+   constructor(x, y, w, h, health, images, colors) {
       this.x = x;
       this.y = y;
       this.w = w;
       this.h = h;
-      this.r = 6;
+      this.images = images;
+      this.colors = colors;
       this.health = health - 1;
-      this.onlyOutline = onlyOutline;
       this.isVisible = true;
       this.isComplete = false;
-      this.colors = [
-         ["#00bcb9", "#4ffffc"],
-         ["#bfc200", "#fcff59"],
-         ["#00d00e", "#3bff48"],
-         ["#8c00ff", "#af4eff"],
-         ["#ff005d", "#ff4e8f"],
-         ["#ffffff", "#ffffff"],
-      ];
-      this.path = [];
-      this.#setupPath();
       this.particles = [];
-   }
-
-   setHealth(health) {
-      this.health = health - 1;
-   }
-
-   setOnlyOutline(onlyOutline) {
-      this.onlyOutline = onlyOutline;
-   }
-
-   #setupPath() {
-      const { x, y, w, h, r } = this;
-      const offset = 2 + 0.5 * (6 - this.health);
-      const X = x * w + offset;
-      const Y = y * h + offset;
-      const W = w - 2 * offset;
-      const H = h - 2 * offset;
-
-      const path1 = create2dRoundedRectPath(X, Y, W, H, r);
-
-      const inOffset = 3;
-      const inX = X + inOffset;
-      const inY = Y + inOffset;
-      const inW = W - inOffset * 2;
-      const inH = H / 1.5 - inOffset * 2;
-
-      const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r);
-
-      this.path = [path1, path2];
    }
 
    #setParticle(gap) {
@@ -67,45 +28,37 @@ class Block {
 
    damage() {
       if (this.health === this.colors.length - 1) return;
-
       this.health--;
       if (this.health < 0) {
          this.isVisible = false;
-         this.#setParticle(8);
+         this.#setParticle(10);
       } else {
-         this.#setParticle(16);
+         this.#setParticle(20);
       }
-      this.#setupPath();
    }
 
    drawOutline(ctx) {
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#ffffff";
-      ctx.stroke(this.path[0]);
+      ctx.rect(this.x * this.w, this.y * this.h, this.w, this.h);
+      ctx.stroke();
    }
 
-   draw(ctx) {
-      if (this.isVisible) {
-         const [color, stroke] = this.colors[this.health];
-
-         ctx.lineWidth = 2;
-         ctx.strokeStyle = stroke;
-         ctx.stroke(this.path[0]);
-
-         ctx.fillStyle = color;
-         ctx.fill(this.path[0]);
-
-         ctx.fillStyle = "#fff4";
-         ctx.fill(this.path[1]);
-      }
-      this.particles.forEach((particle) => {
-         particle.draw(ctx);
-         particle.update();
-      });
+   majorUpdate() {
       this.particles = this.particles.filter((particle) => !particle.isVisible);
 
       if (!this.isVisible && this.particles.length == 0) {
          this.isComplete = true;
       }
+   }
+
+   draw(ctx) {
+      if (this.isVisible) {
+         ctx.drawImage(this.images[this.health], this.x * this.w, this.y * this.h);
+      } 
+      this.particles.forEach((particle) => {
+         particle.draw(ctx);
+         particle.update();
+      });
    }
 }
