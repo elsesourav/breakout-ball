@@ -22,7 +22,7 @@ function playGame() {
 
    CVS.classList.add("active");
    startPreview.classList.remove("active");
-   playLevel.setup(levels[0]);
+   playLevel.setup(levels[7]);
    animation.start(playGame);
 
 

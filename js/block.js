@@ -1,14 +1,13 @@
 class Block {
-   constructor(x, y, w, h, health, images, colors) {
+   constructor(x, y, w, h, health, images) {
       this.x = x;
       this.y = y;
       this.w = w;
       this.h = h;
       this.images = images;
-      this.colors = colors;
       this.health = health - 1;
       this.isVisible = true;
-      this.isComplete = false;
+      this.isCompleted = false;
       this.particles = [];
    }
 
@@ -21,19 +20,21 @@ class Block {
             const px = x * w + j;
             const py = y * h + i;
             const size = Math.ceil(Math.random() * gap);
-            this.particles.push(new Particle(px, py, size, this.colors[this.health + 1][0]));
+            this.particles.push(
+               new Particle(px, py, size, this.images[this.health + 1].color)
+            );
          }
       }
    }
 
    damage() {
-      if (this.health === this.colors.length - 1) return;
+      if (this.health === this.images.length - 1) return;
       this.health--;
       if (this.health < 0) {
          this.isVisible = false;
-         this.#setParticle(10);
+         this.#setParticle(this.w / 8);
       } else {
-         this.#setParticle(20);
+         this.#setParticle(this.w / 4);
       }
    }
 
@@ -45,20 +46,32 @@ class Block {
    }
 
    majorUpdate() {
-      this.particles = this.particles.filter((particle) => !particle.isVisible);
+      for (let i = 0; i < this.particles.length; i++) {
+         if (this.particles[i] && !this.particles[i].isVisible) {
+            this.particles.splice(i--, 1); 
+         }
+      }
 
       if (!this.isVisible && this.particles.length == 0) {
-         this.isComplete = true;
+         this.isCompleted = true;
       }
    }
 
    draw(ctx) {
       if (this.isVisible) {
-         ctx.drawImage(this.images[this.health], this.x * this.w, this.y * this.h);
-      } 
+         ctx.drawImage(
+            this.images[this.health].image,
+            this.x * this.w,
+            this.y * this.h,
+            this.w,
+            this.h
+         );
+      }
       this.particles.forEach((particle) => {
-         particle.draw(ctx);
-         particle.update();
+         if (particle) {
+            particle.draw(ctx);
+            particle.update();
+         }
       });
    }
 }

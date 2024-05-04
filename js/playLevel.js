@@ -11,7 +11,7 @@ class PlayLevel {
       cvs,
       blockW,
       blockH,
-      fps
+      fps,
    }) {
       this.padX = padX;
       this.padY = padY;
@@ -28,9 +28,68 @@ class PlayLevel {
       this.timeCount = 0;
 
       this.blocks = [];
-      this.walls = [];
       this.blockImages = [];
-      this.blockColors = [
+      this.#createBlockImages();
+      this.fpsCounter = 0;
+      this.completeFPSCounter = 0;
+   }
+
+   setup(level = this.level, rows = 9, cols = 10) {
+      const {
+         padX,
+         padY,
+         padW,
+         padH,
+         ballX,
+         ballY,
+         ballR,
+         ballS,
+         cvs,
+         blockW,
+         blockH,
+      } = this;
+
+      this.level = level;
+      this.rows = rows;
+      this.cols = cols;
+      this.blocks = [];
+      this.pad = new Paddle(padX, padY, padW, padH, cvs);
+      this.ball = new Ball(ballX, ballY, ballR, ballS, cvs, blockW, blockH);
+
+      for (let i = 0; i < cols; i++) {
+         this.blocks[i] = [];
+         for (let j = 0; j < rows; j++) {
+            this.blocks[i][j] = null;
+         }
+      }
+
+      for (const key in this.level) {
+         const { x, y, health } = this.level[key];
+         this.blocks[y][x] = new Block(
+            x,
+            y,
+            blockW,
+            blockH,
+            health,
+            this.blockImages
+         );
+      }
+
+      let timeoutId;
+
+      clearTimeout(timeoutId);
+
+      // for showing fps in display
+      timeoutId = setInterval(() => {
+         mobileErr.innerHTML = this.fpsCounter;
+         this.fpsCounter = 0;
+      }, 1000);
+   }
+
+   #createBlockImages() {
+      const blockW = 64;
+      const blockH = 48;
+      const blockColors = [
          ["#00bcb9", "#4ffffc"],
          ["#bfc200", "#fcff59"],
          ["#00d00e", "#3bff48"],
@@ -38,47 +97,9 @@ class PlayLevel {
          ["#ff005d", "#ff4e8f"],
          ["#ffffff", "#ffffff"],
       ];
-      this.fpsCounter = 0;
-      this.completeFPSCounter = 0;
-   }
 
-   setup(level = this.level) {
-      const { padX, padY, padW, padH, ballX, ballY, ballR, ballS, cvs, blockW, blockH } = this;
-
-      this.level = level;
-      this.blocks = [];
-      this.walls = [];
-      this.pad = new Paddle(padX, padY, padW, padH, cvs);
-      this.ball = new Ball(ballX, ballY, ballR, ballS, cvs);
-
-      this.#createBlockImages();
-
-      for (const key in this.level) {
-         const element = this.level[key];
-         const { x, y, health } = element;
-         if (health === 6) {
-            this.walls.push(
-               new Block(x, y, blockW, blockH, health, this.blockImages, this.blockColors)
-            );
-         } else {
-            this.blocks.push(
-               new Block(x, y, blockW, blockH, health, this.blockImages, this.blockColors)
-            );
-         }
-      }
-
-      // for showing fps in display
-      setInterval(() => {
-         mobileErr.innerHTML = this.fpsCounter;
-         this.fpsCounter = 0;
-      }, 1000);
-   }
-
-   #createBlockImages() {
-      const { blockW, blockH } = this;
-
-      this.blockColors.forEach(([color, stroke], i) => {
-         const offset = 2 + 0.5 * (this.blockColors.length - i);
+      blockColors.forEach(([color, stroke], i) => {
+         const offset = 2 + 0.5 * (blockColors.length - i);
          const x = offset;
          const y = offset;
          const r = 6;
@@ -90,8 +111,8 @@ class PlayLevel {
          const inW = W - inOffset * 2;
          const inH = H / 1.5 - inOffset * 2;
 
-         this.blockImages.push(
-            createCanvasImage(
+         this.blockImages.push({
+            image: createCanvasImage(
                (ctx) => {
                   const path1 = create2dRoundedRectPath(x, y, W, H, r);
                   const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r);
@@ -108,22 +129,30 @@ class PlayLevel {
                },
                blockW,
                blockH
-            )
-         );
+            ),
+            color,
+         });
       });
    }
 
    #majorUpdate() {
-      if (this.blocks.length === 0) {
-         console.log("Win!");
-         animation.stop();
-      }
+      // if (this.blocks.length === 0) {
+      //    console.log("Win!");
+      //    animation.stop();
+      // }
 
-      this.blocks.forEach((block) => {
-         block.majorUpdate(ctx);
+      this.blocks.forEach((cols, i) => {
+         cols.forEach((block, j) => {
+            if (block) {
+               if (block.isCompleted) {
+                  this.blocks[i][j] = null;
+               } else {
+                  block.majorUpdate();
+               } 
+            }
+         });
       });
 
-      this.blocks = this.blocks.filter((block) => !block.isComplete);
    }
 
    update() {
@@ -135,19 +164,22 @@ class PlayLevel {
       }
 
       this.pad.update();
-      this.ball.update(this.pad, this.blocks, this.walls);
+      this.ball.update(this.pad, this.blocks, this.blockW, this.blockH);
    }
 
    draw(ctx, cWidth, cHeight) {
+      // clear canvas
       ctx.fillStyle = "#00000077";
       ctx.fillRect(0, 0, cWidth, cHeight);
 
-      this.blocks.forEach((block) => {
-         block.draw(ctx);
+      // draw blocks
+      this.blocks.forEach((rows) => {
+         rows.forEach((block) => {
+            block && block.draw(ctx);
+         });
       });
-      this.walls.forEach((wall) => {
-         wall.draw(ctx);
-      });
+
+      // draw ball and paddle
       this.ball.draw(ctx);
       this.pad.draw(ctx);
    }

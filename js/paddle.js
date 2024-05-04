@@ -2,31 +2,38 @@ class Paddle {
    constructor(x, y, w, h, canvas, gyroSen = 20) {
       this.x = x;
       this.y = y;
+      this.fixY = y;
       this.w = w;
       this.h = h;
       this.tx = this.x;
+      this.ty = this.y;
       this.r = 6;
       this.cvs = canvas;
       this.gyroSen = gyroSen;
+      this.image;
       this.oldGamma = 0;
       this.lh = canvas.height - y - h - 10;
 
       this.vx = 1;
-      this.paths = [];
-      this.pathColors = [];
       this.isPointerLock = false;
       this.percentage = isMobile ? 0.3 : 0.2;
       this.setup();
+      this.#createImage();
       this.#eventListener();
    }
 
    setup(gyroSen = this.gyroSen) {
       this.gyroSen = gyroSen;
+   }
 
-      this.paths = [];
-      this.#createPath();
-      this.pathColors = [
-         "#0000ff88",
+   #createImage() {
+      const { r } = this;
+      const w = 160;
+      const h = 30;
+      const sideW = w / 4;
+
+      const pathColors = [
+         "#0000ffaa",
          "#65f2ff",
          "#ffa600",
          "#ffa600",
@@ -35,54 +42,28 @@ class Paddle {
          "#ffffff66",
          "#00000033",
       ];
-   }
 
-   #createPath() {
-      const { w, h, r } = this;
-      const x = 0,
-         y = 0;
-      const X = x - w / 2;
-      const sideW = w / 4;
+      const locations = [
+         [sideW * 0.7, -h * 0.1, sideW * 2.6, h * 1.2, r],
+         [sideW, h * 0.1, sideW * 2, h * 0.8, r],
+         [0, 0, sideW, h, r], // yellow side left
+         [sideW * 3, 0, sideW, h, r], // yellow side right
+         [sideW / 3, 0, sideW / 3, h, r / 2], // red ring left
+         [w - sideW / 1.5, 0, sideW / 3, h, r / 2], // red ring right
+         [0, h * 0.1, w, h / 3, r],
+         [0, h * 0.8, w, h / 5, r / 2],
+      ];
 
-      this.paths.push(
-         create2dRoundedRectPath(
-            x - sideW - sideW * 0.3,
-            y - h * 0.1,
-            sideW * 2.6,
-            h * 1.2,
-            4
-         )
+      this.image = createCanvasImage(
+         (ctx) => {
+            locations.forEach(([x, y, w, h, r], i) => {
+               ctx.fillStyle = pathColors[i];
+               ctx.fill(create2dRoundedRectPath(x, y, w, h, r));
+            });
+         },
+         w,
+         h
       );
-
-      this.paths.push(
-         create2dRoundedRectPath(x - sideW, y + h * 0.1, sideW * 2, h * 0.8, 4)
-      );
-
-      this.paths.push(create2dRoundedRectPath(x - sideW * 2, y, sideW, h, r));
-
-      this.paths.push(create2dRoundedRectPath(x + sideW, y, sideW, h, r));
-
-      this.paths.push(
-         create2dRoundedRectPath(x - sideW * 2 + 10, y, sideW / 3, h, r / 2)
-      );
-
-      this.paths.push(
-         create2dRoundedRectPath(X + w - 10 - sideW / 3, y, sideW / 3, h, r / 2)
-      );
-
-      this.paths.push(create2dRoundedRectPath(X, y + h * 0.1, w, h / 3, r));
-
-      this.paths.push(create2dRoundedRectPath(X, y + h * 0.8, w, h / 5, r / 2));
-   }
-
-   #drawPath(ctx) {
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      for (let i = 0; i < this.paths.length; i++) {
-         ctx.fillStyle = this.pathColors[i];
-         ctx.fill(this.paths[i]);
-      }
-      ctx.restore();
    }
 
    #eventListener() {
@@ -187,13 +168,19 @@ class Paddle {
       // }
    }
 
+   hit() {
+      this.y = this.fixY + this.h * 0.4;
+      this.ty = this.fixY;
+   }
+
    update() {
       this.x += (this.tx - this.x) * this.percentage;
+      this.y += (this.ty - this.y) * 0.2;
    }
 
    draw(ctx) {
       const { cvs } = this;
-      this.#drawPath(ctx);
+      ctx.drawImage(this.image, this.x - this.w / 2, this.y, this.w, this.h);
 
       // draw lava
       ctx.fillStyle = "#f00";

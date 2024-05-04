@@ -9,7 +9,7 @@ class Particle {
       this.speedX = Math.random() * 5 - 3;
       this.speedY = Math.random() * 5 - 3;
       this.alpha = Math.random() * 2;
-      this.isVisible = false;
+      this.isVisible = true;
    }
 
    update() {
@@ -20,8 +20,8 @@ class Particle {
       this.speedY *= this.friction;
       this.speedY += this.gravity;
       this.alpha -= 0.02;
-      if (this.alpha < 0.02) {
-         this.isVisible = true;
+      if (this.alpha < 0.1) {
+         this.isVisible = false;
          this.alpha = 0;
       }
    }
