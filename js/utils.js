@@ -212,3 +212,4 @@ function createCanvasImage(drawFunction, width, height) {
 
    return image;
 }
+

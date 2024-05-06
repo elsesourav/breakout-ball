@@ -4,6 +4,10 @@ class Block {
       this.y = y;
       this.w = w;
       this.h = h;
+      this.top = y * h;
+      this.bottom = y * h + h;
+      this.left = x * w;
+      this.right = x * w + w;
       this.images = images;
       this.health = health - 1;
       this.isVisible = true;
@@ -26,6 +30,7 @@ class Block {
          }
       }
    }
+
 
    damage() {
       if (this.health === this.images.length - 1) return;

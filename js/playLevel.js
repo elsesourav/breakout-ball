@@ -56,22 +56,10 @@ class PlayLevel {
       this.pad = new Paddle(padX, padY, padW, padH, cvs);
       this.ball = new Ball(ballX, ballY, ballR, ballS, cvs, blockW, blockH);
 
-      for (let i = 0; i < cols; i++) {
-         this.blocks[i] = [];
-         for (let j = 0; j < rows; j++) {
-            this.blocks[i][j] = null;
-         }
-      }
-
       for (const key in this.level) {
          const { x, y, health } = this.level[key];
-         this.blocks[y][x] = new Block(
-            x,
-            y,
-            blockW,
-            blockH,
-            health,
-            this.blockImages
+         this.blocks.push(
+            new Block(x, y, blockW, blockH, health, this.blockImages)
          );
       }
 
@@ -141,18 +129,14 @@ class PlayLevel {
       //    animation.stop();
       // }
 
-      this.blocks.forEach((cols, i) => {
-         cols.forEach((block, j) => {
-            if (block) {
-               if (block.isCompleted) {
-                  this.blocks[i][j] = null;
-               } else {
-                  block.majorUpdate();
-               } 
-            }
-         });
-      });
-
+      for (let i = 0; i < this.blocks.length; i++) {
+         if (this.blocks[i].isCompleted) {
+            this.blocks.splice(i--, 1); 
+         } else {
+            this.blocks[i].majorUpdate();
+         }
+         
+      }
    }
 
    update() {
@@ -164,7 +148,7 @@ class PlayLevel {
       }
 
       this.pad.update();
-      this.ball.update(this.pad, this.blocks, this.blockW, this.blockH);
+      this.ball.update(this.pad, this.blocks);
    }
 
    draw(ctx, cWidth, cHeight) {
@@ -173,11 +157,7 @@ class PlayLevel {
       ctx.fillRect(0, 0, cWidth, cHeight);
 
       // draw blocks
-      this.blocks.forEach((rows) => {
-         rows.forEach((block) => {
-            block && block.draw(ctx);
-         });
-      });
+      this.blocks.forEach((block) => block.draw(ctx));
 
       // draw ball and paddle
       this.ball.draw(ctx);

@@ -8,19 +8,11 @@ class Ball {
       this.cvs = canvas;
       this.blockW = blockW;
       this.blockH = blockH;
-      this.g = 0.03;
       this.vx = speed * (Math.random() * 2 - 1);
       this.vy = -speed;
-      this.nearest = [
-         [-1, -1, blockW, blockH],
-         [0, -1, 0, blockH],
-         [1, -1, r, blockH],
-         [-1, 0, blockW, 0],
-         [1, 0, this.r, 0],
-         [-1, 1, blockW, this.r],
-         [0, 1, 0, this.r],
-         [1, 1, this.r, this.r],
-      ];
+      this.countSteps = 0;
+      this.preX = x;
+      this.preY = y;
    }
 
    collusion(angle) {
@@ -59,66 +51,103 @@ class Ball {
       return this.y - this.r < 0;
    }
 
+   #getIntersectPoint(paddle, blocks) {
+      const range = innerHeight;
+      const angle = Math.atan2(-this.vx, this.vy) + Math.PI / 2; // ball angle in radians
+      // console.log(toDegrees(angle), -this.vx, this.vy);
+      const ballTX = this.x + Math.cos(angle) * range;
+      const ballTY = this.y + Math.sin(angle) * range;
+      const A = new Point(this.x, this.y);
+      const B = new Point(ballTX, ballTY);
+
+      const intersectPoints = [];
+
+      // boundary collision
+      (() => {
+         const a = new Point(0, 0);
+         const b = new Point(this.cvs.width, 0);
+         const c = new Point(this.cvs.width, this.cvs.height);
+         const d = new Point(0, this.cvs.height);
+
+         const intersects = [
+            getIntersection(A, B, a, b, "top"),
+            getIntersection(A, B, b, c, "right"),
+            getIntersection(A, B, c, d, "bottom"),
+            getIntersection(A, B, d, a, "left"),
+         ].filter((e) => e);
+
+         const [min] = intersects.sort((a, b) => a.offset - b.offset);
+         min && intersectPoints.push(min);
+      })();
+
+      // paddle collision
+      (() => {
+         const pa = new Point(0, paddle.y);
+         const pb = new Point(this.cvs.width, paddle.y);
+
+         const intersect = getIntersection(A, B, pa, pb, "top");
+         intersect && intersectPoints.push(intersect);
+      })();
+
+      // block collision
+      blocks.forEach((block) => {
+         const { x, y, w, h } = block;
+
+         const a = new Point(x * w, y * h);
+         const b = new Point(x * w + w, y * h);
+         const c = new Point(x * w + w, y * h + h);
+         const d = new Point(x * w, y * h + h);
+         const intersects = [
+            getIntersection(A, B, a, b, "top"),
+            getIntersection(A, B, b, c, "right"),
+            getIntersection(A, B, c, d, "bottom"),
+            getIntersection(A, B, d, a, "left"),
+         ].filter((e) => e);
+
+         const [min] = intersects.sort((a, b) => a.offset - b.offset);
+         min && intersectPoints.push({ ...min, block });
+      });
+
+      const mins = intersectPoints.sort((a, b) => a.offset - b.offset);
+      let min = mins[0];
+
+
+      // console.log(min.x == this.preX, min.y == this.preY);
+      // console.log(`minX : ${min.x}, minY : ${min.y}, preX : ${this.preX}, preY : ${this.preY}`);
+
+
+      if (min.x == this.preX && min.y == this.preY) {
+         min = mins[1];
+      }
+      this.preX = min.x;
+      this.preY = min.y; 
+
+      
+      return {
+         distanceY: this.y - min.y,
+         x: min.x,
+         y: min.y,
+         side: min.side,
+         block: min.block ? min.block : null,
+      };
+   }
+
    update(paddle, blocks) {
-      const _vx = this.vx / this.s;
-      const _vy = this.vy / this.s;
-      let i = 0;
+      if (this.countSteps-- <= 0) {
+         const { distanceY, x, y, side } = this.#getIntersectPoint(
+            paddle,
+            blocks
+         );
 
-      for (; i < this.s; i++) {
-         this.x += _vx;
-         this.y += _vy;
+         const steps = Math.abs(distanceY / this.vy);
+         this.countSteps = steps;
+         this.x = x;
+         this.y = y;
+         if (side === "left" || side === "right") this.vx *= -1;
+         if (side === "top" || side === "bottom") this.vy *= -1;
+         const timeMS = Math.round(FRAME_RATE * steps);
 
-         // side walls collusion detection
-         if (this.xWallCollision()) {
-            this.vx = -this.vx;
-            break;
-         } else if (this.topWallCollision()) {
-            this.vy = -this.vy;
-            break;
-
-            // paddle collision detection
-         } else if (this.paddleCollision(paddle)) {
-            const angle = (this.x - paddle.x) * 0.5;
-            const dx = Math.sin(toRadians(angle));
-            this.vx += dx;
-            this.vy = -this.s;
-            paddle.hit();
-            break;
-
-            // block collision detection
-         } else {
-            const x = Math.floor(this.x / this.blockW);
-            const y = Math.floor(this.y / this.blockH);
-
-            const collisionBlocks = [];
-            this.nearest.forEach(([ofx, ofy, dx, dy]) => {
-               if (
-                  blocks[y + ofy] &&
-                  blocks[y + ofy][x + ofx] &&
-                  this.blockCollision(blocks[y + ofy][x + ofx])
-               ) {
-                  const block = blocks[y + ofy][x + ofx];
-
-                  collisionBlocks.push({
-                     ofx: ofx,
-                     ofy: ofy,
-                     length:
-                        Math.abs(this.x - block.x + dx) +
-                        Math.abs(this.y - block.y + dy),
-                  });
-               }
-            });
-
-            if (collisionBlocks.length > 0) {
-               collisionBlocks.sort((a, b) => a.length - b.length);
-               const { ofx, ofy } = collisionBlocks[0];
-
-               blocks[y + ofy][x + ofx].damage();
-               this.vx *= ofx ? -1 : 1;
-               this.vy *= ofy ? -1 : 1;
-               break;
-            }
-         }
+         // console.log(timeMS);
       }
    }
 
