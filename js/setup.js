@@ -29,8 +29,9 @@ const playLevel = new PlayLevel({
    blockW: SCALE,
    blockH: SCALE_H,
    fps: FPS,
-   htmlBall,
+   paddleImage: createPaddleImage(),
    ballImage: createBallImage(),
+   blockImages: createBlockImages(),
 });
 
 let levels = [];

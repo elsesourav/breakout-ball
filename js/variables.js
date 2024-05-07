@@ -24,7 +24,6 @@ const CVS = $("#myCanvas");
 const previewCanvas = $("#preview");
 const pCtx = previewCanvas.getContext("2d");
 const ctx = CVS.getContext("2d");
-const htmlBall = $("#ball");
 
 
 

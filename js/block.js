@@ -2,6 +2,8 @@ class Block {
    constructor(x, y, w, h, health, images) {
       this.x = x;
       this.y = y;
+      this.dx = x * w;
+      this.dy = y * h;
       this.w = w;
       this.h = h;
       this.top = y * h;
@@ -31,7 +33,6 @@ class Block {
       }
    }
 
-
    damage() {
       if (this.health === this.images.length - 1) return;
       this.health--;
@@ -46,14 +47,14 @@ class Block {
    drawOutline(ctx) {
       ctx.lineWidth = 1;
       ctx.strokeStyle = "#ffffff";
-      ctx.rect(this.x * this.w, this.y * this.h, this.w, this.h);
+      ctx.rect(this.dx, this.dy, this.w, this.h);
       ctx.stroke();
    }
 
    majorUpdate() {
       for (let i = 0; i < this.particles.length; i++) {
          if (this.particles[i] && !this.particles[i].isVisible) {
-            this.particles.splice(i--, 1); 
+            this.particles.splice(i--, 1);
          }
       }
 
@@ -66,8 +67,8 @@ class Block {
       if (this.isVisible) {
          ctx.drawImage(
             this.images[this.health].image,
-            this.x * this.w,
-            this.y * this.h,
+            this.dx,
+            this.dy,
             this.w,
             this.h
          );

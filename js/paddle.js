@@ -1,5 +1,5 @@
 class Paddle {
-   constructor(x, y, w, h, canvas, gyroSen = 20) {
+   constructor(x, y, w, h, game, image, gyroSen = 20) {
       this.x = x;
       this.y = y;
       this.fixY = y;
@@ -7,18 +7,16 @@ class Paddle {
       this.h = h;
       this.tx = this.x;
       this.ty = this.y;
-      this.r = 6;
-      this.cvs = canvas;
+      this.game = game;
+      this.image = image;
       this.gyroSen = gyroSen;
       this.image;
       this.oldGamma = 0;
-      this.lh = canvas.height - y - h - 10;
+      this.lh = game.cvs.height - y - h - 10;
 
-      this.vx = 1;
       this.isPointerLock = false;
       this.percentage = isMobile ? 0.3 : 0.2;
       this.setup();
-      this.#createImage();
       this.#eventListener();
    }
 
@@ -26,48 +24,8 @@ class Paddle {
       this.gyroSen = gyroSen;
    }
 
-   #createImage() {
-      const { r } = this;
-      const w = 160;
-      const h = 30;
-      const sideW = w / 4;
-
-      const pathColors = [
-         "#0000ffaa",
-         "#65f2ff",
-         "#ffa600",
-         "#ffa600",
-         "#a60000",
-         "#a60000",
-         "#ffffff66",
-         "#00000033",
-      ];
-
-      const locations = [
-         [sideW * 0.7, -h * 0.1, sideW * 2.6, h * 1.2, r],
-         [sideW, h * 0.1, sideW * 2, h * 0.8, r],
-         [0, 0, sideW, h, r], // yellow side left
-         [sideW * 3, 0, sideW, h, r], // yellow side right
-         [sideW / 3, 0, sideW / 3, h, r / 2], // red ring left
-         [w - sideW / 1.5, 0, sideW / 3, h, r / 2], // red ring right
-         [0, h * 0.1, w, h / 3, r],
-         [0, h * 0.8, w, h / 5, r / 2],
-      ];
-
-      this.image = createCanvasImage(
-         (ctx) => {
-            locations.forEach(([x, y, w, h, r], i) => {
-               ctx.fillStyle = pathColors[i];
-               ctx.fill(create2dRoundedRectPath(x, y, w, h, r));
-            });
-         },
-         w,
-         h
-      );
-   }
-
    #eventListener() {
-      const { cvs } = this;
+      const { cvs } = this.game;
       const { left, width } = cvs.getBoundingClientRect();
       const scale = cvs.width / width;
       const cw = cvs.width;
@@ -130,24 +88,24 @@ class Paddle {
          }
       }
 
-      this.cvs.addEventListener("mouseenter", (e) => {
+      this.game.cvs.addEventListener("mouseenter", (e) => {
          this.isPointerLock && pcMoveHandler(e.movementX);
       });
-      this.cvs.addEventListener("mousemove", (e) => {
+      this.game.cvs.addEventListener("mousemove", (e) => {
          this.isPointerLock && pcMoveHandler(e.movementX);
       });
 
-      this.cvs.addEventListener("mouseenter", (e) => {
+      this.game.cvs.addEventListener("mouseenter", (e) => {
          !this.isPointerLock && moveHandler(e.clientX);
       });
-      this.cvs.addEventListener("mousemove", (e) => {
+      this.game.cvs.addEventListener("mousemove", (e) => {
          !this.isPointerLock && moveHandler(e.clientX);
       });
 
-      this.cvs.addEventListener("touchstart", (e) => {
+      this.game.cvs.addEventListener("touchstart", (e) => {
          moveHandler(e.touches[0].clientX);
       });
-      this.cvs.addEventListener("touchmove", (e) => {
+      this.game.cvs.addEventListener("touchmove", (e) => {
          moveHandler(e.touches[0].clientX);
       });
 
@@ -179,7 +137,7 @@ class Paddle {
    }
 
    draw(ctx) {
-      const { cvs } = this;
+      const { cvs } = this.game;
       ctx.drawImage(this.image, this.x - this.w / 2, this.y, this.w, this.h);
 
       // draw lava

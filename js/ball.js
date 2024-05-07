@@ -15,11 +15,6 @@ class Ball {
       this.offsetTop = bound.top;
       this.preX = x;
       this.preY = y;
-
-      this.htmlBall.style.transition = `none`;
-      this.htmlBall.style.transform = `translate(${this.x - this.r}px, ${
-         this.y - this.r
-      }px)`;
    }
 
    collusion(angle) {
@@ -58,7 +53,25 @@ class Ball {
       return this.y - this.r < 0;
    }
 
+   #getMinPoint(A, B, startX, startY, endX, endY) {
+      const a = new Point(startX, startY);
+      const b = new Point(endX, startY);
+      const c = new Point(endX, endY);
+      const d = new Point(startX, endY);
+
+      const intersects = [
+         getIntersection(A, B, a, b, "top"),
+         getIntersection(A, B, b, c, "right"),
+         getIntersection(A, B, c, d, "bottom"),
+         getIntersection(A, B, d, a, "left"),
+      ].filter((e) => e);
+
+      return intersects.sort((a, b) => a.offset - b.offset)[0];
+   }
+
    #getIntersectPoint() {
+      const { cvs, paddle, blocks } = this.game;
+
       const range = innerHeight;
       const angle = Math.atan2(-this.vx, this.vy) + Math.PI / 2; // ball angle in radians
       const ballTX = this.x + Math.cos(angle) * range;
@@ -70,26 +83,14 @@ class Ball {
 
       // boundary collision
       (() => {
-         const a = new Point(this.r, this.r);
-         const b = new Point(this.cvs.width - this.r, this.r);
-         const c = new Point(this.cvs.width - this.r, this.cvs.height - this.r);
-         const d = new Point(this.r, this.cvs.height - this.r);
-
-         const intersects = [
-            getIntersection(A, B, a, b, "top"),
-            getIntersection(A, B, b, c, "right"),
-            getIntersection(A, B, c, d, "bottom"),
-            getIntersection(A, B, d, a, "left"),
-         ].filter((e) => e);
-
-         const [min] = intersects.sort((a, b) => a.offset - b.offset);
-         min && intersectPoints.push(min);
+         const minPoint = this.#getMinPoint(A, B, this.r, this.r, cvs.width - this.r, cvs.height - this.r);
+         minPoint && intersectPoints.push(minPoint);
       })();
 
       // paddle collision
       (() => {
          const pa = new Point(this.r, paddle.y - this.r);
-         const pb = new Point(this.cvs.width - this.r, paddle.y - this.r);
+         const pb = new Point(cvs.width - this.r, paddle.y - this.r);
 
          const intersect = getIntersection(A, B, pa, pb, "top");
          intersect && intersectPoints.push(intersect);
@@ -97,35 +98,19 @@ class Ball {
 
       // block collision
       blocks.forEach((block) => {
-         const { x, y, w, h } = block;
+         const { dx, dy, w, h, isVisible } = block;
 
-         const a = new Point(x * w - this.r, y * h - this.r);
-         const b = new Point(x * w + w + this.r, y * h - this.r);
-         const c = new Point(x * w + w + this.r, y * h + h + this.r);
-         const d = new Point(x * w - this.r, y * h + h + this.r);
-         const intersects = [
-            getIntersection(A, B, a, b, "top"),
-            getIntersection(A, B, b, c, "right"),
-            getIntersection(A, B, c, d, "bottom"),
-            getIntersection(A, B, d, a, "left"),
-         ].filter((e) => e);
-
-         const [min] = intersects.sort((a, b) => a.offset - b.offset);
-         min && intersectPoints.push({ ...min, block });
+         if (isVisible) {
+            const minPoint = this.#getMinPoint(A, B, dx - this.r, dy - this.r, dx + w + this.r, dy + h + this.r);
+            minPoint && intersectPoints.push({ ...minPoint, block });
+         }
       });
 
       const mins = intersectPoints.sort((a, b) => a.offset - b.offset);
       let min = mins[0];
 
-      try {
-         if (min.x == this.preX && min.y == this.preY) {
-            min = mins[1] || mins[0];
-         }
-         this.preX = min.x;
-         this.preY = min.y;
-      } catch (error) {
-         console.log(mins);
-         console.log(min);
+      if (min.x == this.preX && min.y == this.preY) {
+         min = mins[1] || mins[0];
       }
 
       return {
@@ -139,26 +124,19 @@ class Ball {
 
    update() {
       if (this.countSteps-- <= 0) {
-         const { distanceY, x, y, side } = this.#getIntersectPoint(
-            this.game.paddle,
-            this.game.blocks
-         );
+         const { distanceY, x, y, side } = this.#getIntersectPoint();
 
          const steps = Math.abs(distanceY / this.vy);
-         const timeMS = FRAME_RATE * steps;
+         // const timeMS = FRAME_RATE * steps; 
          this.countSteps = steps;
          this.x = x;
          this.y = y;
          if (side === "left" || side === "right") this.vx *= -1;
          if (side === "top" || side === "bottom") this.vy *= -1;
 
-         this.htmlBall.style.transition = `transform ${timeMS}ms linear`;
-         this.htmlBall.style.transform = `translate(${x - this.r}px, ${
-            y - this.r
-         }px)`;
-
-         // console.log(timeMS);
       }
+      this.x += this.vx;
+      this.y += this.vy;
    }
 
    draw(ctx) {
