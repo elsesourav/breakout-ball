@@ -51,20 +51,24 @@ class PlayLevel {
          blockW,
          blockH,
       } = this;
-
+      
       this.level = level;
       this.rows = rows;
       this.cols = cols;
-      this.blocks = [];
-      this.paddle = new Paddle(padX, padY, padW, padH, this, this.paddleImage);
-      this.ball = new Ball(ballX, ballY, ballR, ballS, this.ballImage, this);
 
+      
+      this.blocks = [];
       for (const key in this.level) {
          const { x, y, health } = this.level[key];
          this.blocks.push(
             new Block(x, y, blockW, blockH, health, this.blockImages)
          );
       }
+
+
+      this.paddle = new Paddle(padX, padY, padW, padH, this, this.paddleImage);
+      this.ball = new Ball(ballX, ballY, ballR, ballS, this.ballImage, this);
+
 
       let timeoutId;
 

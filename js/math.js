@@ -37,32 +37,27 @@ class Point {
       this.offset = offset;
    }
 }
-// class Point {
-//    constructor(x, y, offset) {
-//       this.x = x;
-//       this.y = y;
-//       this.offset = offset;
-//    }
+class PointDraw {
+   constructor(x, y, offset) {
+      this.x = x;
+      this.y = y;
+      this.offset = offset;
+   }
 
-//    update(x, y) {
-//       this.x = x;
-//       this.y = y;
-//    }
+   draw(ctx, text, is, radius = 10, strokeWidth = 1) {
+      ctx.beginPath();
+      ctx.fillStyle = is ? "#f00" : "#0f0";
+      ctx.lineWidth = strokeWidth;
+      ctx.arc(this.x, this.y, radius, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.stroke();
 
-//    draw(ctx, text, is, radius = 10, strokeWidth = 1) {
-//       ctx.beginPath();
-//       ctx.fillStyle = is ? "#f00" : "#0f0";
-//       ctx.lineWidth = strokeWidth;
-//       ctx.arc(this.x, this.y, radius, 0, Math.PI * 2, false);
-//       ctx.fill();
-//       ctx.stroke();
-
-//       if (text != undefined) {
-//          ctx.font = "bold 14px Arial";
-//          ctx.fillStyle = "#ffffff";
-//          ctx.textAlign = "center";
-//          ctx.textBaseline = "middle";
-//          ctx.fillText(text, this.x, this.y);
-//       }
-//    }
-// }
+      if (text != undefined) {
+         ctx.font = "bold 14px Arial";
+         ctx.fillStyle = "#ffffff";
+         ctx.textAlign = "center";
+         ctx.textBaseline = "middle";
+         ctx.fillText(text, this.x, this.y);
+      }
+   }
+}

@@ -15,11 +15,7 @@ class Ball {
       this.offsetTop = bound.top;
       this.preX = x;
       this.preY = y;
-   }
-
-   collusion(angle) {
-      this.vx = this.s * Math.cos(angle);
-      this.vy = -this.s * Math.sin(angle);
+      this.#setupNextCollision();
    }
 
    destroy() {
@@ -69,8 +65,9 @@ class Ball {
       return intersects.sort((a, b) => a.offset - b.offset)[0];
    }
 
-   #getIntersectPoint() {
+   #setupNextCollision() {
       const { cvs, paddle, blocks } = this.game;
+      const { r } = this;
 
       const range = innerHeight;
       const angle = Math.atan2(-this.vx, this.vy) + Math.PI / 2; // ball angle in radians
@@ -83,14 +80,21 @@ class Ball {
 
       // boundary collision
       (() => {
-         const minPoint = this.#getMinPoint(A, B, this.r, this.r, cvs.width - this.r, cvs.height - this.r);
+         const minPoint = this.#getMinPoint(
+            A,
+            B,
+            r,
+            r,
+            cvs.width - r,
+            cvs.height - r
+         );
          minPoint && intersectPoints.push(minPoint);
       })();
 
       // paddle collision
       (() => {
-         const pa = new Point(this.r, paddle.y - this.r);
-         const pb = new Point(cvs.width - this.r, paddle.y - this.r);
+         const pa = new Point(0, paddle.y - this.r);
+         const pb = new Point(cvs.width, paddle.y - this.r);
 
          const intersect = getIntersection(A, B, pa, pb, "top");
          intersect && intersectPoints.push(intersect);
@@ -101,7 +105,7 @@ class Ball {
          const { dx, dy, w, h, isVisible } = block;
 
          if (isVisible) {
-            const minPoint = this.#getMinPoint(A, B, dx - this.r, dy - this.r, dx + w + this.r, dy + h + this.r);
+            const minPoint = this.#getMinPoint(A, B, dx, dy, dx + w, dy + h);
             minPoint && intersectPoints.push({ ...minPoint, block });
          }
       });
@@ -109,37 +113,56 @@ class Ball {
       const mins = intersectPoints.sort((a, b) => a.offset - b.offset);
       let min = mins[0];
 
-      if (min.x == this.preX && min.y == this.preY) {
-         min = mins[1] || mins[0];
-      }
+      // if (min.x == this.preX && min.y == this.preY) {
+      // min = mins[1] || mins[0];
+      // }
+
+      console.log(mins);
+      console.log(this.x, this.y);
+      console.log(min);
+      const steps = Math.round(Math.abs((this.y - min.y) / this.vy));
+
+      if (min.side === "left" || min.side === "right") this.vx *= -1;
+      if (min.side === "top" || min.side === "bottom") this.vy *= -1;
+
+      this.countSteps = steps;
+      this.fixSteps = steps;
+      this.tx = min.x;
+      this.ty = min.y;
+      this.ox = this.x;
+      this.oy = this.y;
 
       return {
-         distanceY: this.y - min.y,
+         steps,
          x: min.x,
          y: min.y,
-         side: min.side,
          block: min.block ? min.block : null,
       };
    }
 
    update() {
-      if (this.countSteps-- <= 0) {
-         const { distanceY, x, y, side } = this.#getIntersectPoint();
+      this.countSteps--;
+      console.log(this.countSteps);
 
-         const steps = Math.abs(distanceY / this.vy);
-         // const timeMS = FRAME_RATE * steps; 
-         this.countSteps = steps;
-         this.x = x;
-         this.y = y;
-         if (side === "left" || side === "right") this.vx *= -1;
-         if (side === "top" || side === "bottom") this.vy *= -1;
+      const p = new PointDraw(this.tx, this.ty);
+      p.draw(ctx, "P", false, this.dr);
 
+      this.x += (this.tx - this.ox) * (1 / this.fixSteps);
+      this.y += (this.ty - this.oy) * (1 / this.fixSteps);
+
+      if (this.countSteps == 0) {
+         console.log("target Complete");
+         const { steps, x, y, side } = this.#setupNextCollision();
       }
-      this.x += this.vx;
-      this.y += this.vy;
    }
 
    draw(ctx) {
-      ctx.drawImage(this.image, this.x, this.y, this.dr * 2, this.dr * 2);
+      ctx.drawImage(
+         this.image,
+         this.x - this.r,
+         this.y - this.r,
+         this.dr * 2,
+         this.dr * 2
+      );
    }
 }
