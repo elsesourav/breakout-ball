@@ -12,6 +12,8 @@ class PlayLevel {
       blockW,
       blockH,
       fps,
+      htmlBall,
+      ballImage,
    }) {
       this.padX = padX;
       this.padY = padY;
@@ -25,6 +27,8 @@ class PlayLevel {
       this.blockW = blockW;
       this.blockH = blockH;
       this.fps = fps;
+      this.htmlBall = htmlBall;
+      this.ballImage = ballImage;
       this.timeCount = 0;
 
       this.blocks = [];
@@ -47,6 +51,7 @@ class PlayLevel {
          cvs,
          blockW,
          blockH,
+         htmlBall
       } = this;
 
       this.level = level;
@@ -54,7 +59,7 @@ class PlayLevel {
       this.cols = cols;
       this.blocks = [];
       this.pad = new Paddle(padX, padY, padW, padH, cvs);
-      this.ball = new Ball(ballX, ballY, ballR, ballS, cvs, blockW, blockH);
+      this.ball = new Ball(ballX, ballY, ballR, ballS, this.ballImage, this);
 
       for (const key in this.level) {
          const { x, y, health } = this.level[key];
@@ -77,14 +82,7 @@ class PlayLevel {
    #createBlockImages() {
       const blockW = 64;
       const blockH = 48;
-      const blockColors = [
-         ["#00bcb9", "#4ffffc"],
-         ["#bfc200", "#fcff59"],
-         ["#00d00e", "#3bff48"],
-         ["#8c00ff", "#af4eff"],
-         ["#ff005d", "#ff4e8f"],
-         ["#ffffff", "#ffffff"],
-      ];
+
 
       blockColors.forEach(([color, stroke], i) => {
          const offset = 2 + 0.5 * (blockColors.length - i);

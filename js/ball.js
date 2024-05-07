@@ -1,18 +1,25 @@
 class Ball {
-   constructor(x, y, r, speed, canvas, blockW, blockH) {
+   constructor(x, y, r, speed, image, game) {
       this.x = x;
       this.y = y;
       this.r = r;
       this.dr = r + 2;
       this.s = speed;
-      this.cvs = canvas;
-      this.blockW = blockW;
-      this.blockH = blockH;
+      this.game = game;
       this.vx = speed * (Math.random() * 2 - 1);
       this.vy = -speed;
+      this.image = image;
       this.countSteps = 0;
+      const bound = $("main").getBoundingClientRect();
+      this.offsetLeft = bound.left;
+      this.offsetTop = bound.top;
       this.preX = x;
       this.preY = y;
+
+      this.htmlBall.style.transition = `none`;
+      this.htmlBall.style.transform = `translate(${this.x - this.r}px, ${
+         this.y - this.r
+      }px)`;
    }
 
    collusion(angle) {
@@ -51,10 +58,9 @@ class Ball {
       return this.y - this.r < 0;
    }
 
-   #getIntersectPoint(paddle, blocks) {
+   #getIntersectPoint() {
       const range = innerHeight;
       const angle = Math.atan2(-this.vx, this.vy) + Math.PI / 2; // ball angle in radians
-      // console.log(toDegrees(angle), -this.vx, this.vy);
       const ballTX = this.x + Math.cos(angle) * range;
       const ballTY = this.y + Math.sin(angle) * range;
       const A = new Point(this.x, this.y);
@@ -64,10 +70,10 @@ class Ball {
 
       // boundary collision
       (() => {
-         const a = new Point(0, 0);
-         const b = new Point(this.cvs.width, 0);
-         const c = new Point(this.cvs.width, this.cvs.height);
-         const d = new Point(0, this.cvs.height);
+         const a = new Point(this.r, this.r);
+         const b = new Point(this.cvs.width - this.r, this.r);
+         const c = new Point(this.cvs.width - this.r, this.cvs.height - this.r);
+         const d = new Point(this.r, this.cvs.height - this.r);
 
          const intersects = [
             getIntersection(A, B, a, b, "top"),
@@ -82,8 +88,8 @@ class Ball {
 
       // paddle collision
       (() => {
-         const pa = new Point(0, paddle.y);
-         const pb = new Point(this.cvs.width, paddle.y);
+         const pa = new Point(this.r, paddle.y - this.r);
+         const pb = new Point(this.cvs.width - this.r, paddle.y - this.r);
 
          const intersect = getIntersection(A, B, pa, pb, "top");
          intersect && intersectPoints.push(intersect);
@@ -93,10 +99,10 @@ class Ball {
       blocks.forEach((block) => {
          const { x, y, w, h } = block;
 
-         const a = new Point(x * w, y * h);
-         const b = new Point(x * w + w, y * h);
-         const c = new Point(x * w + w, y * h + h);
-         const d = new Point(x * w, y * h + h);
+         const a = new Point(x * w - this.r, y * h - this.r);
+         const b = new Point(x * w + w + this.r, y * h - this.r);
+         const c = new Point(x * w + w + this.r, y * h + h + this.r);
+         const d = new Point(x * w - this.r, y * h + h + this.r);
          const intersects = [
             getIntersection(A, B, a, b, "top"),
             getIntersection(A, B, b, c, "right"),
@@ -111,18 +117,17 @@ class Ball {
       const mins = intersectPoints.sort((a, b) => a.offset - b.offset);
       let min = mins[0];
 
-
-      // console.log(min.x == this.preX, min.y == this.preY);
-      // console.log(`minX : ${min.x}, minY : ${min.y}, preX : ${this.preX}, preY : ${this.preY}`);
-
-
-      if (min.x == this.preX && min.y == this.preY) {
-         min = mins[1];
+      try {
+         if (min.x == this.preX && min.y == this.preY) {
+            min = mins[1] || mins[0];
+         }
+         this.preX = min.x;
+         this.preY = min.y;
+      } catch (error) {
+         console.log(mins);
+         console.log(min);
       }
-      this.preX = min.x;
-      this.preY = min.y; 
 
-      
       return {
          distanceY: this.y - min.y,
          x: min.x,
@@ -132,43 +137,31 @@ class Ball {
       };
    }
 
-   update(paddle, blocks) {
+   update() {
       if (this.countSteps-- <= 0) {
          const { distanceY, x, y, side } = this.#getIntersectPoint(
-            paddle,
-            blocks
+            this.game.paddle,
+            this.game.blocks
          );
 
          const steps = Math.abs(distanceY / this.vy);
+         const timeMS = FRAME_RATE * steps;
          this.countSteps = steps;
          this.x = x;
          this.y = y;
          if (side === "left" || side === "right") this.vx *= -1;
          if (side === "top" || side === "bottom") this.vy *= -1;
-         const timeMS = Math.round(FRAME_RATE * steps);
+
+         this.htmlBall.style.transition = `transform ${timeMS}ms linear`;
+         this.htmlBall.style.transform = `translate(${x - this.r}px, ${
+            y - this.r
+         }px)`;
 
          // console.log(timeMS);
       }
    }
 
    draw(ctx) {
-      ctx.fillStyle = "#DDDDDD";
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
-      ctx.fill();
-      ctx.closePath();
-
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(
-         this.x - this.dr * 0.1,
-         this.y - this.dr * 0.1,
-         this.dr - this.dr * 0.2,
-         0,
-         Math.PI * 2,
-         false
-      );
-      ctx.fill();
-      ctx.closePath();
+      ctx.drawImage(this.image, this.x, this.y, this.dr * 2, this.dr * 2);
    }
 }
