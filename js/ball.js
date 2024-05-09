@@ -105,22 +105,26 @@ class Ball {
          const { dx, dy, w, h, isVisible } = block;
 
          if (isVisible) {
-            const minPoint = this.#getMinPoint(A, B, dx, dy, dx + w, dy + h);
-            minPoint && intersectPoints.push({ ...minPoint, block });
+            const minPoint = this.#getMinPoint(A, B, dx - r, dy - r, dx + w + r, dy + h + r);
+            minPoint && intersectPoints.push({ ...minPoint, block }); 
          }
-      });
+         // console.log(intersectPoints);
+      }); 
 
       const mins = intersectPoints.sort((a, b) => a.offset - b.offset);
-      let min = mins[0];
+      let min = mins[1] ? mins[1] : mins[0]; 
 
-      // if (min.x == this.preX && min.y == this.preY) {
-      // min = mins[1] || mins[0];
+      // if (Math.round(min.x) == Math.round(this.x) && Math.round(min.y) == Math.round(this.y)) {
+      //    min = mins[1] || mins[0];
       // }
 
       console.log(mins);
-      console.log(this.x, this.y);
+      console.log(this.x, this.y); 
       console.log(min);
-      const steps = Math.round(Math.abs((this.y - min.y) / this.vy));
+
+      const steps = Math.ceil(Math.abs((this.y - min.y) / this.vy) + 0.01); 
+
+      console.log(steps);
 
       if (min.side === "left" || min.side === "right") this.vx *= -1;
       if (min.side === "top" || min.side === "bottom") this.vy *= -1;
@@ -142,15 +146,17 @@ class Ball {
 
    update() {
       this.countSteps--;
-      console.log(this.countSteps);
+      console.log(this.countSteps);  
 
       const p = new PointDraw(this.tx, this.ty);
-      p.draw(ctx, "P", false, this.dr);
+      p.draw(ctx, "P", false, this.dr); 
 
       this.x += (this.tx - this.ox) * (1 / this.fixSteps);
       this.y += (this.ty - this.oy) * (1 / this.fixSteps);
 
       if (this.countSteps == 0) {
+         this.x = this.tx;
+         this.y = this.ty;
          console.log("target Complete");
          const { steps, x, y, side } = this.#setupNextCollision();
       }
