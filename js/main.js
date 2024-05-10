@@ -7,54 +7,82 @@ function playGame() {
    playLevel.draw(ctx, CVS.width, CVS.height);
 }
 
-
-(async () => {
-   const response = await fetch("./levels.json");
-   levels = await response.json();
-   const htmlLevels = createHtmlLevels(levels, $("#levelsMap")); 
-   
-   htmlLevels.forEach(([level], i) => {
-      level.addEventListener("click", () => {
-         setupStartPreview(levels[i], i);
-         currentSelectedLevel = levels[i];
-      });
-   });
-
-   CVS.classList.add("active");
-   startPreview.classList.remove("active");
-   playLevel.setup(levels[7]);
-   animation.start(playGame);
+var importObject = {
+   env: {
+      drawBlocks: function (health, x, y, w, h) {
+         ctx.fillStyle = "#ff0000";
+         ctx.fillRect(x, y, w, h);
+      },
+   },
+   wasi_snapshot_preview1: {},
+};
 
 
+WebAssembly.instantiateStreaming(fetch("./logic.wasm"), importObject).then(
+   (results) => {
+      (async () => {
+         const response = await fetch("./levels.json");
+         levels = await response.json();
+         const htmlLevels = createHtmlLevels(levels, $("#levelsMap"));
+      
+         // htmlLevels.forEach(([level], i) => {
+         //    level.addEventListener("click", () => {
+         //       setupStartPreview(levels[i], i);
+         //       currentSelectedLevel = levels[i];
+         //    });
+         // });
+      
+         const draw = results.instance.exports.draw;
+         draw();
+         
+      })();
+   }
+);
 
-   // function anim() {
-   //    playGame();
-   //    requestAnimationFrame(anim);
-   // }
-   // anim();
-   // let count = 0;
-   // setInterval(() => {
-   //    mobileErr.innerHTML = count; 
-   //    count = 0;
-   // }, 1000);
+// WebAssembly.instantiateStreaming(fetch("../cpp/logic.wasm"), importObject).then(
+//    (results) => {
+//       var add = results.instance.exports.add;
+//       console.log(add(10, 20));
+//    }
+// );
 
-   // function check() {
-   //    console.log("loop");
-   //    count++;
-   //    requestAnimationFrame(check);
-   // }
-   // check();
-   
-   
-   // animation.start(fun);
-   
-   
-   
-})();
+// (async () => {
+//    const response = await fetch("./levels.json");
+//    levels = await response.json();
+//    const htmlLevels = createHtmlLevels(levels, $("#levelsMap"));
 
+//    htmlLevels.forEach(([level], i) => {
+//       level.addEventListener("click", () => {
+//          setupStartPreview(levels[i], i);
+//          currentSelectedLevel = levels[i];
+//       });
+//    });
 
+//    // CVS.classList.add("active");
+//    // startPreview.classList.remove("active");
+//    // playLevel.setup(levels[7]);
+//    // animation.start(playGame);
 
+//    // function anim() {
+//    //    playGame();
+//    //    requestAnimationFrame(anim);
+//    // }
+//    // anim();
+//    // let count = 0;
+//    // setInterval(() => {
+//    //    mobileErr.innerHTML = count;
+//    //    count = 0;
+//    // }, 1000);
 
+//    // function check() {
+//    //    console.log("loop");
+//    //    count++;
+//    //    requestAnimationFrame(check);
+//    // }
+//    // check();
+
+//    // animation.start(fun);
+// })();
 
 // const rsWindow = $("#rs-window");
 // const rsButton = $("#rs-r");

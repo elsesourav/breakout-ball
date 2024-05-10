@@ -1,5 +1,8 @@
 {
    "cSpell.words": [
+      "emscripten",
       "Leaderboard"
-   ]
+   ],
+   "C_Cpp.errorSquiggles": "disabled",
+   "liveServer.settings.port": 5501
 }
