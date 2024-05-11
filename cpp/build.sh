@@ -1,1 +1,0 @@
-emcc -g -gsource-map --no-entry -s STANDALONE_WASM game.cpp logic.cpp -o logic.html && rm logic.html logic.js logic.wasm.map;

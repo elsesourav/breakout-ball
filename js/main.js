@@ -7,37 +7,22 @@ function playGame() {
    playLevel.draw(ctx, CVS.width, CVS.height);
 }
 
-var importObject = {
-   env: {
-      drawBlocks: function (health, x, y, w, h) {
-         ctx.fillStyle = "#ff0000";
-         ctx.fillRect(x, y, w, h);
-      },
-   },
-   wasi_snapshot_preview1: {},
-};
 
+// (async () => {
+//    // const response = await fetch("./levels.json");
+//    // levels = await response.json();
+//    const htmlLevels = createHtmlLevels(levels, $("#levelsMap"));
 
-WebAssembly.instantiateStreaming(fetch("./logic.wasm"), importObject).then(
-   (results) => {
-      (async () => {
-         const response = await fetch("./levels.json");
-         levels = await response.json();
-         const htmlLevels = createHtmlLevels(levels, $("#levelsMap"));
-      
-         // htmlLevels.forEach(([level], i) => {
-         //    level.addEventListener("click", () => {
-         //       setupStartPreview(levels[i], i);
-         //       currentSelectedLevel = levels[i];
-         //    });
-         // });
-      
-         const draw = results.instance.exports.draw;
-         draw();
-         
-      })();
-   }
-);
+//    // htmlLevels.forEach(([level], i) => {
+//    //    level.addEventListener("click", () => {
+//    //       setupStartPreview(levels[i], i);
+//    //       currentSelectedLevel = levels[i];
+//    //    });
+//    // });
+
+//    const draw = results.instance.exports.draw;
+//    draw();
+// })();
 
 // WebAssembly.instantiateStreaming(fetch("../cpp/logic.wasm"), importObject).then(
 //    (results) => {
