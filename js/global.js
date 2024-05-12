@@ -21,19 +21,26 @@ const BALL_RADIUS = SCALE_H * 0.35;
 const BALL_SPEED = 5;
 const SIZE = 128;
 
-
-
 const CVS = $("#myCanvas");
 const previewCanvas = $("#preview");
 const pCtx = previewCanvas.getContext("2d");
 const ctx = CVS.getContext("2d");
 
-
-
 Module.onRuntimeInitialized = () => {
-   const initialize = Module.cwrap("initialize", "number", ["number", "number", "number"]);
+   const initialize = Module.cwrap("initialize", null, [
+      "number",
+      "number",
+      "number",
+   ]);
+   const setLevel = Module.cwrap("setLevel", null, ["string"]);
 
+   // initialize(rows, cols, SIZE);
 
-   initialize(rows, cols, SIZE);
+   const levelStr = "";
+   const level = window.levels[0];
+
+   for (let i = 0; i < level.length; i++) {
+      for (const key in level[i]) levelStr += `${level[i][key]}-`;
+   }
+   setLevel(levelStr);
 };
-

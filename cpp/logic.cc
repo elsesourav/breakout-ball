@@ -1,9 +1,11 @@
-#include <emscripten/emscripten.h>
 #include "./particle.h"
+#include <array>
+#include <emscripten/emscripten.h>
+#include <iostream>
 #include <vector>
 
 EM_JS(void, drawParticle, (float x, float y, float size, float alpha, short colorIndex), {
-   // colorIndex use to get block current color 
+   // colorIndex use to get block current color
    ctx.globalAlpha = alpha;
    ctx.fillStyle = "red";
    ctx.fillRect(x, y, size, size);
@@ -25,5 +27,10 @@ EMSCRIPTEN_KEEPALIVE void initialize(short rows, short cols, short size) {
 
    Particle p = Particle(40, 60, 25, 1);
    p.draw(drawParticle);
+}
+
+
+EMSCRIPTEN_KEEPALIVE void setLevel(char *level) {
+   std::cout << level;
 }
 }
