@@ -1,26 +1,22 @@
 #ifndef BLOCK_H
 #define BLOCK_H
-// #include "particle.hpp"
 
 class Block {
-private:
-   short i, j, w, h, health;
-   float x, y;
-   bool isVisible;
-   bool isCompleted;
-   //std::vector<Particle> particles;
-   // Particle particles[(w * h / 4)]; // size of each particle w, h = 4
-
 public:
-   Block(short j, short i, short w, short h, short health);
+   Block(int x_, int y_, int health_) : x(x_), y(y_), health(health_) {}
 
-   void damage();
+   int getX() const { return x; }
+   int getY() const { return y; }
+   int getHealth() const { return health; }
 
-   void drawOutline();
+   void destroy() { 
+      if (health > 0) health--;
+   }
 
-   void majorUpdate();
-
-   void draw();
+private:
+   int x;
+   int y;
+   int health;
 };
 
 #endif // BLOCK_H

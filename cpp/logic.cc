@@ -1,4 +1,5 @@
 #include "./particle.h"
+#include "./createBlocks.h"
 #include <array>
 #include <emscripten/emscripten.h>
 #include <iostream>
@@ -29,8 +30,17 @@ EMSCRIPTEN_KEEPALIVE void initialize(short rows, short cols, short size) {
    p.draw(drawParticle);
 }
 
-
 EMSCRIPTEN_KEEPALIVE void setLevel(char *level) {
-   std::cout << level;
+   // std::cout << level << std::endl;
+
+   Blocks parser;
+   std::vector<Block> blocks = parser.convertStringToBlocks(level);
+
+   // Print the blocks
+   for (const auto &block : blocks) {
+      std::cout << "x: " << block.getX() << ", y: " << block.getY() << ", health: " << block.getHealth() << std::endl;
+   }
+
+   blocks.clear();
 }
 }

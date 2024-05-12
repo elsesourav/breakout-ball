@@ -36,9 +36,9 @@ Module.onRuntimeInitialized = () => {
 
    // initialize(rows, cols, SIZE);
 
-   const levelStr = "";
+   let levelStr = "";
    const level = window.levels[0];
-
+   
    for (let i = 0; i < level.length; i++) {
       for (const key in level[i]) levelStr += `${level[i][key]}-`;
    }

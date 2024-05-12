@@ -13,8 +13,6 @@ class Ball {
       const bound = $("main").getBoundingClientRect();
       this.offsetLeft = bound.left;
       this.offsetTop = bound.top;
-      this.preX = x;
-      this.preY = y;
       this.#setupNextCollision();
    }
 
