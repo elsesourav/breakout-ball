@@ -1,12 +1,12 @@
 #ifndef BALL_H
 #define BALL_H
 
-typedef void (*FunctionPtr)(float, float, short);
+typedef void (*DrawBallPtr)(float, float, short);
 
 class Ball {
 public:
-   Ball(float x, float y, float speed, short r);
-   void draw(FunctionPtr fun);
+   void init(float x, float y, short r,  float speed);
+   void draw(DrawBallPtr drawBall);
    void update();
 
 private:

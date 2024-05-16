@@ -11,9 +11,6 @@ function createCanvasImage(drawFunction, width, height) {
    const image = new Image();
    image.src = _cvs_.toDataURL("image/png");
 
-   const imgData = _ctx_.getImageData(0, 0, _cvs_.width, _cvs_.height);
-   _ctx_.putImageData(imgData, 0, 0);
-
    return image;
 }
 

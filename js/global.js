@@ -15,6 +15,8 @@ const FPS = 60;
 const FRAME_RATE = 1000 / FPS;
 const pScale = 0.7;
 const FOOTER_HEIGHT = SCALE_H * 2.4;
+const PAD_X = CVS_W / 2;
+const PAD_Y = CVS_H - FOOTER_HEIGHT;
 const PAD_WIDTH = SCALE * 2.4;
 const PAD_HEIGHT = SCALE_H * 0.6;
 const BALL_RADIUS = SCALE_H * 0.35;
@@ -25,22 +27,21 @@ const CVS = $("#myCanvas");
 const previewCanvas = $("#preview");
 const pCtx = previewCanvas.getContext("2d");
 const ctx = CVS.getContext("2d");
+const paddleImage = createPaddleImage();
+const ballImage = createBallImage();
+const blockImages = createBlockImages();
 
 Module.onRuntimeInitialized = () => {
-   const initialize = Module.cwrap("initialize", null, [
-      "number",
-      "number",
-      "number",
-   ]);
-   const setLevel = Module.cwrap("setLevel", null, ["string"]);
+   const init = Module.cwrap("init", null, ["number", "number", "number", "string", "number", "number", "number", "number", "number", "number"]);
 
-   // initialize(rows, cols, SIZE);
-
+   
    let levelStr = "";
    const level = window.levels[0];
    
    for (let i = 0; i < level.length; i++) {
       for (const key in level[i]) levelStr += `${level[i][key]}-`;
    }
-   setLevel(levelStr);
+   
+   init(rows, cols, SIZE, levelStr, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
+
 };

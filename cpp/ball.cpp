@@ -1,10 +1,17 @@
 #include "./ball.h"
 #include "./random.h"
 
-Ball::Ball(float _x, float _y, float _speed, short _r) : x(_x), y(_y), speed(_speed), r(_r), vx(rnd(-1.0f, 1.0f)), vy(-_speed) {}
+void Ball::init(float _x, float _y, short _r, float _speed) {
+   x = _x;
+   y = _y;
+   r = _r;
+   speed = _speed;
+   vx = rnd(-1.0f, 1.0f);
+   vy = -_speed;
+}
 
-void Ball::draw(FunctionPtr fun) {
-   fun(x, y, r);
+void Ball::draw(DrawBallPtr drawBall) {
+   drawBall(x, y, r);
 }
 
 void Ball::update() {
