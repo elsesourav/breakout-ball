@@ -22,8 +22,8 @@ EM_JS(void, drawPaddle, (float x, float y, short w, short h), {
    ctx.drawImage(paddleImage, x - w / 2, y, w, h);
 });
 
-EM_JS(void, drawBlock, (float x, float y, short w, short h), {
-   ctx.drawImage(blockImage[0], x, y, w, h);
+EM_JS(void, drawBlock, (float x, float y, short w, short h, short health), {
+   ctx.drawImage(blockImages[health - 1].image, x * w, y * h, w, h);
 });
 
 
@@ -42,7 +42,7 @@ EMSCRIPTEN_KEEPALIVE void init(short rows, short cols, short size, char *level, 
    WIDTH = SIZE * 9;
    HEIGHT = SIZE * 16;
 
-   game.init(WIDTH, HEIGHT, SIZE, level, padX, padY, padW, padH, padX, padY - ballR, ballR, BallSpeed);
+   game.init(WIDTH, HEIGHT, SIZE, level, padX, padY, padW, padH, padX, padY - ballR, ballR, BallSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
    game.draw(drawBall, drawPaddle, drawBlock);
 }
 

@@ -1,7 +1,7 @@
 #include "createBlocks.h"
 #include <sstream>
 
-std::vector<Block> Blocks::convertStringToBlocks(const std::string &str) {
+std::vector<Block> Blocks::convertStringToBlocks(const std::string &str, short width, short height) {
    std::vector<Block> blocks;
    std::stringstream ss(str);
    std::string token;
@@ -15,7 +15,7 @@ std::vector<Block> Blocks::convertStringToBlocks(const std::string &str) {
          y = std::stoi(token);
       } else if (count == 2) {
          health = std::stoi(token);
-         blocks.emplace_back(x, y, health);
+         blocks.emplace_back(x, y, width, height, health);
          count = -1; // Reset count for next block
       }
       count++;

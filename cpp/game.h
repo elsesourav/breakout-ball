@@ -10,17 +10,17 @@
 
 typedef void (*DrawBallPtr)(float, float, short);
 typedef void (*DrawPaddlePtr)(float, float, short, short);
-typedef void (*DrawBlockPtr)(float, float, short, short);
+typedef void (*DrawBlockPtr)(float, float, short, short, short);
 
 class Game {
 public:
    Game();
-   void init(short WIDTH, short HEIGHT, short SIZE, char *level, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed);
+   void init(short WIDTH, short HEIGHT, short SIZE, char *level, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight);
 
    void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock);
 
 private:
-   short WIDTH, HEIGHT, SIZE;
+   short WIDTH, HEIGHT, SIZE, blockWidth, blockHeight;
    Blocks parser;
    std::vector<Block> blocks;
    Ball ball;

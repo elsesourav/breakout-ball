@@ -1,27 +1,20 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-typedef void (*DrawBlockPtr)(float, float, short, short);
-
-// block draw in pending
+typedef void (*DrawBlockPtr)(float, float, short, short, short);
 
 class Block {
 public:
-   Block(int x_, int y_, int health_) : x(x_), y(y_), health(health_) {}
+   Block(int x, int y, short width, short height, int health);
 
-   int getX() const { return x; }
-   int getY() const { return y; }
-   int getHealth() const { return health; }
+   void draw(DrawBlockPtr drawBlock);
 
-   // void draw(DrawBlockPtr drawBlock);
-
-   void destroy() { 
-      if (health > 0) health--;
-   }
+   void destroy();
 
 private:
    int x;
    int y;
+   short width, height;
    int health;
 };
 
