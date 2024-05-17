@@ -5,17 +5,16 @@ typedef void (*DrawBlockPtr)(float, float, short, short, short);
 
 class Block {
 public:
-   Block(int x, int y, short width, short height, int health);
-
-   void draw(DrawBlockPtr drawBlock);
-
-   void destroy();
-
-private:
    int x;
    int y;
-   short width, height;
+   short w, h;
    int health;
+   bool isDead;
+
+   Block(int x, int y, short width, short w, int h);
+   void draw(DrawBlockPtr drawBlock);
+   bool damage();
+
 };
 
 #endif // BLOCK_H

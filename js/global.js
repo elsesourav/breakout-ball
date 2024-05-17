@@ -17,31 +17,58 @@ const FRAME_RATE = 1000 / FPS;
 const pScale = 0.7;
 const PAD_X = CVS_W / 2;
 const FOOTER_HEIGHT = SIZE * 1.6;
-const PAD_WIDTH = SIZE * 2.5;
+const PAD_WIDTH = SIZE * 2;
 const PAD_Y = CVS_H - FOOTER_HEIGHT;
 const PAD_HEIGHT = SIZE * 0.4;
-const BALL_RADIUS = SIZE * 0.25;
-const BALL_SPEED = 5;
+const BALL_RADIUS = SIZE * 0.22;
+const BALL_SPEED = 10;
 
-const CVS = $("#myCanvas");
+const CVS = $("#mainCanvas"); 
+const STATIC_CVS = $("#staticCanvas");
 const previewCanvas = $("#preview");
-const pCtx = previewCanvas.getContext("2d");
 const ctx = CVS.getContext("2d");
+const sCtx = STATIC_CVS.getContext("2d");
+const pCtx = previewCanvas.getContext("2d");
 const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
 const blockImages = createBlockImages();
 
-Module.onRuntimeInitialized = () => {
-   const init = Module.cwrap("init", null, ["number", "number", "number", "string", "number", "number", "number", "number", "number", "number"]);
+const animation = new Animation(FPS);
+let fpsCounter = 0;
+let init, draw, update, moveLeft, moveRight, moveTarget;
 
+
+addEventListener("keydown", ({ keyCode }) => {
+   if (keyCode === 37) moveLeft();
+   else if (keyCode === 39) moveRight();
+});
+
+
+
+
+
+Module.onRuntimeInitialized = () => {
+   init = Module.cwrap("init", null, ["number", "number", "number", "string", "number", "number", "number", "number", "number", "number"]);
+   draw = Module.cwrap("draw", null, []);
+   update = Module.cwrap("update", null, []);
+   moveLeft = Module.cwrap("moveLeft", null, []);
+   moveRight = Module.cwrap("moveRight", null, []);
+   moveTarget = Module.cwrap("moveTarget", "number", []);
    
-   let levelStr = "";
-   const level = window.levels[0];
-   
-   for (let i = 0; i < level.length; i++) {
-      for (const key in level[i]) levelStr += `${level[i][key]}-`;
+   const level = createStringLevel(window.levels[0]);
+   init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
+
+   function loop() {
+      update();
+      draw();
+      fpsCounter++;
    }
-   
-   init(rows, cols, SIZE, levelStr, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
+
+   setInterval(() => {
+      mobileErr.innerHTML = fpsCounter;
+      fpsCounter = 0;
+   }, 1000);
+
+   animation.start(loop);
 
 };

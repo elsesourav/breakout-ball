@@ -5,12 +5,11 @@
 #include <vector>
 
 short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT;
+Game game;
 
-EM_JS(void, drawParticle, (float x, float y, float size, float alpha, short colorIndex), {
-   // colorIndex use to get block current color
-   ctx.globalAlpha = alpha;
-   ctx.fillStyle = "red";
-   ctx.fillRect(x, y, size, size);
+EM_JS(void, clearCanvas, (short w, short h), {
+   ctx.globalAlpha = 0.5;
+   ctx.clearRect(0, 0, w, h);
    ctx.globalAlpha = 1;
 });
 
@@ -22,14 +21,13 @@ EM_JS(void, drawPaddle, (float x, float y, short w, short h), {
    ctx.drawImage(paddleImage, x - w / 2, y, w, h);
 });
 
-EM_JS(void, drawBlock, (float x, float y, short w, short h, short health), {
-   ctx.drawImage(blockImages[health - 1].image, x * w, y * h, w, h);
+EM_JS(void, clearStaticCanvas, (short w, short h), {
+   sCtx.clearRect(0, 0, w, h);
 });
 
-
-
-Game game;
-
+EM_JS(void, drawBlock, (float x, float y, short w, short h, short health), {
+   if (health > 0) sCtx.drawImage(blockImages[health - 1].image, x, y, w, h);
+}); 
 
 extern "C" {
 
@@ -42,21 +40,24 @@ EMSCRIPTEN_KEEPALIVE void init(short rows, short cols, short size, char *level, 
    WIDTH = SIZE * 9;
    HEIGHT = SIZE * 16;
 
+   game.blocks.clear();
    game.init(WIDTH, HEIGHT, SIZE, level, padX, padY, padW, padH, padX, padY - ballR, ballR, BallSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
-   game.draw(drawBall, drawPaddle, drawBlock);
 }
 
-// EMSCRIPTEN_KEEPALIVE void setLevel(char *level) {
-//    // std::cout << level << std::endl;
+EMSCRIPTEN_KEEPALIVE void update() {
+   game.update();
+}
 
-//    Blocks parser;
-//    std::vector<Block> blocks = parser.convertStringToBlocks(level);
-
-//    // Print the blocks
-//    for (const auto &block : blocks) {
-//       std::cout << "x: " << block.getX() << ", y: " << block.getY() << ", health: " << block.getHealth() << std::endl;
-//    }
-
-//    blocks.clear();
-// }
+EMSCRIPTEN_KEEPALIVE void draw() {
+   game.draw(drawBall, drawPaddle, drawBlock, clearCanvas, clearStaticCanvas);
+}
+EMSCRIPTEN_KEEPALIVE void moveLeft() {
+   game.paddle.moveLeft();
+}
+EMSCRIPTEN_KEEPALIVE void moveRight() {
+   game.paddle.moveRight();
+}
+EMSCRIPTEN_KEEPALIVE float moveTarget(float tx) {
+   return game.paddle.moveTarget(tx);
+}
 }

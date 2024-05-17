@@ -26,12 +26,15 @@ function createBallImage() {
 
          ctx.fillStyle = gradient;
          ctx.beginPath();
-         ctx.arc(70, 70, 70, 0, Math.PI * 2, false);
+         ctx.strokeStyle = "#0ff";
+         ctx.lineWidth = 3;
+         ctx.arc(73, 73, 70, 0, Math.PI * 2, false);
          ctx.fill();
+         ctx.stroke();
          ctx.closePath();
       },
-      140,
-      140
+      146,
+      146
    );
 }
 
@@ -93,7 +96,7 @@ function createBlockImages() {
       const offset = 2 + 0.5 * (blockColors.length - i);
       const x = offset;
       const y = offset;
-      const r = 6;
+      const r = 5;
       const W = blockW - 2 * offset;
       const H = blockH - 2 * offset;
       const inOffset = 3;
@@ -106,7 +109,7 @@ function createBlockImages() {
          image: createCanvasImage(
             (ctx) => {
                const path1 = create2dRoundedRectPath(x, y, W, H, r);
-               const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r);
+               const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r * 1.4);
 
                ctx.lineWidth = 2;
                ctx.strokeStyle = stroke;

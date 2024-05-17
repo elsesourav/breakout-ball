@@ -6,33 +6,35 @@ rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
 rootStyle.setProperty("--pScale", pScale);
 if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
 
-CVS.width = CVS_W;
-CVS.height = CVS_H;
+CVS.width = STATIC_CVS.width = CVS_W;
+CVS.height = STATIC_CVS.height = CVS_H;
 previewCanvas.width = SCALE * rows * pScale;
 previewCanvas.height = SCALE_H * cols * pScale;
 
 ctx.imageSmoothingQuality = "high";
+sCtx.imageSmoothingQuality = "high";
 pCtx.imageSmoothingQuality = "high";
 
-const animation = new Animation(FPS);
-const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
-const playLevel = new PlayLevel({
-   padX: CVS_W / 2,
-   padY: CVS_H - FOOTER_HEIGHT,
-   padW: PAD_WIDTH,
-   padH: PAD_HEIGHT,
-   ballX: CVS_W / 2,
-   ballY: CVS_H - FOOTER_HEIGHT - BALL_RADIUS,
-   ballR: BALL_RADIUS,
-   ballS: BALL_SPEED,
-   cvs: CVS,
-   blockW: SCALE,
-   blockH: SCALE_H,
-   fps: FPS,
-   paddleImage: createPaddleImage(),
-   ballImage: createBallImage(),
-   blockImages: createBlockImages(),
-});
+
+// const animation = new Animation(FPS);
+// const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
+// const playLevel = new PlayLevel({
+//    padX: CVS_W / 2,
+//    padY: CVS_H - FOOTER_HEIGHT,
+//    padW: PAD_WIDTH,
+//    padH: PAD_HEIGHT,
+//    ballX: CVS_W / 2,
+//    ballY: CVS_H - FOOTER_HEIGHT - BALL_RADIUS,
+//    ballR: BALL_RADIUS,
+//    ballS: BALL_SPEED,
+//    cvs: CVS,
+//    blockW: SCALE,
+//    blockH: SCALE_H,
+//    fps: FPS,
+//    paddleImage: createPaddleImage(),
+//    ballImage: createBallImage(),
+//    blockImages: createBlockImages(),
+// });
 
 let levels = [];
 let currentSelectedLevel; // store level map

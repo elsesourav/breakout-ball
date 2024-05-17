@@ -1,11 +1,15 @@
 #include "./block.h"
 
-Block::Block(int x_, int y_, short _width, short _height, int health_) : x(x_), y(y_), width(_width), height(_height), health(health_) {}
+Block::Block(int x_, int y_, short _width, short _height, int health_) : x(x_ * _width), y(y_ * _height), w(_width), h(_height), health(health_), isDead(false) {}
 
 void Block::draw(DrawBlockPtr drawBlock) {
-   drawBlock(x, y, width, height, health);
+   drawBlock(x, y, w, h, health);
 }
 
-void Block::destroy() {
-   if (health > 0) health--;
+bool Block::damage() {
+   if (--health > 0) {
+      return false;
+   } else {
+      return true;
+   }
 }

@@ -193,5 +193,11 @@ function create2dRoundedRectPath(x, y, w, h, r) {
    return path;
 }
 
-
-
+function createStringLevel(level) {
+   let levelStr = "";
+   
+   for (let i = 0; i < level.length; i++) {
+      for (const key in level[i]) levelStr += `${level[i][key]}-`;
+   }
+   return levelStr.slice(0, -1);
+}

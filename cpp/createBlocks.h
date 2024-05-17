@@ -7,7 +7,7 @@
 
 class Blocks {
 public:
-   std::vector<Block> convertStringToBlocks(const std::string &str, short width, short height);
+   std::vector<Block> convertStringToBlocks(const std::string &str, short w, short h);
 };
 
 #endif // CREATE_BLOCKS_H
