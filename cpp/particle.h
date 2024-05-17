@@ -1,8 +1,6 @@
 #ifndef PARTIAL_H
 #define PARTIAL_H
 
-#include <cstdlib> // Include this for the definition of rnd()
-
 typedef void (*DrawParticle)(float, float, float, float, short);
 
 class Particle {

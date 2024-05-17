@@ -29,6 +29,13 @@ EM_JS(void, drawParticle, (float x, float y, float s, float alpha, short colorIn
    ctx.globalAlpha = 1;
 });
 
+EM_JS(void, drawStar, (float x, float y, float s, float alpha), {
+   ctx.globalAlpha = alpha;
+   ctx.fillStyle = "#FFF";
+   ctx.fillRect(x, y, s, s);
+   ctx.globalAlpha = 1;
+});
+
 EM_JS(void, clearStaticCanvas, (short w, short h), {
    sCtx.clearRect(0, 0, w, h);
 });
@@ -58,7 +65,7 @@ EMSCRIPTEN_KEEPALIVE void update() {
 }
 
 EMSCRIPTEN_KEEPALIVE void draw() {
-   game.draw(drawBall, drawPaddle, drawBlock, drawParticle, clearCanvas, clearStaticCanvas);
+   game.draw(drawBall, drawPaddle, drawBlock, drawParticle, drawStar, clearCanvas, clearStaticCanvas);
 }
 EMSCRIPTEN_KEEPALIVE void moveLeft() {
    game.paddle.moveLeft();
