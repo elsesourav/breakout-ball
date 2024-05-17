@@ -9,7 +9,7 @@ typedef void (*DrawBallPtr)(float, float, short);
 class Ball {
 public:
    short r;
-   float x, y, vx, vy, speed;
+   float x, y, vx, vy, speed, distanceX, distanceY, distanceSQR;
 
    void init(float x, float y, short r,  float speed);
    void draw(DrawBallPtr drawBall);
@@ -17,7 +17,7 @@ public:
    void reverseY();
    void reverseX();
    bool checkPaddleCollision(Paddle *block);
-   bool checkBlockCollision(Block *block);
+   short checkBlockCollision(Block *block);
    short collisionSide(Block *block);
 };
 

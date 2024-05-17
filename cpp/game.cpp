@@ -84,7 +84,6 @@ void Game::update() {
    }
 
    // check the collision
-
    if (ball.checkPaddleCollision(&paddle)) {
       ball.reverseY();
    }
@@ -98,14 +97,22 @@ void Game::update() {
 
    i = 0;
    for (auto &block : blocks) {
-      if (!block.isDead && ball.checkBlockCollision(&block)) {
-         short side = ball.collisionSide(&block); // 1 for left, right, 0 for top bottom
+      short dir = ball.checkBlockCollision(&block);
 
-         if (side == 1) {
+      if (!block.isDead && dir != 0) {
+         // short side = ball.collisionSide(&block); // 1 for left, right, 0 for top bottom
+
+         std::cout << dir << std::endl;
+
+         if (dir == 1) {
             ball.reverseX();
-         } else {
+         } else if (dir == -1) {
+            ball.reverseY();
+         } else if (dir == 2) {
+            ball.reverseX();
             ball.reverseY();
          }
+         
          bool is = block.damage();
          isNeedDrawBlocks = true;
 

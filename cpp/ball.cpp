@@ -1,5 +1,6 @@
 #include "./ball.h"
 #include "./random.h"
+#include <cmath>
 #include <iostream>
 using namespace std;
 
@@ -31,20 +32,35 @@ bool Ball::checkPaddleCollision(Paddle *p) {
    float nx = p->x - p->w / 2;
    return x + r >= nx && x - r <= nx + p->w && y + r >= p->y && y - r <= p->y + p->h;
 }
-bool Ball::checkBlockCollision(Block *b) {
-   return x + r >= b->x && x - r <= b->x + b->w && y + r >= b->y && y - r <= b->y + b->h;
+short Ball::checkBlockCollision(Block *b) {
+   distanceX = std::abs(x - b->x);
+   distanceY = std::abs(y - b->y);
+
+   if (distanceX > (b->w / 2 + r)) return 0;
+   if (distanceY > (b->h / 2 + r)) return 0;
+
+   if (distanceX <= (b->w / 2)) return 1;
+   if (distanceY <= (b->h / 2)) return -1;
+
+   distanceSQR = std::pow((distanceX - b->w / 2), 2) + std::pow((distanceY - b->h / 2), 2);
+
+   if (distanceSQR <= std::pow(r, 2)) return 2;
+   return 0;
+   // return x + r >= b->x && x - r <= b->x + b->w && y + r >= b->y && y - r <= b->y + b->h;
 }
+
 short Ball::collisionSide(Block *b) {
    float left = ((x + r) - (b->x + b->w / 2)) - b->w / 2;
    float right = ((b->x + b->w) - (x - r)) - b->w / 2;
-   float top = ((y + r) - (b->y + b->h / 2)) - b->h / 2; 
+   float top = ((y + r) - (b->y + b->h / 2)) - b->h / 2;
    float bottom = ((b->y + b->h) - (y - r)) - b->h / 2;
-   
+
    // std::cout << "left: " << left << " ;right " << right << " ;top " << top << " ;bottom " << bottom << std::endl;
    float max = std::max(std::max(std::max(left, right), top), bottom);
 
-   // std::cout << minimum << std::endl; 
-   if (max == left || max == right) return 1;
-   
+   // std::cout << minimum << std::endl;
+   if (max == left || max == right)
+      return 1;
+
    return 0;
 }
