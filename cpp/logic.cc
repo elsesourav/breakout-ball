@@ -8,8 +8,9 @@ short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT;
 Game game;
 
 EM_JS(void, clearCanvas, (short w, short h), {
-   ctx.globalAlpha = 0.5;
-   ctx.clearRect(0, 0, w, h);
+   ctx.globalAlpha = 0.7;
+   ctx.fillStyle = "#0007";
+   ctx.fillRect(0, 0, w, h);
    ctx.globalAlpha = 1;
 });
 
@@ -21,6 +22,13 @@ EM_JS(void, drawPaddle, (float x, float y, short w, short h), {
    ctx.drawImage(paddleImage, x - w / 2, y, w, h);
 });
 
+EM_JS(void, drawParticle, (float x, float y, float s, float alpha, short colorIndex), {
+   ctx.globalAlpha = alpha;
+   ctx.fillStyle = blockImages[colorIndex].color;
+   ctx.fillRect(x, y, s, s);
+   ctx.globalAlpha = 1;
+});
+
 EM_JS(void, clearStaticCanvas, (short w, short h), {
    sCtx.clearRect(0, 0, w, h);
 });
@@ -28,6 +36,7 @@ EM_JS(void, clearStaticCanvas, (short w, short h), {
 EM_JS(void, drawBlock, (float x, float y, short w, short h, short health), {
    if (health > 0) sCtx.drawImage(blockImages[health - 1].image, x, y, w, h);
 }); 
+
 
 extern "C" {
 
@@ -49,7 +58,7 @@ EMSCRIPTEN_KEEPALIVE void update() {
 }
 
 EMSCRIPTEN_KEEPALIVE void draw() {
-   game.draw(drawBall, drawPaddle, drawBlock, clearCanvas, clearStaticCanvas);
+   game.draw(drawBall, drawPaddle, drawBlock, drawParticle, clearCanvas, clearStaticCanvas);
 }
 EMSCRIPTEN_KEEPALIVE void moveLeft() {
    game.paddle.moveLeft();

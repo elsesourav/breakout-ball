@@ -75,80 +75,80 @@ $("#closeBtn").click(() => {});
 
 
 /* -------- paddle move eventListener -------- */
-
-
-const { left, width } = STATIC_CVS.getBoundingClientRect();
-const scale = STATIC_CVS.width / width;
-const cw = STATIC_CVS.width;
-const hw = PAD_WIDTH / 2;
-let tx = WIDTH / 2;
-
-const moveHandler = (x) => {
-   tx = (x - left) * scale;
-   tx = moveTarget(tx);
-};
-
-const pcMoveHandler = (dx) => {
-   tx += dx * 3;
-   tx = moveTarget(tx);
-};
-
-document.body.addEventListener(
-   "click",
-   (e) => {
-      if (!this.isPointerLock) {
-         this.isPointerLock = true;
-         if (STATIC_CVS.requestPointerLock) {
-            STATIC_CVS.requestPointerLock();
-         } else if (STATIC_CVS.webkitRequestPointerLock) {
-            STATIC_CVS.webkitRequestPointerLock();
-         } else if (STATIC_CVS.mozRequestPointerLock) {
-            STATIC_CVS.mozRequestPointerLock();
+(() => {
+   const { left, width } = STATIC_CVS.getBoundingClientRect();
+   const scale = STATIC_CVS.width / width;
+   let tx = WIDTH / 2;
+   let isPointerLock = false;
+   
+   const moveHandler = (x) => {
+      tx = (x - left) * scale;
+      tx = moveTarget(tx);
+   };
+   
+   const pcMoveHandler = (dx) => {
+      tx += dx * 3;
+      tx = moveTarget(tx);
+   };
+   
+   document.body.addEventListener(
+      "click",
+      (e) => {
+         if (!isPointerLock) {
+            isPointerLock = true;
+            if (STATIC_CVS.requestPointerLock) {
+               STATIC_CVS.requestPointerLock();
+            } else if (STATIC_CVS.webkitRequestPointerLock) {
+               STATIC_CVS.webkitRequestPointerLock();
+            } else if (STATIC_CVS.mozRequestPointerLock) {
+               STATIC_CVS.mozRequestPointerLock();
+            } else {
+               console.warn("Pointer locking not supported");
+               isPointerLock = false;
+            }
          } else {
-            console.warn("Pointer locking not supported");
-            this.isPointerLock = false;
+            document.exitPointerLock =
+               document.exitPointerLock || document.mozExitPointerLock;
+            document.exitPointerLock();
+            isPointerLock = false;
          }
+      },
+      false
+   );
+   
+   document.addEventListener("pointerlockchange", pointerLockChange, false);
+   document.addEventListener("mozpointerlockchange", pointerLockChange, false);
+   
+   function pointerLockChange() {
+      if (
+         document.pointerLockElement === STATIC_CVS ||
+         document.mozPointerLockElement === STATIC_CVS
+      ) {
+         STATIC_CVS.style.curser = "none";
       } else {
-         document.exitPointerLock =
-            document.exitPointerLock || document.mozExitPointerLock;
-         document.exitPointerLock();
-         this.isPointerLock = false;
+         STATIC_CVS.style.curser = "move";
       }
-   },
-   false
-);
-
-document.addEventListener("pointerlockchange", pointerLockChange, false);
-document.addEventListener("mozpointerlockchange", pointerLockChange, false);
-
-function pointerLockChange() {
-   if (
-      document.pointerLockElement === STATIC_CVS ||
-      document.mozPointerLockElement === STATIC_CVS
-   ) {
-      STATIC_CVS.style.curser = "none";
-   } else {
-      STATIC_CVS.style.curser = "move";
    }
-}
+   
+   STATIC_CVS.addEventListener("mouseenter", (e) => {
+      isPointerLock && pcMoveHandler(e.movementX);
+   });
+   STATIC_CVS.addEventListener("mousemove", (e) => {
+      isPointerLock && pcMoveHandler(e.movementX);
+   });
+   
+   STATIC_CVS.addEventListener("mouseenter", (e) => {
+      !isPointerLock && moveHandler(e.clientX);
+   });
+   STATIC_CVS.addEventListener("mousemove", (e) => {
+      !isPointerLock && moveHandler(e.clientX);
+   });
+   
+   STATIC_CVS.addEventListener("touchstart", (e) => {
+      moveHandler(e.touches[0].clientX);
+   });
+   STATIC_CVS.addEventListener("touchmove", (e) => {
+      moveHandler(e.touches[0].clientX);
+   });
+})();
 
-STATIC_CVS.addEventListener("mouseenter", (e) => {
-   this.isPointerLock && pcMoveHandler(e.movementX);
-});
-STATIC_CVS.addEventListener("mousemove", (e) => {
-   this.isPointerLock && pcMoveHandler(e.movementX);
-});
-
-STATIC_CVS.addEventListener("mouseenter", (e) => {
-   !this.isPointerLock && moveHandler(e.clientX);
-});
-STATIC_CVS.addEventListener("mousemove", (e) => {
-   !this.isPointerLock && moveHandler(e.clientX);
-});
-
-STATIC_CVS.addEventListener("touchstart", (e) => {
-   moveHandler(e.touches[0].clientX);
-});
-STATIC_CVS.addEventListener("touchmove", (e) => {
-   moveHandler(e.touches[0].clientX);
-});

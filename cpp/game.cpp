@@ -3,6 +3,8 @@
 #include "./block.h"
 #include "./createBlocks.h"
 #include "./paddle.h"
+#include "./random.h"
+
 #include <iostream>
 using namespace std;
 
@@ -21,7 +23,7 @@ void Game::init(short _WIDTH, short _HEIGHT, short _SIZE, char *level, float pad
    blocks = parser.convertStringToBlocks(level, blockWidth, blockHeight);
 }
 
-void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, ClearCvs clearCvs, ClearStaticCvs clearStaticCvs) {
+void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticle drawParticle, ClearCvs clearCvs, ClearStaticCvs clearStaticCvs) {
    clearCvs(WIDTH, HEIGHT);
    ball.draw(drawBall);
    paddle.draw(drawPaddle);
@@ -33,11 +35,39 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
          block.draw(drawBlock);
       }
    }
+
+   for (auto &particle : particles) {
+      particle.draw(drawParticle);
+   }
+}
+
+void Game::createParticles(float x, float y, short colorIndex) {
+   short gap = blockWidth / 8;
+
+   for (short i = 0; i < blockHeight; i += gap) {
+      for (short j = 0; j < blockWidth; j += gap) {
+         float size = rnd(1.0f, (float) SIZE / 8);
+         float _x = x + j;
+         float _y = y + i;
+         particles.push_back(Particle(_x, _y, size, colorIndex));
+      }
+   }
+
 }
 
 void Game::update() {
+   short i = 0;
+
    ball.update();
    paddle.update();
+
+   // update particles
+   for (auto &particle : particles) {
+      i++;
+      if(particle.update()) {
+         particles.erase(particles.begin() + i);
+      }
+   }
 
    // check the collision
 
@@ -52,8 +82,7 @@ void Game::update() {
       ball.reverseY();
    }
 
-   short i = 0;
-
+   i = 0;
    for (auto &block : blocks) {
       if (!block.isDead && ball.checkBlockCollision(&block)) {
          short side = ball.collisionSide(&block); // 1 for left, right, 0 for top bottom
@@ -67,6 +96,8 @@ void Game::update() {
          isNeedDrawBlocks = true;
 
          if (is) {
+            createParticles(block.x, block.y, block.health);
+
             block.isDead = true;
             blocks.erase(blocks.begin() + i);
          }
