@@ -149,11 +149,13 @@ $("#closeBtn").click(() => {});
       moveHandler(e.touches[0].clientX);
    });
 
+   let oldGamma = 0;
 
    if (window.DeviceOrientationEvent) {
       window.addEventListener("deviceorientation", (e) => {
-         const ntx = tx + (e.gamma * 10);
-         tx = moveTarget(ntx);;
+         const ntx = (e.gamma * 5) - oldGamma;
+         tx = moveTarget(ntx);
+         oldGamma = e.gamma;
       });
    }
 })();
