@@ -153,7 +153,7 @@ $("#closeBtn").click(() => {});
 
    if (window.DeviceOrientationEvent) {
       window.addEventListener("deviceorientation", (e) => {
-         const ntx = (e.gamma * 5) - oldGamma;
+         const ntx = (e.gamma * 3) - oldGamma;
          tx = moveTarget(ntx);
          oldGamma = e.gamma;
       });
