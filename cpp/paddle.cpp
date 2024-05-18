@@ -9,9 +9,7 @@ void Paddle::init(float _x, float _y, short _w, short _h,  float ballSpeed, shor
    ty = _y;
    v = ballSpeed * 2;
    windowWidth = _windowWidth;
-   deltaMove = 0.0f;
    percentage = 0.1f;
-   movePercentage = 0.5f;
    isPointerLock = false;
 }
 
@@ -22,7 +20,6 @@ void Paddle::draw(DrawPaddlePtr drawPaddle) {
 void Paddle::update() {
    x += (tx - x) * percentage;
    y += (ty - y) * percentage;
-   deltaMove *= movePercentage;
 }
 
 void Paddle::moveLeft() {

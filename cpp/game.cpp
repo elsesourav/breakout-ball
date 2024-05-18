@@ -86,6 +86,10 @@ void Game::update() {
    // check the collision
    if (ball.checkPaddleCollision(&paddle)) {
       ball.reverseY();
+      // cout << ball.vx << endl;
+      float nvx = (paddle.tx - paddle.x) * 0.01f;
+      ball.vx += nvx > 2.0f ? 2.0f : nvx < -2.0f ? -2.0f : nvx;
+      // cout << ball.vx << endl;
    }
 
    if (ball.x - ball.r <= 0 || ball.x + ball.r >= WIDTH) {

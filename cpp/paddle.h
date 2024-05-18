@@ -6,7 +6,7 @@ typedef void (*DrawPaddlePtr)(float, float, short, short);
 class Paddle {
 public:
    short w, h;
-   float x, y, tx, ty, v, deltaMove, windowWidth, percentage, movePercentage;
+   float x, y, tx, ty, v, windowWidth, percentage;
    bool isPointerLock;
 
    void init(float x, float y, short w, short h, float ballSpeed, short windowWidth);
