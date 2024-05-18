@@ -110,15 +110,15 @@ void Game::update() {
             ball.reverseY();
          }
          
-         bool is = block.damage();
+         short is = block.damage();
          isNeedDrawBlocks = true;
 
-         if (is) {
+         if (is == 2) {
             createParticles(block.x, block.y, block.health, 2);
 
             block.isDead = true;
             blocks.erase(blocks.begin() + i);
-         } else {
+         } else if (is == 1) {
             createParticles(block.x, block.y, block.health, 1);
          }
          break;

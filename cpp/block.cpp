@@ -13,10 +13,11 @@ void Block::draw(DrawBlockPtr drawBlock) {
    drawBlock(x, y, w, h, health);
 }
 
-bool Block::damage() {
-   if (--health > 0) {
-      return false;
+short Block::damage() {
+   if (health == 6) return 0;
+   if (--health > 0) { 
+      return 1;
    } else {
-      return true;
+      return 2;
    }
 }

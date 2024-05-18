@@ -24,7 +24,7 @@ EM_JS(void, drawPaddle, (float x, float y, short w, short h), {
 
 EM_JS(void, drawParticle, (float x, float y, float s, float alpha, short colorIndex), {
    ctx.globalAlpha = alpha;
-   ctx.fillStyle = blockImages[colorIndex].color;
+   ctx.fillStyle = blockImages[colorIndex].stroke;
    ctx.fillRect(x, y, s, s);
    ctx.globalAlpha = 1;
 });

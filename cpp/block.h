@@ -12,7 +12,7 @@ public:
 
    Block(short x, short y, short w, short h, short health);
    void draw(DrawBlockPtr drawBlock);
-   bool damage();
+   short damage();
 
 };
 

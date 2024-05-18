@@ -55,7 +55,7 @@ Module.onRuntimeInitialized = () => {
    moveRight = Module.cwrap("moveRight", null, []);
    moveTarget = Module.cwrap("moveTarget", "number", []);
    
-   const level = createStringLevel(window.levels[3]);
+   const level = createStringLevel(window.levels[8]);
    init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
 
    function loop() {

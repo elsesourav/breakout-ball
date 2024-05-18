@@ -77,23 +77,23 @@ function createPaddleImage() {
       h
    ));
 }
-
+/* background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);*/
 function createBlockImages() {
    const blockColors = [
-      ["#00bcb9", "#4ffffc"],
-      ["#bfc200", "#fcff59"],
-      ["#00d00e", "#3bff48"],
-      ["#8c00ff", "#af4eff"],
-      ["#ff005d", "#ff4e8f"],
-      ["#ffffff", "#ffffff"],
+      [["#4facfe", "#00f2fe"], "#4ffffc"],
+      [["#f6d365", "#fda085"], "#fcff59"],
+      [["#0ba360", "#20e6c1"], "#3bff48"],
+      [["#b773ff", "#7028e4"], "#af4eff"],
+      [["#ff0844", "#fc8b68"], "#ff4e8f"],
+      [["#e8e5cf", "#c3cfe2"], "#ffffff"],
    ];
 
    const blockW = 64;
    const blockH = 48;
    let blockImages = [];
 
-   blockColors.forEach(([color, stroke], i) => {
-      const offset = 2 + 0.5 * (blockColors.length - i);
+   blockColors.forEach(([[c1, c2], stroke], i) => {
+      const offset = 3 + 0.3 * (blockColors.length - i);
       const x = offset;
       const y = offset;
       const r = 5;
@@ -109,14 +109,24 @@ function createBlockImages() {
          image: createCanvasImage(
             (ctx) => {
                const path1 = create2dRoundedRectPath(x, y, W, H, r);
-               const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r * 1.4);
+               const path2 = create2dRoundedRectPath(
+                  inX,
+                  inY,
+                  inW,
+                  inH,
+                  r * 1.4
+               );
 
-               ctx.lineWidth = 2;
+               const grad = ctx.createLinearGradient(0, 0, W, H);
+               grad.addColorStop(0, c1);
+               grad.addColorStop(1, c2);
+
+               ctx.fillStyle = grad;
+               ctx.fill(path1);
+
+               ctx.lineWidth = 3;
                ctx.strokeStyle = stroke;
                ctx.stroke(path1);
-
-               ctx.fillStyle = color;
-               ctx.fill(path1);
 
                ctx.fillStyle = "#fff4";
                ctx.fill(path2);
@@ -124,7 +134,7 @@ function createBlockImages() {
             blockW,
             blockH
          ),
-         color,
+         stroke,
       });
    });
 

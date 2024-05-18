@@ -72,25 +72,23 @@ $("#redoBtn").click(() => {
 $("#saveBtn").click(() => {});
 $("#closeBtn").click(() => {});
 
-
-
 /* -------- paddle move eventListener -------- */
 (() => {
    const { left, width } = STATIC_CVS.getBoundingClientRect();
    const scale = STATIC_CVS.width / width;
    let tx = WIDTH / 2;
    let isPointerLock = false;
-   
+
    const moveHandler = (x) => {
       tx = (x - left) * scale;
       tx = moveTarget(tx);
    };
-   
+
    const pcMoveHandler = (dx) => {
       tx += dx * 3;
       tx = moveTarget(tx);
    };
-   
+
    document.body.addEventListener(
       "click",
       (e) => {
@@ -115,10 +113,10 @@ $("#closeBtn").click(() => {});
       },
       false
    );
-   
+
    document.addEventListener("pointerlockchange", pointerLockChange, false);
    document.addEventListener("mozpointerlockchange", pointerLockChange, false);
-   
+
    function pointerLockChange() {
       if (
          document.pointerLockElement === STATIC_CVS ||
@@ -129,14 +127,14 @@ $("#closeBtn").click(() => {});
          STATIC_CVS.style.curser = "move";
       }
    }
-   
+
    STATIC_CVS.addEventListener("mouseenter", (e) => {
       isPointerLock && pcMoveHandler(e.movementX);
    });
    STATIC_CVS.addEventListener("mousemove", (e) => {
       isPointerLock && pcMoveHandler(e.movementX);
    });
-   
+
    STATIC_CVS.addEventListener("mouseenter", (e) => {
       !isPointerLock && moveHandler(e.clientX);
    });
@@ -144,12 +142,18 @@ $("#closeBtn").click(() => {});
       !isPointerLock && moveHandler(e.clientX);
    });
 
-   
    STATIC_CVS.addEventListener("touchstart", (e) => {
       moveHandler(e.touches[0].clientX);
    });
    STATIC_CVS.addEventListener("touchmove", (e) => {
       moveHandler(e.touches[0].clientX);
    });
-})();
 
+
+   if (window.DeviceOrientationEvent) {
+      window.addEventListener("deviceorientation", (e) => {
+         const ntx = tx + (e.gamma * 10);
+         tx = moveTarget(ntx);;
+      });
+   }
+})();
