@@ -1,6 +1,13 @@
 #include "./block.h"
 
-Block::Block(int x_, int y_, short _width, short _height, int health_) : x(x_ * _width), y(y_ * _height), w(_width), h(_height), health(health_), isDead(false) {}
+Block::Block(short x_, short y_, short _w, short _h, short _health) : x(x_ * _w), y(y_ * _h), w(_w), h(_h), health(_health) {
+   isDead = false;
+   offset = w * 0.1f;
+   x1 = x;
+   y1 = y;
+   x2 = x + w;
+   y2 = y + h;
+}
 
 void Block::draw(DrawBlockPtr drawBlock) {
    drawBlock(x, y, w, h, health);

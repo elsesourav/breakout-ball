@@ -5,13 +5,12 @@ typedef void (*DrawBlockPtr)(float, float, short, short, short);
 
 class Block {
 public:
-   int x;
-   int y;
-   short w, h;
-   int health;
+   short x, y, w, h, health;
+   float offset;
+   short x1, x2, y1, y2;
    bool isDead;
 
-   Block(int x, int y, short width, short w, int h);
+   Block(short x, short y, short w, short h, short health);
    void draw(DrawBlockPtr drawBlock);
    bool damage();
 

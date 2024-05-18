@@ -143,6 +143,7 @@ $("#closeBtn").click(() => {});
    STATIC_CVS.addEventListener("mousemove", (e) => {
       !isPointerLock && moveHandler(e.clientX);
    });
+
    
    STATIC_CVS.addEventListener("touchstart", (e) => {
       moveHandler(e.touches[0].clientX);

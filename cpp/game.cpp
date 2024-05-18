@@ -100,10 +100,7 @@ void Game::update() {
       short dir = ball.checkBlockCollision(&block);
 
       if (!block.isDead && dir != 0) {
-         // short side = ball.collisionSide(&block); // 1 for left, right, 0 for top bottom
-
-         std::cout << dir << std::endl;
-
+         cout << dir << endl;
          if (dir == 1) {
             ball.reverseX();
          } else if (dir == -1) {
@@ -125,7 +122,7 @@ void Game::update() {
             createParticles(block.x, block.y, block.health, 1);
          }
          break;
-      }
+      } 
       i++;
    }
 }

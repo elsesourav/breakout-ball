@@ -21,7 +21,7 @@ const PAD_WIDTH = SIZE * 2;
 const PAD_Y = CVS_H - FOOTER_HEIGHT;
 const PAD_HEIGHT = SIZE * 0.4;
 const BALL_RADIUS = SIZE * 0.22;
-const BALL_SPEED = 10;
+const BALL_SPEED = 15;
 
 const CVS = $("#mainCanvas"); 
 const STATIC_CVS = $("#staticCanvas");
