@@ -1,6 +1,7 @@
 #include "./paddle.h"
+#include "./random.h"
 
-void Paddle::init(float _x, float _y, short _w, short _h,  float ballSpeed, short _windowWidth) {
+void Paddle::init(float _x, float _y, short _w, short _h, float ballSpeed, short _windowWidth) {
    x = _x;
    y = _y;
    w = _w;
@@ -11,15 +12,34 @@ void Paddle::init(float _x, float _y, short _w, short _h,  float ballSpeed, shor
    windowWidth = _windowWidth;
    percentage = 0.1f;
    isPointerLock = false;
+
+
+   // setup glows
+   short numGlows = (w / 16) * (h / 16);
+   float W = w * 0.9;
+   float H = h * 1.4;
+
+   for (short i = 0; i < numGlows; i++) {
+      float size = rnd(2.0f, 5.0f);
+      float offX = rnd(0.0f, (float)W);
+      float offY = rnd(0.0f, (float)H);
+      short colorIndex = (int) rnd(0.0f, 17.0f);
+      glows.push_back(Glow(offX, offY, size, &x, &y, W, H, colorIndex));
+   }
 }
 
-void Paddle::draw(DrawPaddlePtr drawPaddle) {
+void Paddle::draw(DrawPaddlePtr drawPaddle, DrawGlowPtr drawGlow) {
    drawPaddle(x, y, w, h);
+   for (auto &glow : glows)
+      glow.draw(drawGlow);
 }
 
 void Paddle::update() {
    x += (tx - x) * percentage;
    y += (ty - y) * percentage;
+
+   for (auto &glow : glows)
+      glow.update();
 }
 
 void Paddle::moveLeft() {

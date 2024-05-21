@@ -2,6 +2,25 @@ const _cvs_ = document.createElement("canvas");
 document.body.appendChild(_cvs_);
 _cvs_.style.display = "none";
 const _ctx_ = _cvs_.getContext("2d");
+const glowColors = [
+   "#00FFFF",
+   "#000000",
+   "#FF00FF",
+   "#FFFF00",
+   "#FF4500",
+   "#9400D3",
+   "#FF073A",
+   "#000000",
+   "#32CD32",
+   "#8A2BE2",
+   "#1B03A3",
+   "#BF00FF",
+   "#FF5F1F",
+   "#39FF14",
+   "#FF1493",
+   "#FFFF33",
+   "#00BFFF",
+];
 
 function createCanvasImage(drawFunction, width, height) {
    _cvs_.width = width;
@@ -56,12 +75,15 @@ function createPaddleImage() {
    ];
 
    const locations = [
-      [sideW * 0.7, -h * 0.1, sideW * 2.6, h * 1.2, r],
-      [sideW, h * 0.1, sideW * 2, h * 0.8, r],
-      [0, 0, sideW, h, r], // yellow side left
-      [sideW * 3, 0, sideW, h, r], // yellow side right
-      [sideW / 3, 0, sideW / 3, h, r / 2], // red ring left
-      [w - sideW / 1.5, 0, sideW / 3, h, r / 2], // red ring right
+      [sideW * 0.3, -h * 0.1, sideW * 3.3, h * 1.2, r],
+      [sideW * 0.44, h * 0.1, sideW * 3.1, h * 0.8, r],
+
+      [0, 0, sideW / 2, h, r], // yellow side left
+      [sideW * 3.5, 0, sideW / 2, h, r], // yellow side right
+
+      [sideW / 6, 0, sideW / 6, h, r / 4], // red ring left
+      [w - sideW / 3, 0, sideW / 6, h, r / 4], // red ring right
+
       [0, h * 0.1, w, h / 3, r],
       [0, h * 0.8, w, h / 5, r / 2],
    ];
@@ -77,7 +99,7 @@ function createPaddleImage() {
       h
    ));
 }
-/* background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);*/
+
 function createBlockImages() {
    const blockColors = [
       [["#4facfe", "#00f2fe"], "#4ffffc"],

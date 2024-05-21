@@ -27,7 +27,7 @@ const CVS = $("#mainCanvas");
 const STATIC_CVS = $("#staticCanvas");
 const previewCanvas = $("#preview");
 const ctx = CVS.getContext("2d");
-const sCtx = STATIC_CVS.getContext("2d");
+const sCtx = STATIC_CVS.getContext("2d"); 
 const pCtx = previewCanvas.getContext("2d");
 const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
@@ -55,7 +55,7 @@ Module.onRuntimeInitialized = () => {
    moveRight = Module.cwrap("moveRight", null, []);
    moveTarget = Module.cwrap("moveTarget", "number", []);
    
-   const level = createStringLevel(window.levels[8]);
+   const level = createStringLevel(window.levels[1]);
    init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
 
    function loop() {

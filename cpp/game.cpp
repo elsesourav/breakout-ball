@@ -49,11 +49,11 @@ void Game::createParticles(float x, float y, short colorIndex, short mul) {
 
 }
 
-void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticle drawParticle, DrawStar drawStar, ClearCvs clearCvs, ClearStaticCvs clearStaticCvs) {
+void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, ClearCvsPtr clearCvs, ClearStaticCvsPtr clearStaticCvs) {
    clearCvs(WIDTH, HEIGHT);
    for (auto &star : stars) star.draw(drawStar);
    ball.draw(drawBall);
-   paddle.draw(drawPaddle);
+   paddle.draw(drawPaddle, drawGlow);
 
    if (isNeedDrawBlocks) {
       clearStaticCvs(WIDTH, HEIGHT);
