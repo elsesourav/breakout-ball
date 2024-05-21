@@ -149,23 +149,27 @@ $("#closeBtn").click(() => {});
       moveHandler(e.touches[0].clientX);
    });
 
-   // let gyroscope = new Gyroscope({ frequency: 60 });
-
-   // gyroscope.addEventListener("reading", (e) => {
-   //   console.log(`Angular velocity along the X-axis ${gyroscope.x}`);
-   //   console.log(`Angular velocity along the Y-axis ${gyroscope.y}`);
-   //   console.log(`Angular velocity along the Z-axis ${gyroscope.z}`);
-   //   mobileErr.innerHTML = gyroscope.x;
-   // });
-   // gyroscope.start();
-
    let oldGamma = 0;
 
-   if (window.DeviceOrientationEvent) {
-      window.addEventListener("deviceorientation", (e) => {
+   if ("Gyroscope" in window) {
+      const gyro = new Gyroscope();
+      gyro.start();
+      gyro.addEventListener("reading", (e) => {
          const ntx = e.gamma * 5 - oldGamma;
          tx = moveTarget(ntx);
          oldGamma = e.gamma;
       });
+      gyro.addEventListener("error", (e) => {
+         console.error(e);
+      });
    }
+
+
+   // if (window.DeviceOrientationEvent) {
+   //    window.addEventListener("deviceorientation", (e) => {
+   //       const ntx = e.gamma * 5 - oldGamma;
+   //       tx = moveTarget(ntx);
+   //       oldGamma = e.gamma;
+   //    });
+   // }
 })();

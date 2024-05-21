@@ -2,8 +2,8 @@
 #include "./random.h"
 
 Glow::Glow(float _offX, float _offY, float _size, float *_x, float *_y, short _maxWidth, short _maxHeight, short _colorIndex) : x(_x), y(_y), size(_size), offX(_offX), offY(_offY), maxWidth(_maxWidth), maxHeight(_maxHeight), colorIndex(_colorIndex) {
-   vx = rnd(-_size / 2, _size / 2);
-   vy = rnd(-_size / 2, _size / 2);
+   vx = rnd(-_size, _size);
+   vy = rnd(-_size, _size);
 
    alpha = rnd(.0f, 1.0f);
    alphaRet = rnd(.001f, 0.01f);
