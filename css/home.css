@@ -65,7 +65,7 @@ body {
 .tool-tip-text {
    position: absolute;
    visibility: hidden;
-   width: 100px;
+   width: 110px;
    background-color: #ffffff;
    display: flex;
    flex-direction: column;
@@ -78,7 +78,7 @@ body {
    left: 50%;
    margin-left: -50px;
 
-   i {
+   i, i * {
       color: #000000;
       font-size: calc(var(--s) * 0.25);
    }

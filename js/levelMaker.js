@@ -35,8 +35,8 @@ class LevelMaker {
    #createBlock(offX, offY, isPut = false) {
       const { left, top, width } = this.cvs.getBoundingClientRect();
       const ratio = this.cvs.width / width;
-      const NX = Math.floor(((offX - left) * ratio) / SCALE);
-      const NY = Math.floor(((offY - top) * ratio) / SCALE_H);
+      const NX = Math.floor(((offX - left) * ratio) / CVS_W);
+      const NY = Math.floor(((offY - top) * ratio) / CVS_H);
       let isFind = true;
 
       this.map.some((cols) =>
@@ -82,15 +82,15 @@ class LevelMaker {
       this.cvs.click(({ clientX, clientY }) => {
          this.#createBlock(clientX, clientY, true);
       });
-      this.cvs.on("mousemove", ({ clientX, clientY }) => {
-         this.#createBlock(clientX, clientY);
-      });
-      this.cvs.on("touchstart", ({ touches }) => {
-         this.#createBlock(touches[0].clientX, touches[0].clientY);
-      });
-      this.cvs.on("touchmove", ({ touches }) => {
-         this.#createBlock(touches[0].clientX, touches[0].clientY);
-      });
+      // this.cvs.on("mousemove", ({ clientX, clientY }) => {
+      //    this.#createBlock(clientX, clientY);
+      // });
+      // this.cvs.on("touchstart", ({ touches }) => {
+      //    this.#createBlock(touches[0].clientX, touches[0].clientY);
+      // });
+      // this.cvs.on("touchmove", ({ touches }) => {
+      //    this.#createBlock(touches[0].clientX, touches[0].clientY);
+      // });
    }
 
    draw(ctx, cWidth, cHeight) {

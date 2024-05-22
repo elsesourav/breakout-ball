@@ -34,7 +34,7 @@ const blockImages = createBlockImages();
 
 let fpsCounter = 0;
 let currentLevelIndex = 0;
-let init, draw, update, moveLeft, moveRight, moveTarget, moveDirect;
+let init, draw, update, moveLeft, moveRight, moveTarget, moveDirect, drawOutline;
 const loopFun = () => {
    update();
    draw();
@@ -51,6 +51,7 @@ Module.onRuntimeInitialized = () => {
    moveRight = Module.cwrap("moveRight", null, []);
    moveTarget = Module.cwrap("moveTarget", "number", []);
    moveDirect = Module.cwrap("moveDirect", "number", []);
+   drawOutline = Module.cwrap("drawOutline", null, []);
 };
 
 

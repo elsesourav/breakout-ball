@@ -1,15 +1,10 @@
 #include "./glow.h"
 #include "./random.h"
 
-#include <iostream>
-using namespace std;
-
 
 Glow::Glow(float _offX, float _offY, float _size, float speedX, float speedY, float *_x, float *_y, short _maxWidth, short _maxHeight, short _colorIndex) : x(_x), y(_y), size(_size), offX(_offX), offY(_offY), maxWidth(_maxWidth), maxHeight(_maxHeight), colorIndex(_colorIndex) {
    vx = rnd(-speedX, speedX);
    vy = rnd(-speedY, speedY);
-
-   cout << *x << endl;
 
    alpha = rnd(0.0f, 1.0f);
    alphaRet = rnd(0.01f, 0.1f);
@@ -17,7 +12,6 @@ Glow::Glow(float _offX, float _offY, float _size, float speedX, float speedY, fl
 }
 
 void Glow::draw(DrawGlowPtr drawGlow) {
-   // cout << *x << " " << *x - maxWidth << endl;
    drawGlow((*x - maxWidth / 2) + offX, (*y - maxHeight * 0.2) + offY, size, alpha, colorIndex);
 }
 

@@ -1,8 +1,8 @@
 #include "./game.h"
 #include <array>
 #include <emscripten/emscripten.h>
-#include <string>
 #include <iostream>
+#include <string>
 #include <vector>
 
 short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT;
@@ -50,6 +50,17 @@ EM_JS(void, drawLava, (float x, float y, float w, float h), {
    ctx.fillStyle = "#00000005";
    ctx.fillRect(x, y + h / 2, w, h / 2);
 });
+EM_JS(void, drawLine, (short rows, short cols, short w, short h), {
+   ctx.strokeStyle = "#fff";
+   for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+         ctx.beginPath();
+         ctx.lineWidth = 2;
+         ctx.rect(j * w + 2, i * h + 2, w - 4, h - 4);
+         ctx.stroke();
+      }
+   }
+});
 
 extern "C" {
 
@@ -86,5 +97,8 @@ EMSCRIPTEN_KEEPALIVE float moveTarget(float tx) {
 }
 EMSCRIPTEN_KEEPALIVE float moveDirect(float x) {
    return game.paddle.moveDirect(x);
+}
+EMSCRIPTEN_KEEPALIVE void drawOutline(float x) {
+   drawLine(ROWS, COLS, BLOCK_WIDTH, BLOCK_HEIGHT);
 }
 }

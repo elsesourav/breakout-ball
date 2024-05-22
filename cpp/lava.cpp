@@ -9,7 +9,7 @@ void Lava::init(float _x, float _y, short _w, short _h, float speed) {
    offsetX = (x + w / 2);
 
    // setup glows
-   short numGlows = (w / 50) * (h / 50);
+   short numGlows = (w / 70) * (h / 70);
 
    for (short i = 0; i < numGlows; i++) {
       float H = h * rnd(0.4f, 0.9f);
