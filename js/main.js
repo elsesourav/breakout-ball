@@ -11,7 +11,8 @@ const htmlLevels = createHtmlLevels(window.levels, $("#localMode"));
 
 htmlLevels.forEach(([level], i) => {
    level.addEventListener("click", () => {
-      setupStartPreview(levels[i], i);
+      sCtx = STATIC_CTX;
+      setupStartPreview(i);
       currentSelectedLevel = levels[i];
    });
 });

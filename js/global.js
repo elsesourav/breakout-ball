@@ -27,16 +27,16 @@ const CVS = $("#mainCanvas");
 const STATIC_CVS = $("#staticCanvas");
 const previewCanvas = $("#preview");
 const ctx = CVS.getContext("2d");
-const sCtx = STATIC_CVS.getContext("2d"); 
-const pCtx = previewCanvas.getContext("2d");
+const STATIC_CTX = STATIC_CVS.getContext("2d"); 
+const PREVIEW_CTX = previewCanvas.getContext("2d");
+let sCtx = STATIC_CTX;
 const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
 const blockImages = createBlockImages();
 
 const animation = new Animation(FPS);
 let fpsCounter = 0;
-let init, draw, update, moveLeft, moveRight, moveTarget;
-
+let init, draw, update, moveLeft, moveRight, moveTarget, moveDirect;
 
 
 Module.onRuntimeInitialized = () => {
@@ -46,6 +46,7 @@ Module.onRuntimeInitialized = () => {
    moveLeft = Module.cwrap("moveLeft", null, []);
    moveRight = Module.cwrap("moveRight", null, []);
    moveTarget = Module.cwrap("moveTarget", "number", []);
+   moveDirect = Module.cwrap("moveDirect", "number", []);
 };
 
 

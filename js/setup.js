@@ -6,14 +6,13 @@ rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
 rootStyle.setProperty("--pScale", pScale);
 if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
 
-CVS.width = STATIC_CVS.width = CVS_W;
+previewCanvas.width = CVS.width = STATIC_CVS.width = CVS_W;
 CVS.height = STATIC_CVS.height = CVS_H;
-previewCanvas.width = SCALE * rows * pScale;
-previewCanvas.height = SCALE_H * cols * pScale;
+previewCanvas.height = SIZE * (cols - 1);
 
 ctx.imageSmoothingQuality = "high";
-sCtx.imageSmoothingQuality = "high";
-pCtx.imageSmoothingQuality = "high";
+STATIC_CVS.imageSmoothingQuality = "high";
+PREVIEW_CTX.imageSmoothingQuality = "high";
 
 
 // const animation = new Animation(FPS);

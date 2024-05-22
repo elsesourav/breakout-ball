@@ -1,11 +1,10 @@
-function setupStartPreview(levelInfo, i) {
-   pCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-   for (const key in levelInfo) {
-      const element = levelInfo[key];
-      const { x, y, health } = element
-      const block = new Block(x, y, SCALE * pScale, SCALE_H * pScale, health);
-      block.draw(pCtx);
-   }
+function setupStartPreview(i) {
+   sCtx = PREVIEW_CTX;
+
+   const level = createStringLevel(window.levels[i]);
+   init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED);
+   draw();
+
    startPreview.classList.add("active");
    $("#lvlNo").innerHTML = i + 1;
    $("#lvlRank").innerHTML = "∞";

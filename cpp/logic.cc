@@ -83,4 +83,7 @@ EMSCRIPTEN_KEEPALIVE void moveRight() {
 EMSCRIPTEN_KEEPALIVE float moveTarget(float tx) {
    return game.paddle.moveTarget(tx);
 }
+EMSCRIPTEN_KEEPALIVE float moveDirect(float x) {
+   return game.paddle.moveDirect(x);
+}
 }

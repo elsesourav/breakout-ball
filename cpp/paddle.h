@@ -22,6 +22,7 @@ public:
    void moveLeft();
    void moveRight();
    float moveTarget(float tx);
+   float moveDirect(float x);
 };
 
 #endif // PADDLE_H

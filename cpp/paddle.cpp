@@ -54,3 +54,9 @@ float Paddle::moveTarget(float _tx) {
    }
    return tx;
 }
+float Paddle::moveDirect(float _x) {
+   if (_x - w / 2 >= 0 && _x + w / 2 <= windowWidth) {
+      x = _x;
+   }
+   return x;
+}

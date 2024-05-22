@@ -18,14 +18,14 @@
 
    .rapper {
       position: relative;
-      border-radius: calc(var(--s) * 0.2);
+      border-radius: calc(var(--s) * 0.1);
       outline: solid 2px #0d0098;
       background: radial-gradient(circle, #0d0098 0%, #03001f 100%);
       overflow: hidden;
 
       .canvas-and-lvl-details {
          position: relative;
-         border-radius: calc(var(--s) * 0.2);
+         border-radius: calc(var(--s) * 0.1);
          overflow: hidden;
 
          #preview {
