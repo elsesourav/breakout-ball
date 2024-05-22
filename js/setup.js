@@ -56,3 +56,25 @@ function createHtmlLevels(levels, levelsMap) {
    htmlLevels[0][0].classList.remove("lock");
    return htmlLevels;
 }
+
+// `<div class="level">
+// <div class="top">
+//    <div class="hashtag">
+//       <i class="sbi-trophy2"></i>
+//       <p>00</p>
+//    </div>
+//    <div class="is-lock-or-complete">
+//       <i class="sbi-lock-outline lock"></i
+//       ><i class="sbi-check-circle-outline check"></i>
+//    </div>
+// </div>
+// <div class="icon-and-no">
+//    <i class="sbi-fire"></i>
+//    <p class="no">1</p>
+// </div>
+// <div class="complete-time">
+//    <i class="sbi-stopwatch1"></i>
+//    <p class="time">000</p>
+//    <span>s</span>
+// </div>
+// </div>`

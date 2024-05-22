@@ -190,17 +190,25 @@ $("#closeBtn").click(() => {});
       index: 0,
       preScrollX: 0,
       width: modeType.scrollWidth / 3,
+      isLock: false,
+      ones: false,
    };
 
-   modeOptions.click((e, element, i) => {
+   function selectMode(i) {
       modeOptions.removeClass("active");
-      element.classList.add("active");
+      modeOptions[i].classList.add("active");
       pg.index = i;
       pg.preScrollX = pg.scrollX;
       pg.scrollX = -pg.width * i;
       modeType.style.transitionDuration = "300ms";
       modeType.style.left = `${pg.scrollX}px`;
+   }
+
+   maps.each((e, i) => {
+      if (e.classList.contains("active")) selectMode(i);
    });
+
+   modeOptions.click((e, _, i) => selectMode(i));
 
    modeType.on("touchstart", (e) => {
       pg.x = e.touches[0].clientX;
@@ -211,16 +219,21 @@ $("#closeBtn").click(() => {});
    modeType.on("touchmove", (e) => {
       const { clientX, clientY } = e.touches[0];
 
+      if (!pg.ones && Math.abs(clientX - pg.x) < Math.abs(clientY - pg.y))
+         pg.isLock = true;
+
+      if (!pg.ones) pg.ones = true;
+
+      if (pg.isLock) return;
+
       pg.dx = clientX - pg.x;
       pg.dy = clientY - pg.y;
       pg.x = clientX;
       pg.y = clientY;
       pg.totalMove += pg.dx;
 
-      if (Math.abs(pg.dx) > Math.abs(pg.dy)) {
-         pg.scrollX += pg.dx;
-         modeType.style.left = `${pg.scrollX}px`;
-      }
+      pg.scrollX += pg.dx;
+      modeType.style.left = `${pg.scrollX}px`;
    });
 
    modeType.on("touchend", () => {
@@ -240,10 +253,13 @@ $("#closeBtn").click(() => {});
          modeOptions[pg.index].classList.add("active");
       }
 
-      modeType.style.transitionDuration = `${Math.round(Math.abs((time / pg.width) * 300))}ms`;
+      modeType.style.transitionDuration = `${Math.round(
+         Math.abs((time / pg.width) * 300)
+      )}ms`;
       modeType.style.left = `${pg.scrollX}px`;
-      pg.totalMove = 0;
       pg.preScrollX = pg.scrollX;
 
+      pg.isLock = pg.ones = false;
+      pg.totalMove = pg.dx = pg.dy = 0;
    });
 })();
