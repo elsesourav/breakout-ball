@@ -3,22 +3,22 @@ document.body.appendChild(_cvs_);
 _cvs_.style.display = "none";
 const _ctx_ = _cvs_.getContext("2d");
 const glowColors = [
-   "#00FFFF",
-   "#000000",
-   "#FF00FF",
-   "#FFFF00",
    "#FF4500",
-   "#9400D3",
    "#FF073A",
+   "#FF5F1F",
+   "#FFFF33",
+   "#FFFF00",
+   "#00FFFF",
+   "#FF1493",
+   "#FF00FF",
+   "#000000",
+   "#9400D3",
    "#000000",
    "#32CD32",
    "#8A2BE2",
    "#1B03A3",
    "#BF00FF",
-   "#FF5F1F",
    "#39FF14",
-   "#FF1493",
-   "#FFFF33",
    "#00BFFF",
 ];
 

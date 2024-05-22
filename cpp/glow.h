@@ -9,7 +9,7 @@ public:
    short maxWidth, maxHeight;
    short colorIndex;
 
-   Glow(float offX, float offY, float size, float *x, float *y, short maxWidth, short maxHeight, short colorIndex); 
+   Glow(float offX, float offY, float size, float speedX, float speedY, float *x, float *y, short maxWidth, short maxHeight, short colorIndex); 
    void draw(DrawGlowPtr drawGlow);
    void update();
 };

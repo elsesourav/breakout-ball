@@ -13,14 +13,6 @@ EM_JS(void, clearCanvas, (short w, short h), {
    ctx.fillStyle = "#000";
    ctx.fillRect(0, 0, w, h);
    ctx.globalAlpha = 1;
-
-   // draw lava
-   ctx.fillStyle = "#f00";
-   ctx.fillRect(0, h - h * 0.07, w, h * 0.07);
-   ctx.fillStyle = "#ff03";
-   ctx.fillRect(0, h - h * 0.07, w, h * 0.07 / 6);
-   ctx.fillStyle = "#00000005";
-   ctx.fillRect(0, h - h * 0.07 / 1.2, w, h * 0.07 / 2);
 });
 EM_JS(void, drawBall, (float x, float y, short r), {
    ctx.drawImage(ballImage, x - r, y - r, r * 2, r * 2);
@@ -50,6 +42,14 @@ EM_JS(void, drawBlock, (float x, float y, short w, short h, short health), {
    if (health > 0)
       ctx.drawImage(blockImages[health - 1].image, x, y, w, h);
 });
+EM_JS(void, drawLava, (float x, float y, float w, float h), {
+   ctx.fillStyle = "#f00";
+   ctx.fillRect(x, y, w, h);
+   ctx.fillStyle = "#ff03";
+   ctx.fillRect(x, y, w, h / 6);
+   ctx.fillStyle = "#00000005";
+   ctx.fillRect(x, y + h / 2, w, h / 2);
+});
 
 extern "C" {
 
@@ -65,6 +65,7 @@ EMSCRIPTEN_KEEPALIVE void init(short rows, short cols, short size, char *level, 
    game.blocks.clear();
    game.stars.clear();
    game.paddle.glows.clear();
+   game.lava.glows.clear();
    game.init(WIDTH, HEIGHT, SIZE, level, padX, padY, padW, padH, padX, padY - ballR, ballR, BallSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
 }
 
@@ -72,7 +73,7 @@ EMSCRIPTEN_KEEPALIVE void update() {
    game.update();
 }
 EMSCRIPTEN_KEEPALIVE void draw() {
-   game.draw(drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, clearCanvas);
+   game.draw(drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas);
 }
 EMSCRIPTEN_KEEPALIVE void moveLeft() {
    game.paddle.moveLeft();

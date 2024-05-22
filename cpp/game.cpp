@@ -10,17 +10,17 @@
 
 Game::Game() {}
 
-void Game::init(short _WIDTH, short _HEIGHT, short _SIZE, char *level, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short _blockWidth, short _blockHeight) {
+void Game::init(short _WIDTH, short _HEIGHT, short _SIZE, char *level, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float ballSpeed, short _blockWidth, short _blockHeight) {
    WIDTH = _WIDTH;
    HEIGHT = _HEIGHT;
    SIZE = _SIZE;
    blockWidth = _blockWidth;
    blockHeight = _blockHeight;
 
-   ball.init(ballX, ballY, ballR, BallSpeed);
-   paddle.init(padX, padY, padW, padH, BallSpeed, WIDTH);
+   ball.init(ballX, ballY, ballR, ballSpeed);
+   paddle.init(padX, padY, padW, padH, ballSpeed, WIDTH);
+   lava.init(0, padY + _SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
    blocks = parser.convertStringToBlocks(level, blockWidth, blockHeight);
-
    // setup stars
    float numStars = (WIDTH / 80) * (HEIGHT / 80);
 
@@ -45,7 +45,7 @@ void Game::createParticles(float x, float y, short colorIndex, short mul) {
    }
 }
 
-void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, ClearCvsPtr clearCvs) {
+void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs) {
 
    clearCvs(WIDTH, HEIGHT);
    for (auto &star : stars)
@@ -60,6 +60,8 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    for (auto &particle : particles) {
       particle.draw(drawParticle);
    }
+
+   lava.draw(drawLava, drawGlow);
 }
 
 void Game::update() {
@@ -69,6 +71,7 @@ void Game::update() {
       star.update();
    ball.update();
    paddle.update();
+   lava.update();
 
    // update particles
    for (auto &particle : particles) {

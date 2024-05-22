@@ -24,7 +24,7 @@ void Paddle::init(float _x, float _y, short _w, short _h, float ballSpeed, short
       float offX = rnd(0.0f, (float)W);
       float offY = rnd(0.0f, (float)H);
       short colorIndex = (int) rnd(0.0f, 17.0f);
-      glows.push_back(Glow(offX, offY, size, &x, &y, W, H, colorIndex));
+      glows.push_back(Glow(offX, offY, size, size * 2, size * 2, &x, &y, W, H, colorIndex));
    }
 }
 
