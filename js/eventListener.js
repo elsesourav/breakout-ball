@@ -1,6 +1,9 @@
 const previewClose = $("#previewClose");
 const startPreview = $("#startPreview");
 const startButton = $("#startButton");
+const modeType = $("#modeType");
+const modeOptions = $$(".mode");
+const maps = $$(".map");
 previewClose.click(() => startPreview.classList.remove("active"));
 
 // Start Game
@@ -61,6 +64,11 @@ addEventListener("keyup", ({ keyCode }) => {
    if (keyCode === 32) spaceIsDown = false;
 });
 
+addEventListener("keydown", ({ keyCode }) => {
+   if (keyCode === 37) moveLeft();
+   else if (keyCode === 39) moveRight();
+});
+
 $("#undoBtn").click(() => {
    lvlMaker.undo();
 });
@@ -89,7 +97,7 @@ $("#closeBtn").click(() => {});
       tx = moveTarget(tx);
    };
 
-   document.body.addEventListener(
+   STATIC_CVS.addEventListener(
       "click",
       (e) => {
          if (!isPointerLock) {
@@ -164,7 +172,6 @@ $("#closeBtn").click(() => {});
       });
    }
 
-
    // if (window.DeviceOrientationEvent) {
    //    window.addEventListener("deviceorientation", (e) => {
    //       const ntx = e.gamma * 5 - oldGamma;
@@ -172,4 +179,71 @@ $("#closeBtn").click(() => {});
    //       oldGamma = e.gamma;
    //    });
    // }
+
+   const pg = {
+      x: 0,
+      y: 0,
+      dx: 0,
+      dy: 0,
+      scrollX: 0,
+      totalMove: 0,
+      index: 0,
+      preScrollX: 0,
+      width: modeType.scrollWidth / 3,
+   };
+
+   modeOptions.click((e, element, i) => {
+      modeOptions.removeClass("active");
+      element.classList.add("active");
+      pg.index = i;
+      pg.preScrollX = pg.scrollX;
+      pg.scrollX = -pg.width * i;
+      modeType.style.transitionDuration = "300ms";
+      modeType.style.left = `${pg.scrollX}px`;
+   });
+
+   modeType.on("touchstart", (e) => {
+      pg.x = e.touches[0].clientX;
+      pg.y = e.touches[0].clientY;
+      modeType.style.transitionDuration = 0;
+   });
+
+   modeType.on("touchmove", (e) => {
+      const { clientX, clientY } = e.touches[0];
+
+      pg.dx = clientX - pg.x;
+      pg.dy = clientY - pg.y;
+      pg.x = clientX;
+      pg.y = clientY;
+      pg.totalMove += pg.dx;
+
+      if (Math.abs(pg.dx) > Math.abs(pg.dy)) {
+         pg.scrollX += pg.dx;
+         modeType.style.left = `${pg.scrollX}px`;
+      }
+   });
+
+   modeType.on("touchend", () => {
+      let time = Math.abs(pg.totalMove);
+
+      if (Math.abs(pg.totalMove) < pg.width / 5) {
+         pg.scrollX = -pg.width * pg.index;
+      } else {
+         time = pg.scrollX - pg.preScrollX;
+
+         if (pg.totalMove < 0 && pg.index < 2) pg.index++;
+         if (pg.totalMove > 0 && pg.index > 0) pg.index--;
+         else time = Math.abs(pg.totalMove);
+
+         pg.scrollX = -pg.width * pg.index;
+         modeOptions.removeClass("active");
+         modeOptions[pg.index].classList.add("active");
+      }
+
+      modeType.style.transitionDuration = `${Math.round(Math.abs((time / pg.width) * 300))}ms`;
+      modeType.style.left = `${pg.scrollX}px`;
+      pg.totalMove = 0;
+      pg.preScrollX = pg.scrollX;
+
+   });
 })();

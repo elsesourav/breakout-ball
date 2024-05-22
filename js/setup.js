@@ -18,23 +18,7 @@ pCtx.imageSmoothingQuality = "high";
 
 // const animation = new Animation(FPS);
 // const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
-// const playLevel = new PlayLevel({
-//    padX: CVS_W / 2,
-//    padY: CVS_H - FOOTER_HEIGHT,
-//    padW: PAD_WIDTH,
-//    padH: PAD_HEIGHT,
-//    ballX: CVS_W / 2,
-//    ballY: CVS_H - FOOTER_HEIGHT - BALL_RADIUS,
-//    ballR: BALL_RADIUS,
-//    ballS: BALL_SPEED,
-//    cvs: CVS,
-//    blockW: SCALE,
-//    blockH: SCALE_H,
-//    fps: FPS,
-//    paddleImage: createPaddleImage(),
-//    ballImage: createBallImage(),
-//    blockImages: createBlockImages(),
-// });
+
 
 let levels = [];
 let currentSelectedLevel; // store level map

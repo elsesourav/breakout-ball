@@ -10,42 +10,56 @@
       <!-- font and icon stylesheet -->
       <link rel="stylesheet" href="icons/css/icon.css" />
       <link rel="stylesheet" href="icons/css/font.css" />
-      
+
       <!-- design stylesheet -->
       <link rel="stylesheet" href="./css/home.css" />
       <link rel="stylesheet" href="./css/start-preview.css" />
       <link rel="stylesheet" href="./css/game-designer.css" />
       <link rel="stylesheet" href="./css/lavel.css" />
-      
+
       <!-- all scripts -->
+      <script src="./js/logic.js"></script>
       <script defer src="./js/levels.js"></script>
-      <script defer src="./js/logic.js"></script>
       <script defer src="./js/utils.js"></script>
       <script defer src="./js/createImage.js"></script>
       <script defer src="./js/global.js"></script>
 
       <script defer src="./js/levelMaker.js"></script>
-      <script defer src="./js/playLevel.js"></script>
       <script defer src="./js/setup.js"></script>
       <script defer src="./js/startPreview.js"></script>
       <script defer src="./js/eventListener.js"></script>
       <script defer src="./js/main.js"></script>
-
    </head>
    <body>
-
       <div id="mobileErr" contenteditable="true"></div>
 
       <main>
          <header></header>
-         <div id="levelsMap" class=""></div>
-         <canvas id="mainCanvas" class="active"></canvas>
-         <canvas id="staticCanvas" class="active"></canvas>
+         <div id="gameMode">
+            <div id="selectMode">
+               <div class="mode active">
+                  <p>Local</p>
+               </div>
+               <div class="mode">
+                  <p>Online</p>
+               </div>
+               <div class="mode">
+                  <p>Create</p>
+               </div>
+            </div>
+            <div id="modeType">
+               <div id="localMode" class="map active"></div>
+               <div id="onlineMode" class="map"></div>
+               <div id="createMode" class="map"></div>
+            </div>
+         </div>
+         <canvas id="mainCanvas" class=""></canvas>
+         <canvas id="staticCanvas" class=""></canvas>
 
          <div id="startPreview" class="">
             <button id="previewClose">
                <i class="sbi-cross"></i>
-            </button>
+            </button> 
 
             <div class="rapper">
                <div class="canvas-and-lvl-details">
@@ -56,7 +70,7 @@
                         <div id="lvlNo">1</div>
                      </div>
                      <div class="flex rank">
-                        <p>Your Rank </p>
+                        <p>Your Rank</p>
                         <div id="lvlRank">∞</div>
                      </div>
                      <div class="flex time">
@@ -69,7 +83,7 @@
                   </div>
                </div>
                <div class="btn">
-                  <button id="startButton">START</button> 
+                  <button id="startButton">START</button>
                </div>
                <div class="leaderboard">
                   <div class="title">
@@ -221,6 +235,5 @@
             </div>
          </div>
       </main>
-
    </body>
 </html>

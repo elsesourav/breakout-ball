@@ -111,6 +111,11 @@ const $$ = (selector) => {
          element.addEventListener("click", (e) => fun(e, element, i));
       });
    };
+   self.removeClass = (className) => {
+      self.forEach((element) => {
+         element.classList.remove(className);
+      });
+   };
    self.each = (fun) => self.forEach(fun);
    self.map = (fun) => self.map(fun);
    return self;

@@ -38,14 +38,6 @@ let fpsCounter = 0;
 let init, draw, update, moveLeft, moveRight, moveTarget;
 
 
-addEventListener("keydown", ({ keyCode }) => {
-   if (keyCode === 37) moveLeft();
-   else if (keyCode === 39) moveRight();
-});
-
-
-
-
 
 Module.onRuntimeInitialized = () => {
    init = Module.cwrap("init", null, ["number", "number", "number", "string", "number", "number", "number", "number", "number", "number"]);
@@ -54,7 +46,10 @@ Module.onRuntimeInitialized = () => {
    moveLeft = Module.cwrap("moveLeft", null, []);
    moveRight = Module.cwrap("moveRight", null, []);
    moveTarget = Module.cwrap("moveTarget", "number", []);
-   
+};
+
+
+(() => {
    const level = createStringLevel(window.levels[1]);
    init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
 
@@ -70,5 +65,4 @@ Module.onRuntimeInitialized = () => {
    }, 1000);
 
    animation.start(loop);
-
-};
+})
