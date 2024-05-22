@@ -34,9 +34,15 @@ const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
 const blockImages = createBlockImages();
 
-const animation = new Animation(FPS);
 let fpsCounter = 0;
+let currentLevelIndex = 0;
 let init, draw, update, moveLeft, moveRight, moveTarget, moveDirect;
+const loopFun = () => {
+   update();
+   draw();
+   fpsCounter++;
+}
+const animation = new Animation(FPS, loopFun);
 
 
 Module.onRuntimeInitialized = () => {

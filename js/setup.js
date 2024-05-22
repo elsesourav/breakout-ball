@@ -15,12 +15,6 @@ STATIC_CVS.imageSmoothingQuality = "high";
 PREVIEW_CTX.imageSmoothingQuality = "high";
 
 
-// const animation = new Animation(FPS);
-// const lvlMaker = new LevelMaker(rows, cols, SCALE, SCALE_H, CVS);
-
-
-let levels = [];
-let currentSelectedLevel; // store level map
 
 function createHtmlLevels(levels, levelsMap) {
    levelsMap.innerHTML = "";

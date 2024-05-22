@@ -120,11 +120,10 @@ main {
       pointer-events: none;
       transition: ease-in-out 300ms bottom;
       display: block;
-      z-index: 2;
       border-radius: calc(var(--s) * 0.1);
       cursor: move;
       border: 1px solid #ffffff;
-      z-index: 2;
+      z-index: 4;
       
       &.active {
          bottom: 0;
@@ -134,7 +133,7 @@ main {
    
    #mainCanvas {
       background: #000000;
-      z-index: 1;
+      z-index: 3;
    }
 
 }

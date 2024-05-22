@@ -1,18 +1,11 @@
 const previewClose = $("#previewClose");
 const startPreview = $("#startPreview");
-const startButton = $("#startButton");
 const modeType = $("#modeType");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
 previewClose.click(() => startPreview.classList.remove("active"));
 
-// Start Game
-startButton.click(() => {
-   CVS.classList.add("active");
-   startPreview.classList.remove("active");
-   playLevel.setup(currentSelectedLevel);
-   animation.start(playGame);
-});
+
 
 const lvlOptions = $$("#levelDesigner .option");
 lvlOptions.click((_, ele, i) => {
