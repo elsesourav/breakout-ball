@@ -16,7 +16,6 @@ typedef void (*DrawBlockPtr)(float, float, short, short, short);
 typedef void (*DrawParticlePtr)(float, float, float, float, short);
 typedef void (*DrawStarPtr)(float, float, float, float);
 typedef void (*ClearCvsPtr)(short, short);
-typedef void (*ClearStaticCvsPtr)(short, short);
 typedef void (*DrawGlowPtr)(float, float, float, float, short colorIndex);
 
 class Game {
@@ -28,13 +27,12 @@ public:
    std::vector<Star> stars;
    Ball ball;
    Paddle paddle;
-   bool isNeedDrawBlocks;
    
 
    Game();
    void init(short WIDTH, short HEIGHT, short SIZE, char *level, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight);
 
-   void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, ClearCvsPtr clearCvs, ClearStaticCvsPtr clearStaticCvs);
+   void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, ClearCvsPtr clearCvs);
 
    void createParticles(float x, float y, short colorIndex, short mul);
    void update();

@@ -8,6 +8,8 @@
 void Ball::init(float _x, float _y, short _r, float _speed) {
    x = _x;
    y = _y;
+   preX = _x;
+   preY = _y;
    r = _r;
    speed = _speed;
    vx = rnd(-4.0f, 4.0f);
@@ -27,6 +29,8 @@ void Ball::draw(DrawBallPtr drawBall) {
 }
 
 void Ball::update() {
+   preX = x;
+   preY = y;
    x += vx;
    y += vy;
    this->updateX1X2Y1Y2();
@@ -43,7 +47,6 @@ bool Ball::checkPaddleCollision(Paddle *p) {
    return x + r >= nx && x - r <= nx + p->w && y + r >= p->y && y - r <= p->y + p->h;
 }
 
-
 short Ball::checkBlockCollision(Block *b) {
    if (b->x1 < x2 && b->x2 > x1 && b->y1 < y2 && b->y2 > y1) {
       short left = x2 - b->x1;
@@ -56,9 +59,14 @@ short Ball::checkBlockCollision(Block *b) {
 
       short min = numbers[0];
       short second = numbers[1];
+      float dx = x - preX;
+      float dy = y - preY;
 
       if (abs(min - second) < b->offset) {
-         if (min > b->offset / 2) return 2;
+         if (min > b->offset / 2) {
+            if (abs(dx) > abs(dy)) return 1;
+            else return -1;
+         }
 
       } else {
          if (min == left || min == right) return 1;

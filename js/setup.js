@@ -6,12 +6,11 @@ rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
 rootStyle.setProperty("--pScale", pScale);
 if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
 
-previewCanvas.width = CVS.width = STATIC_CVS.width = CVS_W;
-CVS.height = STATIC_CVS.height = CVS_H;
+previewCanvas.width = CVS.width = CVS_W;
+CVS.height = CVS_H;
 previewCanvas.height = SIZE * (cols - 1);
 
 ctx.imageSmoothingQuality = "high";
-STATIC_CVS.imageSmoothingQuality = "high";
 PREVIEW_CTX.imageSmoothingQuality = "high";
 
 

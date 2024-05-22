@@ -24,12 +24,10 @@ const BALL_RADIUS = SIZE * 0.22;
 const BALL_SPEED = 15;
 
 const CVS = $("#mainCanvas"); 
-const STATIC_CVS = $("#staticCanvas");
 const previewCanvas = $("#preview");
-const ctx = CVS.getContext("2d");
-const STATIC_CTX = STATIC_CVS.getContext("2d"); 
+const CTX = CVS.getContext("2d");
 const PREVIEW_CTX = previewCanvas.getContext("2d");
-let sCtx = STATIC_CTX;
+let ctx = CTX;
 const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
 const blockImages = createBlockImages();

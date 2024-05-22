@@ -111,7 +111,7 @@ main {
    outline: solid 4px #0009;
    overflow: hidden;
 
-   #mainCanvas, #staticCanvas {
+   #mainCanvas {
       position: absolute;
       bottom: -100%;
       left: 0;
@@ -123,17 +123,13 @@ main {
       border-radius: calc(var(--s) * 0.1);
       cursor: move;
       border: 1px solid #ffffff;
+      background: #000000;
       z-index: 4;
       
       &.active {
          bottom: 0;
          pointer-events: all;
       }
-   }
-   
-   #mainCanvas {
-      background: #000000;
-      z-index: 3;
    }
 
 }

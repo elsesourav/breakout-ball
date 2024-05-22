@@ -14,19 +14,26 @@ htmlLevels.forEach(([level], i) => {
 });
 
 // Start Game
-startButton.click(() => {
-   sCtx = STATIC_CTX;
+function playLevel(_level) {
+   ctx = CTX;
    CVS.classList.add("active");
-   STATIC_CVS.classList.add("active");
    startPreview.classList.remove("active");
-
-   const level = createStringLevel(window.levels[currentLevelIndex]);
+   
+   const level = createStringLevel(_level);
    init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
-
+   
    animation.start();
+}
 
-   setInterval(() => {
-      mobileErr.innerHTML = fpsCounter;
-      fpsCounter = 0;
-   }, 1000);
+startButton.click(() => {
+   playLevel(window.levels[currentLevelIndex]);
 });
+
+setTimeout(() => {
+   playLevel(window.levels[currentLevelIndex]);
+}, 1500);
+
+setInterval(() => {
+   mobileErr.innerHTML = fpsCounter;
+   fpsCounter = 0;
+}, 1000);

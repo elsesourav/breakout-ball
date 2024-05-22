@@ -9,7 +9,7 @@ typedef void (*DrawBallPtr)(float, float, short);
 class Ball {
 public:
    short r;
-   float x, y, vx, vy, speed, x1, x2, y1, y2;
+   float x, y, preX, preY, vx, vy, speed, x1, x2, y1, y2;
 
    void init(float x, float y, short r,  float speed);
    void draw(DrawBallPtr drawBall);

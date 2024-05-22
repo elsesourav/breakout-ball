@@ -17,10 +17,10 @@ void Paddle::init(float _x, float _y, short _w, short _h, float ballSpeed, short
    // setup glows
    short numGlows = (w / 16) * (h / 16);
    float W = w * 0.9;
-   float H = h * 1.4;
+   float H = h * 0.8;
 
    for (short i = 0; i < numGlows; i++) {
-      float size = rnd(2.0f, 5.0f);
+      float size = rnd(1.0f, 3.0f);
       float offX = rnd(0.0f, (float)W);
       float offY = rnd(0.0f, (float)H);
       short colorIndex = (int) rnd(0.0f, 17.0f);
