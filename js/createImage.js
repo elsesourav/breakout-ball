@@ -66,10 +66,10 @@ function createPaddleImage() {
    const pathColors = [
       "#0000ffaa",
       "#65f2ff",
-      "#ffa600",
-      "#ffa600",
-      "#a60000",
-      "#a60000",
+      "#6600ff",
+      "#6600ff",
+      "#fff8",
+      "#fff8",
       "#ffffff66",
       "#00000033",
    ];
@@ -107,7 +107,7 @@ function createBlockImages() {
       [["#0ba360", "#20e6c1"], "#3bff48"],
       [["#b773ff", "#7028e4"], "#af4eff"],
       [["#ff0844", "#fc8b68"], "#ff4e8f"],
-      [["#e8e5cf", "#c3cfe2"], "#ffffff"],
+      [["#c3cfe2", "#eaeaea"], "#ffffff"],
    ];
 
    const blockW = 64;

@@ -17,10 +17,15 @@ void Game::init(short _WIDTH, short _HEIGHT, short _SIZE, char *level, float pad
    blockWidth = _blockWidth;
    blockHeight = _blockHeight;
 
+   paddleHidden = false;
+   paddleMaxHidden = _SIZE / 8;
+   paddleHiddenCount = 0;
+
    ball.init(ballX, ballY, ballR, ballSpeed);
    paddle.init(padX, padY, padW, padH, ballSpeed, WIDTH);
    lava.init(0, padY + _SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
    blocks = parser.convertStringToBlocks(level, blockWidth, blockHeight);
+
    // setup stars
    float numStars = (WIDTH / 80) * (HEIGHT / 80);
 
@@ -82,25 +87,41 @@ void Game::update() {
    }
 
    // check the collision
-   if (ball.checkPaddleCollision(&paddle)) {
-      ball.reverseY();
-      // cout << ball.vx << endl;
-      float nvx = (paddle.tx - paddle.x) * 0.01f;
-      ball.vx += nvx > 2.0f ? 2.0f : nvx < -2.0f ? -2.0f
-                                                 : nvx;
-                                                 
-      if (ball.vx > ball.speed) ball.vx = ball.speed;
-      if (ball.vx < -ball.speed) ball.vx = -ball.speed;
-      // cout << ball.vx << endl;
+   // paddle collision
+   if (!paddleHidden) {
+      short dir = ball.checkPaddleCollision(&paddle);
+      if (dir != 0) {
+         if (dir == 1)
+            ball.reverseX();
+         else if (dir == -1)
+            ball.reverseY();
+
+         float nvx = (paddle.tx - paddle.x) * 0.1f;
+         ball.vx += nvx > 8.0f ? 8.0f : nvx < -8.0f ? -8.0f
+                                                    : nvx;
+         if (ball.vx > ball.speed / 1.4)
+            ball.vx = ball.speed / 1.4;
+         if (ball.vx < -ball.speed / 1.4)
+            ball.vx = -ball.speed / 1.4;
+
+         paddleHidden = true;
+      }
+   } else {
+      paddleHiddenCount++;
+      if (paddleHiddenCount >= paddleMaxHidden) {
+         paddleHidden = false;
+         paddleHiddenCount = 0;
+      }
    }
 
-   if (ball.x - ball.r <= 0 || ball.x + ball.r >= WIDTH) {
+   if (ball.x1 <= 0 || ball.x2 >= WIDTH) {
       ball.reverseX();
    }
-   if (ball.y - ball.r <= 0) {
+   if (ball.y1 <= 0) {
       ball.reverseY();
    }
 
+   // block collision
    i = 0;
    for (auto &block : blocks) {
       short dir = ball.checkBlockCollision(&block);

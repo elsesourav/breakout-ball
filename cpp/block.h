@@ -7,7 +7,7 @@ class Block {
 public:
    short x, y, w, h, health;
    float offset;
-   short x1, x2, y1, y2;
+   float x1, x2, y1, y2;
    bool isDead;
 
    Block(short x, short y, short w, short h, short health);

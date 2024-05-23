@@ -23,6 +23,8 @@ typedef void (*ClearCvsPtr)(short, short);
 class Game {
 public:
    short WIDTH, HEIGHT, SIZE, blockWidth, blockHeight, paddleWidth, paddleHeight;
+   bool paddleHidden;
+   short paddleMaxHidden, paddleHiddenCount;
    Blocks parser;
    std::vector<Block> blocks;
    std::vector<Particle> particles;

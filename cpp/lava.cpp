@@ -6,7 +6,7 @@ void Lava::init(float _x, float _y, short _w, short _h, float speed) {
    y = _y;
    w = _w;
    h = _h;
-   offsetX = (x + w / 2);
+   fixX = (x + w / 2);
 
    // setup glows
    short numGlows = (w / 70) * (h / 70);
@@ -17,7 +17,7 @@ void Lava::init(float _x, float _y, short _w, short _h, float speed) {
       float offX = rnd(0.0f, (float)w);
       float offY = rnd(0.0f, (float)H);
       short colorIndex = (int) rnd(0.0f, 5.0f);
-      glows.push_back(Glow(offX, offY, size, speed / 8, speed / 2, &offsetX, &y, w, H, colorIndex));
+      glows.push_back(Glow(offX, offY, size, speed / 8, speed / 2, &fixX, &y, w, H, colorIndex));
    }
 }
 

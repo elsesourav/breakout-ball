@@ -11,7 +11,7 @@ typedef void (*DrawGlowPtr)(float, float, float, float, short colorIndex);
 
 class Lava {
 public:
-   float w, h, x, y, offsetX;
+   float w, h, x, y, fixX;
    std::vector<Glow> glows;
 
    void init(float x, float y, short w, short h, float speed);
