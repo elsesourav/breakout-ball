@@ -13,7 +13,19 @@ previewCanvas.height = SIZE * (cols - 1);
 ctx.imageSmoothingQuality = "high";
 PREVIEW_CTX.imageSmoothingQuality = "high";
 
-
+`<div class="level">
+<div class="top"></div>
+<div class="icon-and-no">
+   <i class="sbi-fire"></i>
+   <p class="creator"><small>@</small>sourav</p>
+   <p class="no">ZAS</p>
+</div>
+<div class="complete-time"></div>
+<div class="playCount">
+   <i class="sbi-play-circle"></i>
+   <p class="count">69</p>
+</div>
+</div>`
 
 function createHtmlLevels(levels, levelsMap) {
    levelsMap.innerHTML = "";

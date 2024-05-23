@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT, FPS, padW, padH, ballR;
-float padX, padY, ballSpeed;
+short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT, FPS;
 short totalFrameCount = 0;
 Game game;
 
@@ -68,29 +67,20 @@ extern "C" {
 
 
 
-EMSCRIPTEN_KEEPALIVE void setup(short rows, short cols, short size, float _padX, float _padY, short _padW, short _padH, short _ballR, float _ballSpeed, short _FPS) {
+EMSCRIPTEN_KEEPALIVE void setup(short rows, short cols, short size, float padX, float padY, short padW, short padH, short ballR, float ballSpeed, short _FPS) {
    ROWS = rows;
    COLS = cols;
    SIZE = size;
-   BLOCK_WIDTH = SIZE;
-   BLOCK_HEIGHT = SIZE / 4 * 3;
-   WIDTH = SIZE * 9;
-   HEIGHT = SIZE * 16;
-   padX = _padX;
-   padY = _padY;
-   padW = _padW;
-   padH = _padH;
-   ballR = _ballR;
-   ballSpeed = _ballSpeed;
+   BLOCK_WIDTH = size;
+   BLOCK_HEIGHT = size / 4 * 3;
+   WIDTH = size * 9;
+   HEIGHT = size * 16;
    FPS = _FPS;
+   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
 }
 EMSCRIPTEN_KEEPALIVE void init(char *level) {
-   game.blocks.clear();
-   game.stars.clear();
-   game.paddle.glows.clear();
-   game.lava.glows.clear();
    totalFrameCount = 0;
-   game.init(WIDTH, HEIGHT, SIZE, level, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
+   game.init(level);
 }
 
 EMSCRIPTEN_KEEPALIVE void update() {

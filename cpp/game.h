@@ -22,9 +22,9 @@ typedef void (*ClearCvsPtr)(short, short);
 
 class Game {
 public:
-   short WIDTH, HEIGHT, SIZE, blockWidth, blockHeight, paddleWidth, paddleHeight;
+   short WIDTH, HEIGHT, SIZE, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR;
+   float paddleMaxHidden, paddleHiddenCount, numStars, padX, padY, ballX, ballY, ballSpeed;
    bool paddleHidden;
-   short paddleMaxHidden, paddleHiddenCount;
    Blocks parser;
    std::vector<Block> blocks;
    std::vector<Particle> particles;
@@ -35,7 +35,8 @@ public:
    
 
    Game();
-   void init(short WIDTH, short HEIGHT, short SIZE, char *level, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight);
+   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight);
+   void init(char *level);
 
    void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs);
 

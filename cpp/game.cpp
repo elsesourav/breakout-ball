@@ -10,25 +10,40 @@
 
 Game::Game() {}
 
-void Game::init(short _WIDTH, short _HEIGHT, short _SIZE, char *level, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float ballSpeed, short _blockWidth, short _blockHeight) {
+void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight) {
    WIDTH = _WIDTH;
    HEIGHT = _HEIGHT;
    SIZE = _SIZE;
    blockWidth = _blockWidth;
    blockHeight = _blockHeight;
 
+   padX = _padX;
+   padY = _padY;
+   padW = _padW;
+   padH = _padH;
+   ballX = _ballX;
+   ballY = _ballY;
+   ballR = _ballR;
+   ballSpeed = _ballSpeed;
+   numStars = (WIDTH / 80) * (HEIGHT / 80);
+}
+
+void Game::init(char *level) {
    paddleHidden = false;
-   paddleMaxHidden = _SIZE / 8;
+   paddleMaxHidden = SIZE / 8;
    paddleHiddenCount = 0;
+
+   blocks.clear();
+   stars.clear();
+   paddle.glows.clear();
+   lava.glows.clear();
 
    ball.init(ballX, ballY, ballR, ballSpeed);
    paddle.init(padX, padY, padW, padH, ballSpeed, WIDTH);
-   lava.init(0, padY + _SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
+   lava.init(0, padY + SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
    blocks = parser.convertStringToBlocks(level, blockWidth, blockHeight);
 
    // setup stars
-   float numStars = (WIDTH / 80) * (HEIGHT / 80);
-
    for (short i = 0; i < numStars; i++) {
       float size = rnd(1.0f, (float)SIZE / 32);
       float x = rnd(0.0f, (float)WIDTH);
