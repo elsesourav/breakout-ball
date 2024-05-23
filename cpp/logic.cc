@@ -5,7 +5,9 @@
 #include <string>
 #include <vector>
 
-short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT;
+short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT, FPS, padW, padH, ballR;
+float padX, padY, ballSpeed;
+short totalFrameCount = 0;
 Game game;
 
 EM_JS(void, clearCanvas, (short w, short h), {
@@ -64,7 +66,9 @@ EM_JS(void, drawLine, (short rows, short cols, short w, short h), {
 
 extern "C" {
 
-EMSCRIPTEN_KEEPALIVE void init(short rows, short cols, short size, char *level, float padX, float padY, short padW, short padH, short ballR, float BallSpeed) {
+
+
+EMSCRIPTEN_KEEPALIVE void setup(short rows, short cols, short size, float _padX, float _padY, short _padW, short _padH, short _ballR, float _ballSpeed, short _FPS) {
    ROWS = rows;
    COLS = cols;
    SIZE = size;
@@ -72,16 +76,26 @@ EMSCRIPTEN_KEEPALIVE void init(short rows, short cols, short size, char *level, 
    BLOCK_HEIGHT = SIZE / 4 * 3;
    WIDTH = SIZE * 9;
    HEIGHT = SIZE * 16;
-
+   padX = _padX;
+   padY = _padY;
+   padW = _padW;
+   padH = _padH;
+   ballR = _ballR;
+   ballSpeed = _ballSpeed;
+   FPS = _FPS;
+}
+EMSCRIPTEN_KEEPALIVE void init(char *level) {
    game.blocks.clear();
    game.stars.clear();
    game.paddle.glows.clear();
    game.lava.glows.clear();
-   game.init(WIDTH, HEIGHT, SIZE, level, padX, padY, padW, padH, padX, padY - ballR, ballR, BallSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
+   totalFrameCount = 0;
+   game.init(WIDTH, HEIGHT, SIZE, level, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
 }
 
 EMSCRIPTEN_KEEPALIVE void update() {
    game.update();
+   totalFrameCount++;
 }
 EMSCRIPTEN_KEEPALIVE void draw() {
    game.draw(drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas);
@@ -100,5 +114,8 @@ EMSCRIPTEN_KEEPALIVE float moveDirect(float x) {
 }
 EMSCRIPTEN_KEEPALIVE void drawOutline(float x) {
    drawLine(ROWS, COLS, BLOCK_WIDTH, BLOCK_HEIGHT);
+}
+EMSCRIPTEN_KEEPALIVE short getTotalTime(float x) {
+   return totalFrameCount / FPS;
 }
 }

@@ -1,9 +1,9 @@
 const previewClose = $("#previewClose");
-const startPreview = $("#startPreview");
+const showPreview = $("#showPreview");
 const modeType = $("#modeType");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
-previewClose.click(() => startPreview.classList.remove("active"));
+previewClose.click(() => showPreview.classList.remove("active"));
 
 
 

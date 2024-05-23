@@ -14,7 +14,7 @@ const rows = 9;
 const cols = 10;
 const FPS = 60;
 const FRAME_RATE = 1000 / FPS;
-const pScale = 0.7;
+const pScale = 0.8;
 const PAD_X = CVS_W / 2;
 const FOOTER_HEIGHT = SIZE * 1.6;
 const PAD_WIDTH = SIZE * 2;
@@ -34,7 +34,7 @@ const blockImages = createBlockImages();
 
 let fpsCounter = 0;
 let currentLevelIndex = 0;
-let init, draw, update, moveLeft, moveRight, moveTarget, moveDirect, drawOutline;
+let init, setup, draw, update, moveLeft, moveRight, moveTarget, moveDirect, drawOutline, getTotalFPS;
 const loopFun = () => {
    update();
    draw();
@@ -44,7 +44,8 @@ const animation = new Animation(FPS, loopFun);
 
 
 Module.onRuntimeInitialized = () => {
-   init = Module.cwrap("init", null, ["number", "number", "number", "string", "number", "number", "number", "number", "number", "number"]);
+   setup = Module.cwrap("setup", null, ["number", "number", "number", "number", "number", "number", "number", "number", "number", "number"]);
+   init = Module.cwrap("init", null, ["string"]);
    draw = Module.cwrap("draw", null, []);
    update = Module.cwrap("update", null, []);
    moveLeft = Module.cwrap("moveLeft", null, []);
@@ -52,12 +53,15 @@ Module.onRuntimeInitialized = () => {
    moveTarget = Module.cwrap("moveTarget", "number", []);
    moveDirect = Module.cwrap("moveDirect", "number", []);
    drawOutline = Module.cwrap("drawOutline", null, []);
+   getTotalTime = Module.cwrap("getTotalTime", "number", []);
+
+   setup(rows, cols, SIZE, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED, FPS);
 };
 
 
 (() => {
    const level = createStringLevel(window.levels[1]);
-   init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
+   init(level); 
 
    function loop() {
       update();

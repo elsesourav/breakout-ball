@@ -11,10 +11,10 @@
       <link rel="stylesheet" href="icons/css/icon.css" />
       <link rel="stylesheet" href="icons/css/font.css" />
 
-      <!-- design stylesheet -->
+      <!-- design stylesheet --> 
       <link rel="stylesheet" href="./css/home.css" />
-      <link rel="stylesheet" href="./css/start-preview.css" />
-      <link rel="stylesheet" href="./css/game-designer.css" />
+      <link rel="stylesheet" href="./css/showPreview.css" />
+      <link rel="stylesheet" href="./css/gameDesigner.css" />
       <link rel="stylesheet" href="./css/lavel.css" />
 
       <!-- all scripts -->
@@ -26,7 +26,7 @@
 
       <script defer src="./js/levelMaker.js"></script>
       <script defer src="./js/setup.js"></script>
-      <script defer src="./js/startPreview.js"></script>
+      <script defer src="./js/showPreview.js"></script>
       <script defer src="./js/eventListener.js"></script>
       <script defer src="./js/main.js"></script>
    </head>
@@ -89,9 +89,9 @@
          </div>
          <canvas id="mainCanvas" class=""></canvas>
 
-         <div id="startPreview" class="">
+         <div id="showPreview" class="testing">
             <button id="previewClose">
-               <i class="sbi-cross"></i>
+               <i class="sbi-arrow-left1"></i>
             </button>
 
             <div class="rapper">
@@ -116,7 +116,14 @@
                   </div>
                </div>
                <div class="btn">
-                  <button id="startButton">START</button>
+                  <span id="levelCreatorName"><small>@</small>sourav</span>
+                  <button id="startButton">
+                     <p class="play">START</p>
+                     <p class="play">PLAY AGAIN</p>
+                  </button>
+                  <button id="homeButton">
+                     <i class="sbi-home"></i>
+                  </button>
                </div>
                <div class="leaderboard">
                   <div class="title">
@@ -130,7 +137,7 @@
                            <td>Name</td>
                            <td>Time</td>
                         </tr>
-                        <tr>
+                        <tr class="me">
                            <td>1</td>
                            <td>Sourav</td>
                            <td>96<span>s</span></td>

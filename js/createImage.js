@@ -102,9 +102,9 @@ function createPaddleImage() {
 
 function createBlockImages() {
    const blockColors = [
-      [["#4facfe", "#00f2fe"], "#4ffffc"],
+      [["#21f4fb", "#4c74ea"], "#4ffffc"],
       [["#f6d365", "#fda085"], "#fcff59"],
-      [["#0ba360", "#20e6c1"], "#3bff48"],
+      [["#04ef00", "#03a900"], "#04ef00"],
       [["#b773ff", "#7028e4"], "#af4eff"],
       [["#ff0844", "#fc8b68"], "#ff4e8f"],
       [["#c3cfe2", "#eaeaea"], "#ffffff"],
@@ -139,7 +139,7 @@ function createBlockImages() {
                   r * 1.4
                );
 
-               const grad = ctx.createLinearGradient(0, 0, W, H);
+               const grad = ctx.createLinearGradient(0, 0, 0, H);
                grad.addColorStop(0, c1);
                grad.addColorStop(1, c2);
 

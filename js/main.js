@@ -17,10 +17,10 @@ htmlLevels.forEach(([level], i) => {
 function playLevel(_level) {
    ctx = CTX;
    CVS.classList.add("active");
-   startPreview.classList.remove("active");
+   showPreview.classList.remove("active");
    
    const level = createStringLevel(_level);
-   init(rows, cols, SIZE, level, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED); 
+   init(level); 
    
    animation.start();
 }
@@ -34,12 +34,10 @@ createNewLevel.click(() => {
 
 
 
-
-
-
+// showPreview.classList.add("active");
 
 setTimeout(() => {
-   // init(rows, cols, SIZE, "", PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED);
+   // init("");
    // update();
    // drawOutline();
    // playLevel(window.levels[currentLevelIndex]);
