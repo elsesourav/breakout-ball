@@ -23,7 +23,7 @@ const PAD_HEIGHT = SIZE * 0.4;
 const BALL_RADIUS = SIZE * 0.22;
 const BALL_SPEED = 15;
 
-const CVS = $("#mainCanvas"); 
+const CVS = $("#mainCanvas");
 const previewCanvas = $("#preview");
 const CTX = CVS.getContext("2d");
 const PREVIEW_CTX = previewCanvas.getContext("2d");
@@ -34,17 +34,37 @@ const blockImages = createBlockImages();
 
 let fpsCounter = 0;
 let currentLevelIndex = 0;
-let init, setup, draw, update, moveLeft, moveRight, moveTarget, moveDirect, drawOutline, getTotalFPS;
+let init,
+   setup,
+   draw,
+   update,
+   moveLeft,
+   moveRight,
+   moveTarget,
+   moveDirect,
+   drawBlockOnly,
+   drawOutline,
+   getTotalFPS;
 const loopFun = () => {
    update();
    draw();
    fpsCounter++;
-}
+};
 const animation = new Animation(FPS, loopFun);
 
-
 Module.onRuntimeInitialized = () => {
-   setup = Module.cwrap("setup", null, ["number", "number", "number", "number", "number", "number", "number", "number", "number", "number"]);
+   setup = Module.cwrap("setup", null, [
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+   ]);
    init = Module.cwrap("init", null, ["string"]);
    draw = Module.cwrap("draw", null, []);
    update = Module.cwrap("update", null, []);
@@ -52,16 +72,68 @@ Module.onRuntimeInitialized = () => {
    moveRight = Module.cwrap("moveRight", null, []);
    moveTarget = Module.cwrap("moveTarget", "number", []);
    moveDirect = Module.cwrap("moveDirect", "number", []);
+   drawBlockOnly = Module.cwrap("drawBlockOnly", null, []);
    drawOutline = Module.cwrap("drawOutline", null, []);
    getTotalTime = Module.cwrap("getTotalTime", "number", []);
 
-   setup(rows, cols, SIZE, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED, FPS);
+   setup(
+      rows,
+      cols,
+      SIZE,
+      PAD_X,
+      PAD_Y,
+      PAD_WIDTH,
+      PAD_HEIGHT,
+      BALL_RADIUS,
+      BALL_SPEED,
+      FPS
+   );
+
+   const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
+   const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
+   const htmlCreateLevels = createOnlineLevels(
+      window.levels,
+      $("#createMode"),
+      true
+   );
+
+   htmlLocalLevels.forEach(([level], i) => {
+      level.addEventListener("click", () => {
+         setupStartPreview(i);
+         currentLevelIndex = i;
+      });
+   });
+
+   htmlOnlineLevels.forEach(([level, cvs], i) => {
+      cvs.width = CVS_W;
+      cvs.height = SIZE * (cols - 2.3); 
+      ctx = cvs.getContext("2d");
+      init(createStringLevel(window.levels[i]));
+      drawBlockOnly();
+
+      level.addEventListener("click", () => {
+         setupStartPreview(i);
+         currentLevelIndex = i;
+      });
+   });
+
+   htmlCreateLevels.forEach(([level, cvs], i) => {
+      cvs.width = CVS_W;
+      cvs.height = SIZE * (cols - 2.3);  
+      ctx = cvs.getContext("2d");
+      init(createStringLevel(window.levels[i]));
+      drawBlockOnly();
+
+      level.addEventListener("click", () => {
+         setupStartPreview(i);
+         currentLevelIndex = i;
+      });
+   });
 };
 
-
-(() => {
+() => {
    const level = createStringLevel(window.levels[1]);
-   init(level); 
+   init(level);
 
    function loop() {
       update();
@@ -75,4 +147,4 @@ Module.onRuntimeInitialized = () => {
    }, 1000);
 
    animation.start(loop);
-})
+};

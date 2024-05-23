@@ -7,8 +7,6 @@
    display: grid;
    place-items: center;
    background: rgba(0, 0, 0, 0.92);
-   /* backdrop-filter: blur(3px);
-   -webkit-backdrop-filter: blur(3px); */
    transition: ease-in-out 300ms top;
    z-index: 5;
 
@@ -110,7 +108,7 @@
             font-size: calc(var(--s) * 0.3);
             border-radius: 10%;
             color: #00fffb;
-            background: -webkit-linear-gradient(45deg, #4dff00, #58eeff);
+            background: -webkit-linear-gradient(#ededed, #464646);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
          }

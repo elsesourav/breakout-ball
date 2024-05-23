@@ -102,6 +102,9 @@ EMSCRIPTEN_KEEPALIVE float moveTarget(float tx) {
 EMSCRIPTEN_KEEPALIVE float moveDirect(float x) {
    return game.paddle.moveDirect(x);
 }
+EMSCRIPTEN_KEEPALIVE void drawBlockOnly() {
+   game.drawBlockOnly(clearCanvas, drawBlock);
+}
 EMSCRIPTEN_KEEPALIVE void drawOutline(float x) {
    drawLine(ROWS, COLS, BLOCK_WIDTH, BLOCK_HEIGHT);
 }

@@ -13,20 +13,6 @@ previewCanvas.height = SIZE * (cols - 1);
 ctx.imageSmoothingQuality = "high";
 PREVIEW_CTX.imageSmoothingQuality = "high";
 
-`<div class="level">
-<div class="top"></div>
-<div class="icon-and-no">
-   <i class="sbi-fire"></i>
-   <p class="creator"><small>@</small>sourav</p>
-   <p class="no">ZAS</p>
-</div>
-<div class="complete-time"></div>
-<div class="playCount">
-   <i class="sbi-play-circle"></i>
-   <p class="count">69</p>
-</div>
-</div>`
-
 function createHtmlLevels(levels, levelsMap) {
    levelsMap.innerHTML = "";
 
@@ -61,24 +47,65 @@ function createHtmlLevels(levels, levelsMap) {
    return htmlLevels;
 }
 
-// `<div class="level">
-// <div class="top">
-//    <div class="hashtag">
-//       <i class="sbi-trophy2"></i>
-//       <p>00</p>
-//    </div>
-//    <div class="is-lock-or-complete">
-//       <i class="sbi-lock-outline lock"></i
-//       ><i class="sbi-check-circle-outline check"></i>
-//    </div>
-// </div>
-// <div class="icon-and-no">
-//    <i class="sbi-fire"></i>
-//    <p class="no">1</p>
-// </div>
-// <div class="complete-time">
-//    <i class="sbi-stopwatch1"></i>
-//    <p class="time">000</p>
-//    <span>s</span>
-// </div>
-// </div>`
+function createOnlineLevels(levels, levelsMap, flag = false) {
+   levelsMap.innerHTML = "";
+   const htmlLevels = [];
+
+   for (let i = 0; i < levels.length; i++) {
+      const mainEle = CE("div", ["level"]);
+      const cvs = CE("canvas", ["levelCvs"]);
+      const details = CE("div", ["details"]);
+      const playCount = CE("div", ["playCount"], "", details);
+      CE("i", ["sbi-play-circle"], "", playCount);
+      const count = CE("p", ["count"], "10", playCount);
+      const id = CE("p", ["id"], "ZAS", details);
+      const _delete = flag
+         ? CE("p", ["sbi-trash-o", "delete"], "", details)
+         : "";
+
+      mainEle.appendChild(cvs);
+      mainEle.appendChild(details);
+      levelsMap.appendChild(mainEle);
+
+      htmlLevels.push([mainEle, cvs, count, id, _delete]);
+   }
+   return htmlLevels;
+}
+
+{
+   /* <div class="level">
+   <div class="top">
+      <div class="hashtag">
+         <i class="sbi-trophy2"></i>
+         <p>00</p>
+      </div>
+      <div class="is-lock-or-complete">
+         <i class="sbi-lock-outline lock"></i
+         ><i class="sbi-check-circle-outline check"></i>
+      </div>
+   </div>
+   <div class="icon-and-no">
+      <i class="sbi-fire"></i>
+      <p class="no">1</p>
+   </div>
+   <div class="complete-time">
+      <i class="sbi-stopwatch1"></i>
+      <p class="time">000</p>
+      <span>s</span>
+   </div>
+</div> */
+}
+
+{
+   /* <div class="level">
+   <canvas class="levelCvs"></canvas>
+   <div class="details">
+      <div class="playCount">
+         <i class="sbi-play-circle"></i>
+         <p class="count">10</p>
+      </div>
+      <p class="id">ZAS</p>
+      <p class="delete"></p>
+   </div>
+</div> */
+}

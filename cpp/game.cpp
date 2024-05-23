@@ -84,6 +84,12 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    lava.draw(drawLava, drawGlow);
 }
 
+void Game::drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock) {
+   clearCvs(WIDTH, HEIGHT);
+   for (auto &block : blocks)
+      block.draw(drawBlock);
+}
+
 void Game::update() {
    short i = 0;
 

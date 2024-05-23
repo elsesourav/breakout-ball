@@ -40,6 +40,8 @@ public:
 
    void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs);
 
+   void drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock);
+
    void createParticles(float x, float y, short colorIndex, short mul);
    void update();
 

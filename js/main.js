@@ -1,17 +1,12 @@
 const startButton = $("#startButton");
-const createNewLevel = $("#createNewLevel");
+// const createNewLevel = $("#createNewLevel");
 
 function lvlEditor() {
    lvlMaker.draw(ctx, CVS.width, CVS.height);
 }
 
-const htmlLevels = createHtmlLevels(window.levels, $("#localMode"));
-htmlLevels.forEach(([level], i) => {
-   level.addEventListener("click", () => {
-      setupStartPreview(i);
-      currentLevelIndex = i;
-   });
-});
+
+
 
 // Start Game
 function playLevel(_level) {
@@ -29,8 +24,8 @@ startButton.click(() => {
    playLevel(window.levels[currentLevelIndex]);
 });
 
-createNewLevel.click(() => {
-});
+// createNewLevel.click(() => {
+// });
 
 
 

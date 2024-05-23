@@ -5,8 +5,6 @@ const modeOptions = $$(".mode");
 const maps = $$(".map");
 previewClose.click(() => showPreview.classList.remove("active"));
 
-
-
 const lvlOptions = $$("#levelDesigner .option");
 lvlOptions.click((_, ele, i) => {
    lvlOptions.each((e) => e.classList.remove("active"));
@@ -235,11 +233,11 @@ $("#closeBtn").click(() => {});
       if (Math.abs(pg.totalMove) < pg.width / 5) {
          pg.scrollX = -pg.width * pg.index;
       } else {
-         time = pg.scrollX - pg.preScrollX;
 
          if (pg.totalMove < 0 && pg.index < 2) pg.index++;
          if (pg.totalMove > 0 && pg.index > 0) pg.index--;
-         else time = Math.abs(pg.totalMove);
+
+         time = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index)); 
 
          pg.scrollX = -pg.width * pg.index;
          modeOptions.removeClass("active");
