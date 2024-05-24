@@ -15,6 +15,15 @@ void Ball::init(float _x, float _y, short _r, float _speed) {
    vy = -_speed;
    this->updateX1X2Y1Y2();
 }
+void Ball::reset(float _x, float _y) {
+   x = _x;
+   y = _y;
+   preX = _x;
+   preY = _y;
+   vx = rnd(-4.0f, 4.0f);
+   vy = -speed;
+   this->updateX1X2Y1Y2();
+}
 
 void Ball::updateX1X2Y1Y2() {
    x1 = x - r;

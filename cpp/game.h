@@ -19,12 +19,16 @@ typedef void (*DrawStarPtr)(float, float, float, float);
 typedef void (*DrawLavaPtr)(float, float, float, float);
 typedef void (*DrawGlowPtr)(float, float, float, float, short colorIndex);
 typedef void (*ClearCvsPtr)(short, short);
+typedef void (*ShowHealthPtr)(short);
+typedef void (*ShowTimePtr)(short);
+typedef void (*ShowCountDownPtr)(short);
+typedef void (*ShowGameOverPtr)();
 
 class Game {
 public:
-   short WIDTH, HEIGHT, SIZE, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR;
+   short WIDTH, HEIGHT, SIZE, FPS, health, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR, totalFrameCount, startingCountDown;
    float paddleMaxHidden, paddleHiddenCount, numStars, padX, padY, ballX, ballY, ballSpeed;
-   bool paddleHidden;
+   bool paddleHidden, gamePose, gameOver;
    Blocks parser;
    std::vector<Block> blocks;
    std::vector<Particle> particles;
@@ -35,15 +39,15 @@ public:
    
 
    Game();
-   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight);
+   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS);
    void init(char *level);
 
    void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs);
 
    void drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock);
 
-   void createParticles(float x, float y, short colorIndex, short mul);
-   void update();
+   void createParticles(float x, float y, float w, float h, short colorIndex, float sizeMul, float mul);
+   void update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver);
 
 };
 

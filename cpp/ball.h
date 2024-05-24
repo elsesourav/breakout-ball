@@ -15,6 +15,7 @@ public:
    std::array<short, 4> numbers;
 
    void init(float x, float y, short r, float speed);
+   void reset(float x, float y);
    void draw(DrawBallPtr drawBall);
    void updateX1X2Y1Y2();
    void update();

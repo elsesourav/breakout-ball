@@ -6,7 +6,6 @@
 #include <vector>
 
 short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT, FPS;
-short totalFrameCount = 0;
 Game game;
 
 EM_JS(void, clearCanvas, (short w, short h), {
@@ -62,10 +61,29 @@ EM_JS(void, drawLine, (short rows, short cols, short w, short h), {
       }
    }
 });
+EM_JS(void, showHealth, (short health), {
+   showHealths.classList = [];
+   showHealths.classList.add(`s${health - 1}`);
+});
+EM_JS(void, showTimes, (short time), {
+   showTimeUsed.innerText = time;
+}); 
+EM_JS(void, showCountDown, (short time), {
+   showCountDowns.classList = [];
+   showCountDowns.classList.add(`s${time}`);
+});
+EM_JS(void, showGameOver, (), {
+   showCountDowns.classList = [];
+   showCountDowns.classList.add("gameOver");
 
+   setTimeout(() => {
+      animation.stop();
+      showCountDowns.classList = [];
+      setupStartPreview(currentLevelIndex, "inGame");
+   }, 2000);
+});
+ 
 extern "C" {
-
-
 
 EMSCRIPTEN_KEEPALIVE void setup(short rows, short cols, short size, float padX, float padY, short padW, short padH, short ballR, float ballSpeed, short _FPS) {
    ROWS = rows;
@@ -76,16 +94,13 @@ EMSCRIPTEN_KEEPALIVE void setup(short rows, short cols, short size, float padX, 
    WIDTH = size * 9;
    HEIGHT = size * 16;
    FPS = _FPS;
-   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT);
+   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS);
 }
 EMSCRIPTEN_KEEPALIVE void init(char *level) {
-   totalFrameCount = 0;
    game.init(level);
 }
-
 EMSCRIPTEN_KEEPALIVE void update() {
-   game.update();
-   totalFrameCount++;
+   game.update(showHealth, showTimes, showCountDown, showGameOver);
 }
 EMSCRIPTEN_KEEPALIVE void draw() {
    game.draw(drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas);
@@ -109,6 +124,6 @@ EMSCRIPTEN_KEEPALIVE void drawOutline(float x) {
    drawLine(ROWS, COLS, BLOCK_WIDTH, BLOCK_HEIGHT);
 }
 EMSCRIPTEN_KEEPALIVE short getTotalTime(float x) {
-   return totalFrameCount / FPS;
+   return game.totalFrameCount / FPS;
 }
 }

@@ -1,4 +1,8 @@
 const startButton = $("#startButton");
+const showHealths = $("#showHealths"); 
+const showCountDowns = $("#showCountDowns");
+const showTime = $("#showTime");
+const showTimeUsed = $("#showTimeUsed");
 // const createNewLevel = $("#createNewLevel");
 
 function lvlEditor() {
@@ -12,12 +16,20 @@ function lvlEditor() {
 function playLevel(_level) {
    ctx = CTX;
    CVS.classList.add("active");
+   showGameStatus.classList.add("active");
    showPreview.classList.remove("active");
+   showTime.classList.remove("active");
+   showHealths.classList = [];
+   
+   setTimeout(() => {
+      showHealths.classList.add(`s${3}`); 
+      showTime.classList.add("active");
+   }, 600);
    
    const level = createStringLevel(_level);
    init(level); 
-   
-   animation.start();
+    
+   animation.start(loopFun);
 }
 
 startButton.click(() => {
@@ -39,6 +51,6 @@ setTimeout(() => {
 }, 1500);
 
 setInterval(() => {
-   // mobileErr.innerHTML = fpsCounter;
+   mobileErr.innerHTML = fpsCounter;
    fpsCounter = 0;
 }, 1000);

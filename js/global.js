@@ -45,6 +45,7 @@ let init,
    drawBlockOnly,
    drawOutline,
    getTotalFPS;
+
 const loopFun = () => {
    update();
    draw();
@@ -129,22 +130,19 @@ Module.onRuntimeInitialized = () => {
          currentLevelIndex = i;
       });
    });
+
+   playLevel(window.levels[currentLevelIndex]); 
 };
 
 () => {
    const level = createStringLevel(window.levels[1]);
    init(level);
 
-   function loop() {
-      update();
-      draw();
-      fpsCounter++;
-   }
 
    setInterval(() => {
       mobileErr.innerHTML = fpsCounter;
       fpsCounter = 0;
    }, 1000);
 
-   animation.start(loop);
+   
 };

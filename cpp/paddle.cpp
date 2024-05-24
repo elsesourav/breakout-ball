@@ -31,6 +31,16 @@ void Paddle::init(float _x, float _y, short _w, short _h, float ballSpeed, short
    this->updateX1X2Y1Y2();
 }
 
+void Paddle::reset(float _x, float _y) {
+   x = _x;
+   y = _y;
+   tx = _x;
+   ty = _y;
+   isPointerLock = false;
+
+   this->updateX1X2Y1Y2();
+}
+
 void Paddle::draw(DrawPaddlePtr drawPaddle, DrawGlowPtr drawGlow) {
    drawPaddle(x, y, w, h);
    for (auto &glow : glows)
@@ -47,9 +57,10 @@ void Paddle::updateX1X2Y1Y2() {
 void Paddle::update() {
    x += (tx - x) * percentage;
    y += (ty - y) * percentage;
-
+   this->updateGlows();
+}
+void Paddle::updateGlows() {
    this->updateX1X2Y1Y2();
-
    for (auto &glow : glows)
       glow.update();
 }

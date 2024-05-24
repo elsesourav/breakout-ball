@@ -17,8 +17,10 @@ public:
    std::vector<Glow> glows;
 
    void init(float x, float y, short w, short h, float ballSpeed, short windowWidth);
+   void reset(float x, float y);
    void draw(DrawPaddlePtr drawPaddle, DrawGlowPtr drawGlow);
    void update();
+   void updateGlows();
    void updateX1X2Y1Y2();
    void moveLeft();
    void moveRight();

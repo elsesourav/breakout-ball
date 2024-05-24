@@ -10,10 +10,11 @@
 
 Game::Game() {}
 
-void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight) {
+void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight, short _FPS) {
    WIDTH = _WIDTH;
    HEIGHT = _HEIGHT;
    SIZE = _SIZE;
+   FPS = _FPS;
    blockWidth = _blockWidth;
    blockHeight = _blockHeight;
 
@@ -30,8 +31,13 @@ void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _p
 
 void Game::init(char *level) {
    paddleHidden = false;
-   paddleMaxHidden = SIZE / 8;
+   gamePose = true;
+   gameOver = false;
+   totalFrameCount = 0;
    paddleHiddenCount = 0;
+   paddleMaxHidden = SIZE / 8;
+   startingCountDown = FPS * 3;
+   health = 3;
 
    blocks.clear();
    stars.clear();
@@ -52,12 +58,12 @@ void Game::init(char *level) {
    }
 }
 
-void Game::createParticles(float x, float y, short colorIndex, short mul) {
-   short gap = blockWidth / (4 * mul);
+void Game::createParticles(float x, float y, float w, float h, short colorIndex, float _sizeMul, float mul) {
+   short gap = w / (4 * mul);
 
-   for (short i = 0; i < blockHeight; i += gap) {
-      for (short j = 0; j < blockWidth; j += gap) {
-         float size = rnd(1.0f, (float)SIZE / 8);
+   for (short i = 0; i < h; i += gap) {
+      for (short j = 0; j < w; j += gap) {
+         float size = rnd(1.0f, (float)SIZE / 8 * _sizeMul);
          float _x = x + j;
          float _y = y + i;
          particles.push_back(Particle(_x, _y, size, colorIndex));
@@ -70,18 +76,19 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    clearCvs(WIDTH, HEIGHT);
    for (auto &star : stars)
       star.draw(drawStar);
-   ball.draw(drawBall);
+   if (!gameOver) ball.draw(drawBall);
    paddle.draw(drawPaddle, drawGlow);
 
    for (auto &block : blocks) {
       block.draw(drawBlock);
    }
 
+   lava.draw(drawLava, drawGlow);
+
    for (auto &particle : particles) {
       particle.draw(drawParticle);
    }
 
-   lava.draw(drawLava, drawGlow);
 }
 
 void Game::drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock) {
@@ -90,13 +97,17 @@ void Game::drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock) {
       block.draw(drawBlock);
 }
 
-void Game::update() {
-   short i = 0;
+void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver) {
 
+   short i = 0;
    for (auto &star : stars)
       star.update();
-   ball.update();
-   paddle.update();
+   if (!gamePose) {
+      ball.update();
+      paddle.update();
+   } else {
+      paddle.updateGlows();
+   }
    lava.update();
 
    // update particles
@@ -142,6 +153,21 @@ void Game::update() {
       ball.reverseY();
    }
 
+   if (!gamePose && ball.y2 >= padY + padH * 4) {
+      gamePose = true;
+      createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3); 
+      showHealth(health--);
+
+      if (health <= 0) {
+         gameOver = true;
+         showGameOver();
+         return;
+      }
+      ball.reset(ballX, ballY);
+      paddle.reset(padX, padY);
+      startingCountDown = FPS * 3;
+   }
+
    // block collision
    i = 0;
    for (auto &block : blocks) {
@@ -161,15 +187,29 @@ void Game::update() {
          short is = block.damage();
 
          if (is == 2) {
-            createParticles(block.x, block.y, block.health, 2);
+            createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 1, 2);
 
             block.isDead = true;
             blocks.erase(blocks.begin() + i);
          } else if (is == 1) {
-            createParticles(block.x, block.y, block.health, 1);
+            createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
          }
-         break;
+         break; 
       }
       i++;
+   } 
+   
+   if (startingCountDown >= 0) {
+      if (startingCountDown % FPS == 0){
+         showCountDown((short)startingCountDown / FPS);
+      }
+      startingCountDown--;
+      if (startingCountDown == 0)
+         gamePose = false;
+   } else if (!gameOver) {
+      totalFrameCount++;
+      if (totalFrameCount % FPS == 0){
+         showTime((short)totalFrameCount / FPS);
+      }
    }
 }
