@@ -200,14 +200,17 @@ main {
             }
          }
 
-         &.gameOver span:first-child p,
-         &.s1 span:nth-child(2) p,
-         &.s2 span:nth-child(3) p,
+         &.gameWin span:first-child p,
+         &.gameOver span:nth-child(2) p,
+         &.s1 span:nth-child(3) p,
+         &.s2 span:nth-child(4) p,
          &.s3 span:last-child p {
             top: calc(var(--window-height) / -2);
             transition-duration: 400ms;
          }
-         &.gameOver span:first-child p {
+
+         &.gameWin span:first-child p,
+         &.gameOver span:nth-child(2) p {
             top: calc(var(--window-height) / -3);
             font-size: calc(var(--s) * 2);
          }

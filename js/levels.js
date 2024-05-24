@@ -1,4 +1,8 @@
 window.levels = [
+   // [
+   //    { x: 4, y: 3, health: 6 },
+   //    { x: 4, y: 4, health: 1 },
+   // ],
    [
       { x: 1, y: 1, health: 1 },
       { x: 2, y: 1, health: 1 },

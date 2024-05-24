@@ -1,4 +1,4 @@
-function setupStartPreview(i, optionalClass = []) {
+function setupStartPreview(i, optionalClass = [], lvlTime = "∞") {
    ctx = PREVIEW_CTX;
    ctx.clearRect(0, 0, CVS.width, CVS.height);
    const level = createStringLevel(window.levels[i]);
@@ -11,6 +11,6 @@ function setupStartPreview(i, optionalClass = []) {
    pushStatus("game");
    animation.stop();
    $("#lvlNo").innerHTML = i + 1;
-   $("#lvlRank").innerHTML = "∞";
-   $("#lvlTime").innerHTML = "∞";
+   // $("#lvlRank").innerHTML = "∞";
+   $("#lvlTime").innerHTML = lvlTime;
 }

@@ -53,8 +53,6 @@
             padding: calc(var(--s) * 0.2);
             justify-content: space-between;
             background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
 
             .flex {
                position: relative;
@@ -83,6 +81,7 @@
                   }
 
                   span {
+                     padding: 0 2px;
                      color: #ff0084;
                   }
                }

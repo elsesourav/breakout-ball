@@ -40,7 +40,7 @@ const alert = new AlertHTML({
    titleHeight: 40,
    buttonHeight: 45,
    width: 290,
-}); 
+});
 
 let fpsCounter = 0;
 let currentLevelIndex = 0;
@@ -54,7 +54,7 @@ let init,
    moveDirect,
    drawBlockOnly,
    drawOutline,
-   getTotalFPS;
+   getTotalFPS; 
 
 const loopFun = () => {
    update();

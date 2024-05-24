@@ -1,8 +1,10 @@
 const startButton = $("#startButton");
 const showHealths = $("#showHealths"); 
 const showCountDowns = $("#showCountDowns");
+const showGameStatus = $("#showGameStatus");
 const showTime = $("#showTime");
 const showTimeUsed = $("#showTimeUsed");
+const lvlTime = $("#lvlTime");
 // const createNewLevel = $("#createNewLevel");
 
 replaceState();
@@ -24,6 +26,8 @@ function playLevel(_level) {
    showHealths.classList = [];
    pushStatus("inGame");
    pushStatus("inGame");
+   lvlTime.innerText = "∞";
+   showTimeUsed.innerText = "0";
    
    setTimeout(() => {
       showHealths.classList.add(`s${3}`); 
@@ -56,6 +60,6 @@ setTimeout(() => {
 }, 1500);
 
 setInterval(() => {
-   mobileErr.innerHTML = fpsCounter;
+   // mobileErr.innerHTML = fpsCounter;
    fpsCounter = 0;
 }, 1000);

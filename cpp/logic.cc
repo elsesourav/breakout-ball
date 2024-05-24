@@ -72,14 +72,26 @@ EM_JS(void, showCountDown, (short time), {
    showCountDowns.classList = [];
    showCountDowns.classList.add(`s${time}`);
 });
-EM_JS(void, showGameOver, (), {
+EM_JS(void, showGameOver, (short time), {
    showCountDowns.classList = [];
    showCountDowns.classList.add("gameOver");
 
    setTimeout(() => {
       animation.stop();
       showCountDowns.classList = [];
-      setupStartPreview(currentLevelIndex, ["inGame"]);
+      setupStartPreview(currentLevelIndex, ["inGame"], time);
+   }, 2000);
+});
+EM_JS(void, showGameComplete, (short time), {
+   showCountDowns.classList = [];
+   showCountDowns.classList.add("gameWin");
+
+   setTimeout(() => {
+      animation.stop();
+      showCountDowns.classList = [];
+      setupStartPreview(currentLevelIndex, ["inGame"], time);
+
+      // update rank
    }, 2000);
 });
  
@@ -100,7 +112,7 @@ EMSCRIPTEN_KEEPALIVE void init(char *level) {
    game.init(level);
 }
 EMSCRIPTEN_KEEPALIVE void update() {
-   game.update(showHealth, showTimes, showCountDown, showGameOver);
+   game.update(showHealth, showTimes, showCountDown, showGameOver, showGameComplete);
 }
 EMSCRIPTEN_KEEPALIVE void draw() {
    game.draw(drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas);

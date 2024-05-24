@@ -33,14 +33,16 @@ void Game::init(char *level) {
    paddleHidden = false;
    gamePose = true;
    gameOver = false;
+   gameComplete = false;
    totalFrameCount = 0;
    paddleHiddenCount = 0;
    paddleMaxHidden = SIZE / 8;
    startingCountDown = FPS * 3;
-   health = 1;
+   health = 3;
 
    blocks.clear();
    stars.clear();
+   particles.clear();
    paddle.glows.clear();
    lava.glows.clear();
 
@@ -48,6 +50,11 @@ void Game::init(char *level) {
    paddle.init(padX, padY, padW, padH, ballSpeed, WIDTH);
    lava.init(0, padY + SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
    blocks = parser.convertStringToBlocks(level, blockWidth, blockHeight);
+
+   wallLength = 0;
+   for (auto &block : blocks) {
+      if (block.health == 6) wallLength++;
+   }
 
    // setup stars
    for (short i = 0; i < numStars; i++) {
@@ -76,7 +83,7 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    clearCvs(WIDTH, HEIGHT);
    for (auto &star : stars)
       star.draw(drawStar);
-   if (!gameOver) ball.draw(drawBall);
+   if (!gameOver && !gameComplete) ball.draw(drawBall);
    paddle.draw(drawPaddle, drawGlow);
 
    for (auto &block : blocks) {
@@ -97,12 +104,12 @@ void Game::drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock) {
       block.draw(drawBlock);
 }
 
-void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver) {
+void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete) {
 
    short i = 0;
    for (auto &star : stars)
       star.update();
-   if (!gamePose) {
+   if (!gamePose && !gameComplete) {
       ball.update();
       paddle.update();
    } else {
@@ -160,7 +167,7 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
 
       if (health <= 0) {
          gameOver = true;
-         showGameOver();
+         showGameOver((short)totalFrameCount / FPS);
          return;
       }
       ball.reset(ballX, ballY);
@@ -174,7 +181,6 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
       short dir = ball.checkBlockCollision(&block);
 
       if (!block.isDead && dir != 0) {
-         // cout << dir << endl;
          if (dir == 1) {
             ball.reverseX();
          } else if (dir == -1) {
@@ -199,6 +205,12 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
       i++;
    } 
    
+   if (!gameComplete && wallLength >= blocks.size()) {
+      gameComplete = true;
+      createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3);
+      showGameComplete((short)totalFrameCount / FPS);
+   }
+
    if (startingCountDown >= 0) {
       if (startingCountDown % FPS == 0){
          showCountDown((short)startingCountDown / FPS);

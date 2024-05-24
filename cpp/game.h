@@ -22,13 +22,14 @@ typedef void (*ClearCvsPtr)(short, short);
 typedef void (*ShowHealthPtr)(short);
 typedef void (*ShowTimePtr)(short);
 typedef void (*ShowCountDownPtr)(short);
-typedef void (*ShowGameOverPtr)();
+typedef void (*ShowGameOverPtr)(short);
+typedef void (*ShowGameCompletePtr)(short);
 
 class Game {
 public:
-   short WIDTH, HEIGHT, SIZE, FPS, health, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR, totalFrameCount, startingCountDown;
+   short WIDTH, HEIGHT, SIZE, FPS, health, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR, totalFrameCount, startingCountDown, wallLength;
    float paddleMaxHidden, paddleHiddenCount, numStars, padX, padY, ballX, ballY, ballSpeed;
-   bool paddleHidden, gamePose, gameOver;
+   bool paddleHidden, gamePose, gameOver, gameComplete;
    Blocks parser;
    std::vector<Block> blocks;
    std::vector<Particle> particles;
@@ -47,7 +48,7 @@ public:
    void drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock);
 
    void createParticles(float x, float y, float w, float h, short colorIndex, float sizeMul, float mul);
-   void update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver);
+   void update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete);
 
 };
 

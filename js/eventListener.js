@@ -191,13 +191,13 @@ $("#closeBtn").click(() => {});
    //    });
    // }
 
-   if (window.DeviceOrientationEvent) {
-      window.addEventListener("deviceorientation", (e) => {
-         const ntx = e.gamma * 5 - oldGamma;
-         tx = moveDirect(ntx);
-         oldGamma = e.gamma;
-      });
-   }
+   // if (window.DeviceOrientationEvent) {
+   //    window.addEventListener("deviceorientation", (e) => {
+   //       const ntx = e.gamma * 5 - oldGamma;
+   //       tx = moveDirect(ntx);
+   //       oldGamma = e.gamma;
+   //    });
+   // }
 
    const pg = {
       x: 0,
