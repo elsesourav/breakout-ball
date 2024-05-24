@@ -5,6 +5,8 @@ const showTime = $("#showTime");
 const showTimeUsed = $("#showTimeUsed");
 // const createNewLevel = $("#createNewLevel");
 
+replaceState();
+
 function lvlEditor() {
    lvlMaker.draw(ctx, CVS.width, CVS.height);
 }
@@ -20,6 +22,8 @@ function playLevel(_level) {
    showPreview.classList.remove("active");
    showTime.classList.remove("active");
    showHealths.classList = [];
+   pushStatus("inGame");
+   pushStatus("inGame");
    
    setTimeout(() => {
       showHealths.classList.add(`s${3}`); 
@@ -37,6 +41,7 @@ startButton.click(() => {
 });
 
 // createNewLevel.click(() => {
+   //   pushStatus("preview");
 // });
 
 

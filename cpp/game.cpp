@@ -37,7 +37,7 @@ void Game::init(char *level) {
    paddleHiddenCount = 0;
    paddleMaxHidden = SIZE / 8;
    startingCountDown = FPS * 3;
-   health = 3;
+   health = 1;
 
    blocks.clear();
    stars.clear();

@@ -1,9 +1,37 @@
 const previewClose = $("#previewClose");
 const showPreview = $("#showPreview");
 const modeType = $("#modeType");
+const homeButton = $("#homeButton");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
-previewClose.click(() => showPreview.classList.remove("active"));
+
+function goHome() {
+   showGameStatus.classList.remove("active");
+   showPreview.classList.remove("active");
+   CVS.classList.remove("active");
+   showTime.classList.remove("active");
+   showHealths.classList = [];
+   pushStatus("home");
+   pushStatus("home");
+}
+
+previewClose.click(goHome);
+homeButton.click(goHome);
+
+window.addEventListener("popstate", function (event) {
+   if (event.state != null && showPreview.classList.contains("active")) {
+      goHome();
+   } else if (event.state != null && event.state.name == "inGame") {
+      alert.show();
+      alert.clickBtn1(() => {
+         alert.hide();
+      });
+      alert.clickBtn2(() => {
+         alert.hide();
+         goHome();
+      });
+   }
+});
 
 const lvlOptions = $$("#levelDesigner .option");
 lvlOptions.click((_, ele, i) => {
@@ -233,11 +261,10 @@ $("#closeBtn").click(() => {});
       if (Math.abs(pg.totalMove) < pg.width / 5) {
          pg.scrollX = -pg.width * pg.index;
       } else {
-
          if (pg.totalMove < 0 && pg.index < 2) pg.index++;
          if (pg.totalMove > 0 && pg.index > 0) pg.index--;
 
-         time = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index)); 
+         time = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index));
 
          pg.scrollX = -pg.width * pg.index;
          modeOptions.removeClass("active");

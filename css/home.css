@@ -183,11 +183,11 @@ main {
             display: flex;
             justify-content: center;
             align-items: center;
+            background: transparent;
             
             p {
                position: absolute;
                font-size: calc(var(--s) * 3);
-               color: #fcff59;
                top: calc(var(--window-height) * -1.5);
                transform: translateY(-50%);
                font-family: f1b;
@@ -208,6 +208,7 @@ main {
             transition-duration: 400ms;
          }
          &.gameOver span:first-child p {
+            top: calc(var(--window-height) / -3);
             font-size: calc(var(--s) * 2);
          }
       }

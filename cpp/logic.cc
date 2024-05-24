@@ -79,7 +79,7 @@ EM_JS(void, showGameOver, (), {
    setTimeout(() => {
       animation.stop();
       showCountDowns.classList = [];
-      setupStartPreview(currentLevelIndex, "inGame");
+      setupStartPreview(currentLevelIndex, ["inGame"]);
    }, 2000);
 });
  
@@ -112,7 +112,11 @@ EMSCRIPTEN_KEEPALIVE void moveRight() {
    game.paddle.moveRight();
 }
 EMSCRIPTEN_KEEPALIVE float moveTarget(float tx) {
-   return game.paddle.moveTarget(tx);
+   if (game.gamePose) {
+      return 0;
+   } else {
+      return game.paddle.moveTarget(tx);
+   }
 }
 EMSCRIPTEN_KEEPALIVE float moveDirect(float x) {
    return game.paddle.moveDirect(x);

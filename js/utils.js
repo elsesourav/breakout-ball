@@ -206,3 +206,10 @@ function createStringLevel(level) {
    }
    return levelStr.slice(0, -1);
 }
+
+function pushStatus(name) {
+   history.pushState({name}, `${name}`, `./`);
+}
+function replaceState(name = "home") {
+   history.replaceState({name}, `${name}`, `./`);
+}

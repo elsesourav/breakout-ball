@@ -32,6 +32,16 @@ const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
 const blockImages = createBlockImages();
 
+const alert = new AlertHTML({
+   title: "Exit",
+   message: "Are you sure you want to Exit this game?",
+   btnNm1: "No",
+   btnNm2: "Yes",
+   titleHeight: 40,
+   buttonHeight: 45,
+   width: 290,
+}); 
+
 let fpsCounter = 0;
 let currentLevelIndex = 0;
 let init,
@@ -107,10 +117,10 @@ Module.onRuntimeInitialized = () => {
 
    htmlOnlineLevels.forEach(([level, cvs], i) => {
       cvs.width = CVS_W;
-      cvs.height = SIZE * (cols - 2.3); 
+      cvs.height = SIZE * (cols - 2.3);
       ctx = cvs.getContext("2d");
       init(createStringLevel(window.levels[i]));
-      drawBlockOnly();
+      draw();
 
       level.addEventListener("click", () => {
          setupStartPreview(i);
@@ -120,10 +130,10 @@ Module.onRuntimeInitialized = () => {
 
    htmlCreateLevels.forEach(([level, cvs], i) => {
       cvs.width = CVS_W;
-      cvs.height = SIZE * (cols - 2.3);  
+      cvs.height = SIZE * (cols - 2.3);
       ctx = cvs.getContext("2d");
       init(createStringLevel(window.levels[i]));
-      drawBlockOnly();
+      draw();
 
       level.addEventListener("click", () => {
          setupStartPreview(i);
@@ -131,18 +141,15 @@ Module.onRuntimeInitialized = () => {
       });
    });
 
-   playLevel(window.levels[currentLevelIndex]); 
+   // playLevel(window.levels[currentLevelIndex]);
 };
 
 () => {
    const level = createStringLevel(window.levels[1]);
    init(level);
 
-
    setInterval(() => {
       mobileErr.innerHTML = fpsCounter;
       fpsCounter = 0;
    }, 1000);
-
-   
 };
