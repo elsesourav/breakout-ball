@@ -40,10 +40,10 @@ void LevelMaker::removeBlock(short _j, short _i) {
       }
    }
 }
-void LevelMaker::hoverBlock(short j, short i) {
-   std::cout << j << " " << i << std::endl;
+void LevelMaker::hoverBlock(short j, short i, short health) {
    for (auto &block : blocks) {
       if (block.j == j && block.i == i) {
+         block.hoverHealth = health;
          block.isHover = true;
       } else {
          block.isHover = false;
@@ -55,7 +55,7 @@ void LevelMaker::draw(DrawBlockPtr drawBlock, DrawBlockAlphaPtr drawBlockAlpha, 
    clearCanvas(WIDTH, HEIGHT);
    for (auto &block : blocks) {
       if (block.isHover) {
-         drawBlockAlpha(block.x, block.y, block.w, block.h, block.health);
+         drawBlockAlpha(block.x, block.y, block.w, block.h, block.hoverHealth);
       } else if (block.onlyOutline) {
          drawBlockOutline(block.x, block.y, block.w, block.h);
       } else {

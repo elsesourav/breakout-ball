@@ -5,7 +5,7 @@ typedef void (*DrawBlockPtr)(float, float, short, short, short);
 
 class Block {
 public:
-   short i, j, x, y, w, h, health;
+   short i, j, x, y, w, h, health, hoverHealth;
    float offset;
    float x1, x2, y1, y2;
    bool isDead, onlyOutline, isHover;

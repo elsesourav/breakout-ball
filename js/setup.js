@@ -1,111 +1,136 @@
-rootStyle.setProperty("--window-width", `${WIDTH}px`);
-rootStyle.setProperty("--window-height", `${HEIGHT}px`);
-rootStyle.setProperty("--s", `${DELTA_SIZE}px`);
-rootStyle.setProperty("--rows", rows);
-rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
-rootStyle.setProperty("--pScale", pScale);
-if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
+const alert = new AlertHTML({
+   title: "Exit",
+   message: "Are you sure you want to Exit this game?",
+   btnNm1: "No",
+   btnNm2: "Yes",
+   titleHeight: 40,
+   buttonHeight: 45,
+   width: 290,
+});
 
-previewCanvas.width = CVS.width = CVS_W;
-CVS.height = CVS_H;
-previewCanvas.height = SIZE * (cols - 1);
+const loopFun = () => {
+   update();
+   draw();
+   fpsCounter++;
+};
+const makerLoopFun = () => {
+   makerDraw();
+};
+const animation = new Animation(FPS, loopFun);
+const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
 
-ctx.imageSmoothingQuality = "high";
-PREVIEW_CTX.imageSmoothingQuality = "high";
+Module.onRuntimeInitialized = () => {
+   setup = Module.cwrap("setup", null, [
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+   ]);
+   init = Module.cwrap("init", null, ["number", "number"]);
+   draw = Module.cwrap("draw", null, []);
+   update = Module.cwrap("update", null, []);
+   moveLeft = Module.cwrap("moveLeft", null, []);
+   moveRight = Module.cwrap("moveRight", null, []);
+   moveTarget = Module.cwrap("moveTarget", "number", []);
+   moveDirect = Module.cwrap("moveDirect", "number", []);
+   drawBlockOnly = Module.cwrap("drawBlockOnly", null, []);
+   drawOutline = Module.cwrap("drawOutline", null, []);
 
-function createHtmlLevels(levels, levelsMap) {
-   levelsMap.innerHTML = "";
+   makerSetup = Module.cwrap("makerSetup", null, [
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+   ]);
+   makerInit = Module.cwrap("makerInit", null, []);
+   makerDraw = Module.cwrap("makerDraw", null, []);
+   makerAddBlock = Module.cwrap("makerAddBlock", null, [
+      "number",
+      "number",
+      "number",
+   ]);
+   makerRemoveBlock = Module.cwrap("makerRemoveBlock", null, [
+      "number",
+      "number",
+   ]);
+   makerHoverBlock = Module.cwrap("makerHoverBlock", null, [
+      "number",
+      "number",
+      "number",
+   ]);
 
-   const htmlLevels = [];
+   setup(
+      CVS_W,
+      CVS_H,
+      SIZE,
+      PAD_X,
+      PAD_Y,
+      PAD_WIDTH,
+      PAD_HEIGHT,
+      BALL_RADIUS,
+      BALL_SPEED,
+      FPS
+   );
 
-   for (let i = 0; i < levels.length; i++) {
-      const mainEle = CE("div", ["level", "lock"]);
+   makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 
-      const top = CE("div", ["top"], "", mainEle);
+   const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
+   const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
+   const htmlCreateLevels = createOnlineLevels(
+      window.levels,
+      $("#createMode"),
+      true
+   );
 
-      const hashtag = CE("div", ["hashtag"], "", top);
-      CE("i", ["sbi-trophy2"], "", hashtag);
-      const p = CE("p", [], "00", hashtag);
+   htmlLocalLevels.forEach(([level], i) => {
+      level.addEventListener("click", () => {
+         setupStartPreview(i);
+         currentLevelIndex = i;
+      });
+   });
 
-      const lockComplete = CE("div", ["is-lock-or-complete"], "", top);
-      CE("i", ["sbi-lock-outline", "lock"], "", lockComplete);
-      CE("i", ["sbi-check-circle-outline", "check"], "", lockComplete);
+   // htmlOnlineLevels.forEach(([level, cvs], i) => {
+   //    cvs.width = CVS_W;
+   //    cvs.height = SIZE * (cols - 2.3);
+   //    ctx = cvs.getContext("2d");
+   //    const { aryPtr, length } = createStringLevel(window.levels[i]);
+   //    init(aryPtr, length);
+   //    draw();
 
-      const iconAndNo = CE("div", ["icon-and-no"], "", mainEle);
-      CE("i", ["sbi-fire"], "", iconAndNo);
-      const no = CE("p", ["no"], i + 1, iconAndNo);
+   //    level.addEventListener("click", () => {
+   //       setupStartPreview(i);
+   //       currentLevelIndex = i;
+   //    });
+   // });
 
-      const completeTime = CE("div", ["complete-time"], "", mainEle);
-      CE("i", ["sbi-stopwatch1"], "", completeTime);
-      const time = CE("p", ["time"], "000", completeTime);
-      CE("span", [], "s", completeTime);
+   // htmlCreateLevels.forEach(([level, cvs], i) => {
+   //    cvs.width = CVS_W;
+   //    cvs.height = SIZE * (cols - 2.3);
+   //    ctx = cvs.getContext("2d");
+   //    const { aryPtr, length } = createStringLevel(window.levels[i]);
+   //    init(aryPtr, length);
+   //    draw();
 
-      levelsMap.appendChild(mainEle);
-      htmlLevels.push([mainEle, p, no, time]);
-   }
-   htmlLevels[0][0].classList.remove("lock");
-   return htmlLevels;
-}
+   //    level.addEventListener("click", () => {
+   //       setupStartPreview(i);
+   //       currentLevelIndex = i;
+   //    });
+   // });
 
-function createOnlineLevels(levels, levelsMap, flag = false) {
-   levelsMap.innerHTML = "";
-   const htmlLevels = [];
 
-   for (let i = 0; i < levels.length; i++) {
-      const mainEle = CE("div", ["level"]);
-      const cvs = CE("canvas", ["levelCvs"]);
-      const details = CE("div", ["details"]);
-      const playCount = CE("div", ["playCount"], "", details);
-      CE("i", ["sbi-play-circle"], "", playCount);
-      const count = CE("p", ["count"], "10", playCount);
-      const id = CE("p", ["id"], "ZAS", details);
-      const _delete = flag
-         ? CE("p", ["sbi-trash-o", "delete"], "", details)
-         : "";
-
-      mainEle.appendChild(cvs);
-      mainEle.appendChild(details);
-      levelsMap.appendChild(mainEle);
-
-      htmlLevels.push([mainEle, cvs, count, id, _delete]);
-   }
-   return htmlLevels;
-}
-
-{
-   /* <div class="level">
-   <div class="top">
-      <div class="hashtag">
-         <i class="sbi-trophy2"></i>
-         <p>00</p>
-      </div>
-      <div class="is-lock-or-complete">
-         <i class="sbi-lock-outline lock"></i
-         ><i class="sbi-check-circle-outline check"></i>
-      </div>
-   </div>
-   <div class="icon-and-no">
-      <i class="sbi-fire"></i>
-      <p class="no">1</p>
-   </div>
-   <div class="complete-time">
-      <i class="sbi-stopwatch1"></i>
-      <p class="time">000</p>
-      <span>s</span>
-   </div>
-</div> */
-}
-
-{
-   /* <div class="level">
-   <canvas class="levelCvs"></canvas>
-   <div class="details">
-      <div class="playCount">
-         <i class="sbi-play-circle"></i>
-         <p class="count">10</p>
-      </div>
-      <p class="id">ZAS</p>
-      <p class="delete"></p>
-   </div>
-</div> */
-}
+   // levelDesigner.classList.add("active");
+   // CVS.classList.add("active");
+   // isLevelMakerModeOn = true;
+   // makerInit();
+   // lvlMaker.setup();
+   // ctx = CTX;
+   // animation.start(makerLoopFun);
+   // playLevel(window.levels[currentLevelIndex]);
+};

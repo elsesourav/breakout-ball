@@ -1,7 +1,6 @@
 #include "./game.h"
 #include "./ball.h"
 #include "./block.h"
-#include "./createBlocks.h"
 #include "./paddle.h"
 #include "./random.h"
 #include "./star.h"
@@ -29,7 +28,7 @@ void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _p
    numStars = (WIDTH / 80) * (HEIGHT / 80);
 }
 
-void Game::init(char *level) {
+void Game::init(int *array, int length) {
    paddleHidden = false;
    gamePose = true;
    gameOver = false;
@@ -49,7 +48,10 @@ void Game::init(char *level) {
    ball.init(ballX, ballY, ballR, ballSpeed);
    paddle.init(padX, padY, padW, padH, ballSpeed, WIDTH);
    lava.init(0, padY + SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
-   blocks = parser.convertStringToBlocks(level, blockWidth, blockHeight);
+   
+   for (short i = 0; i < length; i += 3) {
+      blocks.push_back(Block(array[i], array[i + 1], blockWidth, blockHeight, array[i + 2], false));
+   }
 
    wallLength = 0;
    for (auto &block : blocks) {

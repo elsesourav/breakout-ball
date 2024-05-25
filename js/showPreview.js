@@ -1,9 +1,11 @@
 function setupStartPreview(i, optionalClass = [], lvlTime = "∞") {
    ctx = PREVIEW_CTX;
    ctx.clearRect(0, 0, CVS.width, CVS.height);
-   const level = createStringLevel(window.levels[i]);
-   init(level);
+   const { aryPtr, length } = createStringLevel(window.levels[i]);
+   init(aryPtr, length);
    draw();
+
+   isInOfTheGame = false;
 
    showPreview.classList = [];
    showPreview.classList.add("active", ...optionalClass);

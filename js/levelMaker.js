@@ -8,7 +8,7 @@ class LevelMaker {
 
       this.blocks = [];
       this.state = [];
-      this.map = [];
+      this.defaults = [];
       this.currentState = -1;
       this.selectedHealth = 1;
       this.eraserSelected = false;
@@ -20,16 +20,17 @@ class LevelMaker {
    setup() {
       this.blocks = [];
       this.state = [];
-      this.map = [];
       this.hoverLocation = [null, null];
       this.selectedHealth = 1;
 
-      const {rows, cols, selectedHealth } = this;
+      const { rows, cols } = this;
 
       for (let i = 0; i < cols; i++) {
-         this.map[i] = [];
+         this.blocks[i] = [];
+         this.defaults[i] = [];
          for (let j = 0; j < rows; j++) {
-            this.map[i][j] = {x: 0, y: 0, health: selectedHealth};
+            this.blocks[i][j] = { x: j, y: i, health: 0 };
+            this.defaults[i][j] = { x: j, y: i, health: 0 };
          }
       }
    }
@@ -40,15 +41,20 @@ class LevelMaker {
       const NX = Math.floor(((offX - left) * ratio) / this.w);
       const NY = Math.floor(((offY - top) * ratio) / this.h);
 
+      if (NX > this.rows - 1 || NY > this.cols - 1) {
+         makerHoverBlock(-1, -1, 0);
+         return;
+      }
+
       if (select == "add") {
          makerAddBlock(NX, NY, this.selectedHealth);
-         block[NY][NX].health = this.selectedHealth;
+         this.blocks[NY][NX].health = this.selectedHealth;
          this.#updateState();
       } else if (select == "hover") {
          makerHoverBlock(NX, NY, this.selectedHealth);
       } else if (select == "remove") {
          makerRemoveBlock(NX, NY);
-         lock[NY][NX].health = 0;
+         this.blocks[NY][NX].health = 0;
          this.#updateState();
       }
    }
@@ -89,26 +95,25 @@ class LevelMaker {
    #updateState() {
       this.currentState++;
       this.state = this.state.slice(0, this.currentState);
-      this.state.push([...this.blocks]);
+      this.state.push(structuredClone(this.blocks));
    }
 
-   #updateMap() {
-      this.map.map((cl) => cl.map((blk) => blk.setOnlyOutline(true)));
-
-      this.blocks.forEach((block) => {
-         const { x, y } = block;
-         this.map[y][x].setOnlyOutline(false);
-         this.map[y][x].setHealth(block.health - 1);
-      });
+   #resetCppBlocks() {
+      makerInit();
+      this.blocks.forEach((cols) =>
+         cols.forEach(({ x, y, health }) => {
+            makerAddBlock(x, y, health);
+         })
+      );
    }
 
    undo() {
       if (this.currentState > 0) {
          this.blocks = this.state[--this.currentState];
       } else {
-         this.blocks = [];
+         this.blocks = structuredClone(this.defaults);
       }
-      this.#updateMap();
+      this.#resetCppBlocks();
    }
 
    redo() {
@@ -117,7 +122,7 @@ class LevelMaker {
       } else {
          this.blocks = this.state[this.currentState];
       }
-      this.#updateMap();
+      this.#resetCppBlocks();
    }
 
    getLevel() {

@@ -17,7 +17,7 @@ function lvlEditor() {
 
 
 // Start Game
-function playLevel(_level) {
+function playLevel(level) {
    ctx = CTX;
    CVS.classList.add("active");
    showGameStatus.classList.add("active");
@@ -28,14 +28,15 @@ function playLevel(_level) {
    pushStatus("inGame");
    lvlTime.innerText = "∞";
    showTimeUsed.innerText = "0";
+   isInOfTheGame = true;
    
    setTimeout(() => {
       showHealths.classList.add(`s${3}`); 
       showTime.classList.add("active");
    }, 600);
    
-   const level = createStringLevel(_level);
-   init(level); 
+   const { aryPtr, length } = createStringLevel(level);
+   init(aryPtr, length);
     
    animation.start(loopFun);
 }
@@ -48,8 +49,6 @@ startButton.click(() => {
    //   pushStatus("preview");
 // });
 
-levelDesigner.classList.add("active");
-CVS.classList.add("active");
 
 // showPreview.classList.add("active");
 

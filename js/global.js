@@ -12,7 +12,7 @@ const CVS_W = SIZE * 9;
 const CVS_H = SIZE * 16;
 const rows = 9;
 const cols = 10;
-const FPS = 1;
+const FPS = 60;
 const FRAME_RATE = 1000 / FPS;
 const pScale = 0.8;
 const PAD_X = CVS_W / 2;
@@ -27,21 +27,20 @@ const CVS = $("#mainCanvas");
 const previewCanvas = $("#preview");
 const CTX = CVS.getContext("2d");
 const PREVIEW_CTX = previewCanvas.getContext("2d");
-let ctx = CTX;
 const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
 const blockImages = createBlockImages();
+let ctx = CTX;
 
-const alert = new AlertHTML({
-   title: "Exit",
-   message: "Are you sure you want to Exit this game?",
-   btnNm1: "No",
-   btnNm2: "Yes",
-   titleHeight: 40,
-   buttonHeight: 45,
-   width: 290,
-});
+previewCanvas.width = CVS.width = CVS_W;
+CVS.height = CVS_H;
+previewCanvas.height = SIZE * (cols - 1);
 
+ctx.imageSmoothingQuality = "high";
+PREVIEW_CTX.imageSmoothingQuality = "high";
+
+let isLevelMakerModeOn = false;
+let isInOfTheGame = true;
 let fpsCounter = 0;
 let currentLevelIndex = 0;
 let init,
@@ -61,133 +60,10 @@ let init,
    makerRemoveBlock,
    makerHoverBlock;
 
-const loopFun = () => {
-   update();
-   draw();
-   fpsCounter++;
-};
-const makerLoopFun = () => {
-   makerDraw();
-};
-const animation = new Animation(FPS, loopFun);
-const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
-
-Module.onRuntimeInitialized = () => {
-   setup = Module.cwrap("setup", null, [
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-   ]);
-   init = Module.cwrap("init", null, ["string"]);
-   draw = Module.cwrap("draw", null, []);
-   update = Module.cwrap("update", null, []);
-   moveLeft = Module.cwrap("moveLeft", null, []);
-   moveRight = Module.cwrap("moveRight", null, []);
-   moveTarget = Module.cwrap("moveTarget", "number", []);
-   moveDirect = Module.cwrap("moveDirect", "number", []);
-   drawBlockOnly = Module.cwrap("drawBlockOnly", null, []);
-   drawOutline = Module.cwrap("drawOutline", null, []);
-
-   makerSetup = Module.cwrap("makerSetup", null, [
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-   ]);
-   makerInit = Module.cwrap("makerInit", null, []);
-   makerDraw = Module.cwrap("makerDraw", null, []);
-   makerAddBlock = Module.cwrap("makerAddBlock", null, [
-      "number",
-      "number",
-      "number",
-   ]);
-   makerRemoveBlock = Module.cwrap("makerRemoveBlock", null, [
-      "number",
-      "number",
-   ]);
-   makerHoverBlock = Module.cwrap("makerHoverBlock", null, [
-      "number",
-      "number",
-      "number",
-   ]);
-
-   setup(
-      CVS_W,
-      CVS_H,
-      SIZE,
-      PAD_X,
-      PAD_Y,
-      PAD_WIDTH,
-      PAD_HEIGHT,
-      BALL_RADIUS,
-      BALL_SPEED,
-      FPS
-   );
-
-   makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
-
-   const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
-   const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
-   const htmlCreateLevels = createOnlineLevels(
-      window.levels,
-      $("#createMode"),
-      true
-   );
-
-   htmlLocalLevels.forEach(([level], i) => {
-      level.addEventListener("click", () => {
-         setupStartPreview(i);
-         currentLevelIndex = i;
-      });
-   });
-
-   htmlOnlineLevels.forEach(([level, cvs], i) => {
-      cvs.width = CVS_W;
-      cvs.height = SIZE * (cols - 2.3);
-      ctx = cvs.getContext("2d");
-      init(createStringLevel(window.levels[i]));
-      draw();
-
-      level.addEventListener("click", () => {
-         setupStartPreview(i);
-         currentLevelIndex = i;
-      });
-   });
-
-   htmlCreateLevels.forEach(([level, cvs], i) => {
-      cvs.width = CVS_W;
-      cvs.height = SIZE * (cols - 2.3);
-      ctx = cvs.getContext("2d");
-      init(createStringLevel(window.levels[i]));
-      draw();
-
-      level.addEventListener("click", () => {
-         setupStartPreview(i);
-         currentLevelIndex = i;
-      });
-   });
-
-   makerInit(); 
-   lvlMaker.setup();
-   ctx = CTX;
-   animation.start(makerLoopFun);
-   // playLevel(window.levels[currentLevelIndex]);
-};
-
-() => {
-   const level = createStringLevel(window.levels[1]);
-   init(level);
-
-   setInterval(() => {
-      mobileErr.innerHTML = fpsCounter;
-      fpsCounter = 0;
-   }, 1000);
-};
+rootStyle.setProperty("--window-width", `${WIDTH}px`);
+rootStyle.setProperty("--window-height", `${HEIGHT}px`);
+rootStyle.setProperty("--s", `${DELTA_SIZE}px`);
+rootStyle.setProperty("--rows", rows);
+rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
+rootStyle.setProperty("--pScale", pScale);
+if (!isMobile) rootStyle.setProperty("--cursor", "pointer");

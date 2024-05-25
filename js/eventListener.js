@@ -13,6 +13,7 @@ function goHome() {
    showHealths.classList = [];
    pushStatus("home");
    pushStatus("home");
+   isInOfTheGame = false;
 }
 
 previewClose.click(goHome);
@@ -116,35 +117,35 @@ $("#closeBtn").click(() => {});
       tx = moveTarget(tx);
    };
 
-   CVS.addEventListener(
-      "click",
-      (e) => {
-         if (!isPointerLock) {
-            isPointerLock = true;
-            if (CVS.requestPointerLock) {
-               CVS.requestPointerLock();
-            } else if (CVS.webkitRequestPointerLock) {
-               CVS.webkitRequestPointerLock();
-            } else if (CVS.mozRequestPointerLock) {
-               CVS.mozRequestPointerLock();
-            } else {
-               console.warn("Pointer locking not supported");
-               isPointerLock = false;
-            }
+   CVS.click(() => {
+      if (isLevelMakerModeOn || !isInOfTheGame) return;
+
+      if (!isPointerLock) {
+         isPointerLock = true;
+         if (CVS.requestPointerLock) {
+            CVS.requestPointerLock();
+         } else if (CVS.webkitRequestPointerLock) {
+            CVS.webkitRequestPointerLock();
+         } else if (CVS.mozRequestPointerLock) {
+            CVS.mozRequestPointerLock();
          } else {
-            document.exitPointerLock =
-               document.exitPointerLock || document.mozExitPointerLock;
-            document.exitPointerLock();
+            console.warn("Pointer locking not supported");
             isPointerLock = false;
          }
-      },
-      false
-   );
+      } else {
+         document.exitPointerLock =
+            document.exitPointerLock || document.mozExitPointerLock;
+         document.exitPointerLock();
+         isPointerLock = false;
+      }
+   }, false);
 
    document.addEventListener("pointerlockchange", pointerLockChange, false);
    document.addEventListener("mozpointerlockchange", pointerLockChange, false);
 
    function pointerLockChange() {
+      if (isLevelMakerModeOn || !isInOfTheGame) return;
+
       if (
          document.pointerLockElement === CVS ||
          document.mozPointerLockElement === CVS

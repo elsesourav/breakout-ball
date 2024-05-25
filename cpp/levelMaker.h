@@ -2,7 +2,6 @@
 #define LEVEL_MAKER_H
 
 #include "./block.h"
-#include "./createBlocks.h"
 #include <iostream>
 #include <vector>
 
@@ -21,7 +20,7 @@ public:
    void init();
    void addBlock(short j, short i, short health);
    void removeBlock(short j, short i);
-   void hoverBlock(short j, short i);
+   void hoverBlock(short j, short i, short health);
    void draw(DrawBlockPtr drawBlock, DrawBlockAlphaPtr drawBlockAlpha, DrawBlockOutlinePtr drawBlockOutline, ClearCvsPtr clearCanvas);
 };
 

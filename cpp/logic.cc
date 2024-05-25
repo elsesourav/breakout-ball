@@ -116,8 +116,8 @@ EMSCRIPTEN_KEEPALIVE void setup(short width, short height, short size, float pad
    FPS = _FPS;
    game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS);
 }
-EMSCRIPTEN_KEEPALIVE void init(char *level) {
-   game.init(level);
+EMSCRIPTEN_KEEPALIVE void init(int *array, int length) {
+   game.init(array, length);
 }
 EMSCRIPTEN_KEEPALIVE void update() {
    game.update(showHealth, showTimes, showCountDown, showGameOver, showGameComplete);
@@ -163,8 +163,15 @@ EMSCRIPTEN_KEEPALIVE void makerAddBlock(short j, short i, short health) {
 EMSCRIPTEN_KEEPALIVE void makerRemoveBlock(short j, short i) {
    maker.removeBlock(j, i);
 }
-EMSCRIPTEN_KEEPALIVE void makerHoverBlock(short j, short i) {
-   maker.hoverBlock(j, i);
+EMSCRIPTEN_KEEPALIVE void makerHoverBlock(short j, short i, short health) {
+   maker.hoverBlock(j, i, health);
+}
+EMSCRIPTEN_KEEPALIVE void processArray(int *array, int len) {
+
+   for (int i = 0; i < len; ++i) {
+      std::cout << "array[" << i << "] = " << array[i] << std::endl;
+   }
+    
 }
 
 

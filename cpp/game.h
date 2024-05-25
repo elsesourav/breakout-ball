@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "./createBlocks.h"
 #include "./ball.h"
 #include "./lava.h"
 #include "./paddle.h"
@@ -30,7 +29,6 @@ public:
    short WIDTH, HEIGHT, SIZE, FPS, health, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR, totalFrameCount, startingCountDown, wallLength;
    float paddleMaxHidden, paddleHiddenCount, numStars, padX, padY, ballX, ballY, ballSpeed;
    bool paddleHidden, gamePose, gameOver, gameComplete;
-   Blocks parser;
    std::vector<Block> blocks;
    std::vector<Particle> particles;
    std::vector<Star> stars;
@@ -41,7 +39,7 @@ public:
 
    Game();
    void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS);
-   void init(char *level);
+   void init(int *array, int length);
 
    void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs);
 
