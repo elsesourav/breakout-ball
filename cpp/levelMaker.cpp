@@ -12,30 +12,24 @@ void LevelMaker::setup(short _rows, short _cols, short _WIDTH, short _HEIGHT, sh
    blockHeight = _blockHeight;
 }
 
-void LevelMaker::init() {
+void LevelMaker::init(int *array, int length) {
    blocks.clear();
-   for (short i = 0; i < cols; i++) {
-      for (short j = 0; j < rows; j++) {
-         blocks.push_back(Block(j, i, blockWidth, blockHeight, 0, true));
-      }
+   for (short i = 0; i < length; i += 3) {
+      if (array[i + 2] == 0) {
+         blocks.push_back(Block(array[i], array[i + 1], blockWidth, blockHeight, 0));
+      } else
+         blocks.push_back(Block(array[i], array[i + 1], blockWidth, blockHeight, array[i + 2]));
    }
 }
 void LevelMaker::addBlock(short j, short i, short health) {
-   for (auto &block : blocks) {
-      if (block.j == j && block.i == i) {
-         block.health = health;
-         block.isHover = false;
-         block.onlyOutline = false;
-         break;
-      }
-   }
+   blocks[i * rows + j].health = health;
+   blocks[i * rows + j].isHover = false;
 }
 void LevelMaker::removeBlock(short _j, short _i) {
    for (auto &block : blocks) {
       if (block.j == _j && block.i == _i) {
          block.health = 0;
          block.isHover = false;
-         block.onlyOutline = true;
          break;
       }
    }
@@ -56,10 +50,10 @@ void LevelMaker::draw(DrawBlockPtr drawBlock, DrawBlockAlphaPtr drawBlockAlpha, 
    for (auto &block : blocks) {
       if (block.isHover) {
          drawBlockAlpha(block.x, block.y, block.w, block.h, block.hoverHealth);
-      } else if (block.onlyOutline) {
-         drawBlockOutline(block.x, block.y, block.w, block.h);
-      } else {
+      } else if (block.health > 0) {
          block.draw(drawBlock);
+      } else {
+         drawBlockOutline(block.x, block.y, block.w, block.h);
       }
    }
 }

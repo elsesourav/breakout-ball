@@ -17,7 +17,7 @@ public:
 
    LevelMaker();
    void setup(short rows, short cols, short WIDTH, short HEIGHT, short SIZE, short blockWidth, short blockHeight);
-   void init();
+   void init(int *array, int length);
    void addBlock(short j, short i, short health);
    void removeBlock(short j, short i);
    void hoverBlock(short j, short i, short health);

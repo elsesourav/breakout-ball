@@ -49,7 +49,7 @@ Module.onRuntimeInitialized = () => {
       "number",
       "number",
    ]);
-   makerInit = Module.cwrap("makerInit", null, []);
+   makerInit = Module.cwrap("makerInit", null, ["number", "number"]);
    makerDraw = Module.cwrap("makerDraw", null, []);
    makerAddBlock = Module.cwrap("makerAddBlock", null, [
       "number",
@@ -100,7 +100,7 @@ Module.onRuntimeInitialized = () => {
    //    cvs.width = CVS_W;
    //    cvs.height = SIZE * (cols - 2.3);
    //    ctx = cvs.getContext("2d");
-   //    const { aryPtr, length } = createStringLevel(window.levels[i]);
+   //    const { aryPtr, length } = create2dAryPointer(window.levels[i]);
    //    init(aryPtr, length);
    //    draw();
 
@@ -114,7 +114,7 @@ Module.onRuntimeInitialized = () => {
    //    cvs.width = CVS_W;
    //    cvs.height = SIZE * (cols - 2.3);
    //    ctx = cvs.getContext("2d");
-   //    const { aryPtr, length } = createStringLevel(window.levels[i]);
+   //    const { aryPtr, length } = create2dAryPointer(window.levels[i]);
    //    init(aryPtr, length);
    //    draw();
 
@@ -125,12 +125,12 @@ Module.onRuntimeInitialized = () => {
    // });
 
 
-   // levelDesigner.classList.add("active");
-   // CVS.classList.add("active");
-   // isLevelMakerModeOn = true;
-   // makerInit();
-   // lvlMaker.setup();
-   // ctx = CTX;
-   // animation.start(makerLoopFun);
+   levelDesigner.classList.add("active");
+   CVS.classList.add("active");
+   isLevelMakerModeOn = true;
+   makerInit();
+   lvlMaker.init();
+   ctx = CTX;
+   animation.start(makerLoopFun);
    // playLevel(window.levels[currentLevelIndex]);
 };

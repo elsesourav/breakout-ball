@@ -35,7 +35,7 @@ function playLevel(level) {
       showTime.classList.add("active");
    }, 600);
    
-   const { aryPtr, length } = createStringLevel(level);
+   const { aryPtr, length } = create2dAryPointer(level);
    init(aryPtr, length);
     
    animation.start(loopFun);

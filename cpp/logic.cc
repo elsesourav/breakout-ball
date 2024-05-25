@@ -38,18 +38,17 @@ EM_JS(void, drawGlow, (float x, float y, float s, float alpha, short colorIndex)
    ctx.globalAlpha = 1;
 });
 EM_JS(void, drawBlock, (float x, float y, short w, short h, short health), {
-   if (health > 0)
-      ctx.drawImage(blockImages[health - 1].image, x, y, w, h);
+   ctx.drawImage(blockImages[health - 1].image, x, y, w, h);
 });
 EM_JS(void, drawBlockAlpha, (float x, float y, short w, short h, short health), {
-   ctx.globalAlpha = 0.5;
+   ctx.globalAlpha = 0.3;
    ctx.drawImage(blockImages[health - 1].image, x, y, w, h);
    ctx.globalAlpha = 1;
 });
 EM_JS(void, drawBlockOutline, (float x, float y, short w, short h), {
-   ctx.lineWidth = 3;
+   ctx.lineWidth = 1;
    ctx.strokeStyle = "#fff";
-   let off = 5;
+   let off = 4;
    ctx.stroke(create2dRoundedRectPath(x + off, y + off, w - off * 2, h - off * 2, 15));
 });
 EM_JS(void, drawLava, (float x, float y, float w, float h), {
@@ -151,8 +150,8 @@ EMSCRIPTEN_KEEPALIVE void drawOutline(float x) {
 EMSCRIPTEN_KEEPALIVE void makerSetup(short rows, short cols, short width, short height, short size) {
    maker.setup(rows, cols, width, height, size, size, size / 4 * 3);
 }
-EMSCRIPTEN_KEEPALIVE void makerInit(short width, short height, short size) {
-   maker.init();
+EMSCRIPTEN_KEEPALIVE void makerInit(int *array, int length) {
+   maker.init(array, length);
 }
 EMSCRIPTEN_KEEPALIVE void makerDraw() {
    maker.draw(drawBlock, drawBlockAlpha, drawBlockOutline, clearCanvas);

@@ -50,7 +50,7 @@ void Game::init(int *array, int length) {
    lava.init(0, padY + SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
    
    for (short i = 0; i < length; i += 3) {
-      blocks.push_back(Block(array[i], array[i + 1], blockWidth, blockHeight, array[i + 2], false));
+      blocks.push_back(Block(array[i], array[i + 1], blockWidth, blockHeight, array[i + 2]));
    }
 
    wallLength = 0;
@@ -89,7 +89,7 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    paddle.draw(drawPaddle, drawGlow);
 
    for (auto &block : blocks) {
-      block.draw(drawBlock);
+      if(block.health > 0) block.draw(drawBlock);
    }
 
    lava.draw(drawLava, drawGlow);

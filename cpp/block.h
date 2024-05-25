@@ -8,9 +8,9 @@ public:
    short i, j, x, y, w, h, health, hoverHealth;
    float offset;
    float x1, x2, y1, y2;
-   bool isDead, onlyOutline, isHover;
+   bool isDead, isHover;
 
-   Block(short x, short y, short w, short h, short health, bool onlyOutline);
+   Block(short x, short y, short w, short h, short health);
    void draw(DrawBlockPtr drawBlock);
    short damage();
 

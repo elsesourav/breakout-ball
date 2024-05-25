@@ -6,33 +6,115 @@ class LevelMaker {
       this.h = height;
       this.cvs = canvas;
 
-      this.blocks = [];
-      this.state = [];
-      this.defaults = [];
-      this.currentState = -1;
       this.selectedHealth = 1;
       this.eraserSelected = false;
-      this.hoverLocation = [null, null];
       this.#eventHandler();
-      this.setup();
    }
 
-   setup() {
+   init() {
       this.blocks = [];
-      this.state = [];
-      this.hoverLocation = [null, null];
+      this.states = [];
       this.selectedHealth = 1;
+      this.currentState = 0;
+      this.eraserSelected = false;
 
-      const { rows, cols } = this;
+      this.undoStack = [];
+      this.redoStack = [];
 
-      for (let i = 0; i < cols; i++) {
+      for (let i = 0; i < this.cols; i++) {
          this.blocks[i] = [];
-         this.defaults[i] = [];
-         for (let j = 0; j < rows; j++) {
+         for (let j = 0; j < this.rows; j++) {
             this.blocks[i][j] = { x: j, y: i, health: 0 };
-            this.defaults[i][j] = { x: j, y: i, health: 0 };
          }
       }
+      this.states.push(copyArray(this.blocks));
+      this.#resetCppBlocks();
+   }
+
+   #eventHandler() {
+      this.cvs.addEventListener("click", ({ clientX, clientY }) => {
+         if (this.eraserSelected) {
+            this.#setupBlock(clientX, clientY, "remove");
+         } else {
+            this.#setupBlock(clientX, clientY, "add");
+         }
+      });
+      this.cvs.addEventListener("mousemove", ({ clientX, clientY }) => {
+         this.#setupBlock(clientX, clientY, "hover");
+      });
+      this.cvs.addEventListener("touchstart", ({ touches }) => {
+         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
+      });
+      this.cvs.addEventListener("touchmove", ({ touches }) => {
+         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
+      });
+
+      const lvlOptions = $$("#levelDesigner .option");
+
+
+      lvlOptions.click((_, ele, i) => {
+         lvlOptions.removeClass("active");
+         ele.classList.add("active");
+         if (i <= 4) lvlMaker.selectHealth(i + 1);
+         else if (i === 5) lvlMaker.selectWall(i + 1);
+         else if (i === 6) lvlMaker.selectEraser(i + 1);
+      });
+
+      let spaceIsDown = false;
+
+      addEventListener("keydown", ({ keyCode }) => {
+         if (keyCode === 32) spaceIsDown = true;
+
+         if (spaceIsDown) {
+            if (keyCode >= 49 && keyCode <= 53) {
+               // get value 1 to 5 (e.g: 49 - 48 = 1, 50 - 48 = 2, ...)
+               const i = keyCode - 48;
+               lvlOptions.removeClass("active");
+               lvlOptions[i - 1].classList.add("active");
+               lvlMaker.selectHealth(i);
+            } else if (keyCode === 87) {
+               // wall
+               lvlOptions.removeClass("active");
+               lvlOptions[5].classList.add("active");
+               lvlMaker.selectWall();
+            } else if (keyCode === 69) {
+               // eraser
+               lvlOptions.removeClass("active");
+               lvlOptions[6].classList.add("active");
+               lvlMaker.selectEraser();
+            } else if (keyCode === 90) {
+               // undo
+               lvlMaker.undo();
+            } else if (keyCode === 89) {
+               // redo
+               lvlMaker.redo();
+            } else if (keyCode === 83) {
+               // save
+            } else if (keyCode === 67) {
+               // close
+            }
+         }
+      });
+
+      addEventListener("keyup", ({ keyCode }) => {
+         if (keyCode === 32) spaceIsDown = false;
+      });
+
+      addEventListener("keydown", ({ keyCode }) => {
+         if (keyCode === 37) moveLeft();
+         else if (keyCode === 39) moveRight();
+      });
+
+      $("#undoBtn").click(() => {
+         lvlMaker.undo();
+      });
+
+      $("#redoBtn").click(() => {
+         lvlMaker.redo();
+      });
+
+      $("#saveBtn").click(() => {});
+      $("#closeBtn").click(() => {});
    }
 
    #setupBlock(offX, offY, select = "hover") {
@@ -47,35 +129,50 @@ class LevelMaker {
       }
 
       if (select == "add") {
-         makerAddBlock(NX, NY, this.selectedHealth);
-         this.blocks[NY][NX].health = this.selectedHealth;
-         this.#updateState();
+         this.addBlock(NX, NY, this.selectedHealth);
       } else if (select == "hover") {
          makerHoverBlock(NX, NY, this.selectedHealth);
       } else if (select == "remove") {
-         makerRemoveBlock(NX, NY);
-         this.blocks[NY][NX].health = 0;
-         this.#updateState();
+         this.removeBlock(NX, NY);
       }
    }
 
-   #eventHandler() {
-      this.cvs.click(({ clientX, clientY }) => {
-         if (this.eraserSelected) {
-            this.#setupBlock(clientX, clientY, "remove");
-         } else {
-            this.#setupBlock(clientX, clientY, "add");
-         }
-      });
-      this.cvs.on("mousemove", ({ clientX, clientY }) => {
-         this.#setupBlock(clientX, clientY, "hover");
-      });
-      this.cvs.on("touchstart", ({ touches }) => {
-         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
-      });
-      this.cvs.on("touchmove", ({ touches }) => {
-         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
-      });
+   addBlock(NX, NY, health) {
+      if (this.blocks[NY][NX].health === health) return;
+
+      this.states.splice(this.currentState + 1, this.states.length);
+      this.currentState++;
+      this.blocks[NY][NX].health = health;
+      this.states.push(copyArray(this.blocks));
+      makerAddBlock(NX, NY, health);
+   }
+
+   removeBlock(NX, NY) {
+      this.states.splice(this.currentState + 1, this.states.length);
+      this.currentState++;
+      this.blocks[NY][NX].health = 0;
+      console.log(this.blocks);
+      this.states.push(copyArray(this.blocks));
+      makerRemoveBlock(NX, NY);
+   }
+
+   #resetCppBlocks() {
+      const { aryPtr, length } = create2dAryPointer([].concat(...this.blocks));
+      makerInit(aryPtr, length);
+   }
+
+   redo() {
+      if (this.currentState < this.states.length - 1) {
+         this.blocks = copyArray(this.states[++this.currentState]);
+         this.#resetCppBlocks();
+      }
+   }
+
+   undo() {
+      if (this.currentState > 0) {
+         this.blocks = copyArray(this.states[--this.currentState]);
+         this.#resetCppBlocks();
+      }
    }
 
    selectHealth(health) {
@@ -92,42 +189,5 @@ class LevelMaker {
       this.eraserSelected = true;
    }
 
-   #updateState() {
-      this.currentState++;
-      this.state = this.state.slice(0, this.currentState);
-      this.state.push(structuredClone(this.blocks));
-   }
-
-   #resetCppBlocks() {
-      makerInit();
-      this.blocks.forEach((cols) =>
-         cols.forEach(({ x, y, health }) => {
-            makerAddBlock(x, y, health);
-         })
-      );
-   }
-
-   undo() {
-      if (this.currentState > 0) {
-         this.blocks = this.state[--this.currentState];
-      } else {
-         this.blocks = structuredClone(this.defaults);
-      }
-      this.#resetCppBlocks();
-   }
-
-   redo() {
-      if (this.currentState < this.state.length - 1) {
-         this.blocks = this.state[this.currentState++];
-      } else {
-         this.blocks = this.state[this.currentState];
-      }
-      this.#resetCppBlocks();
-   }
-
-   getLevel() {
-      const { x, y, health } = this.blocks;
-      alert(`"${JSON.stringify({ x, y, health })}"`);
-      return { x, y, health };
-   }
+   getLevel() {}
 }

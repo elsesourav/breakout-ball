@@ -198,7 +198,7 @@ function create2dRoundedRectPath(x, y, w, h, r) {
    return path;
 }
 
-function createStringLevel(level) {
+function create2dAryPointer(level) {
    let ary = [];
    for (let i = 0; i < level.length; i++)
       for (const key in level[i]) ary.push(level[i][key]);
@@ -208,6 +208,10 @@ function createStringLevel(level) {
 
    Module.HEAP32.set(ary, aryPtr / 4);
    return { aryPtr, length: ary.length };
+}
+
+function copyArray(ary) {
+   return JSON.parse(JSON.stringify(ary));
 }
 
 function pushStatus(name) {
