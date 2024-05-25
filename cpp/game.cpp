@@ -218,7 +218,7 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
       startingCountDown--;
       if (startingCountDown == 0)
          gamePose = false;
-   } else if (!gameOver) {
+   } else if (!gameOver && !gameComplete) {
       totalFrameCount++;
       if (totalFrameCount % FPS == 0){
          showTime((short)totalFrameCount / FPS);

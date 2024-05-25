@@ -3,7 +3,6 @@
 
 #include "./glow.h"
 #include <iostream>
-#include <string>
 #include <vector>
 
 typedef void (*DrawLavaPtr)(float, float, float, float);

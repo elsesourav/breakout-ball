@@ -1,12 +1,11 @@
 #include "./game.h"
-#include <array>
+#include "./levelMaker.h"
 #include <emscripten/emscripten.h>
 #include <iostream>
-#include <string>
-#include <vector>
 
 short ROWS, COLS, SIZE, BLOCK_WIDTH, BLOCK_HEIGHT, WIDTH, HEIGHT, FPS;
 Game game;
+LevelMaker maker;
 
 EM_JS(void, clearCanvas, (short w, short h), {
    ctx.globalAlpha = 0.2;
@@ -41,6 +40,17 @@ EM_JS(void, drawGlow, (float x, float y, float s, float alpha, short colorIndex)
 EM_JS(void, drawBlock, (float x, float y, short w, short h, short health), {
    if (health > 0)
       ctx.drawImage(blockImages[health - 1].image, x, y, w, h);
+});
+EM_JS(void, drawBlockAlpha, (float x, float y, short w, short h, short health), {
+   ctx.globalAlpha = 0.5;
+   ctx.drawImage(blockImages[health - 1].image, x, y, w, h);
+   ctx.globalAlpha = 1;
+});
+EM_JS(void, drawBlockOutline, (float x, float y, short w, short h), {
+   ctx.lineWidth = 3;
+   ctx.strokeStyle = "#fff";
+   let off = 5;
+   ctx.stroke(create2dRoundedRectPath(x + off, y + off, w - off * 2, h - off * 2, 15));
 });
 EM_JS(void, drawLava, (float x, float y, float w, float h), {
    ctx.fillStyle = "#f00";
@@ -97,14 +107,12 @@ EM_JS(void, showGameComplete, (short time), {
  
 extern "C" {
 
-EMSCRIPTEN_KEEPALIVE void setup(short rows, short cols, short size, float padX, float padY, short padW, short padH, short ballR, float ballSpeed, short _FPS) {
-   ROWS = rows;
-   COLS = cols;
+EMSCRIPTEN_KEEPALIVE void setup(short width, short height, short size, float padX, float padY, short padW, short padH, short ballR, float ballSpeed, short _FPS) {
    SIZE = size;
    BLOCK_WIDTH = size;
    BLOCK_HEIGHT = size / 4 * 3;
-   WIDTH = size * 9;
-   HEIGHT = size * 16;
+   WIDTH = width;
+   HEIGHT = height;
    FPS = _FPS;
    game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS);
 }
@@ -139,7 +147,25 @@ EMSCRIPTEN_KEEPALIVE void drawBlockOnly() {
 EMSCRIPTEN_KEEPALIVE void drawOutline(float x) {
    drawLine(ROWS, COLS, BLOCK_WIDTH, BLOCK_HEIGHT);
 }
-EMSCRIPTEN_KEEPALIVE short getTotalTime(float x) {
-   return game.totalFrameCount / FPS;
+
+EMSCRIPTEN_KEEPALIVE void makerSetup(short rows, short cols, short width, short height, short size) {
+   maker.setup(rows, cols, width, height, size, size, size / 4 * 3);
 }
+EMSCRIPTEN_KEEPALIVE void makerInit(short width, short height, short size) {
+   maker.init();
+}
+EMSCRIPTEN_KEEPALIVE void makerDraw() {
+   maker.draw(drawBlock, drawBlockAlpha, drawBlockOutline, clearCanvas);
+}
+EMSCRIPTEN_KEEPALIVE void makerAddBlock(short j, short i, short health) {
+   maker.addBlock(j, i, health);
+}
+EMSCRIPTEN_KEEPALIVE void makerRemoveBlock(short j, short i) {
+   maker.removeBlock(j, i);
+}
+EMSCRIPTEN_KEEPALIVE void makerHoverBlock(short j, short i) {
+   maker.hoverBlock(j, i);
+}
+
+
 }

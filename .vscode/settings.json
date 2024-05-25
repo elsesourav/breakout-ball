@@ -55,5 +55,9 @@
       "algorithm": "cpp",
       "fstream": "cpp",
       "iomanip": "cpp"
-   }
+   },
+   "cSpell.ignoreWords": [
+      "-webkit-background-clip",
+      "mozpointerlockchange"
+   ]
 }

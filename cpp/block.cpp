@@ -1,7 +1,8 @@
 #include "./block.h"
 
-Block::Block(short x_, short y_, short _w, short _h, short _health) : x(x_ * _w), y(y_ * _h), w(_w), h(_h), health(_health) {
+Block::Block(short _x, short _y, short _w, short _h, short _health, bool _onlyOutline) : i(_y), j(_x), x(_x * _w), y(_y * _h), w(_w), h(_h), health(_health), onlyOutline(_onlyOutline){
    isDead = false;
+   isHover = false;
    offset = w * 0.1f;
    x1 = x;
    y1 = y;

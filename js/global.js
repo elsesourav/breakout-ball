@@ -12,7 +12,7 @@ const CVS_W = SIZE * 9;
 const CVS_H = SIZE * 16;
 const rows = 9;
 const cols = 10;
-const FPS = 60;
+const FPS = 1;
 const FRAME_RATE = 1000 / FPS;
 const pScale = 0.8;
 const PAD_X = CVS_W / 2;
@@ -54,14 +54,23 @@ let init,
    moveDirect,
    drawBlockOnly,
    drawOutline,
-   getTotalFPS; 
+   makerSetup,
+   makerInit,
+   makerDraw,
+   makerAddBlock,
+   makerRemoveBlock,
+   makerHoverBlock;
 
 const loopFun = () => {
    update();
    draw();
    fpsCounter++;
 };
+const makerLoopFun = () => {
+   makerDraw();
+};
 const animation = new Animation(FPS, loopFun);
+const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
 
 Module.onRuntimeInitialized = () => {
    setup = Module.cwrap("setup", null, [
@@ -85,11 +94,34 @@ Module.onRuntimeInitialized = () => {
    moveDirect = Module.cwrap("moveDirect", "number", []);
    drawBlockOnly = Module.cwrap("drawBlockOnly", null, []);
    drawOutline = Module.cwrap("drawOutline", null, []);
-   getTotalTime = Module.cwrap("getTotalTime", "number", []);
+
+   makerSetup = Module.cwrap("makerSetup", null, [
+      "number",
+      "number",
+      "number",
+      "number",
+      "number",
+   ]);
+   makerInit = Module.cwrap("makerInit", null, []);
+   makerDraw = Module.cwrap("makerDraw", null, []);
+   makerAddBlock = Module.cwrap("makerAddBlock", null, [
+      "number",
+      "number",
+      "number",
+   ]);
+   makerRemoveBlock = Module.cwrap("makerRemoveBlock", null, [
+      "number",
+      "number",
+   ]);
+   makerHoverBlock = Module.cwrap("makerHoverBlock", null, [
+      "number",
+      "number",
+      "number",
+   ]);
 
    setup(
-      rows,
-      cols,
+      CVS_W,
+      CVS_H,
       SIZE,
       PAD_X,
       PAD_Y,
@@ -99,6 +131,8 @@ Module.onRuntimeInitialized = () => {
       BALL_SPEED,
       FPS
    );
+
+   makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 
    const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
    const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
@@ -141,6 +175,10 @@ Module.onRuntimeInitialized = () => {
       });
    });
 
+   makerInit(); 
+   lvlMaker.setup();
+   ctx = CTX;
+   animation.start(makerLoopFun);
    // playLevel(window.levels[currentLevelIndex]);
 };
 

@@ -15,7 +15,7 @@ std::vector<Block> Blocks::convertStringToBlocks(const std::string &str, short _
          y = std::stoi(token);
       } else if (count == 2) {
          health = std::stoi(token);
-         blocks.emplace_back(x, y, _w, _h, health);
+         blocks.emplace_back(x, y, _w, _h, health, false);
          count = -1;
       }
       count++;

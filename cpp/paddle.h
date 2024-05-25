@@ -2,9 +2,8 @@
 #define PADDLE_H
 
 #include "./glow.h"
-#include <iostream>
-#include <string>
 #include <vector>
+#include <iostream>
 
 typedef void (*DrawPaddlePtr)(float, float, short, short);
 typedef void (*DrawGlowPtr)(float, float, float, float, short colorIndex);

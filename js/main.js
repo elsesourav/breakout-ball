@@ -48,7 +48,8 @@ startButton.click(() => {
    //   pushStatus("preview");
 // });
 
-
+levelDesigner.classList.add("active");
+CVS.classList.add("active");
 
 // showPreview.classList.add("active");
 

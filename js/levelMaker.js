@@ -22,94 +22,53 @@ class LevelMaker {
       this.state = [];
       this.map = [];
       this.hoverLocation = [null, null];
-      const { w, h, rows, cols, selectedHealth } = this;
+      this.selectedHealth = 1;
+
+      const {rows, cols, selectedHealth } = this;
 
       for (let i = 0; i < cols; i++) {
          this.map[i] = [];
          for (let j = 0; j < rows; j++) {
-            this.map[i][j] = new Block(j, i, w, h, selectedHealth, true);
+            this.map[i][j] = {x: 0, y: 0, health: selectedHealth};
          }
       }
    }
 
-   #createBlock(offX, offY, isPut = false) {
+   #setupBlock(offX, offY, select = "hover") {
       const { left, top, width } = this.cvs.getBoundingClientRect();
       const ratio = this.cvs.width / width;
-      const NX = Math.floor(((offX - left) * ratio) / CVS_W);
-      const NY = Math.floor(((offY - top) * ratio) / CVS_H);
-      let isFind = true;
+      const NX = Math.floor(((offX - left) * ratio) / this.w);
+      const NY = Math.floor(((offY - top) * ratio) / this.h);
 
-      this.map.some((cols) =>
-         cols.some((block) => {
-            const { x, y } = block;
-
-            if (NX === x && NY === y) {
-               isFind = false;
-               if (!this.eraserSelected && !isMobile) {
-                  this.hoverLocation = [x, y];
-
-                  if (isPut) {
-                     if (!this.blocks.some((b) => b.x === x && b.y === y)) {
-                        this.blocks.push({
-                           x,
-                           y,
-                           w: this.w,
-                           h: this.h,
-                           health: this.selectedHealth,
-                        });
-                        this.#updateState(this.blocks);
-                        block.setHealth(this.selectedHealth);
-                        block.setOnlyOutline(false);
-                     }
-                  }
-               } else if (isPut) {
-                  block.setOnlyOutline(true);
-                  this.blocks = this.blocks.filter(
-                     (b) => !(b.x === x && b.y === y)
-                  );
-                  this.#updateState(this.blocks);
-               }
-
-               return true;
-            }
-         })
-      );
-
-      if (isFind) this.hoverLocation = [null, null];
+      if (select == "add") {
+         makerAddBlock(NX, NY, this.selectedHealth);
+         block[NY][NX].health = this.selectedHealth;
+         this.#updateState();
+      } else if (select == "hover") {
+         makerHoverBlock(NX, NY, this.selectedHealth);
+      } else if (select == "remove") {
+         makerRemoveBlock(NX, NY);
+         lock[NY][NX].health = 0;
+         this.#updateState();
+      }
    }
 
    #eventHandler() {
       this.cvs.click(({ clientX, clientY }) => {
-         this.#createBlock(clientX, clientY, true);
+         if (this.eraserSelected) {
+            this.#setupBlock(clientX, clientY, "remove");
+         } else {
+            this.#setupBlock(clientX, clientY, "add");
+         }
       });
-      // this.cvs.on("mousemove", ({ clientX, clientY }) => {
-      //    this.#createBlock(clientX, clientY);
-      // });
-      // this.cvs.on("touchstart", ({ touches }) => {
-      //    this.#createBlock(touches[0].clientX, touches[0].clientY);
-      // });
-      // this.cvs.on("touchmove", ({ touches }) => {
-      //    this.#createBlock(touches[0].clientX, touches[0].clientY);
-      // });
-   }
-
-   draw(ctx, cWidth, cHeight) {
-      const [x, y] = this.hoverLocation;
-
-      ctx.clearRect(0, 0, cWidth, cHeight);
-      this.map.forEach((cols, Y) => {
-         cols.forEach((block, X) => {
-            if (!block.onlyOutline) {
-               block.draw(ctx);
-            } else if (X === x && Y === y) {
-               block.setHealth(this.selectedHealth);
-               ctx.globalAlpha = 0.5;
-               block.draw(ctx);
-               ctx.globalAlpha = 1;
-            } else {
-               block.drawOutline(ctx);
-            }
-         });
+      this.cvs.on("mousemove", ({ clientX, clientY }) => {
+         this.#setupBlock(clientX, clientY, "hover");
+      });
+      this.cvs.on("touchstart", ({ touches }) => {
+         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
+      });
+      this.cvs.on("touchmove", ({ touches }) => {
+         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
       });
    }
 
@@ -127,10 +86,10 @@ class LevelMaker {
       this.eraserSelected = true;
    }
 
-   #updateState(newState) {
+   #updateState() {
       this.currentState++;
       this.state = this.state.slice(0, this.currentState);
-      this.state.push([...newState]);
+      this.state.push([...this.blocks]);
    }
 
    #updateMap() {
