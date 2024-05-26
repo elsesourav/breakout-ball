@@ -17,16 +17,16 @@
       <link rel="stylesheet" href="./css/gameDesigner.css" />
       <link rel="stylesheet" href="./css/lavel.css" />
 
-      <!-- all scripts --> 
+      <!-- all scripts -->
       <script src="./js/logic.js"></script>
-      <script src="./js/alert.js"></script> 
+      <script src="./js/alert.js"></script>
       <script defer src="./js/levels.js"></script>
       <script defer src="./js/utils.js"></script>
       <script defer src="./js/createImage.js"></script>
       <script defer src="./js/levelMaker.js"></script>
       <script defer src="./js/global.js"></script>
       <script defer src="./js/setup.js"></script>
-      
+
       <script defer src="./js/showPreview.js"></script>
       <script defer src="./js/eventListener.js"></script>
       <script defer src="./js/main.js"></script>
@@ -61,10 +61,10 @@
                <i class="sbi-heart"></i>
                <i class="sbi-heart"></i>
                <i class="sbi-heart"></i>
-            </div> 
-            <div id="showCountDowns" class=""> 
-               <span><p>Level Win!</p></span> 
-               <span><p>Game Over!</p></span> 
+            </div>
+            <div id="showCountDowns" class="">
+               <span><p>Level Win!</p></span>
+               <span><p>Game Over!</p></span>
                <span><p>1</p></span>
                <span><p>2</p></span>
                <span><p>3</p></span>
@@ -165,11 +165,11 @@
          </div>
 
          <div id="levelDesigner" class="">
-            <div class="selection">
-               <p>BLOCKS</p>
+            <div class="selection one">
+               <p class="tag">BLOCKS</p>
                <div class="options">
                   <div class="option active">
-                     <div class="block">1</div>
+                     <div class="block"><span>1</span></div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle">
                            Hit Points(HP) <b>1</b></i
@@ -178,7 +178,7 @@
                      </div>
                   </div>
                   <div class="option">
-                     <div class="block">2</div>
+                     <div class="block"><span>2</span></div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle">
                            Hit Points(HP) <b>2</b></i
@@ -187,7 +187,7 @@
                      </div>
                   </div>
                   <div class="option">
-                     <div class="block">3</div>
+                     <div class="block"><span>3</span></div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle">
                            Hit Points(HP) <b>3</b></i
@@ -196,7 +196,7 @@
                      </div>
                   </div>
                   <div class="option">
-                     <div class="block">4</div>
+                     <div class="block"><span>4</span></div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle">
                            Hit Points(HP) <b>4</b></i
@@ -205,7 +205,7 @@
                      </div>
                   </div>
                   <div class="option">
-                     <div class="block">5</div>
+                     <div class="block"><span>5</span></div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle">
                            Hit Points(HP) <b>5</b></i
@@ -215,14 +215,14 @@
                   </div>
                </div>
             </div>
-            <div class="selection">
+            <div class="selection two">
                <div class="names">
-                  <p>WALL</p>
-                  <p>ERASER</p>
+                  <p class="tag">WALL</p>
+                  <p class="tag">ERASER</p>
                </div>
                <div class="options">
                   <div class="option">
-                     <div class="block no-effect"></div>
+                     <div class="block"><span></span></div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle">
                            Hit Points(HP) <b>∞</b></i
@@ -231,7 +231,9 @@
                      </div>
                   </div>
                   <div class="option">
-                     <i class="sbi-eraser1 block no-effect"></i>
+                     <div class="block eraser">
+                        <span><i class="sbi-gavel"></i></span>
+                     </div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle"> Remove Block & Wall</i>
                         <i class="sbi-keyboard"> SPACE+E</i>
@@ -239,21 +241,38 @@
                   </div>
                </div>
             </div>
-            <div class="buttons">
+
+            <div class="buttons one">
                <button class="btn" id="undoBtn">
-                  <i class="sbi-undo"></i>
+                  <i class="sbi-undo1"></i>
                   <div class="tool-tip-text">
                      <i class="sbi-info-with-circle"> Undo Edit</i>
                      <i class="sbi-keyboard"> SPACE+Z</i>
                   </div>
                </button>
                <button class="btn" id="redoBtn">
-                  <i class="sbi-redo"></i>
+                  <i class="sbi-undo1 rotate"></i>
                   <div class="tool-tip-text">
                      <i class="sbi-info-with-circle"> Redo Edit</i>
                      <i class="sbi-keyboard"> SPACE+Y</i>
                   </div>
                </button>
+               <button class="btn" id="makeTesting">
+                  <i class="sbi-play-circle"></i>
+                  <div class="tool-tip-text">
+                     <i class="sbi-info-with-circle"> Test Level</i>
+                     <i class="sbi-keyboard"> SPACE+T</i>
+                  </div>
+               </button>
+            </div>
+
+            <div class="buttons two">
+               <div class="switch-button">
+                  <input class="switch-button-checkbox" type="checkbox" />
+                  <label class="switch-button-label" for="">
+                     <span class="switch-button-label-span">Private</span>
+                  </label>
+               </div>
                <button class="btn" id="saveBtn">
                   <i class="sbi-save2"></i>
                   <div class="tool-tip-text">
@@ -262,7 +281,7 @@
                   </div>
                </button>
                <button class="btn" id="closeBtn">
-                  <i class="sbi-log-out"></i>
+                  <i class="sbi-sign-out"></i>
                   <div class="tool-tip-text">
                      <i class="sbi-info-with-circle"> Close Making</i>
                      <i class="sbi-keyboard"> SPACE+C</i>

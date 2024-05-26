@@ -49,7 +49,9 @@ void LevelMaker::draw(DrawBlockPtr drawBlock, DrawBlockAlphaPtr drawBlockAlpha, 
    clearCanvas(WIDTH, HEIGHT);
    for (auto &block : blocks) {
       if (block.isHover) {
-         drawBlockAlpha(block.x, block.y, block.w, block.h, block.hoverHealth);
+         if (block.hoverHealth > 0)
+            drawBlockAlpha(block.x, block.y, block.w, block.h, block.hoverHealth);
+         else drawBlockOutline(block.x, block.y, block.w, block.h);
       } else if (block.health > 0) {
          block.draw(drawBlock);
       } else {

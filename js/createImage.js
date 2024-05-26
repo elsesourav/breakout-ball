@@ -34,9 +34,10 @@ function createCanvasImage(drawFunction, width, height) {
 }
 
 function createBallImage() {
+   const _scale = 4;
    return createCanvasImage(
       (ctx) => {
-         const gradient = ctx.createRadialGradient(96, 24, 2, 70, 70, 110);
+         const gradient = ctx.createRadialGradient(96 * _scale, 24 * _scale, 2 * _scale, 70 * _scale, 70 * _scale, 110 * _scale);
 
          gradient.addColorStop(0, "white");
          gradient.addColorStop(0.03, "aqua");
@@ -46,21 +47,22 @@ function createBallImage() {
          ctx.fillStyle = gradient;
          ctx.beginPath();
          ctx.strokeStyle = "#0ff";
-         ctx.lineWidth = 3;
-         ctx.arc(73, 73, 70, 0, Math.PI * 2, false);
+         ctx.lineWidth = 2 * _scale;
+         ctx.arc(73 * _scale, 73 * _scale, 70 * _scale, 0, Math.PI * 2, false);
          ctx.fill();
          ctx.stroke();
          ctx.closePath();
       },
-      146,
-      146
+      146 * _scale,
+      146 * _scale
    );
 }
 
 function createPaddleImage() {
-   const r = 8,
-      w = 160,
-      h = 30,
+   const _scale = 4;
+   const r = 8 * _scale,
+      w = 160 * _scale,
+      h = 30 * _scale,
       sideW = w / 4;
 
    const pathColors = [
@@ -102,26 +104,26 @@ function createPaddleImage() {
 
 function createBlockImages() {
    const blockColors = [
-      [["#21f4fb", "#4c74ea"], "#4ffffc"],
-      [["#f6d365", "#fda085"], "#fcff59"],
+      [["#00f7ff", "#006caf"], "#4ffffc"],
+      [["#eeff01", "#986300"], "#fcff59"],
       [["#04ef00", "#03a900"], "#04ef00"],
       [["#b773ff", "#7028e4"], "#af4eff"],
-      [["#ff0844", "#fc8b68"], "#ff4e8f"],
+      [["#ff0844", "#ff7e9e"], "#ff20c4"],
       [["#c3cfe2", "#eaeaea"], "#ffffff"],
    ];
 
-   const blockW = 64;
-   const blockH = 48;
+   const blockW = 256;
+   const blockH = blockW / 4 * 3;
    let blockImages = [];
 
    blockColors.forEach(([[c1, c2], stroke], i) => {
-      const offset = 3 + 0.3 * (blockColors.length - i);
+      const offset = 18 + 0.3 * (blockColors.length - i);
       const x = offset;
       const y = offset;
-      const r = 5;
+      const r = 20;
       const W = blockW - 2 * offset;
       const H = blockH - 2 * offset;
-      const inOffset = 3;
+      const inOffset = 18;
       const inX = x + inOffset;
       const inY = y + inOffset;
       const inW = W - inOffset * 2;
@@ -136,7 +138,7 @@ function createBlockImages() {
                   inY,
                   inW,
                   inH,
-                  r * 1.4
+                  r * 1.2
                );
 
                const grad = ctx.createLinearGradient(0, 0, 0, H);
@@ -146,7 +148,7 @@ function createBlockImages() {
                ctx.fillStyle = grad;
                ctx.fill(path1);
 
-               ctx.lineWidth = 3;
+               ctx.lineWidth = 8;
                ctx.strokeStyle = stroke;
                ctx.stroke(path1);
 

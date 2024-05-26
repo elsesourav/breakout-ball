@@ -51,7 +51,6 @@ class LevelMaker {
 
       const lvlOptions = $$("#levelDesigner .option");
 
-
       lvlOptions.click((_, ele, i) => {
          lvlOptions.removeClass("active");
          ele.classList.add("active");
@@ -131,7 +130,8 @@ class LevelMaker {
       if (select == "add") {
          this.addBlock(NX, NY, this.selectedHealth);
       } else if (select == "hover") {
-         makerHoverBlock(NX, NY, this.selectedHealth);
+         if (this.eraserSelected) makerHoverBlock(NX, NY, 0);
+         else makerHoverBlock(NX, NY, this.selectedHealth);
       } else if (select == "remove") {
          this.removeBlock(NX, NY);
       }
@@ -151,7 +151,6 @@ class LevelMaker {
       this.states.splice(this.currentState + 1, this.states.length);
       this.currentState++;
       this.blocks[NY][NX].health = 0;
-      console.log(this.blocks);
       this.states.push(copyArray(this.blocks));
       makerRemoveBlock(NX, NY);
    }

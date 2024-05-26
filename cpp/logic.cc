@@ -46,10 +46,12 @@ EM_JS(void, drawBlockAlpha, (float x, float y, short w, short h, short health), 
    ctx.globalAlpha = 1;
 });
 EM_JS(void, drawBlockOutline, (float x, float y, short w, short h), {
-   ctx.lineWidth = 1;
+   ctx.globalAlpha = 0.3;
+   ctx.lineWidth = 2;
    ctx.strokeStyle = "#fff";
    let off = 4;
    ctx.stroke(create2dRoundedRectPath(x + off, y + off, w - off * 2, h - off * 2, 15));
+   ctx.globalAlpha = 1;
 });
 EM_JS(void, drawLava, (float x, float y, float w, float h), {
    ctx.fillStyle = "#f00";
