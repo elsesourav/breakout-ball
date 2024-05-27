@@ -2,16 +2,27 @@
    position: absolute;
    width: 100%;
    left: 0;
-   bottom: 0;
-   background: radial-gradient(circle, #0d0098 0%, #03001f 100%);
+   bottom: -100%;
+   background: var(-main-bg);
    display: none;
    padding: calc(var(--gap) * 2);
    row-gap: calc(var(--gap) * 5);
    border: solid 1px #0d0098;
    z-index: 4;
+   opacity: 0;
+   transition-property: overlay display opacity;
+   transition-duration: 300ms;
+   transition-behavior: allow-discrete;
 
    &.active {
       display: grid;
+      bottom: 0;
+      opacity: 1;
+
+      @starting-style {
+         opacity: 0;
+         bottom: -100%;
+      }
    }
 
    p {
@@ -191,7 +202,7 @@
                &.eraser span > i {
                   display: grid;
                   place-items: center;
-                  color: #ff0000;
+                  color: #000;
                   text-shadow: none;
                   background: -webkit-linear-gradient(#ff0000, #640000);
                   -webkit-background-clip: text;
@@ -219,25 +230,24 @@
          position: relative;
          outline: solid 1px #fff;
          background: rgba(255, 255, 255, 0.56);
-         box-shadow: inset 0 0 2px #000;
+         box-shadow: inset 0 0 4px #000;
          border: none;
          padding: 0;
          width: calc(var(--s));
-         height: var(--btn-h);
-         border-radius: var(--gap);
+         height: calc(var(--s));
+         border-radius: calc(var(--s) * 4);
          cursor: var(--cursor);
-         transition: linear 200ms background;
          display: grid;
          place-items: center;
-         transition: ease-in-out 200ms background;
-
+         transition: linear 200ms background;
+         
          @media (hover: hover) and (pointer: fine) {
             &:hover {
-               background: #666666;
+               background: #fff;
             }
          }
          &:active {
-            background: #666666;
+            background: #fff;
          }
 
          & > i {
@@ -246,7 +256,7 @@
             width: 100%;
             display: grid;
             place-items: center;
-            font-size: calc(var(--s) * 0.5);
+            font-size: calc(var(--s) * 0.6);
             background: -webkit-linear-gradient(#001bce, #000736);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -256,9 +266,9 @@
             }
             
          }
-         &#makeTesting  i{
-            font-size: calc(var(--s) * 0.6);
-            background: -webkit-linear-gradient(#1f02ff, #00aeff);
+         &#makeTesting > i {
+            font-size: calc(var(--s) * 0.7);
+            background: -webkit-linear-gradient(#023dff, #5d00ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
          }

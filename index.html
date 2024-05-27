@@ -50,8 +50,30 @@
             </div>
             <div id="modeType">
                <div id="localMode" class="map"></div>
-               <div id="onlineMode" class="map"></div>
-               <div id="createMode" class="map"></div>
+               <div class="map extra">
+                  <div class="top">
+                     <div class="box">
+                        <i class="sbi-search"></i>
+                        <input
+                           type="text"
+                           id="searchInput"
+                           placeholder="Search Level"
+                           spellcheck="false"
+                           autocomplete="off"
+                        />
+                     </div>
+                  </div>
+                  <div id="onlineMode" class="inner"></div>
+               </div>
+               <div class="map extra active">
+                  <div class="top">
+                     <div class="box" id="createLevel">
+                        <i class="sbi-plus1"></i>
+                        <p>ADD</p>
+                     </div>
+                  </div>
+                  <div id="createMode" class="inner"></div>
+               </div>
             </div>
          </div>
 
@@ -232,7 +254,7 @@
                   </div>
                   <div class="option">
                      <div class="block eraser">
-                        <span><i class="sbi-gavel"></i></span>
+                        <span><i class="sbi-gavel1"></i></span>
                      </div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle"> Remove Block & Wall</i>
@@ -260,7 +282,7 @@
                <button class="btn" id="makeTesting">
                   <i class="sbi-play-circle"></i>
                   <div class="tool-tip-text">
-                     <i class="sbi-info-with-circle"> Test Level</i>
+                     <i class="sbi-info-with-circle"> Run Level</i>
                      <i class="sbi-keyboard"> SPACE+T</i>
                   </div>
                </button>

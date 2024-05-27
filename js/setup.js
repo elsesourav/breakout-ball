@@ -1,12 +1,3 @@
-const alert = new AlertHTML({
-   title: "Exit",
-   message: "Are you sure you want to Exit this game?",
-   btnNm1: "No",
-   btnNm2: "Yes",
-   titleHeight: 40,
-   buttonHeight: 45,
-   width: 290,
-});
 
 const loopFun = () => {
    update();
@@ -125,12 +116,12 @@ Module.onRuntimeInitialized = () => {
    // });
 
 
-   levelDesigner.classList.add("active");
-   CVS.classList.add("active");
-   isLevelMakerModeOn = true;
-   makerInit();
-   lvlMaker.init();
-   ctx = CTX;
-   animation.start(makerLoopFun);
+   // levelDesigner.classList.add("active");
+   // CVS.classList.add("active");
+   // isLevelMakerModeOn = true;
+   // makerInit();
+   // lvlMaker.init();
+   // ctx = CTX;
+   // animation.start(makerLoopFun);
    // playLevel(window.levels[currentLevelIndex]);
 };

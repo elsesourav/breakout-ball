@@ -10,22 +10,32 @@ function goHome() {
    showPreview.classList.remove("active");
    CVS.classList.remove("active");
    showTime.classList.remove("active");
+   levelDesigner.classList.remove("active");
+   ctx = CTX;
+   animation.stop();
    showHealths.classList = [];
    pushStatus("home");
    pushStatus("home");
    isInOfTheGame = false;
+   isLevelMakerModeOn = false;
 }
 
 previewClose.click(goHome);
 homeButton.click(goHome);
 
-window.addEventListener("popstate", function (event) {
+addEventListener("popstate", function (event) {
    if (event.state != null && showPreview.classList.contains("active")) {
       goHome();
    } else if (event.state != null && event.state.name == "inGame") {
+      const alert = new AlertHTML({
+         title: "Exit",
+         message: "Are you sure you want to Exit this game?",
+      });
       alert.show();
       alert.clickBtn1(() => {
          alert.hide();
+         pushStatus("inGame");
+         pushStatus("inGame");
       });
       alert.clickBtn2(() => {
          alert.hide();
@@ -156,7 +166,7 @@ window.addEventListener("popstate", function (event) {
       pg.index = i;
       pg.preScrollX = pg.scrollX;
       pg.scrollX = -pg.width * i;
-      modeType.style.transitionDuration = "300ms";
+      modeType.style.transitionDuration = "150ms";
       modeType.style.left = `${pg.scrollX}px`;
    }
 
@@ -169,7 +179,7 @@ window.addEventListener("popstate", function (event) {
    modeType.on("touchstart", (e) => {
       pg.x = e.touches[0].clientX;
       pg.y = e.touches[0].clientY;
-      modeType.style.transitionDuration = 0;
+      modeType.style.transitionDuration = `0ms`;
    });
 
    modeType.on("touchmove", (e) => {
@@ -189,7 +199,7 @@ window.addEventListener("popstate", function (event) {
       pg.totalMove += pg.dx;
 
       pg.scrollX += pg.dx;
-      modeType.style.left = `${pg.scrollX}px`;
+      modeType.style.left = `${Math.round(pg.scrollX)}px`;
    });
 
    modeType.on("touchend", () => {
@@ -209,9 +219,9 @@ window.addEventListener("popstate", function (event) {
       }
 
       modeType.style.transitionDuration = `${Math.round(
-         Math.abs((time / pg.width) * 300)
+         Math.abs((time / pg.width) * 150)
       )}ms`;
-      modeType.style.left = `${pg.scrollX}px`;
+      modeType.style.left = `${Math.round(pg.scrollX)}px`;
       pg.preScrollX = pg.scrollX;
 
       pg.isLock = pg.ones = false;

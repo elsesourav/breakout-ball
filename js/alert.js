@@ -4,14 +4,15 @@ class AlertHTML {
       windowWidth = window.innerWidth,
       titleIcon,
       windowHeight = window.innerHeight,
-      width = 250,
-      titleHeight = 30,
-      buttonHeight = 50,
+      width = 290,
+      titleHeight = 40,
+      buttonHeight = 45,
       title,
       message,
-      btnNm1,
-      btnNm2,
-      parent,
+      btnNm1 = "No",
+      btnNm2 = "Yes",
+      parent = document.body,
+      oneBtn = false
    }) {
       this.windowWidth = windowWidth;
       this.windowHeight = windowHeight;
@@ -24,6 +25,7 @@ class AlertHTML {
       this.btnNm1 = btnNm1;
       this.btnNm2 = btnNm2;
       this.parent = parent;
+      this.oneBtn = oneBtn;
 
       // element
       this.msgEle = undefined;
@@ -79,7 +81,7 @@ class AlertHTML {
 
       /**/ this.buttons = ce({ cls: "_-_a-buttons", parent: this.inner });
       /**/ this.button1 = ce({ cls: "_-_a-btn", parent: this.buttons });
-      if (this.btnNm2)
+      if (!this.oneBtn)
          this.button2 = ce({
             cls: "_-_a-btn _-_a-b-last",
             parent: this.buttons,
@@ -89,7 +91,7 @@ class AlertHTML {
          html: this.btnNm1,
          parent: this.button1,
       });
-      /**/ this.btn2Ele = ce({
+      /**/ if (!this.oneBtn) this.btn2Ele = ce({
          tag: "p",
          html: this.btnNm2,
          parent: this.button2,
@@ -116,6 +118,7 @@ class AlertHTML {
            align-items: center;
            background: rgba(0, 0, 0, 0.3);
            backdrop-filter: blur(7px);
+           -webkit-backdrop-filter: blur(7px);
            transition: 0s;
            transition-delay: 0.2s;
            z-index: 100;
@@ -275,6 +278,9 @@ class AlertHTML {
    }
    hide() {
       this.box.classList.remove("active");
+      setTimeout(() => {
+         this.parent.removeChild(this.box);
+      }, 500);
    }
 
    clickBtn1(fun) {

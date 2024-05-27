@@ -39,6 +39,8 @@
    --color5-br: #ff20c4;
    --color6-bg: linear-gradient(#b0b7c1, #eaeaea);
    --color6-br: #ffffff;
+
+   --main-bg: radial-gradient(circle, #0d0098 0%, #03001f 100%);
 }
 
 body {

@@ -5,7 +5,7 @@
 const rootStyle = document.querySelector(":root").style;
 
 // when run this app in mobile is return true
-const isMobile = localStorage.mobile || navigator.maxTouchPoints > 1;
+const isMobile = localStorage.mobile || 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
 // minimum window size
 const minSize = innerWidth > innerHeight ? innerHeight : innerWidth;
@@ -221,6 +221,7 @@ function replaceState(name = "home") {
    history.replaceState({ name }, `${name}`, `./`);
 }
 
+
 function createHtmlLevels(levels, levelsMap) {
    levelsMap.innerHTML = "";
 
@@ -268,7 +269,7 @@ function createOnlineLevels(levels, levelsMap, flag = false) {
       const count = CE("p", ["count"], "10", playCount);
       const id = CE("p", ["id"], "ZAS", details);
       const _delete = flag
-         ? CE("p", ["sbi-trash-o", "delete"], "", details)
+         ? CE("p", ["sbi-settings", "setting"], "", details)
          : "";
 
       mainEle.appendChild(cvs);

@@ -17,15 +17,15 @@ function lvlEditor() {
 
 
 // Start Game
-function playLevel(level) {
+function playLevel(level, mode = "inGame") {
    ctx = CTX;
    CVS.classList.add("active");
    showGameStatus.classList.add("active");
    showPreview.classList.remove("active");
    showTime.classList.remove("active");
    showHealths.classList = [];
-   pushStatus("inGame");
-   pushStatus("inGame");
+   pushStatus(mode);
+   pushStatus(mode);
    lvlTime.innerText = "∞";
    showTimeUsed.innerText = "0";
    isInOfTheGame = true;

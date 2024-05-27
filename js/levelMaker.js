@@ -9,6 +9,7 @@ class LevelMaker {
       this.selectedHealth = 1;
       this.eraserSelected = false;
       this.#eventHandler();
+      this.blocks = [];
    }
 
    init() {
@@ -17,6 +18,8 @@ class LevelMaker {
       this.selectedHealth = 1;
       this.currentState = 0;
       this.eraserSelected = false;
+      this.spaceIsDown = false;
+      this.isDragging = false;
 
       this.undoStack = [];
       this.redoStack = [];
@@ -31,23 +34,63 @@ class LevelMaker {
       this.#resetCppBlocks();
    }
 
+   #confirmExit() {
+      if (this.blocks.some((c) => c.some((e) => e.health > 0))) {
+         const alert = new AlertHTML({
+            title: "Exit Level Creation",
+            message: "Are you sure you want to exit level creation?",
+         });
+         alert.show();
+         alert.clickBtn1(() => {
+            alert.hide();
+         });
+         alert.clickBtn2(() => {
+            alert.hide();
+            goHome();
+         });
+         return;
+      }
+      goHome();
+   }
+
+   #confirmSave() {
+      if (this.blocks.some((c) => c.some((e) => e.health > 0 && e.health < 6))) {
+         const alert = new AlertHTML({
+            title: "Confirm Save and Exit",
+            message: "Are you sure you want to save this level? After saving, you will not be able to modify this level.",
+         });
+         alert.show();
+         alert.clickBtn1(() => {
+            alert.hide();
+         });
+         alert.clickBtn2(() => {
+            alert.hide();
+            goHome();
+         });
+         return;
+      } else {
+         const alert = new AlertHTML({
+            title: "Level Con't Empty",
+            message: "You must add at least one destroyable block, (HP 1-5). The level cannot be empty.",
+            btnNm1: "Okay",
+            oneBtn: true
+         });
+         alert.show();
+         alert.clickBtn1(() => {
+            alert.hide();
+         });
+         return;
+      }
+   }
+
    #eventHandler() {
-      this.cvs.addEventListener("click", ({ clientX, clientY }) => {
-         if (this.eraserSelected) {
-            this.#setupBlock(clientX, clientY, "remove");
-         } else {
-            this.#setupBlock(clientX, clientY, "add");
-         }
-      });
-      this.cvs.addEventListener("mousemove", ({ clientX, clientY }) => {
-         this.#setupBlock(clientX, clientY, "hover");
-      });
-      this.cvs.addEventListener("touchstart", ({ touches }) => {
-         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
-      });
-      this.cvs.addEventListener("touchmove", ({ touches }) => {
-         this.#setupBlock(touches[0].clientX, touches[0].clientY, "hover");
-      });
+      this.cvs.addEventListener("click", (e) => this.#setupBlock(e));
+      this.cvs.addEventListener("mousedown", () => (this.isDragging = true));
+      this.cvs.addEventListener("mousemove", (e) => this.#setupBlock(e));
+      this.cvs.addEventListener("mouseup", () => (this.isDragging = false));
+      this.cvs.addEventListener("touchstart", (e) => (this.isDragging = true));
+      this.cvs.addEventListener("touchmove", (e) => this.#setupBlock(e));
+      this.cvs.addEventListener("touchend", () => (this.isDragging = false));
 
       const lvlOptions = $$("#levelDesigner .option");
 
@@ -59,12 +102,10 @@ class LevelMaker {
          else if (i === 6) lvlMaker.selectEraser(i + 1);
       });
 
-      let spaceIsDown = false;
-
       addEventListener("keydown", ({ keyCode }) => {
-         if (keyCode === 32) spaceIsDown = true;
+         if (keyCode === 32) this.spaceIsDown = true;
 
-         if (spaceIsDown) {
+         if (this.spaceIsDown) {
             if (keyCode >= 49 && keyCode <= 53) {
                // get value 1 to 5 (e.g: 49 - 48 = 1, 50 - 48 = 2, ...)
                const i = keyCode - 48;
@@ -96,7 +137,7 @@ class LevelMaker {
       });
 
       addEventListener("keyup", ({ keyCode }) => {
-         if (keyCode === 32) spaceIsDown = false;
+         if (keyCode === 32) this.spaceIsDown = false;
       });
 
       addEventListener("keydown", ({ keyCode }) => {
@@ -104,23 +145,43 @@ class LevelMaker {
          else if (keyCode === 39) moveRight();
       });
 
-      $("#undoBtn").click(() => {
-         lvlMaker.undo();
+      $("#undoBtn").click(() => lvlMaker.undo());
+      $("#redoBtn").click(() => lvlMaker.redo());
+
+      $("#saveBtn").click(() => this.#confirmSave());
+      $("#makeTesting").click(() => {
+         playLevel(this.blocks);
       });
 
-      $("#redoBtn").click(() => {
-         lvlMaker.redo();
-      });
+      $("#closeBtn").click(() => this.#confirmExit());
 
-      $("#saveBtn").click(() => {});
-      $("#closeBtn").click(() => {});
+      $("#createLevel").click(() => {
+         levelDesigner.classList.add("active");
+         CVS.classList.add("active");
+         pushStatus("testing");
+         pushStatus("testing");
+         isLevelMakerModeOn = true;
+         makerInit();
+         lvlMaker.init();
+         ctx = CTX;
+         animation.start(makerLoopFun);
+      });
    }
 
-   #setupBlock(offX, offY, select = "hover") {
+   #setupBlock(e) {
+      let select;
+      const { clientX, clientY } = e.type === "touchmove" ? e.touches[0] : e;
+
+      if (this.eraserSelected) {
+         select = this.isDragging || e.type === "click" ? "remove" : "hover";
+      } else {
+         select = this.isDragging || e.type === "click" ? "add" : "hover";
+      }
+
       const { left, top, width } = this.cvs.getBoundingClientRect();
       const ratio = this.cvs.width / width;
-      const NX = Math.floor(((offX - left) * ratio) / this.w);
-      const NY = Math.floor(((offY - top) * ratio) / this.h);
+      const NX = Math.floor(((clientX - left) * ratio) / this.w);
+      const NY = Math.floor(((clientY - top) * ratio) / this.h);
 
       if (NX > this.rows - 1 || NY > this.cols - 1) {
          makerHoverBlock(-1, -1, 0);
