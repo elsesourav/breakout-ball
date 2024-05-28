@@ -2,11 +2,11 @@
    position: absolute;
    width: 100%;
    left: 0;
-   bottom: -100%;
-   background: var(-main-bg);
+   bottom: 0;
+   background: var(--main-bg);
    display: none;
-   padding: calc(var(--gap) * 2);
-   row-gap: calc(var(--gap) * 5);
+   padding: calc(var(--gap) * 1);
+   row-gap: calc(var(--gap) * 3);
    border: solid 1px #0d0098;
    z-index: 4;
    opacity: 0;
@@ -16,12 +16,10 @@
 
    &.active {
       display: grid;
-      bottom: 0;
       opacity: 1;
 
       @starting-style {
          opacity: 0;
-         bottom: -100%;
       }
    }
 
@@ -74,8 +72,6 @@
             cursor: var(--cursor);
             overflow: visible;
 
-            
-
             .block {
                position: relative;
                width: calc(100% + var(--_padding) * 2);
@@ -85,7 +81,7 @@
                place-items: center;
                border-radius: inherit;
                overflow: hidden;
-               
+
                span {
                   position: relative;
                   width: 100%;
@@ -99,7 +95,7 @@
                   font-size: calc(var(--s) * 0.5);
                   text-shadow: 0 1px 1px #000000;
                   border-radius: calc(var(--s) * 0.14);
-                  
+
                   &::after {
                      --offset: calc(var(--s) * 0.06);
                      position: absolute;
@@ -112,7 +108,7 @@
                      z-index: 6;
                   }
                }
-               
+
                &::before {
                   content: "";
                   position: absolute;
@@ -210,7 +206,6 @@
                   font-size: calc(var(--s) * 0.6);
                }
             }
-
          }
       }
    }
@@ -240,7 +235,7 @@
          display: grid;
          place-items: center;
          transition: linear 200ms background;
-         
+
          @media (hover: hover) and (pointer: fine) {
             &:hover {
                background: #fff;
@@ -260,11 +255,10 @@
             background: -webkit-linear-gradient(#001bce, #000736);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            
+
             &.rotate {
                transform: scaleX(-1);
             }
-            
          }
          &#makeTesting > i {
             font-size: calc(var(--s) * 0.7);
@@ -272,7 +266,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
          }
-         
       }
 
       .switch-button {
@@ -413,3 +406,4 @@
       transform: rotate(360deg);
    }
 }
+

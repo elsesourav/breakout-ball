@@ -2,8 +2,8 @@ class LevelMaker {
    constructor(rows, cols, width, height, canvas) {
       this.rows = rows;
       this.cols = cols;
-      this.w = width;
-      this.h = height;
+      this.width = width;
+      this.height = height;
       this.cvs = canvas;
 
       this.selectedHealth = 1;
@@ -27,15 +27,15 @@ class LevelMaker {
       for (let i = 0; i < this.cols; i++) {
          this.blocks[i] = [];
          for (let j = 0; j < this.rows; j++) {
-            this.blocks[i][j] = { x: j, y: i, health: 0 };
+            this.blocks[i][j] = { x: j, y: i, h: 0 };
          }
       }
       this.states.push(copyArray(this.blocks));
       this.#resetCppBlocks();
    }
 
-   #confirmExit() {
-      if (this.blocks.some((c) => c.some((e) => e.health > 0))) {
+   confirmExit() {
+      if (this.blocks.some((c) => c.some((e) => e.h > 0))) {
          const alert = new AlertHTML({
             title: "Exit Level Creation",
             message: "Are you sure you want to exit level creation?",
@@ -53,10 +53,37 @@ class LevelMaker {
       goHome();
    }
 
+   #showEmptyAlert() {
+      const alert = new AlertHTML({
+         title: "Level Con't Empty",
+         message: "You must add at least one destroyable block, (HP 1-5). The level cannot be empty.",
+         btnNm1: "Okay",
+         oneBtn: true
+      });
+      alert.show();
+      alert.clickBtn1(() => {
+         alert.hide();
+      });
+   }
+
+   #runLevel() {
+      if (this.blocks.some((c) => c.some((e) => e.h > 0 && e.h < 6))) {
+         currentPlayingLevel = this.getLevel();
+         currentGameMode = "testing";
+         playLevel("testing");
+         levelDesigner.classList.remove("active");
+      } else {
+         this.#showEmptyAlert();
+      }
+   }
+
    #confirmSave() {
-      if (this.blocks.some((c) => c.some((e) => e.health > 0 && e.health < 6))) {
+      if (this.blocks.some((c) => c.some((e) => e.h > 0 && e.h < 6))) {
          const alert = new AlertHTML({
             title: "Confirm Save and Exit",
+            btnNm1Color: "#00ffff",
+            btnNm2Color: "#1eff00",
+            titleColor: "#1eff00",
             message: "Are you sure you want to save this level? After saving, you will not be able to modify this level.",
          });
          alert.show();
@@ -69,17 +96,7 @@ class LevelMaker {
          });
          return;
       } else {
-         const alert = new AlertHTML({
-            title: "Level Con't Empty",
-            message: "You must add at least one destroyable block, (HP 1-5). The level cannot be empty.",
-            btnNm1: "Okay",
-            oneBtn: true
-         });
-         alert.show();
-         alert.clickBtn1(() => {
-            alert.hide();
-         });
-         return;
+         this.#showEmptyAlert();
       }
    }
 
@@ -149,23 +166,29 @@ class LevelMaker {
       $("#redoBtn").click(() => lvlMaker.redo());
 
       $("#saveBtn").click(() => this.#confirmSave());
-      $("#makeTesting").click(() => {
-         playLevel(this.blocks);
-      });
+      $("#makeTesting").click(() => this.#runLevel());
 
-      $("#closeBtn").click(() => this.#confirmExit());
+      $("#closeBtn").click(() => this.confirmExit());
 
       $("#createLevel").click(() => {
-         levelDesigner.classList.add("active");
-         CVS.classList.add("active");
-         pushStatus("testing");
-         pushStatus("testing");
-         isLevelMakerModeOn = true;
-         makerInit();
+         this.show();
          lvlMaker.init();
-         ctx = CTX;
-         animation.start(makerLoopFun);
       });
+      
+   }
+
+   show() {
+      showGameStatus.classList.remove("active");
+      showPreview.classList.remove("active");
+      levelDesigner.classList.add("active");
+      CVS.classList.add("active");
+      pushStatus("createMode");
+      pushStatus("createMode");
+      isLevelMakerModeOn = true;
+      makerInit();
+      ctx = CTX;
+      this.#resetCppBlocks();
+      animation.start(makerLoopFun);
    }
 
    #setupBlock(e) {
@@ -180,10 +203,10 @@ class LevelMaker {
 
       const { left, top, width } = this.cvs.getBoundingClientRect();
       const ratio = this.cvs.width / width;
-      const NX = Math.floor(((clientX - left) * ratio) / this.w);
-      const NY = Math.floor(((clientY - top) * ratio) / this.h);
+      const NX = Math.floor(((clientX - left) * ratio) / this.width);
+      const NY = Math.floor(((clientY - top) * ratio) / this.height);
 
-      if (NX > this.rows - 1 || NY > this.cols - 1) {
+      if (NX > this.rows - 1 || NY > this.cols - 1 || NX < 0 || NY < 0) {
          makerHoverBlock(-1, -1, 0);
          return;
       }
@@ -198,20 +221,20 @@ class LevelMaker {
       }
    }
 
-   addBlock(NX, NY, health) {
-      if (this.blocks[NY][NX].health === health) return;
+   addBlock(NX, NY, h) {
+      if (this.blocks[NY][NX].h === h) return;
 
       this.states.splice(this.currentState + 1, this.states.length);
       this.currentState++;
-      this.blocks[NY][NX].health = health;
+      this.blocks[NY][NX].h = h;
       this.states.push(copyArray(this.blocks));
-      makerAddBlock(NX, NY, health);
+      makerAddBlock(NX, NY, h);
    }
 
    removeBlock(NX, NY) {
       this.states.splice(this.currentState + 1, this.states.length);
       this.currentState++;
-      this.blocks[NY][NX].health = 0;
+      this.blocks[NY][NX].h = 0;
       this.states.push(copyArray(this.blocks));
       makerRemoveBlock(NX, NY);
    }
@@ -235,8 +258,8 @@ class LevelMaker {
       }
    }
 
-   selectHealth(health) {
-      this.selectedHealth = health;
+   selectHealth(h) {
+      this.selectedHealth = h;
       this.eraserSelected = false;
    }
 
@@ -249,5 +272,17 @@ class LevelMaker {
       this.eraserSelected = true;
    }
 
-   getLevel() {}
+   getLevel() {
+      const lvl = [];
+      this.blocks.forEach((cols) => {
+         cols.forEach(({x, y, h}) => {
+            if (h > 0) lvl.push({ x: x, y: y, h: h })
+         });
+      });
+      return {
+         id: generateUniqueId(),
+         creator: user.name,
+         blocks: lvl
+      };
+   }
 }

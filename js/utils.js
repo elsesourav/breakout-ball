@@ -36,19 +36,6 @@ function getDataFromLocalStorage(key) {
    return JSON.parse(localStorage.getItem(key));
 }
 
-function seedRandom(seed) {
-   const a = 1664525;
-   const c = 1013904223;
-   const m = Math.pow(2, 32);
-
-   let currentSeed = seed;
-
-   return function () {
-      currentSeed = (a * currentSeed + c) % m;
-      return currentSeed / m;
-   };
-}
-
 class Animation {
    constructor(fps, fun) {
       this.fps = fps;
@@ -121,23 +108,19 @@ const $$ = (selector) => {
    return self;
 };
 
-// class add in html
-function addClass(array, className = "active") {
-   if (array.length == undefined) {
-      array.classList.forEach(() => array.classList.add(className));
-   } else {
-      array.forEach((element) => element.classList.add(className));
-   }
+const validEmail = (exp) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
+const validName = (exp) => /^([a-zA-Zà-úÀ-Ú]{2,})+\s+([a-zA-Zà-úÀ-Ú\s]{2,})+$/.test(exp);
+const validUName = (exp) => /^[a-zA-Z0-9\_\-\@]{6,16}$/.test(exp);
+const validPass = (exp) => /^([A-Za-z0-9à-úÀ-Ú\@\_\.\-]{8,16})+$/.test(exp);
+const validText = (exp) => /^([A-Za-z0-9à-úÀ-Ú\.\-\,\_\|\?\:\*\&\%\#\!\+\~\₹\'\"\`\@\s]{2,})+$/.test(exp);
+
+function generateUniqueId() {
+   const timestamp = Date.now();
+   const random = Math.floor(Math.random() * Math.pow(36, 2));
+   const combined = timestamp.toString(36) + random.toString(36);
+   return combined.slice(-5).toUpperCase();
 }
 
-// classes remove in html
-function removeClass(array, className = "active") {
-   if (array.length == undefined) {
-      array.classList.forEach(() => array.classList.remove(className));
-   } else {
-      array.forEach((element) => element.classList.remove(className));
-   }
-}
 
 // create element
 const CE = (tagName, className = [], inrHtml = "", parent = null) => {
@@ -147,33 +130,6 @@ const CE = (tagName, className = [], inrHtml = "", parent = null) => {
    if (parent) parent.appendChild(e);
    return e;
 };
-
-function hover(element) {
-   element.classList.add("hover-n");
-   element.classList.remove("hover");
-
-   const addHover = () => {
-      element.classList.add("hover");
-      element.classList.remove("hover-n");
-   };
-   const removeHover = () => {
-      element.classList.remove("hover");
-      element.classList.add("hover-n");
-   };
-   element.addEventListener("touchstart", () => {
-      isMobile && addHover();
-   });
-   element.addEventListener("mouseenter", () => {
-      !isMobile && addHover();
-   });
-
-   element.addEventListener("touchend", () => {
-      isMobile && removeHover();
-   });
-   element.addEventListener("mouseleave", () => {
-      !isMobile && removeHover();
-   });
-}
 
 function setDataToLocalStorage(key, object) {
    var data = JSON.stringify(object);
@@ -220,8 +176,6 @@ function pushStatus(name) {
 function replaceState(name = "home") {
    history.replaceState({ name }, `${name}`, `./`);
 }
-
-
 function createHtmlLevels(levels, levelsMap) {
    levelsMap.innerHTML = "";
 

@@ -20,11 +20,22 @@ function goHome() {
    isLevelMakerModeOn = false;
 }
 
-previewClose.click(goHome);
+previewClose.click(() => {
+   if (currentGameMode == "testing") {
+      lvlMaker.show();
+   } else {
+      goHome();
+   }
+});
+
 homeButton.click(goHome);
 
 addEventListener("popstate", function (event) {
-   if (event.state != null && showPreview.classList.contains("active")) {
+   if (event.state != null && event.state.name == "testing") {
+      lvlMaker.show();
+   } else if (event.state != null && event.state.name == "createMode") {
+      lvlMaker.confirmExit();
+   } else if (event.state != null && showPreview.classList.contains("active")) {
       goHome();
    } else if (event.state != null && event.state.name == "inGame") {
       const alert = new AlertHTML({

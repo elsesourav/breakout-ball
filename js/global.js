@@ -11,7 +11,7 @@ const SCALE_H = DELTA_SIZE / (4 / 3);
 const CVS_W = SIZE * 9;
 const CVS_H = SIZE * 16;
 const rows = 9;
-const cols = 10;
+const cols = 11;
 const FPS = 60;
 const FRAME_RATE = 1000 / FPS;
 const pScale = 0.8;
@@ -42,7 +42,6 @@ PREVIEW_CTX.imageSmoothingQuality = "high";
 let isLevelMakerModeOn = false;
 let isInOfTheGame = true;
 let fpsCounter = 0;
-let currentLevelIndex = 0;
 let init,
    setup,
    draw,

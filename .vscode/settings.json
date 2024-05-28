@@ -1,10 +1,11 @@
 {
    "cSpell.words": [
+      "elsesourav",
       "emscripten",
       "Leaderboard"
    ],
    "C_Cpp.errorSquiggles": "disabled",
-   "liveServer.settings.port": 5501,
+   "liveServer.settings.port": 5500,
    "files.associations": {
       "array": "cpp",
       "__bit_reference": "cpp",

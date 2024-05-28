@@ -17,7 +17,7 @@ function lvlEditor() {
 
 
 // Start Game
-function playLevel(level, mode = "inGame") {
+function playLevel(mode = "inGame") {
    ctx = CTX;
    CVS.classList.add("active");
    showGameStatus.classList.add("active");
@@ -35,29 +35,16 @@ function playLevel(level, mode = "inGame") {
       showTime.classList.add("active");
    }, 600);
    
-   const { aryPtr, length } = create2dAryPointer(level);
+   const { aryPtr, length } = create2dAryPointer(currentPlayingLevel.blocks); 
    init(aryPtr, length);
     
    animation.start(loopFun);
 }
 
 startButton.click(() => {
-   playLevel(window.levels[currentLevelIndex]);
+   playLevel();
 });
 
-// createNewLevel.click(() => {
-   //   pushStatus("preview");
-// });
-
-
-// showPreview.classList.add("active");
-
-setTimeout(() => {
-   // init("");
-   // update();
-   // drawOutline();
-   // playLevel(window.levels[currentLevelIndex]);
-}, 1500);
 
 setInterval(() => {
    // mobileErr.innerHTML = fpsCounter;

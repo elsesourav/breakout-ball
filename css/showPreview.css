@@ -295,10 +295,11 @@
       }
    }
 
-   &:not(.inGame) #startButton p:nth-child(2),
-   &:is(:not(.inGame), .local) .btn #levelCreatorName,
+   &:not(.inGame, .testing) #startButton p:nth-child(2),
+   &:is(:not(.inGame, .testing), .local) .btn #levelCreatorName,
    &:not(.inGame) .btn #homeButton,
    &.inGame #startButton p:first-child,
+   &.testing #startButton p:first-child,
    &.testing .leaderboard,
    &.testing .rapper .canvas-and-lvl-details .rank {
       display: none;

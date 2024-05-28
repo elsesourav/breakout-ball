@@ -90,7 +90,7 @@ EM_JS(void, showGameOver, (short time), {
    setTimeout(() => {
       animation.stop();
       showCountDowns.classList = [];
-      setupStartPreview(currentLevelIndex, ["inGame"], time);
+      setupStartPreview(["inGame"], time);
    }, 2000);
 });
 EM_JS(void, showGameComplete, (short time), {
@@ -100,7 +100,8 @@ EM_JS(void, showGameComplete, (short time), {
    setTimeout(() => {
       animation.stop();
       showCountDowns.classList = [];
-      setupStartPreview(currentLevelIndex, ["inGame"], time);
+      if (currentGameMode == "testing") setupStartPreview(["testing"], time);
+      else  setupStartPreview(["inGame"], time);
 
       // update rank
    }, 2000);

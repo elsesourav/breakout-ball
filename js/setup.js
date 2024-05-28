@@ -1,4 +1,3 @@
-
 const loopFun = () => {
    update();
    draw();
@@ -9,6 +8,12 @@ const makerLoopFun = () => {
 };
 const animation = new Animation(FPS, loopFun);
 const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
+let currentPlayingLevel = window.levels[0];
+let currentGameMode = "local";
+let user = {
+   name: "elsesourav"
+}
+
 
 Module.onRuntimeInitialized = () => {
    setup = Module.cwrap("setup", null, [
@@ -73,17 +78,18 @@ Module.onRuntimeInitialized = () => {
    makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 
    const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
-   const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
-   const htmlCreateLevels = createOnlineLevels(
-      window.levels,
-      $("#createMode"),
-      true
-   );
+   // const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
+   // const htmlCreateLevels = createOnlineLevels(
+   //    window.levels,
+   //    $("#createMode"),
+   //    true
+   // );
 
    htmlLocalLevels.forEach(([level], i) => {
       level.addEventListener("click", () => {
-         setupStartPreview(i);
-         currentLevelIndex = i;
+         currentGameMode = "local";
+         currentPlayingLevel = window.levels[i];
+         setupStartPreview();
       });
    });
 
@@ -96,8 +102,9 @@ Module.onRuntimeInitialized = () => {
    //    draw();
 
    //    level.addEventListener("click", () => {
-   //       setupStartPreview(i);
-   //       currentLevelIndex = i;
+   //       currentGameMode = "online";
+   //       currentPlayingLevel = window.levels[i];
+   //       setupStartPreview();
    //    });
    // });
 
@@ -110,11 +117,11 @@ Module.onRuntimeInitialized = () => {
    //    draw();
 
    //    level.addEventListener("click", () => {
-   //       setupStartPreview(i);
-   //       currentLevelIndex = i;
+   //       currentGameMode = "online";
+   //       currentPlayingLevel = window.levels[i];
+   //       setupStartPreview();
    //    });
    // });
-
 
    // levelDesigner.classList.add("active");
    // CVS.classList.add("active");
@@ -123,5 +130,5 @@ Module.onRuntimeInitialized = () => {
    // lvlMaker.init();
    // ctx = CTX;
    // animation.start(makerLoopFun);
-   // playLevel(window.levels[currentLevelIndex]);
+   // playLevel();
 };
