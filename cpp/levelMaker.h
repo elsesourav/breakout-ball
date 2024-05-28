@@ -15,13 +15,18 @@ public:
    short rows, cols, WIDTH, HEIGHT, SIZE, blockWidth, blockHeight;
    std::vector<Block> blocks;
 
+   DrawBlockPtr drawBlock;
+   DrawBlockAlphaPtr drawBlockAlpha;
+   DrawBlockOutlinePtr drawBlockOutline;
+   ClearCvsPtr clearCanvas;
+
    LevelMaker();
-   void setup(short rows, short cols, short WIDTH, short HEIGHT, short SIZE, short blockWidth, short blockHeight);
+   void setup(short rows, short cols, short WIDTH, short HEIGHT, short SIZE, short blockWidth, short blockHeight, DrawBlockPtr drawBlock, DrawBlockAlphaPtr drawBlockAlpha, DrawBlockOutlinePtr drawBlockOutline, ClearCvsPtr clearCanvas);
    void init(int *array, int length);
    void addBlock(short j, short i, short health);
    void removeBlock(short j, short i);
    void hoverBlock(short j, short i, short health);
-   void draw(DrawBlockPtr drawBlock, DrawBlockAlphaPtr drawBlockAlpha, DrawBlockOutlinePtr drawBlockOutline, ClearCvsPtr clearCanvas);
+   void draw();
 };
 
 #endif // LEVEL_MAKER_H

@@ -10,7 +10,7 @@ using namespace std;
 
 Game::Game() {}
 
-void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight, short _FPS) {
+void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight, short _FPS, DrawBallPtr _drawBall, DrawPaddlePtr _drawPaddle, DrawBlockPtr _drawBlock, DrawParticlePtr _drawParticle, DrawStarPtr _drawStar, DrawGlowPtr _drawGlow, DrawLavaPtr _drawLava, ClearCvsPtr _clearCvs, ShowHealthPtr _showHealth, ShowTimePtr _showTime, ShowCountDownPtr _showCountDown, ShowGameOverPtr _showGameOver, ShowGameCompletePtr _showGameComplete, VibratePtr _vibrate) {
    WIDTH = _WIDTH;
    HEIGHT = _HEIGHT;
    SIZE = _SIZE;
@@ -27,6 +27,22 @@ void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _p
    ballR = _ballR;
    ballSpeed = _ballSpeed;
    numStars = (WIDTH / 80) * (HEIGHT / 80);
+
+   vibrate = _vibrate;
+   drawBall = _drawBall;
+   drawPaddle = _drawPaddle;
+   drawBlock = _drawBlock;
+   drawParticle = _drawParticle;
+   drawStar = _drawStar;
+   drawGlow = _drawGlow;
+   drawLava = _drawLava;
+   clearCvs = _clearCvs;
+   showHealth = _showHealth;
+   showTime = _showTime;
+   showCountDown = _showCountDown;
+   showGameOver = _showGameOver;
+   showGameComplete = _showGameComplete;
+   vibrate = _vibrate;
 }
 
 void Game::init(int *array, int length) {
@@ -82,7 +98,7 @@ void Game::createParticles(float x, float y, float w, float h, short colorIndex,
    }
 }
 
-void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs) {
+void Game::draw() {
 
    clearCvs(WIDTH, HEIGHT);
    for (auto &star : stars)
@@ -103,14 +119,13 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    }
 }
 
-void Game::drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock) {
+void Game::drawBlockOnly() {
    clearCvs(WIDTH, HEIGHT);
    for (auto &block : blocks)
       block.draw(drawBlock);
 }
 
-void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete) {
-
+void Game::update() {
    short i = 0;
    for (auto &star : stars)
       star.update();
@@ -140,6 +155,7 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
                   ball.vx = -ball.maxV;
 
                paddleHidden = true;
+               vibrate(50);
             }
          }
 
@@ -162,9 +178,12 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
                    if (is == 2) {
                       createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 1, 2);
                       block.isDead = true;
+                      this->vibrate(50);
                       return true;
-                   } else if (is == 1)
+                   } else if (is == 1) {
                       createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
+                     this->vibrate(100);
+                   }
 
                    return false;
                 }
@@ -211,11 +230,13 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
       if (health <= 0) {
          gameOver = true;
          showGameOver((short)totalFrameCount / FPS);
+         this->vibrate(1000);
          return;
       }
       ball.reset(ballX, ballY);
       paddle.reset(padX, padY);
       startingCountDown = FPS * 3;
+      this->vibrate(500);
    }
 
    if (!gameComplete && wallLength >= blocks.size()) {

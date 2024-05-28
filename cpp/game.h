@@ -23,6 +23,7 @@ typedef void (*ShowTimePtr)(short);
 typedef void (*ShowCountDownPtr)(short);
 typedef void (*ShowGameOverPtr)(short);
 typedef void (*ShowGameCompletePtr)(short);
+typedef void (*VibratePtr)(short);
 
 class Game {
 public:
@@ -36,17 +37,31 @@ public:
    Lava lava;
    Paddle paddle;
    
+   DrawBallPtr drawBall;
+   DrawPaddlePtr drawPaddle;
+   DrawBlockPtr drawBlock;
+   DrawParticlePtr drawParticle;
+   DrawStarPtr drawStar;
+   DrawGlowPtr drawGlow;
+   DrawLavaPtr drawLava;
+   ClearCvsPtr clearCvs;
+   ShowHealthPtr showHealth;
+   ShowTimePtr showTime;
+   ShowCountDownPtr showCountDown;
+   ShowGameOverPtr showGameOver;
+   ShowGameCompletePtr showGameComplete;
+   VibratePtr vibrate;
 
    Game();
-   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS);
+   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS, DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs, ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete, VibratePtr vibrate);
    void init(int *array, int length);
+ 
+   void draw();
 
-   void draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs);
-
-   void drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock);
+   void drawBlockOnly();
 
    void createParticles(float x, float y, float w, float h, short colorIndex, float sizeMul, float mul);
-   void update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete);
+   void update();
 
 };
 

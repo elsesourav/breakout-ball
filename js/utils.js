@@ -121,6 +121,12 @@ function generateUniqueId() {
    return combined.slice(-5).toUpperCase();
 }
 
+function vibrateDevice(time = 200) {
+   if (navigator.vibrate) {
+      navigator.vibrate(time); 
+   }
+}
+
 
 // create element
 const CE = (tagName, className = [], inrHtml = "", parent = null) => {

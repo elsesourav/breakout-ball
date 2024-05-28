@@ -2,7 +2,7 @@
 
 LevelMaker::LevelMaker() {}
 
-void LevelMaker::setup(short _rows, short _cols, short _WIDTH, short _HEIGHT, short _SIZE, short _blockWidth, short _blockHeight) {
+void LevelMaker::setup(short _rows, short _cols, short _WIDTH, short _HEIGHT, short _SIZE, short _blockWidth, short _blockHeight, DrawBlockPtr _drawBlock, DrawBlockAlphaPtr _drawBlockAlpha, DrawBlockOutlinePtr _drawBlockOutline, ClearCvsPtr _clearCanvas) {
    WIDTH = _WIDTH;
    HEIGHT = _HEIGHT;
    rows = _rows;
@@ -10,6 +10,11 @@ void LevelMaker::setup(short _rows, short _cols, short _WIDTH, short _HEIGHT, sh
    SIZE = _SIZE;
    blockWidth = _blockWidth;
    blockHeight = _blockHeight;
+
+   drawBlock = _drawBlock;
+   drawBlockAlpha = _drawBlockAlpha;
+   drawBlockOutline = _drawBlockOutline;
+   clearCanvas = _clearCanvas;
 }
 
 void LevelMaker::init(int *array, int length) {
@@ -45,7 +50,7 @@ void LevelMaker::hoverBlock(short j, short i, short health) {
    }
 }
 
-void LevelMaker::draw(DrawBlockPtr drawBlock, DrawBlockAlphaPtr drawBlockAlpha, DrawBlockOutlinePtr drawBlockOutline, ClearCvsPtr clearCanvas) {
+void LevelMaker::draw() {
    clearCanvas(WIDTH, HEIGHT);
    for (auto &block : blocks) {
       if (block.isHover) {

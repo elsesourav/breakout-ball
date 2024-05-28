@@ -86,6 +86,7 @@ EM_JS(void, showCountDown, (short time), {
 EM_JS(void, showGameOver, (short time), {
    showCountDowns.classList = [];
    showCountDowns.classList.add("gameOver");
+   
 
    setTimeout(() => {
       animation.stop();
@@ -107,6 +108,9 @@ EM_JS(void, showGameComplete, (short time), {
       // update rank
    }, 2000);
 });
+EM_JS(void, vibrate, (short time), {
+   vibrateDevice(time);
+});
  
 extern "C" {
 
@@ -117,16 +121,16 @@ EMSCRIPTEN_KEEPALIVE void setup(short width, short height, short size, float pad
    WIDTH = width;
    HEIGHT = height;
    FPS = _FPS;
-   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS);
+   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS, drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas, showHealth, showTimes, showCountDown, showGameOver, showGameComplete, vibrate);
 }
 EMSCRIPTEN_KEEPALIVE void init(int *array, int length) {
    game.init(array, length);
 }
 EMSCRIPTEN_KEEPALIVE void update() {
-   game.update(showHealth, showTimes, showCountDown, showGameOver, showGameComplete);
+   game.update();
 }
 EMSCRIPTEN_KEEPALIVE void draw() {
-   game.draw(drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas);
+   game.draw();
 }
 EMSCRIPTEN_KEEPALIVE void moveLeft() {
    game.paddle.moveLeft();
@@ -145,20 +149,20 @@ EMSCRIPTEN_KEEPALIVE float moveDirect(float x) {
    return game.paddle.moveDirect(x);
 }
 EMSCRIPTEN_KEEPALIVE void drawBlockOnly() {
-   game.drawBlockOnly(clearCanvas, drawBlock);
+   game.drawBlockOnly();
 }
 EMSCRIPTEN_KEEPALIVE void drawOutline(float x) {
    drawLine(ROWS, COLS, BLOCK_WIDTH, BLOCK_HEIGHT);
 }
 
 EMSCRIPTEN_KEEPALIVE void makerSetup(short rows, short cols, short width, short height, short size) {
-   maker.setup(rows, cols, width, height, size, size, size / 4 * 3);
+   maker.setup(rows, cols, width, height, size, size, size / 4 * 3, drawBlock, drawBlockAlpha, drawBlockOutline, clearCanvas);
 }
 EMSCRIPTEN_KEEPALIVE void makerInit(int *array, int length) {
    maker.init(array, length);
 }
 EMSCRIPTEN_KEEPALIVE void makerDraw() {
-   maker.draw(drawBlock, drawBlockAlpha, drawBlockOutline, clearCanvas);
+   maker.draw();
 }
 EMSCRIPTEN_KEEPALIVE void makerAddBlock(short j, short i, short health) {
    maker.addBlock(j, i, health);
