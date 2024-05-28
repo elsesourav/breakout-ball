@@ -11,7 +11,7 @@ typedef void (*DrawBallPtr)(float, float, short);
 class Ball {
 public:
    short r, left, right, top, bottom, min, second;
-   float x, y, preX, preY, vx, vy, speed, x1, x2, y1, y2, dx, dy;
+   float x, y, preX, preY, vx, vy, speed, x1, x2, y1, y2, dx, dy, maxV;
    std::array<short, 4> numbers;
 
    void init(float x, float y, short r, float speed);

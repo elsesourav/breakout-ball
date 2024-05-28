@@ -118,35 +118,59 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
       for (short i = 0; i < ballSpeed; i++) {
          ball.update();
 
-         // block collision
-         short j = 0;
-         for (auto &block : blocks) {
-            short dir = ball.checkBlockCollision(&block);
+         // paddle collision
+         if (!paddleHidden) {
+            short dir = ball.checkPaddleCollision(&paddle);
+            if (dir != 0) {
+               if (dir == 1)
+                  ball.goLeft();
+               else if (dir == 2)
+                  ball.goRight();
+               else if (dir == 3)
+                  ball.goTop();
+               else if (dir == 4)
+                  ball.goBottom();
 
-            if (!block.isDead && dir != 0) {
-               if (dir == 1) {
-                  ball.reverseX();
-               } else if (dir == -1) {
-                  ball.reverseY();
-               } else if (dir == 2) {
-                  ball.reverseX();
-                  ball.reverseY();
-               }
+               float nvx = (paddle.tx - paddle.x) * 0.02;
+               ball.vx += nvx > ball.maxV ? ball.maxV : nvx < -ball.maxV ? -ball.maxV : nvx;
 
-               short is = block.damage();
+               if (ball.vx > ball.maxV)
+                  ball.vx = ball.maxV;
+               if (ball.vx < -ball.maxV)
+                  ball.vx = -ball.maxV;
 
-               if (is == 2) {
-                  createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 1, 2);
-
-                  block.isDead = true;
-                  blocks.erase(blocks.begin() + j);
-               } else if (is == 1) {
-                  createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
-               }
-               break;
+               paddleHidden = true;
             }
-            i++;
          }
+
+         // block collision
+         blocks.erase(
+             remove_if(blocks.begin(), blocks.end(), [this](Block &block) {
+                short dir = this->ball.checkBlockCollision(&block);
+
+                if (!block.isDead && dir != 0) {
+                   if (dir == 1)
+                      ball.goLeft();
+                   else if (dir == 2)
+                      ball.goRight();
+                   else if (dir == 3)
+                      ball.goTop();
+                   else if (dir == 4)
+                      ball.goBottom();
+
+                   short is = block.damage();
+                   if (is == 2) {
+                      createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 1, 2);
+                      block.isDead = true;
+                      return true;
+                   } else if (is == 1)
+                      createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
+
+                   return false;
+                }
+                return false;
+             }),
+             blocks.end());
       }
       paddle.update();
    } else {
@@ -156,32 +180,10 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
 
    // update particles
    particles.erase(
-       remove_if(particles.begin(), particles.end(), [](auto &particle) {
+       remove_if(particles.begin(), particles.end(), [](Particle &particle) {
           return particle.update();
        }),
        particles.end());
-
-   // check the collision
-   // paddle collision
-   if (!paddleHidden) {
-      short dir = ball.checkPaddleCollision(&paddle);
-      if (dir != 0) {
-         if (dir == 1)
-            ball.reverseX();
-         else if (dir == -1)
-            ball.reverseY();
-
-         float nvx = (paddle.tx - paddle.x) * 0.1f;
-         ball.vx += nvx > 8.0f ? 8.0f : nvx < -8.0f ? -8.0f
-                                                    : nvx;
-         if (ball.vx > ball.speed / 1.4)
-            ball.vx = ball.speed / 1.4;
-         if (ball.vx < -ball.speed / 1.4)
-            ball.vx = -ball.speed / 1.4;
-
-         paddleHidden = true;
-      }
-   }
 
    if (paddleHidden) {
       paddleHiddenCount++;
@@ -195,7 +197,7 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
    if (ball.x1 <= 0) {
       ball.goRight();
    } else if (ball.x2 >= WIDTH) {
-      ball.goRight();
+      ball.goLeft();
    }
    if (ball.y1 <= 0) {
       ball.goBottom();
