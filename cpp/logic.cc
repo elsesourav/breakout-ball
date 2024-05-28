@@ -90,7 +90,8 @@ EM_JS(void, showGameOver, (short time), {
    setTimeout(() => {
       animation.stop();
       showCountDowns.classList = [];
-      setupStartPreview(["inGame"], time);
+      if (currentGameMode == "testing") setupStartPreview(["testing"], time);
+      else  setupStartPreview(["inGame"], time);
    }, 2000);
 });
 EM_JS(void, showGameComplete, (short time), {

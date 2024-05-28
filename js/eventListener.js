@@ -166,7 +166,7 @@ addEventListener("popstate", function (event) {
       totalMove: 0,
       index: 0,
       preScrollX: 0,
-      width: modeType.scrollWidth / 3,
+      width: modeType.scrollWidth / 4,
       isLock: false,
       ones: false,
    };
@@ -219,7 +219,7 @@ addEventListener("popstate", function (event) {
       if (Math.abs(pg.totalMove) < pg.width / 5) {
          pg.scrollX = -pg.width * pg.index;
       } else {
-         if (pg.totalMove < 0 && pg.index < 2) pg.index++;
+         if (pg.totalMove < 0 && pg.index < 3) pg.index++;
          if (pg.totalMove > 0 && pg.index > 0) pg.index--;
 
          time = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index));

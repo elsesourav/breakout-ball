@@ -187,8 +187,11 @@ class LevelMaker {
       isLevelMakerModeOn = true;
       makerInit();
       ctx = CTX;
-      this.#resetCppBlocks();
-      animation.start(makerLoopFun);
+      ctx.clearRect(0, 0, CVS.width, CVS.height);
+      setTimeout(() => {
+         this.#resetCppBlocks();
+         animation.start(makerLoopFun);
+      }, 300);
    }
 
    #setupBlock(e) {

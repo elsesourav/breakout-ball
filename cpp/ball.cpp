@@ -44,17 +44,11 @@ void Ball::update() {
    y += vy;
    this->updateX1X2Y1Y2();
 }
-void Ball::reverseY() {
-   vy *= -1;
-}
-void Ball::reverseX() {
-   vx *= -1;
-}
 void Ball::goLeft() {
    vx = abs(vx) * -1;
 }
 void Ball::goRight() {
-   vx = abs(vy);
+   vx = abs(vx);
 }
 void Ball::goTop() {
    vy = abs(vy) * -1;

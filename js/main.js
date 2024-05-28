@@ -47,6 +47,6 @@ startButton.click(() => {
 
 
 setInterval(() => {
-   mobileErr.innerHTML = fpsCounter;
+   // mobileErr.innerHTML = fpsCounter;
    fpsCounter = 0;
 }, 1000);

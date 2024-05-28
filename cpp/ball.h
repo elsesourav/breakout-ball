@@ -19,8 +19,6 @@ public:
    void draw(DrawBallPtr drawBall);
    void updateX1X2Y1Y2();
    void update();
-   void reverseY();
-   void reverseX();
    void goLeft();
    void goRight();
    void goTop();

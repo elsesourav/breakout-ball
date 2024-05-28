@@ -23,6 +23,7 @@
          var(--h) - calc(var(--preview-h) + var(--button-h))
       );
 
+      margin-top: calc(var(--s) * 0.3);
       position: relative;
       width: var(--preview-w);
       max-height: var(--h);
@@ -256,9 +257,8 @@
                         font-family: f6b;
                         color: #00f2ff;
                      }
-
                   }
-                  
+
                   &.me::before {
                      content: "";
                      position: absolute;
@@ -308,21 +308,25 @@
 
    #previewClose {
       position: absolute;
-      left: calc(var(--s) * 0.1);
-      top: calc(var(--s) * 0.1);
-      font-size: calc(var(--s) * 0.6);
+      left: calc(var(--s) * 0.2);
+      top: calc(var(--s) * 0.15);
+      font-size: calc(var(--s) * 0.5);
       width: calc(var(--s) * 1);
-      height: calc(var(--s) * 0.7);
+      height: calc(var(--s) * 0.8);
       display: grid;
       place-items: center;
-      border-radius: calc(var(--s) * 0.2);
-      color: #ffffff;
-      background: #ff000066;
+      border-radius: calc(var(--s) * 0.3);
+      background: #0015ff80;
       border: none;
-      outline: solid 1px #ff0000;
-      text-shadow: 0 1px #000000;
+      outline: solid 1px #7c7cff;
       cursor: var(--cursor);
       z-index: 1;
+
+      i {
+         background: -webkit-linear-gradient(#ff5900, #ff0000);
+         -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
+      }
    }
 }
 
