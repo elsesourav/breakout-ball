@@ -6,6 +6,7 @@
 #include "./star.h"
 
 #include <iostream>
+using namespace std;
 
 Game::Game() {}
 
@@ -45,17 +46,18 @@ void Game::init(int *array, int length) {
    paddle.glows.clear();
    lava.glows.clear();
 
-   ball.init(ballX, ballY, ballR, ballSpeed);
+   ball.init(ballX, ballY, ballR, 1);
    paddle.init(padX, padY, padW, padH, ballSpeed, WIDTH);
    lava.init(0, padY + SIZE * 0.8, WIDTH, HEIGHT * 0.05, ballSpeed / 4);
-   
+
    for (short i = 0; i < length; i += 3) {
       blocks.push_back(Block(array[i], array[i + 1], blockWidth, blockHeight, array[i + 2]));
    }
 
    wallLength = 0;
    for (auto &block : blocks) {
-      if (block.health == 6) wallLength++;
+      if (block.health == 6)
+         wallLength++;
    }
 
    // setup stars
@@ -85,11 +87,13 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    clearCvs(WIDTH, HEIGHT);
    for (auto &star : stars)
       star.draw(drawStar);
-   if (!gameOver && !gameComplete) ball.draw(drawBall);
+   if (!gameOver && !gameComplete)
+      ball.draw(drawBall);
    paddle.draw(drawPaddle, drawGlow);
 
    for (auto &block : blocks) {
-      if(block.health > 0) block.draw(drawBlock);
+      if (block.health > 0)
+         block.draw(drawBlock);
    }
 
    lava.draw(drawLava, drawGlow);
@@ -97,7 +101,6 @@ void Game::draw(DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr dra
    for (auto &particle : particles) {
       particle.draw(drawParticle);
    }
-
 }
 
 void Game::drawBlockOnly(ClearCvsPtr clearCvs, DrawBlockPtr drawBlock) {
@@ -112,7 +115,39 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
    for (auto &star : stars)
       star.update();
    if (!gamePose && !gameComplete) {
-      ball.update();
+      for (short i = 0; i < ballSpeed; i++) {
+         ball.update();
+
+         // block collision
+         short j = 0;
+         for (auto &block : blocks) {
+            short dir = ball.checkBlockCollision(&block);
+
+            if (!block.isDead && dir != 0) {
+               if (dir == 1) {
+                  ball.reverseX();
+               } else if (dir == -1) {
+                  ball.reverseY();
+               } else if (dir == 2) {
+                  ball.reverseX();
+                  ball.reverseY();
+               }
+
+               short is = block.damage();
+
+               if (is == 2) {
+                  createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 1, 2);
+
+                  block.isDead = true;
+                  blocks.erase(blocks.begin() + j);
+               } else if (is == 1) {
+                  createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
+               }
+               break;
+            }
+            i++;
+         }
+      }
       paddle.update();
    } else {
       paddle.updateGlows();
@@ -120,12 +155,11 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
    lava.update();
 
    // update particles
-   for (auto &particle : particles) {
-      i++;
-      if (particle.update()) {
-         particles.erase(particles.begin() + i);
-      }
-   }
+   particles.erase(
+       remove_if(particles.begin(), particles.end(), [](auto &particle) {
+          return particle.update();
+       }),
+       particles.end());
 
    // check the collision
    // paddle collision
@@ -147,7 +181,9 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
 
          paddleHidden = true;
       }
-   } else {
+   }
+
+   if (paddleHidden) {
       paddleHiddenCount++;
       if (paddleHiddenCount >= paddleMaxHidden) {
          paddleHidden = false;
@@ -155,16 +191,19 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
       }
    }
 
-   if (ball.x1 <= 0 || ball.x2 >= WIDTH) {
-      ball.reverseX();
+   // wall collision
+   if (ball.x1 <= 0) {
+      ball.goRight();
+   } else if (ball.x2 >= WIDTH) {
+      ball.goRight();
    }
    if (ball.y1 <= 0) {
-      ball.reverseY();
+      ball.goBottom();
    }
 
    if (!gamePose && ball.y2 >= padY + padH * 4) {
       gamePose = true;
-      createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3); 
+      createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3);
       showHealth(health--);
 
       if (health <= 0) {
@@ -177,36 +216,6 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
       startingCountDown = FPS * 3;
    }
 
-   // block collision
-   i = 0;
-   for (auto &block : blocks) {
-      short dir = ball.checkBlockCollision(&block);
-
-      if (!block.isDead && dir != 0) {
-         if (dir == 1) {
-            ball.reverseX();
-         } else if (dir == -1) {
-            ball.reverseY();
-         } else if (dir == 2) {
-            ball.reverseX();
-            ball.reverseY();
-         }
-
-         short is = block.damage();
-
-         if (is == 2) {
-            createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 1, 2);
-
-            block.isDead = true;
-            blocks.erase(blocks.begin() + i);
-         } else if (is == 1) {
-            createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
-         }
-         break; 
-      }
-      i++;
-   } 
-   
    if (!gameComplete && wallLength >= blocks.size()) {
       gameComplete = true;
       createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3);
@@ -214,7 +223,7 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
    }
 
    if (startingCountDown >= 0) {
-      if (startingCountDown % FPS == 0){
+      if (startingCountDown % FPS == 0) {
          showCountDown((short)startingCountDown / FPS);
       }
       startingCountDown--;
@@ -222,7 +231,7 @@ void Game::update(ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownP
          gamePose = false;
    } else if (!gameOver && !gameComplete) {
       totalFrameCount++;
-      if (totalFrameCount % FPS == 0){
+      if (totalFrameCount % FPS == 0) {
          showTime((short)totalFrameCount / FPS);
       }
    }

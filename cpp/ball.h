@@ -21,6 +21,10 @@ public:
    void update();
    void reverseY();
    void reverseX();
+   void goLeft();
+   void goRight();
+   void goTop();
+   void goBottom();
    short getCollisionSide(float X1, float Y1, float X2, float Y2, float offset);
    short checkPaddleCollision(Paddle *paddle);
    short checkBlockCollision(Block *block);
