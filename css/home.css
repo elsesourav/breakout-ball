@@ -7,8 +7,8 @@
    -moz-user-select: none;
    -webkit-user-select: none;
    font-family: f3;
-
-   /* outline: solid 1px #f00; */
+/* 
+   outline: solid 1px #f00; */
 }
 
 ::-webkit-scrollbar {
@@ -41,6 +41,13 @@
    --color6-br: #ffffff;
 
    --main-bg: radial-gradient(circle, #0d0098 0%, #03001f 100%);
+   --bg-transparent: linear-gradient(
+      to right,
+      #00000000,
+      rgba(0, 0, 0, 0.3),
+      #00000000,
+      #00000000
+   );
 }
 
 body {

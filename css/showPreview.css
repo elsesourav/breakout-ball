@@ -104,7 +104,7 @@
             position: absolute;
             top: calc(var(--s) * -0.05);
             left: calc(var(--s) * 0.1);
-            font-family: f8b;
+            font-family: f1b;
             font-size: calc(var(--s) * 0.3);
             border-radius: 10%;
             color: #00fffb;

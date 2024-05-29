@@ -238,4 +238,11 @@ addEventListener("popstate", function (event) {
       pg.isLock = pg.ones = false;
       pg.totalMove = pg.dx = pg.dy = 0;
    });
+
+   $("#seekBar").on("touchstart", () => {
+      pg.isLock = true;
+   })
+   $("#seekBar").on("touchend", () => {
+      pg.isLock = false;
+   })
 })();
