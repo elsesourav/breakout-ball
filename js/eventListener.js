@@ -2,6 +2,7 @@ const previewClose = $("#previewClose");
 const showPreview = $("#showPreview");
 const modeType = $("#modeType");
 const homeButton = $("#homeButton");
+const seekBar = $("#seekBar");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
 
@@ -241,8 +242,29 @@ addEventListener("popstate", function (event) {
 
    $("#seekBar").on("touchstart", () => {
       pg.isLock = true;
-   })
+   });
    $("#seekBar").on("touchend", () => {
       pg.isLock = false;
-   })
+   });
+
+   $("#seekBar").on("input", function() {
+      volume = seekBar.value;
+   });
+
+   $("#vibrateBtn").click(function() {
+      this.classList.toggle("active");
+      if (this.classList.contains("active")) {
+         isVibrateActive = true;
+      } else {
+         isVibrateActive = false;
+      }
+   });
+   $("#gyroBtn").click(function() {
+      this.classList.toggle("active");
+      if (this.classList.contains("active")) {
+         isGyroActive = true;
+      } else {
+         isGyroActive = false;
+      }
+   });
 })();

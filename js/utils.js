@@ -121,8 +121,12 @@ function generateUniqueId() {
    return combined.slice(-5).toUpperCase();
 }
 
+let volume = 1;
+let isGyroActive = true;
+let isVibrateActive = true;
+
 function vibrateDevice(time = 200) {
-   if (navigator.vibrate) {
+   if (isVibrateActive && navigator.vibrate) {
       navigator.vibrate(time); 
    }
 }
