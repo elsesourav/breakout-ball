@@ -1,14 +1,6 @@
 "use strict";
 "use strict";
 
-//use cssRoot.style.setProperty("key", "value");
-const rootStyle = document.querySelector(":root").style;
-
-// when run this app in mobile is return true
-const isMobile = localStorage.mobile || 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-
-// minimum window size
-const minSize = innerWidth > innerHeight ? innerHeight : innerWidth;
 
 const toRadians = (degree) => (degree * Math.PI) / 180; // degree to radian
 const toDegrees = (radian) => (radian * 180) / Math.PI; // radian to Degree
@@ -108,11 +100,16 @@ const $$ = (selector) => {
    return self;
 };
 
-const validEmail = (exp) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
-const validName = (exp) => /^([a-zA-Zà-úÀ-Ú]{2,})+\s+([a-zA-Zà-úÀ-Ú\s]{2,})+$/.test(exp);
+const validEmail = (exp) =>
+   /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
+const validName = (exp) =>
+   /^([a-zA-Zà-úÀ-Ú]{2,})+\s+([a-zA-Zà-úÀ-Ú\s]{2,})+$/.test(exp);
 const validUName = (exp) => /^[a-zA-Z0-9\_\-\@]{6,16}$/.test(exp);
 const validPass = (exp) => /^([A-Za-z0-9à-úÀ-Ú\@\_\.\-]{8,16})+$/.test(exp);
-const validText = (exp) => /^([A-Za-z0-9à-úÀ-Ú\.\-\,\_\|\?\:\*\&\%\#\!\+\~\₹\'\"\`\@\s]{2,})+$/.test(exp);
+const validText = (exp) =>
+   /^([A-Za-z0-9à-úÀ-Ú\.\-\,\_\|\?\:\*\&\%\#\!\+\~\₹\'\"\`\@\s]{2,})+$/.test(
+      exp
+   );
 
 function generateUniqueId() {
    const timestamp = Date.now();
@@ -121,16 +118,11 @@ function generateUniqueId() {
    return combined.slice(-5).toUpperCase();
 }
 
-let volume = 1;
-let isGyroActive = true;
-let isVibrateActive = true;
-
 function vibrateDevice(time = 200) {
    if (isVibrateActive && navigator.vibrate) {
-      navigator.vibrate(time); 
+      navigator.vibrate(time);
    }
 }
-
 
 // create element
 const CE = (tagName, className = [], inrHtml = "", parent = null) => {
@@ -179,6 +171,67 @@ function create2dAryPointer(level) {
 function copyArray(ary) {
    return JSON.parse(JSON.stringify(ary));
 }
+
+class ApiError extends Error {
+   constructor(
+      statusCode,
+      message = "Something went wrong",
+      errors = [],
+      stack = ""
+   ) {
+      super(message);
+      this.statusCode = statusCode;
+      this.message = message;
+      this.errors = errors;
+      this.success = false;
+
+      if (stack) {
+         this.stack = stack;
+      } else {
+         Error.captureStackTrace(this, this.constructor);
+      }
+   }
+}
+
+const asyncHandler = (fun) => {
+   return new Promise(async (resolve) => {
+      if (!navigator.onLine) {
+         const alert = new AlertHTML({
+            title: "Connection error",
+            message:
+               "You are offline. Please check your internet connection and try again",
+            btnNm1: "Okay",
+            oneBtn: true,
+         });
+         alert.show();
+         alert.clickBtn1(() => {
+            alert.hide();
+            resolve(false);
+         });
+      } else {
+         floatingInputShow.classList.add("active");
+         const response = await fun(resolve);
+         floatingInputShow.classList.remove("active");
+
+         const { data, title, message } = response;
+         if (data != null) {
+            resolve(data);
+         } else {
+            const alert = new AlertHTML({
+               title: title,
+               message: message,
+               btnNm1: "Okay",
+               oneBtn: true,
+            });
+            resolve(null);
+            alert.show();
+            alert.clickBtn1(() => {
+               alert.hide();
+            });
+         }
+      }
+   });
+};
 
 function pushStatus(name) {
    history.pushState({ name }, `${name}`, `./`);
@@ -282,3 +335,23 @@ function createOnlineLevels(levels, levelsMap, flag = false) {
    </div>
 </div> */
 }
+
+
+const CVS = $("#mainCanvas");
+const previewCanvas = $("#preview");
+const CTX = CVS.getContext("2d");
+const PREVIEW_CTX = previewCanvas.getContext("2d");
+const paddleImage = createPaddleImage();
+const ballImage = createBallImage();
+const blockImages = createBlockImages();
+let ctx = CTX;
+
+previewCanvas.width = CVS.width = CVS_W;
+CVS.height = CVS_H;
+previewCanvas.height = SIZE * (cols - 1);
+
+ctx.imageSmoothingQuality = "high";
+PREVIEW_CTX.imageSmoothingQuality = "high";
+
+const waitingWindow = $("#waitingWindow");
+waitingWindow.classList.add("active");

@@ -5,6 +5,23 @@ const homeButton = $("#homeButton");
 const seekBar = $("#seekBar");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
+const pg = {
+   x: 0,
+   y: 0,
+   dx: 0,
+   dy: 0,
+   scrollX: 0,
+   totalMove: 0,
+   index: 0,
+   preScrollX: 0,
+   width: modeType.scrollWidth / 4,
+   isLock: false,
+   ones: false,
+};
+const { left, width } = CVS.getBoundingClientRect();
+const scale = CVS.width / width;
+let tx = WIDTH / 2;
+let isPointerLock = false;
 
 function goHome() {
    showGameStatus.classList.remove("active");
@@ -56,123 +73,102 @@ addEventListener("popstate", function (event) {
    }
 });
 
+const moveHandler = (x) => {
+   tx = (x - left) * scale;
+   tx = moveTarget(tx);
+};
 
+const pcMoveHandler = (dx) => {
+   tx += dx * 3;
+   tx = moveTarget(tx);
+};
 
 /* -------- paddle move eventListener -------- */
-(() => {
-   const { left, width } = CVS.getBoundingClientRect();
-   const scale = CVS.width / width;
-   let tx = WIDTH / 2;
-   let isPointerLock = false;
+CVS.click(() => {
+   if (isLevelMakerModeOn || !isInOfTheGame) return;
 
-   const moveHandler = (x) => {
-      tx = (x - left) * scale;
-      tx = moveTarget(tx);
-   };
-
-   const pcMoveHandler = (dx) => {
-      tx += dx * 3;
-      tx = moveTarget(tx);
-   };
-
-   CVS.click(() => {
-      if (isLevelMakerModeOn || !isInOfTheGame) return;
-
-      if (!isPointerLock) {
-         isPointerLock = true;
-         if (CVS.requestPointerLock) {
-            CVS.requestPointerLock();
-         } else if (CVS.webkitRequestPointerLock) {
-            CVS.webkitRequestPointerLock();
-         } else if (CVS.mozRequestPointerLock) {
-            CVS.mozRequestPointerLock();
-         } else {
-            console.warn("Pointer locking not supported");
-            isPointerLock = false;
-         }
+   if (!isPointerLock) {
+      isPointerLock = true;
+      if (CVS.requestPointerLock) {
+         CVS.requestPointerLock();
+      } else if (CVS.webkitRequestPointerLock) {
+         CVS.webkitRequestPointerLock();
+      } else if (CVS.mozRequestPointerLock) {
+         CVS.mozRequestPointerLock();
       } else {
-         document.exitPointerLock =
-            document.exitPointerLock || document.mozExitPointerLock;
-         document.exitPointerLock();
+         console.warn("Pointer locking not supported");
          isPointerLock = false;
       }
-   }, false);
-
-   document.addEventListener("pointerlockchange", pointerLockChange, false);
-   document.addEventListener("mozpointerlockchange", pointerLockChange, false);
-
-   function pointerLockChange() {
-      if (isLevelMakerModeOn || !isInOfTheGame) return;
-
-      if (
-         document.pointerLockElement === CVS ||
-         document.mozPointerLockElement === CVS
-      ) {
-         CVS.style.curser = "none";
-      } else {
-         CVS.style.curser = "move";
-      }
+   } else {
+      document.exitPointerLock =
+         document.exitPointerLock || document.mozExitPointerLock;
+      document.exitPointerLock();
+      isPointerLock = false;
    }
+}, false);
 
-   CVS.addEventListener("mouseenter", (e) => {
-      isPointerLock && pcMoveHandler(e.movementX);
-   });
-   CVS.addEventListener("mousemove", (e) => {
-      isPointerLock && pcMoveHandler(e.movementX);
-   });
+document.addEventListener("pointerlockchange", pointerLockChange, false);
+document.addEventListener("mozpointerlockchange", pointerLockChange, false);
 
-   CVS.addEventListener("mouseenter", (e) => {
-      !isPointerLock && moveHandler(e.clientX);
-   });
-   CVS.addEventListener("mousemove", (e) => {
-      !isPointerLock && moveHandler(e.clientX);
-   });
+function pointerLockChange() {
+   if (isLevelMakerModeOn || !isInOfTheGame) return;
 
-   CVS.addEventListener("touchstart", (e) => {
-      moveHandler(e.touches[0].clientX);
-   });
-   CVS.addEventListener("touchmove", (e) => {
-      moveHandler(e.touches[0].clientX);
-   });
+   if (
+      document.pointerLockElement === CVS ||
+      document.mozPointerLockElement === CVS
+   ) {
+      CVS.style.curser = "none";
+   } else {
+      CVS.style.curser = "move";
+   }
+}
 
-   let oldGamma = 0;
+CVS.addEventListener("mouseenter", (e) => {
+   isPointerLock && pcMoveHandler(e.movementX);
+});
+CVS.addEventListener("mousemove", (e) => {
+   isPointerLock && pcMoveHandler(e.movementX);
+});
 
-   // if ("Gyroscope" in window) {
-   //    const gyro = new Gyroscope();
-   //    gyro.start();
-   //    gyro.addEventListener("reading", (e) => {
-   //       const ntx = e.gamma * 5 - oldGamma;
-   //       tx = moveDirect(ntx);
-   //       oldGamma = e.gamma;
-   //    });
-   //    gyro.addEventListener("error", (e) => {
-   //       console.error(e);
-   //    });
-   // }
+CVS.addEventListener("mouseenter", (e) => {
+   !isPointerLock && moveHandler(e.clientX);
+});
+CVS.addEventListener("mousemove", (e) => {
+   !isPointerLock && moveHandler(e.clientX);
+});
 
-   // if (window.DeviceOrientationEvent) {
-   //    window.addEventListener("deviceorientation", (e) => {
-   //       const ntx = e.gamma * 5 - oldGamma;
-   //       tx = moveDirect(ntx);
-   //       oldGamma = e.gamma;
-   //    });
-   // }
+CVS.addEventListener("touchstart", (e) => {
+   moveHandler(e.touches[0].clientX);
+});
+CVS.addEventListener("touchmove", (e) => {
+   moveHandler(e.touches[0].clientX);
+});
 
-   const pg = {
-      x: 0,
-      y: 0,
-      dx: 0,
-      dy: 0,
-      scrollX: 0,
-      totalMove: 0,
-      index: 0,
-      preScrollX: 0,
-      width: modeType.scrollWidth / 4,
-      isLock: false,
-      ones: false,
-   };
+let oldGamma = 0;
 
-   function selectMode(i) {
+// if ("Gyroscope" in window) {
+//    const gyro = new Gyroscope();
+//    gyro.start();
+//    gyro.addEventListener("reading", (e) => {
+//       const ntx = e.gamma * 5 - oldGamma;
+//       tx = moveDirect(ntx);
+//       oldGamma = e.gamma;
+//    });
+//    gyro.addEventListener("error", (e) => {
+//       console.error(e);
+//    });
+// }
+
+// if (window.DeviceOrientationEvent) {
+//    window.addEventListener("deviceorientation", (e) => {
+//       const ntx = e.gamma * 5 - oldGamma;
+//       tx = moveDirect(ntx);
+//       oldGamma = e.gamma;
+//    });
+// }
+
+async function selectMode(i, is = false) {
+   if (!is) {
       modeOptions.removeClass("active");
       modeOptions[i].classList.add("active");
       pg.index = i;
@@ -182,89 +178,113 @@ addEventListener("popstate", function (event) {
       modeType.style.left = `${pg.scrollX}px`;
    }
 
-   maps.each((e, i) => {
-      if (e.classList.contains("active")) selectMode(i);
-   });
+   if (i > 1) {
+      const isAuth = await getUser();
+      if (!isAuth) {
+         const data = await userForm(floatingInputShow);
 
-   modeOptions.click((e, _, i) => selectMode(i));
-
-   modeType.on("touchstart", (e) => {
-      pg.x = e.touches[0].clientX;
-      pg.y = e.touches[0].clientY;
-      modeType.style.transitionDuration = `0ms`;
-   });
-
-   modeType.on("touchmove", (e) => {
-      const { clientX, clientY } = e.touches[0];
-
-      if (!pg.ones && Math.abs(clientX - pg.x) < Math.abs(clientY - pg.y))
-         pg.isLock = true;
-
-      if (!pg.ones) pg.ones = true;
-
-      if (pg.isLock) return;
-
-      pg.dx = clientX - pg.x;
-      pg.dy = clientY - pg.y;
-      pg.x = clientX;
-      pg.y = clientY;
-      pg.totalMove += pg.dx;
-
-      pg.scrollX += pg.dx;
-      modeType.style.left = `${Math.round(pg.scrollX)}px`;
-   });
-
-   modeType.on("touchend", () => {
-      let time = Math.abs(pg.totalMove);
-
-      if (Math.abs(pg.totalMove) < pg.width / 5) {
-         pg.scrollX = -pg.width * pg.index;
-      } else {
-         if (pg.totalMove < 0 && pg.index < 3) pg.index++;
-         if (pg.totalMove > 0 && pg.index > 0) pg.index--;
-
-         time = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index));
-
-         pg.scrollX = -pg.width * pg.index;
-         modeOptions.removeClass("active");
-         modeOptions[pg.index].classList.add("active");
+         if (data) {
+            const { username, password, isSignin } = data;
+            if (isSignin) {
+               // const user = await loginUser(username, password);
+               if (!user) {
+                  // selectMode(i, false);
+               } else {
+               }
+            } else {
+               // const user = await createNewUser(username, password);
+               if (!user) {
+                  // selectMode(i, false);
+               } else {
+               }
+            }
+         } else {
+            selectMode(0);
+         }
       }
+   }
+}
 
-      modeType.style.transitionDuration = `${Math.round(
-         Math.abs((time / pg.width) * 150)
-      )}ms`;
-      modeType.style.left = `${Math.round(pg.scrollX)}px`;
-      pg.preScrollX = pg.scrollX;
+modeOptions.click((e, _, i) => selectMode(i));
 
-      pg.isLock = pg.ones = false;
-      pg.totalMove = pg.dx = pg.dy = 0;
-   });
+modeType.on("touchstart", (e) => {
+   pg.x = e.touches[0].clientX;
+   pg.y = e.touches[0].clientY;
+   modeType.style.transitionDuration = `0ms`;
+});
 
-   $("#seekBar").on("touchstart", () => {
+modeType.on("touchmove", (e) => {
+   const { clientX, clientY } = e.touches[0];
+
+   if (!pg.ones && Math.abs(clientX - pg.x) < Math.abs(clientY - pg.y))
       pg.isLock = true;
-   });
-   $("#seekBar").on("touchend", () => {
-      pg.isLock = false;
-   });
 
-   $("#seekBar").on("input", function() {
-      volume = seekBar.value;
-   });
+   if (!pg.ones) pg.ones = true;
 
-   $("#vibrateBtn").click(function() {
-      this.classList.toggle("active");
-      if (this.classList.contains("active")) {
-         isVibrateActive = true;
-      } else {
-         isVibrateActive = false;
-      }
-   });
-   $("#gyroBtn").click(function() {
-      this.classList.toggle("active");
-      if (this.classList.contains("active")) {
-         isGyroActive = true;
-      } else {
-         isGyroActive = false;
-      }
-   });
-})();
+   if (pg.isLock) return;
+
+   pg.dx = clientX - pg.x;
+   pg.dy = clientY - pg.y;
+   pg.x = clientX;
+   pg.y = clientY;
+   pg.totalMove += pg.dx;
+
+   pg.scrollX += pg.dx;
+   modeType.style.left = `${Math.round(pg.scrollX)}px`;
+});
+
+modeType.on("touchend", () => {
+   let time = Math.abs(pg.totalMove);
+
+   if (Math.abs(pg.totalMove) < pg.width / 5) {
+      pg.scrollX = -pg.width * pg.index;
+   } else {
+      if (pg.totalMove < 0 && pg.index < 3) pg.index++;
+      if (pg.totalMove > 0 && pg.index > 0) pg.index--;
+
+      time = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index));
+
+      pg.scrollX = -pg.width * pg.index;
+      modeOptions.removeClass("active");
+      modeOptions[pg.index].classList.add("active");
+   }
+
+   modeType.style.transitionDuration = `${Math.round(
+      Math.abs((time / pg.width) * 150)
+   )}ms`;
+   modeType.style.left = `${Math.round(pg.scrollX)}px`;
+   pg.preScrollX = pg.scrollX;
+
+   selectMode(pg.index, false);
+
+   pg.isLock = pg.ones = false;
+   pg.totalMove = pg.dx = pg.dy = 0;
+});
+
+$("#seekBar").on("touchstart", () => {
+   pg.isLock = true;
+});
+$("#seekBar").on("touchend", () => {
+   pg.isLock = false;
+});
+
+$("#seekBar").on("input", function () {
+   user.volume = seekBar.value;
+});
+
+$("#vibrateBtn").click(function () {
+   this.classList.toggle("active");
+   if (this.classList.contains("active")) {
+      user.isVibrateActive = true;
+   } else {
+      user.isVibrateActive = false;
+   }
+});
+$("#gyroBtn").click(function () {
+   this.classList.toggle("active");
+   if (this.classList.contains("active")) {
+      user.isGyroActive = true;
+   } else {
+      user.isGyroActive = false;
+   }
+});

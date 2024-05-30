@@ -23,41 +23,42 @@ const PAD_HEIGHT = SIZE * 0.4;
 const BALL_RADIUS = SIZE * 0.22;
 const BALL_SPEED = 15;
 
-const CVS = $("#mainCanvas");
-const previewCanvas = $("#preview");
-const CTX = CVS.getContext("2d");
-const PREVIEW_CTX = previewCanvas.getContext("2d");
-const paddleImage = createPaddleImage();
-const ballImage = createBallImage();
-const blockImages = createBlockImages();
-let ctx = CTX;
-
-previewCanvas.width = CVS.width = CVS_W;
-CVS.height = CVS_H;
-previewCanvas.height = SIZE * (cols - 1);
-
-ctx.imageSmoothingQuality = "high";
-PREVIEW_CTX.imageSmoothingQuality = "high";
-
 let isLevelMakerModeOn = false;
 let isInOfTheGame = true;
 let fpsCounter = 0;
-let init,
-   setup,
-   draw,
-   update,
-   moveLeft,
-   moveRight,
-   moveTarget,
-   moveDirect,
-   drawBlockOnly,
-   drawOutline,
-   makerSetup,
-   makerInit,
-   makerDraw,
-   makerAddBlock,
-   makerRemoveBlock,
-   makerHoverBlock;
+let init, setup, draw, update;
+let moveLeft, moveRight, moveTarget, moveDirect, drawBlockOnly, drawOutline;
+let makerSetup, makerInit, makerDraw;
+let makerAddBlock, makerRemoveBlock, makerHoverBlock;
+let currentPlayingLevel = window.levels[0];
+let currentGameMode = "local";
+
+let user = {
+   username: "guest",
+   volume: 1,
+   isGyroActive: true,
+   isVibrateActive: true,
+   fullName: "",
+   levelsRecord: {
+      "0": {
+         bestTime: null,
+         play: false
+      }
+   }
+}
+
+//use cssRoot.style.setProperty("key", "value");
+const rootStyle = document.querySelector(":root").style;
+
+// when run this app in mobile is return true
+const isMobile =
+   localStorage.mobile ||
+   "ontouchstart" in window ||
+   navigator.maxTouchPoints > 0 ||
+   navigator.msMaxTouchPoints > 0;
+
+// minimum window size
+const minSize = innerWidth > innerHeight ? innerHeight : innerWidth;
 
 rootStyle.setProperty("--window-width", `${WIDTH}px`);
 rootStyle.setProperty("--window-height", `${HEIGHT}px`);

@@ -1,5 +1,5 @@
 const _cvs_ = document.createElement("canvas");
-document.body.appendChild(_cvs_);
+
 _cvs_.style.display = "none";
 const _ctx_ = _cvs_.getContext("2d");
 const glowColors = [
@@ -21,6 +21,10 @@ const glowColors = [
    "#39FF14",
    "#00BFFF",
 ];
+
+onload = () => {
+   document.body.appendChild(_cvs_);
+}
 
 function createCanvasImage(drawFunction, width, height) {
    _cvs_.width = width;

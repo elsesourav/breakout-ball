@@ -1,3 +1,4 @@
+
 const loopFun = () => {
    update();
    draw();
@@ -8,11 +9,6 @@ const makerLoopFun = () => {
 };
 const animation = new Animation(FPS, loopFun);
 const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
-let currentPlayingLevel = window.levels[0];
-let currentGameMode = "local";
-let user = {
-   name: "elsesourav"
-}
 
 
 Module.onRuntimeInitialized = () => {

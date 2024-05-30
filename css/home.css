@@ -7,8 +7,8 @@
    -moz-user-select: none;
    -webkit-user-select: none;
    font-family: f3;
-/* 
-   outline: solid 1px #f00; */
+
+   /* outline: solid 1px #f00; */
 }
 
 ::-webkit-scrollbar {
