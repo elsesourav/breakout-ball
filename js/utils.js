@@ -119,7 +119,7 @@ function generateUniqueId() {
 }
 
 function vibrateDevice(time = 200) {
-   if (isVibrateActive && navigator.vibrate) {
+   if (user.isVibrateActive && navigator.vibrate) {
       navigator.vibrate(time);
    }
 }
