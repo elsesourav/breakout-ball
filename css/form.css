@@ -99,7 +99,7 @@
       [class*="input-"] {
          position: relative;
          width: 80%;
-         height: 2rem;
+         height: calc(var(--s) * 0.9);
          display: grid;
          margin: calc(var(--s) * 0.3);
          border-radius: 6px;
@@ -108,6 +108,10 @@
          background: #fff;
          outline: solid 1px #2a0093;
          overflow: hidden;
+
+         &.hidden {
+            display: none;
+         }
 
          &.three {
             grid-template-columns: 1fr 6fr calc(var(--s) * 0.8);
@@ -121,7 +125,7 @@
             background: transparent;
             font-size: calc(var(--s) * 0.4);
             font-family: f3;
-            padding: 0 0.4rem;
+            padding: calc(var(--s) * 0.1) calc(var(--s) * 0.3);
             border: none;
             outline: none;
             box-shadow: inset 0 0 calc(var(--s) * 0.1) #000;
@@ -183,6 +187,54 @@
                }
             }
          }
+
+         .tool-tip-text {
+            position: fixed;
+            visibility: hidden;
+            width: calc(var(--s) * 5.5);
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            gap: calc(var(--gap) * 0.6);
+            border-radius: 6px;
+            padding: var(--gap);
+            z-index: 15;
+            transform: translate(0%, calc(var(--s) * -0.9));
+            outline: solid 1px #000;
+            transition: linear 2s visibility;
+            transition-delay: 2s;
+
+            i,
+            i > * {
+               color: #000000;
+               font-size: calc(var(--s) * 0.25);
+            }
+
+            &::after {
+               content: "";
+               position: absolute;
+               top: 100%;
+               left: 50%;
+               margin-left: -5px;
+               border-width: 5px;
+               border-style: solid;
+               border-color: #ffffff transparent transparent transparent;
+            }
+
+         }
+         @media (hover: hover) and (pointer: fine) {
+            &:focus .tool-tip-text {
+               visibility: visible;
+               transition-delay: 0ms;
+            }
+         }
+         &:active .tool-tip-text,
+         &:focus .tool-tip-text {
+            visibility: visible;
+            transition-delay: 0ms;
+         }
+
       }
 
       .buttons {
@@ -196,7 +248,7 @@
          border-radius: inherit;
          margin: var(--margin);
 
-         button {
+         input[type="submit"] {
             position: relative;
             width: calc(var(--s) * 2.5);
             height: calc(var(--s) * 0.8);
@@ -211,14 +263,22 @@
             align-items: center;
             appearance: none;
             cursor: var(--cursor);
-            background: linear-gradient(-30deg, #1a2980, #26d0ce, #1a2980);
             border: solid 1px #00ffd9;
             color: #fff;
             text-transform: uppercase;
             font-size: calc(var(--s) * 0.4);
             font-family: f1b;
-            transition: 0.3s linear background;
-            background-size: 200% auto;
+            background: linear-gradient(-30deg, #1a2980, #26d0ce, #1a2980);
+            transition: 300ms linear background;
+
+            @media (hover: hover) and (pointer: fine) {
+               &:hover {
+                  background: #26d0ce;
+               }
+            }
+            &:active {
+               background: #26d0ce;
+            }
          }
       }
 

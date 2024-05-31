@@ -347,6 +347,10 @@
       }
 
       &.two {
+         .tool-tip-text {
+            transform: translateX(calc(var(--s) * -0.76));
+         }
+
          .btn {
             position: relative;
             outline: solid 1px #fff;

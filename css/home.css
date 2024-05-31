@@ -68,11 +68,11 @@ body {
    -webkit-touch-callout: none;
    -ms-touch-select: none; */
 }
-.tool-tip-text {
+#levelDesigner .tool-tip-text {
    display: none;
 }
 @media (hover: hover) and (pointer: fine) {
-   .tool-tip-text {
+   #levelDesigner .tool-tip-text {
       position: absolute;
       visibility: hidden;
       width: calc(var(--s) * 2.5);
@@ -104,7 +104,7 @@ body {
    }
    
    
-   *:has(> .tool-tip-text):hover .tool-tip-text {
+   #levelDesigner  *:has(> .tool-tip-text):hover .tool-tip-text {
       visibility: visible;
    }
 }
@@ -137,6 +137,10 @@ main {
       transition-duration: 300ms;
       transition-property: bottom opacity;
       transition-timing-function: linear;
+
+      touch-action: none;
+      -ms-touch-action: none;
+      -webkit-touch-callout: none;
       
       &.active {
          opacity: 1;

@@ -3,40 +3,119 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-auth.onAuthStateChanged((user) => {
-   waitingWindow.classList.remove("active");
-   if (user) {
-
-   } else {
-      
-   }
- });
-
- 
-
 function getUser() {
    return auth.currentUser;
 }
-function getUsername() {
-   const user = getUser();
-   return user ? user.email.split("@")[0] : null;
+function getUserInfo() {
+   return JSONtoOBJECT(getUser().photoURL);
 }
-console.log(getUser());
-console.log(getUsername());
+async function userProfileUpdate(data) {
+   const myData = OBJECTtoJSON(data);
+   await getUser().updateProfile({
+      photoURL: myData,
+   });
+   return true;
+}
+
+async function getLevelRank(levelId) {
+   const playersRef = db.ref(`ranking/level-${levelId}`);
+   const data = await playersRef.orderByChild("time").once("value");
+   return data.val();
+}
+
+async function getUserRank(levelId) {
+   const levelRank = await getLevelRank(levelId);
+   const array = Object.entries(levelRank);
+   const rank = array.length - array.findIndex(([e]) => e == username);
+   return {
+      userRank: rank,
+      ranks: array,
+   };
+}
+
+async function setUserLevelRank(levelId, time) {
+   const ref = db.ref(`ranking/level-${levelId}/${username}`);
+   await ref.set({
+      time: time,
+      fullName,
+   });
+   return await getUserRank(levelId);
+}
+
+async function updateUserLevelRank(levelId, time) {
+   const ref = db.ref(`ranking/level-${levelId}/${username}/time`);
+   await ref.set(time);
+   return await getUserRank(levelId);
+}
+
+async function updateLocalLevel(levelId, time) {
+   const info = getUserInfo();
+   if (info.levelsRecord[levelId]) {
+      if (info.levelsRecord[levelId].time < time) {
+         info.levelsRecord[levelId].bestTime = time;
+         const all = await updateUserLevelRank(levelId, time);
+         const result = getRank(all);
+         info.levelsRecord[levelId].rank = result.userRank;
+         await userProfileUpdate(info);
+         return result.ranks;
+      }
+   } else {
+      info.levelsRecord[levelId].bestTime = time;
+      const all = await setUserLevelRank(levelId, time);
+      const result = getRank(all);
+      info.levelsRecord[levelId].rank = result.userRank;
+      await userProfileUpdate(info);
+      return result.ranks;
+   }
+
+   setupLocalLevel(info.levelsRecord);
+}
+
+auth.onAuthStateChanged(async (User) => {
+   waitingWindow.classList.remove("active");
+   if (!User) {
+      const { fullName, username, password, isSignin } = await userForm(
+         floatingInputShow,
+         true
+      );
+      if (isSignin) {
+         await signinUser(username, password);
+      } else {
+         await createNewUser(username, password, fullName);
+      }
+   } else {
+      const info = getUserInfo();
+      username = info.username;
+      fullName = info.fullName;
+
+      // setUserLevelRank(0, 100);
+      // setUserLevelRank(0, 200);
+      // setUserLevelRank(0, 300);
+      // setUserLevelRank(0, 50);
+      updateLocalLevel(0, 20);
+      setupLocalLevel(info.levelsRecord);
+      $("#fullName").innerText = info.fullName;
+      $("#username").innerText = `@${info.username}`;
+   }
+});
 
 const createNewUser = (username, password, fullName) =>
    asyncHandler(async () => {
       try {
-         const userCredential = await auth.createUserWithEmailAndPassword(`${username}@sb.com`, password);
-         await userCredential.user.updateProfile({
+         const userCredential = await auth.createUserWithEmailAndPassword(
+            `${username}@sb.com`,
+            password
+         );
+         await userProfileUpdate({
             fullName: fullName,
-            currentLevel
-         })
-         await auth.signInWithEmailAndPassword(`${username}@sb.com`, password);
+            username: username,
+            ...userDemo,
+         });
          return {
-            data: userCredential.user
+            data: userCredential.user,
          };
       } catch (error) {
+         console.log(error);
          if (error.code == "auth/email-already-in-use") {
             return {
                data: null,
@@ -52,24 +131,28 @@ const createNewUser = (username, password, fullName) =>
             };
          }
       }
-   }
-); 
+   });
 
-const loginUser = (username, password) =>
+const signinUser = (username, password) =>
    asyncHandler(async () => {
       try {
-         const userCredential = await auth.signInWithEmailAndPassword(`${username}@sb.com`, password);
+         const userCredential = await auth.signInWithEmailAndPassword(
+            `${username}@sb.com`,
+            password
+         );
          return {
-            data: userCredential.user
+            data: userCredential.user,
          };
       } catch (error) {
          console.log(error);
-         if (error.code == "auth/invalid-login-credentials" || error.code == "auth/internal-error") {
+         if (
+            error.code == "auth/invalid-login-credentials" ||
+            error.code == "auth/internal-error"
+         ) {
             return {
                data: null,
                title: "Authentication Error",
-               message:
-                  "The username (${username}) is invalid. Please ensure it meets the required criteria or create a new account if you do not have one.",
+               message: `The username (${username}) is invalid. Please ensure it meets the required criteria or create a new account if you do not have one.`,
             };
          } else {
             return {
@@ -79,8 +162,7 @@ const loginUser = (username, password) =>
             };
          }
       }
-   }
-); 
+   });
 
 {
    // async function loginUser(username, password) {
@@ -137,5 +219,5 @@ const loginUser = (username, password) =>
 //    console.log(data);
 // })
 setTimeout(() => {
-   console.log(auth.user); 
+   console.log(auth.user);
 }, 1000);

@@ -178,31 +178,30 @@ async function selectMode(i, is = false) {
       modeType.style.left = `${pg.scrollX}px`;
    }
 
-   if (i > 1) {
-      const isAuth = await getUser();
-      if (!isAuth) {
-         const data = await userForm(floatingInputShow);
+   const isAuth = await getUser();
 
-         if (data) {
-            const { username, password, isSignin } = data;
-            if (isSignin) {
-               // const user = await loginUser(username, password);
-               if (!user) {
-                  // selectMode(i, false);
-               } else {
-               }
-            } else {
-               // const user = await createNewUser(username, password);
-               if (!user) {
-                  // selectMode(i, false);
-               } else {
-               }
-            }
-         } else {
-            selectMode(0);
-         }
-      }
-   }
+   // if (!isAuth) {
+   //    const data = await userForm(floatingInputShow);
+
+   //    if (data) {
+   //       const { username, password, isSignin } = data;
+   //       if (isSignin) {
+   //          // const user = await loginUser(username, password);
+   //          if (!user) {
+   //             // selectMode(i, false);
+   //          } else {
+   //          }
+   //       } else {
+   //          // const user = await createNewUser(username, password);
+   //          if (!user) {
+   //             // selectMode(i, false);
+   //          } else {
+   //          }
+   //       }
+   //    } else {
+   //       selectMode(0);
+   //    }
+   // }
 }
 
 modeOptions.click((e, _, i) => selectMode(i));

@@ -11,6 +11,18 @@ const animation = new Animation(FPS, loopFun);
 const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
 
 
+function setupLocalLevel(levels) {
+   const htmlLocalLevels = createHtmlLevels(window.levels, levels, $("#localMode"));
+
+   htmlLocalLevels.forEach(([level], i) => {
+      level.addEventListener("click", () => {
+         currentGameMode = "local";
+         currentPlayingLevel = window.levels[i];
+         setupStartPreview();
+      });
+   });
+}
+
 Module.onRuntimeInitialized = () => {
    setup = Module.cwrap("setup", null, [
       "number",
@@ -73,7 +85,7 @@ Module.onRuntimeInitialized = () => {
 
    makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 
-   const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
+   // const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
    // const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
    // const htmlCreateLevels = createOnlineLevels(
    //    window.levels,
@@ -81,13 +93,13 @@ Module.onRuntimeInitialized = () => {
    //    true
    // );
 
-   htmlLocalLevels.forEach(([level], i) => {
-      level.addEventListener("click", () => {
-         currentGameMode = "local";
-         currentPlayingLevel = window.levels[i];
-         setupStartPreview();
-      });
-   });
+   // htmlLocalLevels.forEach(([level], i) => {
+   //    level.addEventListener("click", () => {
+   //       currentGameMode = "local";
+   //       currentPlayingLevel = window.levels[i];
+   //       setupStartPreview();
+   //    });
+   // });
 
    // htmlOnlineLevels.forEach(([level, cvs], i) => {
    //    cvs.width = CVS_W;

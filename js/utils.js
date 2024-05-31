@@ -1,7 +1,6 @@
 "use strict";
 "use strict";
 
-
 const toRadians = (degree) => (degree * Math.PI) / 180; // degree to radian
 const toDegrees = (radian) => (radian * 180) / Math.PI; // radian to Degree
 
@@ -102,10 +101,9 @@ const $$ = (selector) => {
 
 const validEmail = (exp) =>
    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
-const validName = (exp) =>
-   /^([a-zA-Zà-úÀ-Ú]{2,})+\s+([a-zA-Zà-úÀ-Ú\s]{2,})+$/.test(exp);
-const validUName = (exp) => /^[a-zA-Z0-9\_\-\@]{6,16}$/.test(exp);
-const validPass = (exp) => /^([A-Za-z0-9à-úÀ-Ú\@\_\.\-]{8,16})+$/.test(exp);
+const validName = (exp) => /^[a-zA-Z\s]{3,16}$/.test(exp);
+const validUName = (exp) => /^[a-zA-Z0-9\_\-]{4,16}$/.test(exp);
+const validPass = (exp) => /^([A-Za-z0-9à-úÀ-Ú\@\_\.\-]{6,16})+$/.test(exp);
 const validText = (exp) =>
    /^([A-Za-z0-9à-úÀ-Ú\.\-\,\_\|\?\:\*\&\%\#\!\+\~\₹\'\"\`\@\s]{2,})+$/.test(
       exp
@@ -124,6 +122,10 @@ function vibrateDevice(time = 200) {
    }
 }
 
+function reloadLocation() {
+   window.location.reload();
+}
+
 // create element
 const CE = (tagName, className = [], inrHtml = "", parent = null) => {
    const e = document.createElement(tagName);
@@ -139,6 +141,13 @@ function setDataToLocalStorage(key, object) {
 }
 function getDataToLocalStorage(key) {
    return JSON.parse(localStorage.getItem(key));
+}
+
+function OBJECTtoJSON(data) {
+   return JSON.stringify(data);
+}
+function JSONtoOBJECT(data) {
+   return JSON.parse(data);
 }
 
 function create2dRoundedRectPath(x, y, w, h, r) {
@@ -207,15 +216,17 @@ const asyncHandler = (fun) => {
          alert.clickBtn1(() => {
             alert.hide();
             resolve(false);
+            reloadLocation();
          });
       } else {
-         floatingInputShow.classList.add("active");
+         waitingWindow.classList.add("active");
          const response = await fun(resolve);
-         floatingInputShow.classList.remove("active");
+         waitingWindow.classList.remove("active");
 
          const { data, title, message } = response;
          if (data != null) {
             resolve(data);
+            reloadLocation();
          } else {
             const alert = new AlertHTML({
                title: title,
@@ -227,6 +238,7 @@ const asyncHandler = (fun) => {
             alert.show();
             alert.clickBtn1(() => {
                alert.hide();
+               reloadLocation();
             });
          }
       }
@@ -239,12 +251,14 @@ function pushStatus(name) {
 function replaceState(name = "home") {
    history.replaceState({ name }, `${name}`, `./`);
 }
-function createHtmlLevels(levels, levelsMap) {
+function createHtmlLevels(levels, userLevels, levelsMap) {
    levelsMap.innerHTML = "";
 
    const htmlLevels = [];
+   let userLevelLength = userLevels.length;
 
-   for (let i = 0; i < levels.length; i++) {
+   for (let i = 0, j = 0; i < levels.length; i++) {
+      if (userLevelLength > j) j++;
       const mainEle = CE("div", ["level", "lock"]);
 
       const top = CE("div", ["top"], "", mainEle);
@@ -259,17 +273,28 @@ function createHtmlLevels(levels, levelsMap) {
 
       const iconAndNo = CE("div", ["icon-and-no"], "", mainEle);
       CE("i", ["sbi-fire"], "", iconAndNo);
-      const no = CE("p", ["no"], i + 1, iconAndNo);
+      const no = CE("p", ["no"], levels[i].id, iconAndNo);
 
       const completeTime = CE("div", ["complete-time"], "", mainEle);
       CE("i", ["sbi-stopwatch1"], "", completeTime);
       const time = CE("p", ["time"], "000", completeTime);
       CE("span", [], "s", completeTime);
 
+      if (i === j) {
+         mainEle.classList.remove("lock");
+         p.innerText = userLevels[j].rank || "00";
+         time.innerText = userLevels[j].bestTime || "000";
+         if (userLevels[j].completed) {
+            mainEle.classList.add("complete");
+         }
+      }
+      if (i === j + 1 && userLevels[j].completed) {
+         mainEle.classList.remove("lock");
+      }
+
       levelsMap.appendChild(mainEle);
       htmlLevels.push([mainEle, p, no, time]);
    }
-   htmlLevels[0][0].classList.remove("lock");
    return htmlLevels;
 }
 
@@ -335,7 +360,6 @@ function createOnlineLevels(levels, levelsMap, flag = false) {
    </div>
 </div> */
 }
-
 
 const CVS = $("#mainCanvas");
 const previewCanvas = $("#preview");

@@ -551,7 +551,7 @@
                   font-size: calc(var(--s) * 0.6);
                   font-family: f1b;
                   color: #ffffff;
-                  background: -webkit-linear-gradient(#ffffff, #7e7e7e);
+                  background: -webkit-linear-gradient(-20deg, #00ffcc, #0077ff);
                   -webkit-background-clip: text;
                   -webkit-text-fill-color: transparent;
                }

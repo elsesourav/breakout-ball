@@ -33,16 +33,16 @@ let makerAddBlock, makerRemoveBlock, makerHoverBlock;
 let currentPlayingLevel = window.levels[0];
 let currentGameMode = "local";
 
-let user = {
-   username: "guest",
+let username, fullName;
+let userDemo = {
    volume: 1,
    isGyroActive: true,
    isVibrateActive: true,
-   fullName: "",
    levelsRecord: {
       "0": {
+         rank: null,
          bestTime: null,
-         play: false
+         completed: false
       }
    }
 }
