@@ -3,13 +3,6 @@ window.levels = [
       id: "1",
       creator: "elsesourav",
       blocks: [
-         { x: 4, y: 4, h: 1 },
-      ],
-   },
-   {
-      id: "10",
-      creator: "elsesourav",
-      blocks: [
          { x: 1, y: 1, h: 1 },
          { x: 2, y: 1, h: 1 },
          { x: 3, y: 1, h: 1 },

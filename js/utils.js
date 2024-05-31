@@ -117,7 +117,7 @@ function generateUniqueId() {
 }
 
 function vibrateDevice(time = 200) {
-   if (user.isVibrateActive && navigator.vibrate) {
+   if (userDemo.isVibrateActive && navigator.vibrate) {
       navigator.vibrate(time);
    }
 }
@@ -282,13 +282,13 @@ function createHtmlLevels(levels, userLevels, levelsMap) {
 
       if (i === j) {
          mainEle.classList.remove("lock");
-         p.innerText = userLevels[j].rank || "00";
-         time.innerText = userLevels[j].bestTime || "000";
-         if (userLevels[j].completed) {
+         p.innerText = userLevels[j + 1].rank || "00";
+         time.innerText = userLevels[j + 1].bestTime || "000";
+         if (userLevels[j + 1].completed) {
             mainEle.classList.add("complete");
          }
       }
-      if (i === j + 1 && userLevels[j].completed) {
+      if (i === j + 1 && userLevels[j + 1].completed) {
          mainEle.classList.remove("lock");
       }
 

@@ -91,19 +91,27 @@ EM_JS(void, showGameOver, (short time), {
    setTimeout(() => {
       animation.stop();
       showCountDowns.classList = [];
-      if (currentGameMode == "testing") setupStartPreview(["testing"], time);
-      else  setupStartPreview(["inGame"], time);
+      if (currentGameMode == "testing") setupStartPreview(["testing"], null, time);
+      else  setupStartPreview(["inGame"], null, time);
    }, 2000);
 });
 EM_JS(void, showGameComplete, (short time), {
    showCountDowns.classList = [];
    showCountDowns.classList.add("gameWin");
 
-   setTimeout(() => {
+   setTimeout(async () => {
       animation.stop();
       showCountDowns.classList = [];
-      if (currentGameMode == "testing") setupStartPreview(["testing"], time);
-      else  setupStartPreview(["inGame"], time);
+      if (currentGameMode == "testing") setupStartPreview(["testing"]);
+      else {
+         const data = await setupLevelRanking(currentPlayingLevel.id, time);
+         setupStartPreview(["inGame"], data);
+      }
+
+      // setup every level
+      const info = getUserInfo();
+
+      setupLocalLevel(info.levelsRecord);
 
       // update rank
    }, 2000);

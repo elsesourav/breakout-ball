@@ -18,17 +18,19 @@ async function userProfileUpdate(data) {
 }
 
 async function getLevelRank(levelId) {
+   waitingWindow.classList.add("active");
    const playersRef = db.ref(`ranking/level-${levelId}`);
    const data = await playersRef.orderByChild("time").once("value");
+   waitingWindow.classList.remove("active");
    return data.val();
 }
 
 async function getUserRank(levelId) {
    const levelRank = await getLevelRank(levelId);
-   const array = Object.entries(levelRank);
-   const rank = array.length - array.findIndex(([e]) => e == username);
+   const array = levelRank ? Object.entries(levelRank) : [];
+   const rank = array.findIndex(([e]) => e == username);
    return {
-      userRank: rank,
+      userRank: rank == -1 ? null : rank,
       ranks: array,
    };
 }
@@ -37,82 +39,98 @@ async function setUserLevelRank(levelId, time) {
    const ref = db.ref(`ranking/level-${levelId}/${username}`);
    await ref.set({
       time: time,
-      fullName,
+      fullName: fullName,
    });
    return await getUserRank(levelId);
 }
 
 async function updateUserLevelRank(levelId, time) {
    const ref = db.ref(`ranking/level-${levelId}/${username}/time`);
-   await ref.set(time);
+   await ref.update(time);
    return await getUserRank(levelId);
 }
 
-async function updateLocalLevel(levelId, time) {
+async function setupLevelRanking(levelId, time) {
    const info = getUserInfo();
-   if (info.levelsRecord[levelId]) {
-      if (info.levelsRecord[levelId].time < time) {
-         info.levelsRecord[levelId].bestTime = time;
-         const all = await updateUserLevelRank(levelId, time);
-         const result = getRank(all);
-         info.levelsRecord[levelId].rank = result.userRank;
-         await userProfileUpdate(info);
-         return result.ranks;
-      }
-   } else {
-      info.levelsRecord[levelId].bestTime = time;
-      const all = await setUserLevelRank(levelId, time);
-      const result = getRank(all);
-      info.levelsRecord[levelId].rank = result.userRank;
-      await userProfileUpdate(info);
-      return result.ranks;
+   if (info.levelsRecord[levelId] && info.levelsRecord[levelId].time > time)
+      return;
+
+   waitingWindow.classList.add("active");
+
+   const data = info.levelsRecord[levelId].time
+      ? await updateUserLevelRank(levelId, time)
+      : await setUserLevelRank(levelId, time);
+
+   info.levelsRecord[levelId].bestTime = time;
+   info.levelsRecord[levelId].rank = data.userRank;
+   info.levelsRecord[levelId].completed = true;
+
+   if (window.levels.length - 1 > levelId) {
+      info.levelsRecord[`${Number(levelId) + 1}`] = {
+         bestTime: null,
+         rank: null,
+         completed: false,
+      };
    }
 
-   setupLocalLevel(info.levelsRecord);
+   console.log(info);
+   await userProfileUpdate(info);
+   waitingWindow.classList.remove("active");
+   return data;
 }
 
-auth.onAuthStateChanged(async (User) => {
-   waitingWindow.classList.remove("active");
-   if (!User) {
-      const { fullName, username, password, isSignin } = await userForm(
-         floatingInputShow,
-         true
-      );
-      if (isSignin) {
-         await signinUser(username, password);
+Module.onRuntimeInitialized = () => {
+   waitingWindow.classList.add("active");
+   auth.onAuthStateChanged(async (User) => {
+      loadWasm();
+      waitingWindow.classList.remove("active");
+      if (!User) {
+         const { fullName, username, password, isSignin } = await userForm(
+            floatingInputShow,
+            true
+         );
+         if (isSignin) {
+            await signinUser(username, password);
+         } else {
+            await createNewUser(username, password, fullName);
+         }
       } else {
-         await createNewUser(username, password, fullName);
+         const info = getUserInfo();
+         userDemo = info;
+         username = info.username;
+         fullName = info.fullName;
+
+         setupLocalLevel(info.levelsRecord);
+         $("#fullName").innerText = info.fullName;
+         $("#username").innerText = `@${info.username}`;
       }
-   } else {
-      const info = getUserInfo();
-      username = info.username;
-      fullName = info.fullName;
+   });
+};
 
-      // setUserLevelRank(0, 100);
-      // setUserLevelRank(0, 200);
-      // setUserLevelRank(0, 300);
-      // setUserLevelRank(0, 50);
-      updateLocalLevel(0, 20);
-      setupLocalLevel(info.levelsRecord);
-      $("#fullName").innerText = info.fullName;
-      $("#username").innerText = `@${info.username}`;
-   }
-});
-
-const createNewUser = (username, password, fullName) =>
-   asyncHandler(async () => {
+const createNewUser = (username, password, fullName) => {
+   return asyncHandler(async () => {
       try {
-         const userCredential = await auth.createUserWithEmailAndPassword(
+         await auth.createUserWithEmailAndPassword(
             `${username}@sb.com`,
             password
          );
-         await userProfileUpdate({
-            fullName: fullName,
+         const info = {
             username: username,
-            ...userDemo,
-         });
+            fullName: fullName,
+            volume: 1,
+            isGyroActive: true,
+            isVibrateActive: true,
+            levelsRecord: {
+               1: {
+                  rank: null,
+                  bestTime: null,
+                  completed: false,
+               },
+            },
+         };
+         await userProfileUpdate(info);
          return {
-            data: userCredential.user,
+            data: true,
          };
       } catch (error) {
          console.log(error);
@@ -132,16 +150,14 @@ const createNewUser = (username, password, fullName) =>
          }
       }
    });
+};
 
-const signinUser = (username, password) =>
-   asyncHandler(async () => {
+const signinUser = (username, password) => {
+   return asyncHandler(async () => {
       try {
-         const userCredential = await auth.signInWithEmailAndPassword(
-            `${username}@sb.com`,
-            password
-         );
+         await auth.signInWithEmailAndPassword(`${username}@sb.com`, password);
          return {
-            data: userCredential.user,
+            data: true,
          };
       } catch (error) {
          console.log(error);
@@ -163,61 +179,4 @@ const signinUser = (username, password) =>
          }
       }
    });
-
-{
-   // async function loginUser(username, password) {
-   //    try {
-   //       const doc = await db.collection("usernameToUid").doc(username).get();
-   //       if (doc.exists) {
-   //          const uid = doc.data().uid;
-   //          const userDoc = await db.collection("users").doc(uid).get();
-   //          if (userDoc.exists) {
-   //             const email = userDoc.data().email;
-   //             const userCredential = await auth.signInWithEmailAndPassword(
-   //                email,
-   //                password
-   //             );
-   //             const user = userCredential.user;
-   //             console.log("User signed in:", user);
-   //          } else {
-   //             console.error("No user found with the provided UID.");
-   //          }
-   //       } else {
-   //          console.error("Username not found.");
-   //       }
-   //    } catch (error) {
-   //       console.error("Error signing in:", error.code, error.message);
-   //    }
-   // }
-   // async function createNewUser(username, email, password) {
-   //    try {
-   //       const userCredential = await auth.createUserWithEmailAndPassword(
-   //          email,
-   //          password
-   //       );
-   //       const User = userCredential.user;
-   //       // await db.collection("usernameToUid").doc(username).set({
-   //       //    uid: User.uid,
-   //       // });
-   //       // await db.collection("users").doc(User.uid).set({
-   //       //    username: username,
-   //       //    email: email,
-   //       // });
-   //       console.log("User created:", User);
-   //    } catch (error) {
-   //       console.error("Error creating new user:", error.code, error.message);
-   //    }
-   // }
-   // };
-}
-
-// createNewUser("sourav", "431413414").then((data) => {
-//    // console.log(data);
-// });
-
-// loginUser("sourav", "431413414").then((data) => {
-//    console.log(data);
-// })
-setTimeout(() => {
-   console.log(auth.user);
-}, 1000);
+};

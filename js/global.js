@@ -39,7 +39,7 @@ let userDemo = {
    isGyroActive: true,
    isVibrateActive: true,
    levelsRecord: {
-      "0": {
+      "1": {
          rank: null,
          bestTime: null,
          completed: false

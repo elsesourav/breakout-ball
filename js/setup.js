@@ -14,8 +14,10 @@ const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
 function setupLocalLevel(levels) {
    const htmlLocalLevels = createHtmlLevels(window.levels, levels, $("#localMode"));
 
-   htmlLocalLevels.forEach(([level], i) => {
-      level.addEventListener("click", () => {
+   htmlLocalLevels.every(([lvl], i) => {
+      console.log(i > levels.length);
+      if (i > levels.length) return true;
+      lvl.addEventListener("click", () => {
          currentGameMode = "local";
          currentPlayingLevel = window.levels[i];
          setupStartPreview();
@@ -23,7 +25,7 @@ function setupLocalLevel(levels) {
    });
 }
 
-Module.onRuntimeInitialized = () => {
+function loadWasm() {
    setup = Module.cwrap("setup", null, [
       "number",
       "number",
@@ -139,4 +141,4 @@ Module.onRuntimeInitialized = () => {
    // ctx = CTX;
    // animation.start(makerLoopFun);
    // playLevel();
-};
+}

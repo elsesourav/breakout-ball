@@ -102,9 +102,6 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
             setBorder();
          }
       }
-      const keyEnter = (e) => {
-         if (e.keyCode === 13) sendValue();
-      };
 
       const changeAuthOption = (e) => {
          title.innerHTML = isSignin ? "Sign Up" : "Sign In";
@@ -122,7 +119,6 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       };
 
       const removeAllEventListener = () => {
-         fw.removeEventListener("keydown", keyEnter);
          fw.removeEventListener("click", setIsSectionTrue, true);
          closeButton.removeEventListener("click", closeSingle);
          fw.removeEventListener("submit", sendValue);
@@ -134,7 +130,6 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
          );
       };
 
-      fw.addEventListener("keydown", keyEnter);
       fw.addEventListener("click", setIsSectionTrue, true);
       closeButton.addEventListener("click", closeSingle);
       fw.addEventListener("submit", sendValue);
