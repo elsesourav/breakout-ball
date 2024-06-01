@@ -23,6 +23,12 @@ const PAD_HEIGHT = SIZE * 0.4;
 const BALL_RADIUS = SIZE * 0.22;
 const BALL_SPEED = 15;
 
+
+const MAX_PAGE_RENDER = 4;
+const MAX_PAGE_BUTTON = 5;
+let currentPageIndex = 0;
+let maxPagePossible = 5;
+
 let isLevelMakerModeOn = false;
 let isInOfTheGame = true;
 let fpsCounter = 0;
@@ -33,7 +39,6 @@ let makerAddBlock, makerRemoveBlock, makerHoverBlock;
 let currentPlayingLevel;
 let currentGameMode = "local";
 
-let username, fullName;
 let tempUser = {}
 
 //use cssRoot.style.setProperty("key", "value");

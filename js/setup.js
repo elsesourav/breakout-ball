@@ -1,4 +1,3 @@
-
 const loopFun = () => {
    update();
    draw();
@@ -9,10 +8,18 @@ const makerLoopFun = () => {
 };
 const animation = new Animation(FPS, loopFun);
 const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
-
+const htmlCreateLevels = createOnlineLevels(
+   window.levels,
+   $("#createMode"),
+   true
+);
 
 function setupLocalLevel(levels) {
-   const htmlLocalLevels = createHtmlLevels(tempUser.numLocalLevels, levels, $("#localMode"));
+   const htmlLocalLevels = createHtmlLevels(
+      tempUser.numLocalLevels,
+      levels,
+      $("#localMode")
+   );
 
    htmlLocalLevels.every(([lvl], i) => {
       if (!levels[i + 1]) return false;
@@ -23,6 +30,27 @@ function setupLocalLevel(levels) {
          setupStartPreview();
       });
       return true;
+   });
+}
+
+async function setupCreateLevel() {
+   const levels = await getUserCreatedLevels();
+   const htmlCreateLevels = createOnlineLevels(levels, $("#createMode"), true);
+   console.log(levels);
+
+   htmlCreateLevels.forEach(([level, cvs], i) => {
+      cvs.width = CVS_W;
+      cvs.height = SIZE * (cols - 2.3);
+      ctx = cvs.getContext("2d");
+      const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
+      init(aryPtr, length);
+      draw();
+
+      level.addEventListener("click", () => {
+         currentGameMode = "online";
+         currentPlayingLevel = window.levels[i];
+         setupStartPreview();
+      });
    });
 }
 

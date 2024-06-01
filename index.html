@@ -8,12 +8,13 @@
       <title>Breakout Ball</title>
 
       <!-- font and icon stylesheet -->
-      <link rel="stylesheet" href="icons/css/icon.css" />
       <link rel="stylesheet" href="icons/css/font.css" />
-
+      <link rel="stylesheet" href="icons/css/icon.css" />
+      
       <!-- design stylesheet -->
       <link rel="stylesheet" href="./css/home.css" />
       <link rel="stylesheet" href="./css/form.css" />
+      <link rel="stylesheet" href="./css/pages.css" />
       <link rel="stylesheet" href="./css/showPreview.css" />
       <link rel="stylesheet" href="./css/gameDesigner.css" />
       <link rel="stylesheet" href="./css/lavel.css" />
@@ -26,6 +27,7 @@
       <script src="./js/config.js"></script>
       <script src="./js/global.js"></script>
       <script src="./js/createImage.js"></script>
+      <script src="./js/pages.js"></script>
       <script src="./js/form.js"></script>
       <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-app.js"></script>
       <script src="https://www.gstatic.com/firebasejs/8.6.0/firebase-auth.js"></script>
@@ -43,9 +45,11 @@
       <div id="mobileErr" contenteditable="true"></div>
 
       <main>
-         <header></header>
          <div id="gameMode">
-            <div id="selectMode">
+            <!--==============================
+                    Header (Navigation)
+            ===============================-->
+            <header id="selectMode">
                <div class="mode active">
                   <p>Local</p>
                </div>
@@ -59,10 +63,13 @@
                   <p>Profile</p>
                </div>
                <div class="move"></div>
-            </div>
+            </header>
+            <!--==============================
+                     Navigation Body
+            ===============================-->
             <div id="modeType">
                <div id="localMode" class="map"></div>
-               <div class="map extra">
+               <div class="map extra" id="onlineMap">
                   <div class="top">
                      <div class="box">
                         <i class="sbi-search"></i>
@@ -76,6 +83,7 @@
                      </div>
                   </div>
                   <div id="onlineMode" class="inner"></div>
+                  <div id="pages"></div>
                </div>
                <div class="map extra">
                   <div class="top">
@@ -134,7 +142,14 @@
             </div>
          </div>
 
+         <!--==============================
+                     Main Canvas
+         ===============================-->
          <canvas id="mainCanvas" class=""></canvas>
+
+         <!--=============================================
+           Game Status(Health, time, Game Over, Game Win)
+         ================================================-->
          <div id="showGameStatus" class="">
             <div id="showHealths" class="">
                <i class="sbi-heart"></i>
@@ -154,6 +169,9 @@
             </div>
          </div>
 
+         <!--==============================
+                  Game Preview
+         ===============================-->
          <div id="showPreview" class="">
             <button id="previewClose">
                <i class="sbi-arrow-left2"></i>
@@ -200,6 +218,9 @@
             </div>
          </div>
 
+         <!--==============================
+               Level Create Options
+         ===============================-->
          <div id="levelDesigner" class="">
             <div class="selection one">
                <p class="tag">BLOCKS</p>
@@ -261,7 +282,8 @@
                      <div class="block"><span></span></div>
                      <div class="tool-tip-text">
                         <i class="sbi-info-with-circle">
-                           Hit Points(HP) <b>∞</b></i>
+                           Hit Points(HP) <b>∞</b></i
+                        >
                         <i class="sbi-keyboard"> SPACE+W</i>
                      </div>
                   </div>
@@ -330,6 +352,9 @@
             </div>
          </div>
 
+         <!--==============================
+                  Loading Window
+         ===============================-->
          <div id="waitingWindow" class="">
             <div class="center">
                <div class="wave" style="--delay: 0"></div>
@@ -345,6 +370,9 @@
             </div>
          </div>
 
+         <!--==============================
+                  Alert Window
+         ===============================-->
          <div id="floatingInputShow" class="floating-window-outer"></div>
       </main>
    </body>

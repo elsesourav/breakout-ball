@@ -102,7 +102,7 @@ async function updateLevelView(levelId) {
    });
 }
 
-async function saveLevel(newLevel, path = "local") {
+async function saveLevel(newLevel, path = "online") {
    waitingWindow.classList.add("active");
    try {
       const ref = db.ref(`levels/${path}/${newLevel.id}`);
@@ -132,32 +132,16 @@ async function getLevel(levelId) {
    }
 }
 
-Module.onRuntimeInitialized = () => {
+async function getUserCreatedLevels() {
    waitingWindow.classList.add("active");
-   auth.onAuthStateChanged(async (User) => {
-      loadWasm();
-
-      waitingWindow.classList.remove("active");
-      if (!User) {
-         const { fullName, username, password, isSignin } = await userForm(
-            floatingInputShow,
-            true
-         );
-         if (isSignin) {
-            await signinUser(username, password);
-         } else {
-            await createNewUser(username, password, fullName);
-         }
-      } else {
-         const info = getUserInfo();
-         tempUser = info;
-
-         setupLocalLevel(info.levelsRecord);
-         $("#fullName").innerText = info.fullName;
-         $("#username").innerText = `@${info.username}`;
-      }
-   });
-};
+   const ref = db.ref(`levels/online`);
+   const levels = await ref
+      .orderByChild("creator")
+      .equalTo(tempUser.username)
+      .once("value");
+   waitingWindow.classList.remove("active");
+   return levels.val();
+}
 
 const createNewUser = (username, password, fullName) => {
    return asyncHandler(async () => {
@@ -228,6 +212,53 @@ const signinUser = (username, password) => {
                message: "Invalid Password. Please enter a valid password",
             };
          }
+      }
+   });
+};
+
+Module.onRuntimeInitialized = () => {
+   waitingWindow.classList.add("active");
+   auth.onAuthStateChanged(async (User) => {
+      loadWasm();
+
+      waitingWindow.classList.remove("active");
+      if (!User) {
+         const { fullName, username, password, isSignin } = await userForm(
+            floatingInputShow,
+            true
+         );
+         if (isSignin) {
+            await signinUser(username, password);
+         } else {
+            await createNewUser(username, password, fullName);
+         }
+      } else {
+         const info = getUserInfo();
+         tempUser = info;
+
+         setupLocalLevel(info.levelsRecord);
+         $("#fullName").innerText = info.fullName;
+         $("#username").innerText = `@${info.username}`;
+
+         // download online levels
+         const onlineRef = db.ref(`levels/online`);
+         window.onlineLevels = [];
+
+         onlineRef.on("child_added", (s) => {
+            window.onlineLevels.push(s.val());
+            window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
+            const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
+            PAGES.update(maxPagePossible);
+            pageClickAction();
+         });
+
+         onlineRef.on("child_removed", (s) => {
+            const index = window.onlineLevels.findIndex((e) => e.id === s.key);
+            if (index !== -1) {
+               window.onlineLevels.splice(index, 1);
+               pageClickAction();
+            }
+         });
       }
    });
 };

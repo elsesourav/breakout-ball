@@ -99,6 +99,17 @@ const $$ = (selector) => {
    return self;
 };
 
+function debounce(func, delay = 500) {
+   let timer;
+   return function (...args) {
+      const context = this;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+         func.apply(context, args);
+      }, delay);
+   };
+}
+
 const validEmail = (exp) =>
    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
 const validName = (exp) => /^[a-zA-Z\s]{3,16}$/.test(exp);
@@ -172,10 +183,10 @@ function create2dAryPointer(level) {
       ary.push(level[i].y);
       ary.push(level[i].h);
    }
-   
+
    let nBytes = ary.length * 4;
    let aryPtr = Module._malloc(nBytes);
-   
+
    Module.HEAP32.set(ary, aryPtr / 4);
    return { aryPtr, length: ary.length };
 }
@@ -301,11 +312,11 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
    return htmlLevels;
 }
 
-function createOnlineLevels(levels, levelsMap, flag = false) {
+function createOnlineLevels(numOfLevel, levelsMap) {
    levelsMap.innerHTML = "";
    const htmlLevels = [];
 
-   for (let i = 0; i < levels.length; i++) {
+   for (let i = 0; i < numOfLevel; i++) {
       const mainEle = CE("div", ["level"]);
       const cvs = CE("canvas", ["levelCvs"]);
       const details = CE("div", ["details"]);
@@ -313,15 +324,19 @@ function createOnlineLevels(levels, levelsMap, flag = false) {
       CE("i", ["sbi-play-circle"], "", playCount);
       const count = CE("p", ["count"], "10", playCount);
       const id = CE("p", ["id"], "ZAS", details);
-      const _delete = flag
-         ? CE("p", ["sbi-settings", "setting"], "", details)
-         : "";
-
       mainEle.appendChild(cvs);
       mainEle.appendChild(details);
       levelsMap.appendChild(mainEle);
 
-      htmlLevels.push([mainEle, cvs, count, id, _delete]);
+      cvs.width = CVS_W;
+      cvs.height = SIZE * (cols - 2.7);
+      const ctx = cvs.getContext("2d");
+
+      function clear() {
+         ctx.clearRect(0, 0, cvs.width, cvs.height);
+      }
+
+      htmlLevels.push([mainEle, ctx, count, id, clear]);
    }
    return htmlLevels;
 }

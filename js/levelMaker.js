@@ -93,7 +93,7 @@ class LevelMaker {
          alert.clickBtn2(async () => {
             alert.hide();
             const newLevel = this.getLevel();
-            const isUpload = await saveLevel(newLevel, "online");
+            const isUpload = await saveLevel(newLevel);
             if (isUpload) {
                goHome();
             } else {
@@ -299,7 +299,7 @@ class LevelMaker {
       });
       return {
          id: generateUniqueId(),
-         creator: user.name,
+         creator: tempUser.username,
          playCount: 0,
          blocks: lvl
       };
