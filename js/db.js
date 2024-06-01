@@ -45,44 +45,42 @@ async function setUserLevelRank(levelId, time) {
 }
 
 async function updateUserLevelRank(levelId, time) {
-   const ref = db.ref(`ranking/level-${levelId}/${username}/time`);
-   await ref.update(time);
+   const ref = db.ref(`ranking/level-${levelId}/${username}`);
+   await ref.update({time});
    return await getUserRank(levelId);
 }
 
 async function setupLevelRanking(levelId, time) {
    const info = getUserInfo();
-   if (info.levelsRecord[levelId] && info.levelsRecord[levelId].time > time)
-      return;
 
+   if (info.levelsRecord[levelId] && info.levelsRecord[levelId].time !== null && info.levelsRecord[levelId].time <= time) return null;
    waitingWindow.classList.add("active");
 
-   const data = info.levelsRecord[levelId].time
+   const data = info.levelsRecord[levelId] && info.levelsRecord[levelId].time !== null
       ? await updateUserLevelRank(levelId, time)
       : await setUserLevelRank(levelId, time);
 
-   info.levelsRecord[levelId].bestTime = time;
+   info.levelsRecord[levelId].time = time;
    info.levelsRecord[levelId].rank = data.userRank;
    info.levelsRecord[levelId].completed = true;
 
    if (window.levels.length - 1 > levelId) {
       info.levelsRecord[`${Number(levelId) + 1}`] = {
-         bestTime: null,
+         time: null,
          rank: null,
          completed: false,
       };
    }
 
-   console.log(info);
    await userProfileUpdate(info);
    waitingWindow.classList.remove("active");
    return data;
 }
-
 Module.onRuntimeInitialized = () => {
    waitingWindow.classList.add("active");
    auth.onAuthStateChanged(async (User) => {
       loadWasm();
+
       waitingWindow.classList.remove("active");
       if (!User) {
          const { fullName, username, password, isSignin } = await userForm(
@@ -123,7 +121,7 @@ const createNewUser = (username, password, fullName) => {
             levelsRecord: {
                1: {
                   rank: null,
-                  bestTime: null,
+                  time: null,
                   completed: false,
                },
             },
@@ -133,7 +131,6 @@ const createNewUser = (username, password, fullName) => {
             data: true,
          };
       } catch (error) {
-         console.log(error);
          if (error.code == "auth/email-already-in-use") {
             return {
                data: null,
@@ -160,7 +157,6 @@ const signinUser = (username, password) => {
             data: true,
          };
       } catch (error) {
-         console.log(error);
          if (
             error.code == "auth/invalid-login-credentials" ||
             error.code == "auth/internal-error"

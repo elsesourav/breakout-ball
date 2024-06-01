@@ -41,7 +41,7 @@ let userDemo = {
    levelsRecord: {
       "1": {
          rank: null,
-         bestTime: null,
+         time: null,
          completed: false
       }
    }

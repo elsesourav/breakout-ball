@@ -33,13 +33,14 @@ async function setupStartPreview(optionalClass = [], data = null, time = null) {
 
    isInOfTheGame = false;
 
+   const levelId = currentPlayingLevel.id;
+
    showPreview.classList = [];
    showPreview.classList.add("active", ...optionalClass);
-   pushStatus("game");
-   pushStatus("game");
+   
    animation.stop();
-   $("#lvlNo").innerHTML = currentPlayingLevel.id;
-   $("#levelCreatorName").innerHTML = currentPlayingLevel.id > 100 ? `@${currentPlayingLevel.creator}` : "";
-   $("#lvlRank").innerHTML = userRank !== null ? userRank : "∞" ;
-   $("#lvlTime").innerHTML = userRank !== null ? ranks[userRank - 1][1].time : time !== null ? time : "∞" ;
+   $("#lvlNo").innerHTML = levelId;
+   $("#levelCreatorName").innerHTML = levelId > 100 ? `@${currentPlayingLevel.creator}` : "";
+   $("#lvlRank").innerHTML = userRank !== null ? userRank + 1 : "∞";
+   $("#lvlTime").innerHTML = time !== null ? time : userRank !== null ? ranks[userRank][1].time : "∞" ;
 }

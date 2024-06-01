@@ -265,7 +265,7 @@ function createHtmlLevels(levels, userLevels, levelsMap) {
 
       const hashtag = CE("div", ["hashtag"], "", top);
       CE("i", ["sbi-trophy2"], "", hashtag);
-      const p = CE("p", [], "00", hashtag);
+      const p = CE("p", [], "∞", hashtag);
 
       const lockComplete = CE("div", ["is-lock-or-complete"], "", top);
       CE("i", ["sbi-lock-outline", "lock"], "", lockComplete);
@@ -277,13 +277,13 @@ function createHtmlLevels(levels, userLevels, levelsMap) {
 
       const completeTime = CE("div", ["complete-time"], "", mainEle);
       CE("i", ["sbi-stopwatch1"], "", completeTime);
-      const time = CE("p", ["time"], "000", completeTime);
+      const time = CE("p", ["time"], "∞", completeTime);
       CE("span", [], "s", completeTime);
 
       if (i === j) {
          mainEle.classList.remove("lock");
-         p.innerText = userLevels[j + 1].rank || "00";
-         time.innerText = userLevels[j + 1].bestTime || "000";
+         p.innerText = userLevels[j + 1].rank + 1 || "∞";
+         time.innerText = userLevels[j + 1].time || "∞";
          if (userLevels[j + 1].completed) {
             mainEle.classList.add("complete");
          }

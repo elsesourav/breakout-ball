@@ -15,13 +15,14 @@ function setupLocalLevel(levels) {
    const htmlLocalLevels = createHtmlLevels(window.levels, levels, $("#localMode"));
 
    htmlLocalLevels.every(([lvl], i) => {
-      console.log(i > levels.length);
-      if (i > levels.length) return true;
+      if (!levels[i + 1]) return false;
+
       lvl.addEventListener("click", () => {
          currentGameMode = "local";
          currentPlayingLevel = window.levels[i];
          setupStartPreview();
       });
+      return true;
    });
 }
 
