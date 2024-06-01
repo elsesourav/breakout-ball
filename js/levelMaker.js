@@ -90,9 +90,24 @@ class LevelMaker {
          alert.clickBtn1(() => {
             alert.hide();
          });
-         alert.clickBtn2(() => {
+         alert.clickBtn2(async () => {
             alert.hide();
-            goHome();
+            const newLevel = this.getLevel();
+            const isUpload = await saveLevel(newLevel, "online");
+            if (isUpload) {
+               goHome();
+            } else {
+               const alert = new AlertHTML({
+                  title: "Save Error",
+                  message: "There was an error saving your level. Please try again.",
+                  btnNm1: "Okay",
+                  oneBtn: true,
+               });
+               alert.show();
+               alert.clickBtn1(() => {
+                  alert.hide();
+               });
+            }
          });
          return;
       } else {
@@ -285,6 +300,7 @@ class LevelMaker {
       return {
          id: generateUniqueId(),
          creator: user.name,
+         playCount: 0,
          blocks: lvl
       };
    }

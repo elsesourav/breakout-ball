@@ -12,14 +12,14 @@ const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
 
 
 function setupLocalLevel(levels) {
-   const htmlLocalLevels = createHtmlLevels(window.levels, levels, $("#localMode"));
+   const htmlLocalLevels = createHtmlLevels(tempUser.numLocalLevels, levels, $("#localMode"));
 
    htmlLocalLevels.every(([lvl], i) => {
       if (!levels[i + 1]) return false;
 
-      lvl.addEventListener("click", () => {
+      lvl.addEventListener("click", async () => {
          currentGameMode = "local";
-         currentPlayingLevel = window.levels[i];
+         currentPlayingLevel = await getLevel(i + 1);
          setupStartPreview();
       });
       return true;

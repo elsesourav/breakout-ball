@@ -1,6 +1,7 @@
 window.levels = [
    {
       id: "1",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 1, y: 1, h: 1 },
@@ -23,6 +24,7 @@ window.levels = [
    },
    {
       id: "2",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 1, y: 1, h: 1 },
@@ -61,6 +63,7 @@ window.levels = [
    },
    {
       id: "3",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 1, y: 1, h: 1 },
@@ -95,6 +98,7 @@ window.levels = [
    },
    {
       id: "4",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 1, y: 1, h: 1 },
@@ -137,6 +141,7 @@ window.levels = [
    },
    {
       id: "5",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 5, y: 5, h: 2 },
@@ -180,6 +185,7 @@ window.levels = [
    },
    {
       id: "6",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 4, y: 4, h: 4 },
@@ -243,6 +249,7 @@ window.levels = [
    },
    {
       id: "7",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 0, y: 0, h: 3 },
@@ -306,6 +313,7 @@ window.levels = [
    },
    {
       id: "8",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 1, y: 9, h: 6 },
@@ -367,6 +375,7 @@ window.levels = [
    },
    {
       id: "9",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 4, y: 4, h: 6 },
@@ -445,6 +454,7 @@ window.levels = [
    },
    {
       id: "10",
+      playCount: 0,
       creator: "elsesourav",
       blocks: [
          { x: 1, y: 9, h: 5 },

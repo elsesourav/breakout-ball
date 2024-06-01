@@ -117,7 +117,7 @@ function generateUniqueId() {
 }
 
 function vibrateDevice(time = 200) {
-   if (userDemo.isVibrateActive && navigator.vibrate) {
+   if (tempUser.isVibrateActive && navigator.vibrate) {
       navigator.vibrate(time);
    }
 }
@@ -167,12 +167,15 @@ function create2dRoundedRectPath(x, y, w, h, r) {
 
 function create2dAryPointer(level) {
    let ary = [];
-   for (let i = 0; i < level.length; i++)
-      for (const key in level[i]) ary.push(level[i][key]);
-
+   for (let i = 0; i < level.length; i++) {
+      ary.push(level[i].x);
+      ary.push(level[i].y);
+      ary.push(level[i].h);
+   }
+   
    let nBytes = ary.length * 4;
    let aryPtr = Module._malloc(nBytes);
-
+   
    Module.HEAP32.set(ary, aryPtr / 4);
    return { aryPtr, length: ary.length };
 }
@@ -251,13 +254,13 @@ function pushStatus(name) {
 function replaceState(name = "home") {
    history.replaceState({ name }, `${name}`, `./`);
 }
-function createHtmlLevels(levels, userLevels, levelsMap) {
+function createHtmlLevels(nLevel, userLevels, levelsMap) {
    levelsMap.innerHTML = "";
 
    const htmlLevels = [];
    let userLevelLength = userLevels.length;
 
-   for (let i = 0, j = 0; i < levels.length; i++) {
+   for (let i = 0, j = 0; i < nLevel; i++) {
       if (userLevelLength > j) j++;
       const mainEle = CE("div", ["level", "lock"]);
 
@@ -273,7 +276,7 @@ function createHtmlLevels(levels, userLevels, levelsMap) {
 
       const iconAndNo = CE("div", ["icon-and-no"], "", mainEle);
       CE("i", ["sbi-fire"], "", iconAndNo);
-      const no = CE("p", ["no"], levels[i].id, iconAndNo);
+      const no = CE("p", ["no"], i + 1, iconAndNo);
 
       const completeTime = CE("div", ["complete-time"], "", mainEle);
       CE("i", ["sbi-stopwatch1"], "", completeTime);

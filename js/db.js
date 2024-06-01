@@ -28,7 +28,7 @@ async function getLevelRank(levelId) {
 async function getUserRank(levelId) {
    const levelRank = await getLevelRank(levelId);
    const array = levelRank ? Object.entries(levelRank) : [];
-   const rank = array.findIndex(([e]) => e == username);
+   const rank = array.findIndex(([e]) => e == tempUser.username);
    return {
       userRank: rank == -1 ? null : rank,
       ranks: array,
@@ -36,35 +36,46 @@ async function getUserRank(levelId) {
 }
 
 async function setUserLevelRank(levelId, time) {
-   const ref = db.ref(`ranking/level-${levelId}/${username}`);
+   const ref = db.ref(`ranking/level-${levelId}/${tempUser.username}`);
    await ref.set({
       time: time,
-      fullName: fullName,
+      fullName: tempUser.fullName,
    });
    return await getUserRank(levelId);
 }
 
 async function updateUserLevelRank(levelId, time) {
-   const ref = db.ref(`ranking/level-${levelId}/${username}`);
-   await ref.update({time});
+   const ref = db.ref(`ranking/level-${levelId}/${tempUser.username}`);
+   await ref.update({ time });
    return await getUserRank(levelId);
 }
 
 async function setupLevelRanking(levelId, time) {
    const info = getUserInfo();
 
-   if (info.levelsRecord[levelId] && info.levelsRecord[levelId].time !== null && info.levelsRecord[levelId].time <= time) return null;
+   if (
+      info.levelsRecord[levelId] &&
+      info.levelsRecord[levelId].time !== null &&
+      info.levelsRecord[levelId].time <= time
+   )
+      return null;
    waitingWindow.classList.add("active");
 
-   const data = info.levelsRecord[levelId] && info.levelsRecord[levelId].time !== null
-      ? await updateUserLevelRank(levelId, time)
-      : await setUserLevelRank(levelId, time);
+   const data =
+      info.levelsRecord[levelId] && info.levelsRecord[levelId].time !== null
+         ? await updateUserLevelRank(levelId, time)
+         : await setUserLevelRank(levelId, time);
+
+   await updateLevelView(
+      levelId,
+      currentGameMode == "local" ? currentGameMode : "online"
+   );
 
    info.levelsRecord[levelId].time = time;
    info.levelsRecord[levelId].rank = data.userRank;
    info.levelsRecord[levelId].completed = true;
 
-   if (window.levels.length - 1 > levelId) {
+   if (tempUser.numLocalLevels - 1 > levelId) {
       info.levelsRecord[`${Number(levelId) + 1}`] = {
          time: null,
          rank: null,
@@ -76,6 +87,51 @@ async function setupLevelRanking(levelId, time) {
    waitingWindow.classList.remove("active");
    return data;
 }
+
+async function updateLevelView(levelId) {
+   waitingWindow.classList.add("active");
+   const refLocal = db.ref(`levels/local/${levelId}/playCount`);
+   const refOnline = db.ref(`levels/online/${levelId}/playCount`);
+
+   const level = await refLocal.get();
+   const ref = level.exists() ? refLocal : refOnline;
+
+   await ref.transaction((count) => {
+      if (!count) return 1;
+      return count + 1;
+   });
+}
+
+async function saveLevel(newLevel, path = "local") {
+   waitingWindow.classList.add("active");
+   try {
+      const ref = db.ref(`levels/${path}/${newLevel.id}`);
+      await ref.set(newLevel);
+      waitingWindow.classList.remove("active");
+      return true;
+   } catch (error) {
+      return false;
+   }
+}
+
+async function getLevel(levelId) {
+   waitingWindow.classList.add("active");
+   try {
+      const refLocal = db.ref(`levels/local/${levelId}`);
+      const refOnline = db.ref(`levels/online/${levelId}`);
+
+      let level = await refLocal.get();
+
+      if (level.exists()) level = level.val();
+      else level = (await refOnline.get()).val();
+
+      waitingWindow.classList.remove("active");
+      return level;
+   } catch (error) {
+      return false;
+   }
+}
+
 Module.onRuntimeInitialized = () => {
    waitingWindow.classList.add("active");
    auth.onAuthStateChanged(async (User) => {
@@ -94,9 +150,7 @@ Module.onRuntimeInitialized = () => {
          }
       } else {
          const info = getUserInfo();
-         userDemo = info;
-         username = info.username;
-         fullName = info.fullName;
+         tempUser = info;
 
          setupLocalLevel(info.levelsRecord);
          $("#fullName").innerText = info.fullName;
@@ -118,6 +172,7 @@ const createNewUser = (username, password, fullName) => {
             volume: 1,
             isGyroActive: true,
             isVibrateActive: true,
+            numLocalLevels: 10,
             levelsRecord: {
                1: {
                   rank: null,

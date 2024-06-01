@@ -215,11 +215,14 @@ void Game::update() {
    // wall collision
    if (ball.x1 <= 0) {
       ball.goRight();
+      this->vibrate(50);
    } else if (ball.x2 >= WIDTH) {
       ball.goLeft();
+      this->vibrate(50);
    }
    if (ball.y1 <= 0) {
       ball.goBottom();
+      this->vibrate(50);
    }
 
    if (!gamePose && ball.y2 >= padY + padH * 4) {

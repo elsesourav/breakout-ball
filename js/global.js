@@ -30,22 +30,11 @@ let init, setup, draw, update;
 let moveLeft, moveRight, moveTarget, moveDirect, drawBlockOnly, drawOutline;
 let makerSetup, makerInit, makerDraw;
 let makerAddBlock, makerRemoveBlock, makerHoverBlock;
-let currentPlayingLevel = window.levels[0];
+let currentPlayingLevel;
 let currentGameMode = "local";
 
 let username, fullName;
-let userDemo = {
-   volume: 1,
-   isGyroActive: true,
-   isVibrateActive: true,
-   levelsRecord: {
-      "1": {
-         rank: null,
-         time: null,
-         completed: false
-      }
-   }
-}
+let tempUser = {}
 
 //use cssRoot.style.setProperty("key", "value");
 const rootStyle = document.querySelector(":root").style;
