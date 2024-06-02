@@ -2,14 +2,14 @@
 #pages {
    --gap: 10px;
    position: relative;
-   width: calc(100% - var(--s) * 0.8);
+   width: calc(100% - var(--s) * 2);
    height: calc(var(--pages-h) - var(--s) * 0.2);
    display: flex;
    justify-content: center;
    align-items: center;
    gap: var(--gap);
    padding: auto;
-   margin: calc(var(--s) * 0.1) calc(var(--s) * 0.4);
+   margin: calc(var(--s) * 0.1) calc(var(--s) * 1);
    background: var(--main-bg1);
    border-radius: calc(var(--s));
    outline: solid 1px #110050;
@@ -31,7 +31,7 @@
       -moz-user-select: none;
       -ms-user-select: none;
       background: #00000055;
-      border: solid 1px #000dff;
+      border: solid 1px #fff8;
       color: #ffffff;
       transition-timing-function: ease-in-out;
       transition-property: color border box-shadow;
@@ -53,8 +53,8 @@
          display: grid;
       }
       &.active {
-         color: #ffffff;
-         border: solid 1px #9599ff;
+         color: #00d0ff;
+         border: solid 1px #008faf;
 
          &::after {
             background: #ffffff33;

@@ -9,6 +9,7 @@ class Pages {
       this.pages = [];
       this.#createPages();
       this.#pageEventListener();
+      this.update(0);
    }
 
    #createHtmlPage(valueOrClassName = false) {

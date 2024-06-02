@@ -174,8 +174,12 @@ async function selectMode(i, is = false) {
       pg.index = i;
       pg.preScrollX = pg.scrollX;
       pg.scrollX = -pg.width * i;
-      modeType.style.transitionDuration = "150ms";
+      modeType.style.transitionDuration = "100ms";
       modeType.style.left = `${pg.scrollX}px`;
+   }
+
+   if (i === 2) {
+      setupCreateLevel();
    }
 }
 
@@ -201,14 +205,14 @@ modeType.on("touchmove", (e) => {
    pg.dy = clientY - pg.y;
    pg.x = clientX;
    pg.y = clientY;
-   pg.totalMove += pg.dx;
+   pg.totalMove += pg.dx * 2;
 
-   pg.scrollX += pg.dx;
+   pg.scrollX += pg.dx * 2;
    modeType.style.left = `${Math.round(pg.scrollX)}px`;
 });
 
 modeType.on("touchend", () => {
-   let time = Math.abs(pg.totalMove);
+   let dx = Math.abs(pg.totalMove);
 
    if (Math.abs(pg.totalMove) < pg.width / 5) {
       pg.scrollX = -pg.width * pg.index;
@@ -216,7 +220,7 @@ modeType.on("touchend", () => {
       if (pg.totalMove < 0 && pg.index < 3) pg.index++;
       if (pg.totalMove > 0 && pg.index > 0) pg.index--;
 
-      time = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index));
+      dx = Math.abs(Math.abs(pg.scrollX) - Math.abs(pg.width * pg.index));
 
       pg.scrollX = -pg.width * pg.index;
       modeOptions.removeClass("active");
@@ -224,7 +228,7 @@ modeType.on("touchend", () => {
    }
 
    modeType.style.transitionDuration = `${Math.round(
-      Math.abs((time / pg.width) * 150)
+      Math.abs((dx / pg.width) * 100)
    )}ms`;
    modeType.style.left = `${Math.round(pg.scrollX)}px`;
    pg.preScrollX = pg.scrollX;

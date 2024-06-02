@@ -24,7 +24,7 @@ const BALL_RADIUS = SIZE * 0.22;
 const BALL_SPEED = 15;
 
 
-const MAX_PAGE_RENDER = 4;
+const MAX_PAGE_RENDER = 20;
 const MAX_PAGE_BUTTON = 5;
 let currentPageIndex = 0;
 let maxPagePossible = 5;

@@ -8,11 +8,47 @@ const makerLoopFun = () => {
 };
 const animation = new Animation(FPS, loopFun);
 const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
-const htmlCreateLevels = createOnlineLevels(
-   window.levels,
-   $("#createMode"),
-   true
-);
+const pagesElement = document.getElementById("pages");
+
+const PAGES = new Pages(MAX_PAGE_BUTTON, pagesElement, setupOnlineLevels);
+const htmlOnlineLevels = createOnlineLevels(MAX_PAGE_RENDER, $("#onlineMode"));
+
+htmlOnlineLevels.forEach(([level], i) => {
+   level.addEventListener("click", () => {
+      currentGameMode = "online";
+      currentPlayingLevel = window.onlineLevels[currentPageIndex * MAX_PAGE_RENDER + i];
+      setupStartPreview();
+   });
+});
+
+function setupOnlineLevel(eleAry, level) {
+   const [mainEle, _ctx, count, id, clear] = eleAry;
+   mainEle.classList.add("show");
+   count.innerText = level.playCount;
+   id.innerText = level.id;
+
+   clear();
+   ctx = _ctx;
+   clear();
+   const { aryPtr, length } = create2dAryPointer(level.blocks);
+   init(aryPtr, length);
+   draw();
+}
+
+function setupOnlineLevels(current = currentPageIndex) {
+   currentPageIndex = current;
+   let j;
+   let i = current * MAX_PAGE_RENDER;
+   let n = Math.min(window.onlineLevels.length, (current + 1) * MAX_PAGE_RENDER);
+
+   for (j = 0; i < n; i++, j++) {
+      setupOnlineLevel(htmlOnlineLevels[j], window.onlineLevels[i]);
+   }
+   for (; j < MAX_PAGE_RENDER; j++) {
+      const [mainEle] = htmlOnlineLevels[j];
+      mainEle.classList.remove("show");
+   }
+}
 
 function setupLocalLevel(levels) {
    const htmlLocalLevels = createHtmlLevels(
@@ -33,25 +69,32 @@ function setupLocalLevel(levels) {
    });
 }
 
+let htmlCreateLevels = [];
+
 async function setupCreateLevel() {
-   const levels = await getUserCreatedLevels();
-   const htmlCreateLevels = createOnlineLevels(levels, $("#createMode"), true);
-   console.log(levels);
+   const levels = window.onlineLevels.filter((e) => e.creator == tempUser.username);
 
-   htmlCreateLevels.forEach(([level, cvs], i) => {
-      cvs.width = CVS_W;
-      cvs.height = SIZE * (cols - 2.3);
-      ctx = cvs.getContext("2d");
-      const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
-      init(aryPtr, length);
-      draw();
+   if (htmlCreateLevels.length !=  levels.length) {
+      htmlCreateLevels = createUserLevels(levels, $("#createMode"));
 
-      level.addEventListener("click", () => {
-         currentGameMode = "online";
-         currentPlayingLevel = window.levels[i];
-         setupStartPreview();
+      htmlCreateLevels.forEach(([mainEle, cvs, _ctx, count, id, setting, clear], i) => {
+         mainEle.classList.add("show");
+         count.innerText = levels[i].playCount;
+         id.innerText = levels[i].id;
+         clear();
+         ctx = _ctx;
+         clear();
+         const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
+         init(aryPtr, length);
+         draw();
+         
+         cvs.addEventListener("click", () => {
+            currentGameMode = "online";
+            currentPlayingLevel = levels[i];
+            setupStartPreview();
+         });
       });
-   });
+   }
 }
 
 function loadWasm() {

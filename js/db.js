@@ -132,16 +132,16 @@ async function getLevel(levelId) {
    }
 }
 
-async function getUserCreatedLevels() {
-   waitingWindow.classList.add("active");
-   const ref = db.ref(`levels/online`);
-   const levels = await ref
-      .orderByChild("creator")
-      .equalTo(tempUser.username)
-      .once("value");
-   waitingWindow.classList.remove("active");
-   return levels.val();
-}
+// async function getUserCreatedLevels() {
+//    waitingWindow.classList.add("active");
+//    const ref = db.ref(`levels/online`);
+//    const levels = await ref
+//       .orderByChild("creator")
+//       .equalTo(tempUser.username)
+//       .once("value");
+//    waitingWindow.classList.remove("active");
+//    return levels.val();
+// }
 
 const createNewUser = (username, password, fullName) => {
    return asyncHandler(async () => {
@@ -244,12 +244,17 @@ Module.onRuntimeInitialized = () => {
          const onlineRef = db.ref(`levels/online`);
          window.onlineLevels = [];
 
-         onlineRef.on("child_added", (s) => {
-            window.onlineLevels.push(s.val());
+         const bounce = debounce(() => {
             window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
             const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
             PAGES.update(maxPagePossible);
-            pageClickAction();
+            setupCreateLevel();
+            setupOnlineLevels();
+         }, 200);
+
+         onlineRef.on("child_added", (s) => {
+            window.onlineLevels.push(s.val());
+            bounce();
          });
 
          onlineRef.on("child_removed", (s) => {

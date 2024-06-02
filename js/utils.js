@@ -99,16 +99,16 @@ const $$ = (selector) => {
    return self;
 };
 
-function debounce(func, delay = 500) {
-   let timer;
+const debounce = (func, delay) => {
+   let debounceTimer;
    return function (...args) {
-      const context = this;
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-         func.apply(context, args);
-      }, delay);
+       const context = this;
+       clearTimeout(debounceTimer);
+       debounceTimer = setTimeout(() => func.apply(context, args), delay);
    };
-}
+};
+
+
 
 const validEmail = (exp) =>
    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
@@ -283,7 +283,7 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
 
       const lockComplete = CE("div", ["is-lock-or-complete"], "", top);
       CE("i", ["sbi-lock-outline", "lock"], "", lockComplete);
-      CE("i", ["sbi-check-circle-outline", "check"], "", lockComplete);
+      CE("i", ["sbi-check-square-o", "check"], "", lockComplete);
 
       const iconAndNo = CE("div", ["icon-and-no"], "", mainEle);
       CE("i", ["sbi-fire"], "", iconAndNo);
@@ -337,6 +337,37 @@ function createOnlineLevels(numOfLevel, levelsMap) {
       }
 
       htmlLevels.push([mainEle, ctx, count, id, clear]);
+   }
+   return htmlLevels;
+}
+
+function createUserLevels(levels, levelsMap) {
+   levelsMap.innerHTML = "";
+   const htmlLevels = [];
+
+   for (let i = 0; i < levels.length; i++) {
+      const mainEle = CE("div", ["level"]);
+      const cvs = CE("canvas", ["levelCvs"]);
+      const details = CE("div", ["details"]);
+      const playCount = CE("div", ["playCount"], "", details);
+      CE("i", ["sbi-play-circle"], "", playCount);
+      const count = CE("p", ["count"], "10", playCount);
+      const id = CE("p", ["id"], "ZAS", details);
+      const setting = CE("p", ["sbi-settings", "setting"], "", details);
+
+      mainEle.appendChild(cvs);
+      mainEle.appendChild(details);
+      levelsMap.appendChild(mainEle);
+
+      cvs.width = CVS_W;
+      cvs.height = SIZE * (cols - 2.7);
+      const ctx = cvs.getContext("2d");
+
+      function clear() {
+         ctx.clearRect(0, 0, cvs.width, cvs.height);
+      }
+
+      htmlLevels.push([mainEle, cvs, ctx, count, id, setting, clear]);
    }
    return htmlLevels;
 }
