@@ -40,7 +40,7 @@ function setupOnlineLevels(searchData = "", current = currentPageIndex) {
    let n = Math.min(window.onlineLevels.length, (current + 1) * MAX_PAGE_RENDER);
 
    if (searchData.length === 5) {
-      const findLevel = window.onlineLevels.find(e => e.id === searchData);
+      const findLevel = window.onlineLevels.find((e) => e.id === searchData);
       if (findLevel) {
          setupOnlineLevel(htmlOnlineLevels[0], findLevel);
          j = 1;
@@ -58,11 +58,7 @@ function setupOnlineLevels(searchData = "", current = currentPageIndex) {
 }
 
 function setupLocalLevel(levels) {
-   const htmlLocalLevels = createHtmlLevels(
-      tempUser.numLocalLevels,
-      levels,
-      $("#localMode")
-   );
+   const htmlLocalLevels = createHtmlLevels(tempUser.numLocalLevels, levels, $("#localMode"));
 
    htmlLocalLevels.every(([lvl], i) => {
       if (!levels[i + 1]) return false;
@@ -77,12 +73,10 @@ function setupLocalLevel(levels) {
 
 const htmlCreateLevels = createUserLevels(MAX_LEVEL_CAN_CREATE, $("#createMode"));
 
-
-
 async function setupCreateLevel() {
    let levels = window.onlineLevels.filter((e) => e.creator == tempUser.username);
    levels.push(...window.privateLevels);
-   const len = totalCreatedLevel = levels.length;
+   const len = (totalCreatedLevel = levels.length);
    let I, j;
 
    for (I = 0; I < len; I++) {
@@ -90,65 +84,69 @@ async function setupCreateLevel() {
       mainEle.classList.add("show");
       count.innerText = levels[I].playCount;
       id.innerText = levels[I].id;
-   
+
       ctx = _ctx;
       const { aryPtr, length } = create2dAryPointer(levels[I].blocks);
       init(aryPtr, length);
       draw();
 
-      const isPublic = window.onlineLevels.find(e => e.id === levels[I].id) !== undefined;
+      const isPublic = window.onlineLevels.find((e) => e.id === levels[I].id) !== undefined;
       _privacy.classList.toggle("active", !isPublic);
 
-      safeEventListener(setting, async ([i]) => {
-         const data = await getUserRank(levels[i].id);
-         M_lvlNo.innerText = levels[i].id;
-         M_lvlRank.innerText = data.userRank !== null ? data.userRank + 1 : "∞";
-         M_playCount.innerText = levels[i].playCount;
+      safeEventListener(
+         setting,
+         async ([i]) => {
+            const data = await getUserRank(levels[i].id);
+            M_lvlNo.innerText = levels[i].id;
+            M_lvlRank.innerText = data.userRank !== null ? data.userRank + 1 : "∞";
+            M_playCount.innerText = levels[i].playCount;
 
-         const isPublic = window.onlineLevels.find(e => e.id === levels[i].id) !== undefined;
-         privacyModifier.checked = isPublic;
+            const isPublic = window.onlineLevels.find((e) => e.id === levels[i].id) !== undefined;
+            privacyModifier.checked = isPublic;
 
-         ctx = MODIFIER_CTX;
-         const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
-         init(aryPtr, length);
-         draw();
+            ctx = MODIFIER_CTX;
+            const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
+            init(aryPtr, length);
+            draw();
 
-         levelModifier.classList.add("active");
+            levelModifier.classList.add("active");
 
+            safeEventListener(saveModifier, async () => {
+               if (isPublic === privacyModifier.checked) {
+                  // same position. don't need to change anything
+                  levelModifier.classList.remove("active");
+               } else {
+                  const un = `${tempUser.username}/`;
+                  const oldPath = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
+                  const newPath = `levels/${isPublic ? "private" : "online"}/${isPublic ? un : ""}${levels[i].id}`;
 
-         safeEventListener(saveModifier, async () => {
-            if (isPublic ===  privacyModifier.checked) { // same position. don't need to change anything
-               levelModifier.classList.remove("active");
-            } else {
-               const un = `${tempUser.username}/`;
-               const oldPath = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
-               const newPath = `levels/${isPublic ? "private" : "online"}/${isPublic ? un : ""}${levels[i].id}`;
-               
-               await moveData(oldPath, newPath);
-               _privacy.classList.toggle("active", isPublic);
-               levelModifier.classList.remove("active");
-            }
-         });
-
-         safeEventListener(deleteLevel, async () => {
-            const alert = new AlertHTML({
-               title: "Delete Level",
-               message: "Are you sure you want to delete this level?",
+                  await moveData(oldPath, newPath);
+                  _privacy.classList.toggle("active", isPublic);
+                  levelModifier.classList.remove("active");
+               }
             });
-            alert.show();
-            alert.clickBtn1(() => {
-               alert.hide();
-               levelModifier.classList.remove("active");
+
+            safeEventListener(deleteLevel, async () => {
+               const alert = new AlertHTML({
+                  title: "Delete Level",
+                  message: "Are you sure you want to delete this level?",
+               });
+               alert.show();
+               alert.clickBtn1(() => {
+                  alert.hide();
+                  levelModifier.classList.remove("active");
+               });
+               alert.clickBtn2(async () => {
+                  alert.hide();
+                  const un = `${tempUser.username}/`;
+                  const path = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
+                  await deleteData(path);
+                  levelModifier.classList.remove("active");
+               });
             });
-            alert.clickBtn2(async () => {
-               alert.hide();
-               const un = `${tempUser.username}/`;
-               const path = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
-               await deleteData(path);
-               levelModifier.classList.remove("active");
-            });
-         });
-      }, [I]);
+         },
+         [I]
+      );
 
       safeEventListener(cvs, () => {
          currentGameMode = "online";
@@ -158,7 +156,6 @@ async function setupCreateLevel() {
    }
 
    for (j = I; j < MAX_LEVEL_CAN_CREATE; j++) htmlCreateLevels[j][0].classList.remove("show");
-   
 
    // if (htmlCreateLevels.length != levels.length) {
    //    htmlCreateLevels = createUserLevels(levels, $("#createMode"));
@@ -167,7 +164,7 @@ async function setupCreateLevel() {
    //       mainEle.classList.add("show");
    //       count.innerText = levels[i].playCount;
    //       id.innerText = levels[i].id;
-         
+
    //       ctx = _ctx;
    //       const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
    //       init(aryPtr, length);
@@ -199,7 +196,7 @@ async function setupCreateLevel() {
    //                const un = `${tempUser.username}/`;
    //                const oldPath = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
    //                const newPath = `levels/${isPublic ? "private" : "online"}/${isPublic ? un : ""}${levels[i].id}`;
-                  
+
    //                await moveData(oldPath, newPath);
    //                if (!isPublic) {
    //                   const index = window.privateLevels.findIndex((e) => e.id === levels[i].id);
@@ -209,7 +206,7 @@ async function setupCreateLevel() {
    //                }
    //                _privacy.classList.toggle("active", isPublic);
    //                levelModifier.classList.remove("active");
-   //             } 
+   //             }
    //          }, true);
 
    //          $("#deleteLevel").click(async () => {
@@ -230,9 +227,9 @@ async function setupCreateLevel() {
    //                levelModifier.classList.remove("active");
    //             });
    //          }, true);
-            
+
    //       });
-         
+
    //       cvs.addEventListener("click", () => {
    //          currentGameMode = "online";
    //          currentPlayingLevel = levels[i];
@@ -265,97 +262,25 @@ function loadWasm() {
    drawBlockOnly = Module.cwrap("drawBlockOnly", null, []);
    drawOutline = Module.cwrap("drawOutline", null, []);
 
-   makerSetup = Module.cwrap("makerSetup", null, [
-      "number",
-      "number",
-      "number",
-      "number",
-      "number",
-   ]);
+   makerSetup = Module.cwrap("makerSetup", null, ["number", "number", "number", "number", "number"]);
    makerInit = Module.cwrap("makerInit", null, ["number", "number"]);
    makerDraw = Module.cwrap("makerDraw", null, []);
-   makerAddBlock = Module.cwrap("makerAddBlock", null, [
-      "number",
-      "number",
-      "number",
-   ]);
-   makerRemoveBlock = Module.cwrap("makerRemoveBlock", null, [
-      "number",
-      "number",
-   ]);
-   makerHoverBlock = Module.cwrap("makerHoverBlock", null, [
-      "number",
-      "number",
-      "number",
-   ]);
+   makerAddBlock = Module.cwrap("makerAddBlock", null, ["number", "number", "number"]);
+   makerRemoveBlock = Module.cwrap("makerRemoveBlock", null, ["number", "number"]);
+   makerHoverBlock = Module.cwrap("makerHoverBlock", null, ["number", "number", "number"]);
 
-   setup(
-      CVS_W,
-      CVS_H,
-      SIZE,
-      PAD_X,
-      PAD_Y,
-      PAD_WIDTH,
-      PAD_HEIGHT,
-      BALL_RADIUS,
-      BALL_SPEED,
-      FPS
-   );
+   setup(CVS_W, CVS_H, SIZE, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED, FPS);
 
    makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 
-   // const htmlLocalLevels = createHtmlLevels(window.levels, $("#localMode"));
-   // const htmlOnlineLevels = createOnlineLevels(window.levels, $("#onlineMode"));
-   // const htmlCreateLevels = createOnlineLevels(
-   //    window.levels,
-   //    $("#createMode"),
-   //    true
-   // );
+   let oldGamma = 0;
 
-   // htmlLocalLevels.forEach(([level], i) => {
-   //    level.addEventListener("click", () => {
-   //       currentGameMode = "local";
-   //       currentPlayingLevel = window.levels[i];
-   //       setupPreview();
-   //    });
-   // });
-
-   // htmlOnlineLevels.forEach(([level, cvs], i) => {
-   //    cvs.width = CVS_W;
-   //    cvs.height = SIZE * (cols - 2.3);
-   //    ctx = cvs.getContext("2d");
-   //    const { aryPtr, length } = create2dAryPointer(window.levels[i]);
-   //    init(aryPtr, length);
-   //    draw();
-
-   //    level.addEventListener("click", () => {
-   //       currentGameMode = "online";
-   //       currentPlayingLevel = window.levels[i];
-   //       setupPreview();
-   //    });
-   // });
-
-   // htmlCreateLevels.forEach(([level, cvs], i) => {
-   //    cvs.width = CVS_W;
-   //    cvs.height = SIZE * (cols - 2.3);
-   //    ctx = cvs.getContext("2d");
-   //    const { aryPtr, length } = create2dAryPointer(window.levels[i]);
-   //    init(aryPtr, length);
-   //    draw();
-
-   //    level.addEventListener("click", () => {
-   //       currentGameMode = "online";
-   //       currentPlayingLevel = window.levels[i];
-   //       setupPreview();
-   //    });
-   // });
-
-   // levelDesigner.classList.add("active");
-   // CVS.classList.add("active");
-   // isLevelMakerModeOn = true;
-   // makerInit();
-   // lvlMaker.init();
-   // ctx = CTX;
-   // animation.start(makerLoopFun);
-   // playLevel();
+   if (window.DeviceOrientationEvent) {
+      window.addEventListener("deviceorientation", (e) => {
+         const ntx = e.gamma * 5 - oldGamma;
+         mobileErr.innerHTML = Math.round(ntx) + " :  : " + Math.round(e.gamma);
+         tx = moveDirect(ntx);
+         oldGamma = e.gamma;
+      });
+   }
 }

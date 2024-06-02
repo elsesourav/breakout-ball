@@ -23,7 +23,6 @@ const PAD_HEIGHT = SIZE * 0.4;
 const BALL_RADIUS = SIZE * 0.22;
 const BALL_SPEED = 15;
 
-
 const MAX_PAGE_RENDER = 20;
 const MAX_PAGE_BUTTON = 5;
 const MAX_LEVEL_CAN_CREATE = 30;
@@ -41,17 +40,14 @@ let makerAddBlock, makerRemoveBlock, makerHoverBlock;
 let currentPlayingLevel;
 let currentGameMode = "local";
 
-let tempUser = {}
+let tempUser = {};
 
 //use cssRoot.style.setProperty("key", "value");
 const rootStyle = document.querySelector(":root").style;
 
 // when run this app in mobile is return true
 const isMobile =
-   localStorage.mobile ||
-   "ontouchstart" in window ||
-   navigator.maxTouchPoints > 0 ||
-   navigator.msMaxTouchPoints > 0;
+   localStorage.mobile || "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
 // minimum window size
 const minSize = innerWidth > innerHeight ? innerHeight : innerWidth;

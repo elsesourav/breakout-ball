@@ -24,7 +24,7 @@ const glowColors = [
 
 onload = () => {
    document.body.appendChild(_cvs_);
-}
+};
 
 function createCanvasImage(drawFunction, width, height) {
    _cvs_.width = width;
@@ -41,7 +41,14 @@ function createBallImage() {
    const _scale = 4;
    return createCanvasImage(
       (ctx) => {
-         const gradient = ctx.createRadialGradient(96 * _scale, 24 * _scale, 2 * _scale, 70 * _scale, 70 * _scale, 110 * _scale);
+         const gradient = ctx.createRadialGradient(
+            96 * _scale,
+            24 * _scale,
+            2 * _scale,
+            70 * _scale,
+            70 * _scale,
+            110 * _scale
+         );
 
          gradient.addColorStop(0, "white");
          gradient.addColorStop(0.03, "aqua");
@@ -69,16 +76,7 @@ function createPaddleImage() {
       h = 30 * _scale,
       sideW = w / 4;
 
-   const pathColors = [
-      "#0000ffaa",
-      "#65f2ff",
-      "#6600ff",
-      "#6600ff",
-      "#fff8",
-      "#fff8",
-      "#ffffff66",
-      "#00000033",
-   ];
+   const pathColors = ["#0000ffaa", "#65f2ff", "#6600ff", "#6600ff", "#fff8", "#fff8", "#ffffff66", "#00000033"];
 
    const locations = [
       [sideW * 0.3, -h * 0.1, sideW * 3.3, h * 1.2, r],
@@ -117,7 +115,7 @@ function createBlockImages() {
    ];
 
    const blockW = 256;
-   const blockH = blockW / 4 * 3;
+   const blockH = (blockW / 4) * 3;
    let blockImages = [];
 
    blockColors.forEach(([[c1, c2], stroke], i) => {
@@ -137,13 +135,7 @@ function createBlockImages() {
          image: createCanvasImage(
             (ctx) => {
                const path1 = create2dRoundedRectPath(x, y, W, H, r);
-               const path2 = create2dRoundedRectPath(
-                  inX,
-                  inY,
-                  inW,
-                  inH,
-                  r * 1.2
-               );
+               const path2 = create2dRoundedRectPath(inX, inY, inW, inH, r * 1.2);
 
                const grad = ctx.createLinearGradient(0, 0, 0, H);
                grad.addColorStop(0, c1);

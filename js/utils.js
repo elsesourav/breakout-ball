@@ -86,9 +86,7 @@ const $$ = (selector) => {
    };
    self.click = (fun, once = false) => {
       self.forEach((element, i) => {
-         element.addEventListener("click", (e) =>
-            fun(e, element, i), { once }
-         );
+         element.addEventListener("click", (e) => fun(e, element, i), { once });
       });
    };
    self.removeClass = (className) => {
@@ -110,17 +108,11 @@ const debounce = (func, delay) => {
    };
 };
 
-
-
-const validEmail = (exp) =>
-   /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
+const validEmail = (exp) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
 const validName = (exp) => /^[a-zA-Z\s]{3,16}$/.test(exp);
 const validUName = (exp) => /^[a-zA-Z0-9\_\-]{4,16}$/.test(exp);
 const validPass = (exp) => /^([A-Za-z0-9à-úÀ-Ú\@\_\.\-]{6,16})+$/.test(exp);
-const validText = (exp) =>
-   /^([A-Za-z0-9à-úÀ-Ú\.\-\,\_\|\?\:\*\&\%\#\!\+\~\₹\'\"\`\@\s]{2,})+$/.test(
-      exp
-   );
+const validText = (exp) => /^([A-Za-z0-9à-úÀ-Ú\.\-\,\_\|\?\:\*\&\%\#\!\+\~\₹\'\"\`\@\s]{2,})+$/.test(exp);
 
 const base36ToBase10 = (base36String) => {
    return parseInt(base36String, 36);
@@ -202,12 +194,7 @@ function copyArray(ary) {
 }
 
 class ApiError extends Error {
-   constructor(
-      statusCode,
-      message = "Something went wrong",
-      errors = [],
-      stack = ""
-   ) {
+   constructor(statusCode, message = "Something went wrong", errors = [], stack = "") {
       super(message);
       this.statusCode = statusCode;
       this.message = message;
@@ -227,8 +214,7 @@ const asyncHandler = (fun) => {
       if (!navigator.onLine) {
          const alert = new AlertHTML({
             title: "Connection error",
-            message:
-               "You are offline. Please check your internet connection and try again",
+            message: "You are offline. Please check your internet connection and try again",
             btnNm1: "Okay",
             oneBtn: true,
          });
@@ -346,7 +332,7 @@ function createOnlineLevels(numOfLevel, levelsMap) {
 function createUserLevels(max, levelsMap) {
    levelsMap.innerHTML = "";
    const htmlLevels = [];
-   
+
    for (let i = 0; i < max; i++) {
       const mainEle = CE("div", ["level"]);
 
@@ -381,7 +367,6 @@ function safeEventListener(element, fun, ary = [], action = "click") {
    };
    element.addEventListener(action, element._fn);
 }
-
 
 {
    /* <div class="level">
@@ -419,31 +404,31 @@ function safeEventListener(element, fun, ary = [], action = "click") {
       <p class="delete"></p>
       </div>
       </div> */
-   }
-   
-   const CVS = $("#mainCanvas");
-   const previewCanvas = $("#preview");
-   const cvsModifier = $("#cvsModifier");
-   const CTX = CVS.getContext("2d");
-   const PREVIEW_CTX = previewCanvas.getContext("2d");
-   const MODIFIER_CTX = cvsModifier.getContext("2d");
-   const paddleImage = createPaddleImage();
-   const ballImage = createBallImage();
-   const blockImages = createBlockImages();
-   let ctx = CTX;
-   
-   cvsModifier.width = previewCanvas.width = CVS.width = CVS_W;
-   CVS.height = CVS_H;
-   cvsModifier.height = previewCanvas.height = SIZE * (cols - 1);
-   
-   CTX.imageSmoothingQuality = "high";
-   PREVIEW_CTX.imageSmoothingQuality = "high";
-   MODIFIER_CTX.imageSmoothingQuality = "high";
-   
-   const waitingWindow = $("#waitingWindow");
-   
-   function loadingWindow(is = false) {
-      waitingWindow.classList.toggle("active", is);
-   }
+}
 
-   loadingWindow(true);
+const CVS = $("#mainCanvas");
+const previewCanvas = $("#preview");
+const cvsModifier = $("#cvsModifier");
+const CTX = CVS.getContext("2d");
+const PREVIEW_CTX = previewCanvas.getContext("2d");
+const MODIFIER_CTX = cvsModifier.getContext("2d");
+const paddleImage = createPaddleImage();
+const ballImage = createBallImage();
+const blockImages = createBlockImages();
+let ctx = CTX;
+
+cvsModifier.width = previewCanvas.width = CVS.width = CVS_W;
+CVS.height = CVS_H;
+cvsModifier.height = previewCanvas.height = SIZE * (cols - 1);
+
+CTX.imageSmoothingQuality = "high";
+PREVIEW_CTX.imageSmoothingQuality = "high";
+MODIFIER_CTX.imageSmoothingQuality = "high";
+
+const waitingWindow = $("#waitingWindow");
+
+function loadingWindow(is = false) {
+   waitingWindow.classList.toggle("active", is);
+}
+
+loadingWindow(true);

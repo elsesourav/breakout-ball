@@ -33,7 +33,6 @@ class AlertHTML {
       this.btnNm2Color = btnNm2Color;
       this.titleColor = titleColor;
 
-
       // element
       this.msgEle = undefined;
       this.btn1Ele = undefined;
@@ -107,8 +106,7 @@ class AlertHTML {
    }
 
    #css() {
-      const isMobile =
-         localStorage.mobile || window.navigator.maxTouchPoints > 1;
+      const isMobile = localStorage.mobile || window.navigator.maxTouchPoints > 1;
       return `
       :root {
          --_-_a-width: ${this.width}px;

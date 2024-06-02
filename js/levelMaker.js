@@ -58,7 +58,7 @@ class LevelMaker {
          title: "Level Con't Empty",
          message: "You must add at least one destroyable block, (HP 1-5). The level cannot be empty.",
          btnNm1: "Okay",
-         oneBtn: true
+         oneBtn: true,
       });
       alert.show();
       alert.clickBtn1(() => {
@@ -84,7 +84,8 @@ class LevelMaker {
             btnNm1Color: "#00ffff",
             btnNm2Color: "#1eff00",
             titleColor: "#1eff00",
-            message: "Are you sure you want to save this level? After saving, you will not be able to modify this level.",
+            message:
+               "Are you sure you want to save this level? After saving, you will not be able to modify this level.",
          });
          alert.show();
          alert.clickBtn1(() => {
@@ -95,7 +96,7 @@ class LevelMaker {
             const isPublic = privacy.checked;
             const newLevel = this.getLevel();
             animation.stop();
-            const isUpload = isPublic ? (await saveLevel(newLevel)) : (await saveLevelPrivate(newLevel));
+            const isUpload = isPublic ? await saveLevel(newLevel) : await saveLevelPrivate(newLevel);
             if (isUpload) {
                goHome();
             } else {
@@ -196,7 +197,7 @@ class LevelMaker {
                title: `Level Limit Reached`,
                message: `You have reached the maximum number of levels you can create. Please delete some levels to create more. (Max Limit ${MAX_LEVEL_CAN_CREATE})`,
                btnNm1: "Okay",
-               oneBtn: true
+               oneBtn: true,
             });
             alert.show();
             alert.clickBtn1(() => {
@@ -204,7 +205,6 @@ class LevelMaker {
             });
          }
       });
-      
    }
 
    show() {
@@ -309,15 +309,15 @@ class LevelMaker {
    getLevel() {
       const lvl = [];
       this.blocks.forEach((cols) => {
-         cols.forEach(({x, y, h}) => {
-            if (h > 0) lvl.push({ x: x, y: y, h: h })
+         cols.forEach(({ x, y, h }) => {
+            if (h > 0) lvl.push({ x: x, y: y, h: h });
          });
       });
       return {
          id: generateUniqueId(),
          creator: tempUser.username,
          playCount: 0,
-         blocks: lvl
+         blocks: lvl,
       };
    }
 }

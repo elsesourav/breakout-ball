@@ -75,9 +75,8 @@ searchInput.on("input", () => {
    if (val.length !== 5 && _once_) {
       _once_ = false;
       setupOnlineLevels();
-   }  
+   }
 });
-
 
 addEventListener("popstate", function (event) {
    if (event.state != null && event.state.name == "testing") {
@@ -129,8 +128,7 @@ CVS.click(() => {
          isPointerLock = false;
       }
    } else {
-      document.exitPointerLock =
-         document.exitPointerLock || document.mozExitPointerLock;
+      document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
       document.exitPointerLock();
       isPointerLock = false;
    }
@@ -142,10 +140,7 @@ document.addEventListener("mozpointerlockchange", pointerLockChange, false);
 function pointerLockChange() {
    if (isLevelMakerModeOn || !isInOfTheGame) return;
 
-   if (
-      document.pointerLockElement === CVS ||
-      document.mozPointerLockElement === CVS
-   ) {
+   if (document.pointerLockElement === CVS || document.mozPointerLockElement === CVS) {
       CVS.style.curser = "none";
    } else {
       CVS.style.curser = "move";
@@ -173,31 +168,6 @@ CVS.addEventListener("touchmove", (e) => {
    moveHandler(e.touches[0].clientX);
 });
 
-let oldGamma = 0;
-
-// if ("Gyroscope" in window) {
-//    const gyro = new Gyroscope();
-//    gyro.start();
-//    gyro.addEventListener("reading", (e) => {
-//       const ntx = e.gamma * 5 - oldGamma;
-//       // mobileErr.innerHTML = ntx + " :  : " + e.gamma;
-//       tx = moveDirect(ntx);
-//       oldGamma = e.gamma;
-//    });
-//    gyro.addEventListener("error", (e) => {
-//       console.error(e);
-//    });
-// }
-
-if (window.DeviceOrientationEvent) {
-   window.addEventListener("deviceorientation", (e) => {
-      const ntx = e.gamma * 5 - oldGamma;
-      mobileErr.innerHTML = ntx + " :  : " + e.gamma;
-      tx = moveDirect(ntx);
-      oldGamma = e.gamma;
-   });
-}
-
 async function selectMode(i) {
    modeOptions.removeClass("active");
    modeOptions[i].classList.add("active");
@@ -219,8 +189,7 @@ modeType.on("touchstart", (e) => {
 modeType.on("touchmove", (e) => {
    const { clientX, clientY } = e.touches[0];
 
-   if (!pg.ones && Math.abs(clientX - pg.x) < Math.abs(clientY - pg.y))
-      pg.isLock = true;
+   if (!pg.ones && Math.abs(clientX - pg.x) < Math.abs(clientY - pg.y)) pg.isLock = true;
 
    if (!pg.ones) pg.ones = true;
 
@@ -252,9 +221,7 @@ modeType.on("touchend", () => {
       modeOptions[pg.index].classList.add("active");
    }
 
-   modeType.style.transitionDuration = `${Math.round(
-      Math.abs((dx / pg.width) * 100)
-   )}ms`;
+   modeType.style.transitionDuration = `${Math.round(Math.abs((dx / pg.width) * 100))}ms`;
    modeType.style.left = `${Math.round(pg.scrollX)}px`;
    pg.preScrollX = pg.scrollX;
 

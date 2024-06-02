@@ -11,17 +11,17 @@ async function setupPreview(mode = "play", data = null, time = null) {
    let rank, rankTable;
 
    if (mode !== "testing") {
-      const DATA = data || await getUserRank(levelId);
+      const DATA = data || (await getUserRank(levelId));
       rank = DATA.userRank;
       rankTable = DATA.ranks;
 
       if (base36ToBase10(levelId) < 100) {
          const rankElements = document.querySelectorAll("#localMode .local-user-rank");
-         if(rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank;
+         if (rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank;
       }
 
       let tableRows = "";
-   
+
       for (let i = 0; i < rankTable.length; i++) {
          const { fullName, time } = rankTable[i];
          tableRows += `<tr ${rank === i ? 'class="me"' : ""}>
@@ -30,7 +30,7 @@ async function setupPreview(mode = "play", data = null, time = null) {
                <td>${time}<span>s</span></td>
          </tr>`;
       }
-   
+
       const leaderBoardHTML = `
             <table>
                <tr>
@@ -40,7 +40,7 @@ async function setupPreview(mode = "play", data = null, time = null) {
                </tr>
                ${tableRows}
             </table>`;
-   
+
       $("#rankingTable").innerHTML = leaderBoardHTML;
    }
 
@@ -50,5 +50,5 @@ async function setupPreview(mode = "play", data = null, time = null) {
    $("#lvlNo").innerHTML = levelId;
    $("#levelCreatorName").innerHTML = base36ToBase10(levelId) > 100 ? `@${currentPlayingLevel.creator}` : "";
    $("#lvlRank").innerHTML = rank !== null ? rank + 1 : "∞";
-   $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank].time : "∞" ;
+   $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank].time : "∞";
 }

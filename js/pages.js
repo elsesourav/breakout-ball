@@ -50,8 +50,7 @@ class Pages {
             const newI = left ? start + i - 1 : start + i;
 
             if (i == 0 && left) page.classList.add(nextIcon, "show");
-            else if (i == maxPages - 1 && right)
-               page.classList.add(nextIcon, "show");
+            else if (i == maxPages - 1 && right) page.classList.add(nextIcon, "show");
             else {
                page.classList.add("show");
                page.innerHTML = newI;
@@ -61,7 +60,7 @@ class Pages {
       } else {
          for (let i = 0; i < possible; i++) {
             const page = pages[i];
-            if (i == 0 ) page.classList.add("active");
+            if (i == 0) page.classList.add("active");
             page.classList.add("show");
             page.innerHTML = i + 1;
          }
@@ -88,8 +87,7 @@ class Pages {
                      this.#updatePages(false, true, 1);
                   }
                } else {
-                  const pageN1Value =
-                     parseInt(pages[maxPages - 2].innerText) + 1;
+                  const pageN1Value = parseInt(pages[maxPages - 2].innerText) + 1;
 
                   if (current + temp + 1 < possible) {
                      this.current = pageN1Value;

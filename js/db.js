@@ -32,7 +32,7 @@ async function getUserRank(levelId) {
    const levelRank = await getLevelRank(levelId);
    let sortedList = [];
    for (const key in levelRank) {
-      sortedList.push({...levelRank[key], username: key});
+      sortedList.push({ ...levelRank[key], username: key });
    }
    sortedList.sort((a, b) => a.time - b.time);
    const rank = sortedList.findIndex((e) => e.username === tempUser.username);
@@ -70,7 +70,7 @@ async function setupLevelRanking(levelId, time) {
       info.levelsRecord[levelId].time !== null &&
       info.levelsRecord[levelId].time <= time
    )
-   return null;
+      return null;
 
    loadingWindow(true);
    const data =
@@ -78,10 +78,7 @@ async function setupLevelRanking(levelId, time) {
          ? await updateUserLevelRank(levelId, time)
          : await setUserLevelRank(levelId, time);
 
-   await updateLevelView(
-      levelId,
-      currentGameMode == "local" ? currentGameMode : "online"
-   );
+   await updateLevelView(levelId, currentGameMode == "local" ? currentGameMode : "online");
 
    if (info.levelsRecord[levelId]) {
       info.levelsRecord[levelId].time = time;
@@ -186,7 +183,7 @@ async function moveData(oldPath, newPath) {
          title: "Something is wrong",
          message: "Database not response please try again.",
          btnNm1: "Okay",
-         oneBtn: true
+         oneBtn: true,
       });
       loadingWindow();
       alert.show();
@@ -207,7 +204,7 @@ async function deleteData(path) {
          title: "Something is wrong",
          message: "Database not response please try again.",
          btnNm1: "Okay",
-         oneBtn: true
+         oneBtn: true,
       });
       loadingWindow();
       alert.show();
@@ -220,10 +217,7 @@ async function deleteData(path) {
 const createNewUser = (username, password, fullName) => {
    return asyncHandler(async () => {
       try {
-         await auth.createUserWithEmailAndPassword(
-            `${username}@sb.com`,
-            password
-         );
+         await auth.createUserWithEmailAndPassword(`${username}@sb.com`, password);
          const info = {
             username: username,
             fullName: fullName,
@@ -248,8 +242,7 @@ const createNewUser = (username, password, fullName) => {
             return {
                data: null,
                title: "Username Exists",
-               message:
-                  "This username is already taken. Please choose a different one.",
+               message: "This username is already taken. Please choose a different one.",
             };
          } else {
             return {
@@ -270,10 +263,7 @@ const signinUser = (username, password) => {
             data: true,
          };
       } catch (error) {
-         if (
-            error.code == "auth/invalid-login-credentials" ||
-            error.code == "auth/internal-error"
-         ) {
+         if (error.code == "auth/invalid-login-credentials" || error.code == "auth/internal-error") {
             return {
                data: null,
                title: "Authentication Error",
@@ -297,10 +287,7 @@ Module.onRuntimeInitialized = () => {
 
       if (!User) {
          loadingWindow();
-         const { fullName, username, password, isSignin } = await userForm(
-            floatingInputShow,
-            true
-         );
+         const { fullName, username, password, isSignin } = await userForm(floatingInputShow, true);
          if (isSignin) {
             await signinUser(username, password);
          } else {
@@ -325,9 +312,7 @@ Module.onRuntimeInitialized = () => {
          const bounceAll = debounce(() => {
             loadComplete = true;
             window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
-            const maxPagePossible = Math.ceil(
-               window.onlineLevels.length / MAX_PAGE_RENDER
-            );
+            const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
             PAGES.update(maxPagePossible);
             setupCreateLevel();
             setupOnlineLevels();
@@ -363,7 +348,6 @@ Module.onRuntimeInitialized = () => {
                bounceAll();
             }
          });
-
 
          // when on online map exist then remove loading window
          setTimeout(() => {
