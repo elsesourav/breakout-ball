@@ -57,7 +57,6 @@ function setupLocalLevel(levels) {
 
    htmlLocalLevels.every(([lvl], i) => {
       if (!levels[i + 1]) return false;
-
       lvl.addEventListener("click", async () => {
          currentGameMode = "local";
          currentPlayingLevel = await getLevel(i + 1);
@@ -67,94 +66,182 @@ function setupLocalLevel(levels) {
    });
 }
 
-let htmlCreateLevels = [];
+const htmlCreateLevels = createUserLevels(MAX_LEVEL_CAN_CREATE, $("#createMode"));
+
+
 
 async function setupCreateLevel() {
    let levels = window.onlineLevels.filter((e) => e.creator == tempUser.username);
    levels.push(...window.privateLevels);
+   const len = totalCreatedLevel = levels.length;
+   let I, j;
 
-   if (htmlCreateLevels.length !=  levels.length) {
-      htmlCreateLevels = createUserLevels(levels, $("#createMode"));
+   for (I = 0; I < len; I++) {
+      const [mainEle, cvs, _ctx, count, id, setting, _privacy] = htmlCreateLevels[I];
+      mainEle.classList.add("show");
+      count.innerText = levels[I].playCount;
+      id.innerText = levels[I].id;
+   
+      ctx = _ctx;
+      const { aryPtr, length } = create2dAryPointer(levels[I].blocks);
+      init(aryPtr, length);
+      draw();
 
-      htmlCreateLevels.forEach(([mainEle, cvs, _ctx, count, id, setting, _privacy], i) => {
-         mainEle.classList.add("show");
-         count.innerText = levels[i].playCount;
-         id.innerText = levels[i].id;
-         
-         ctx = _ctx;
+      const isPublic = window.onlineLevels.find(e => e.id === levels[I].id) !== undefined;
+      _privacy.classList.toggle("active", !isPublic);
+
+      safeEventListener(setting, async () => {
+         let i = I - 1;
+         waitingWindow.classList.add("active"); 
+         const data = await getUserRank(levels[i].id);
+         M_lvlNo.innerText = levels[i].id;
+         M_lvlRank.innerText = data.userRank !== null ? data.userRank + 1 : "∞";
+         M_playCount.innerText = levels[i].playCount;
+
+         const isPublic = window.onlineLevels.find(e => e.id === levels[i].id) !== undefined;
+         privacyModifier.checked = isPublic;
+
+         ctx = MODIFIER_CTX;
          const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
          init(aryPtr, length);
          draw();
 
-         const isPublic = window.onlineLevels.find(e => e.id === levels[i].id) !== undefined;
-         _privacy.classList.toggle("active", !isPublic);
+         levelModifier.classList.add("active");
+         waitingWindow.classList.remove("active");
 
-         setting.addEventListener("click", async () => {
-            waitingWindow.classList.add("active"); 
-            const data = await getUserRank(levels[i].id);
-            M_lvlNo.innerText = levels[i].id;
-            M_lvlRank.innerText = data.userRank !== null ? data.userRank + 1 : "∞";
-            M_playCount.innerText = levels[i].playCount;
 
-            const isPublic = window.onlineLevels.find(e => e.id === levels[i].id) !== undefined;
-            privacyModifier.checked = isPublic;
-
-            ctx = MODIFIER_CTX;
-            const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
-            init(aryPtr, length);
-            draw();
-
-            levelModifier.classList.add("active");
-            waitingWindow.classList.remove("active");
-
-            $("#saveModifier").click(async () => {
-               if (isPublic ===  privacyModifier.checked) { // same position. don't need to change anything
-                  levelModifier.classList.remove("active");
-               } else {
-                  const un = `${tempUser.username}/`;
-                  const oldPath = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
-                  const newPath = `levels/${isPublic ? "private" : "online"}/${isPublic ? un : ""}${levels[i].id}`;
-                  
-                  await moveData(oldPath, newPath);
-                  if (!isPublic) {
-                     const index = window.privateLevels.findIndex((e) => e.id === levels[i].id);
-                     if (index !== -1) {
-                        window.privateLevels.splice(index, 1);
-                     }
+         safeEventListener(saveModifier, async () => {
+            if (isPublic ===  privacyModifier.checked) { // same position. don't need to change anything
+               levelModifier.classList.remove("active");
+            } else {
+               const un = `${tempUser.username}/`;
+               const oldPath = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
+               const newPath = `levels/${isPublic ? "private" : "online"}/${isPublic ? un : ""}${levels[i].id}`;
+               
+               await moveData(oldPath, newPath);
+               if (!isPublic) {
+                  const index = window.privateLevels.findIndex((e) => e.id === levels[i].id);
+                  if (index !== -1) {
+                     window.privateLevels.splice(index, 1);
                   }
-                  _privacy.classList.toggle("active", isPublic);
-                  levelModifier.classList.remove("active");
-               } 
-            }, true);
-
-            $("#deleteLevel").click(async () => {
-               const alert = new AlertHTML({
-                  title: "Delete Level",
-                  message: "Are you sure you want to delete this level?",
-               });
-               alert.show();
-               alert.clickBtn1(() => {
-                  alert.hide();
-                  levelModifier.classList.remove("active");
-               });
-               alert.clickBtn2(async () => {
-                  alert.hide();
-                  const un = `${tempUser.username}/`;
-                  const path = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
-                  await deleteData(path);
-                  levelModifier.classList.remove("active");
-               });
-            }, true);
-            
+               }
+               _privacy.classList.toggle("active", isPublic);
+               levelModifier.classList.remove("active");
+            }
          });
-         
-         cvs.addEventListener("click", () => {
-            currentGameMode = "online";
-            currentPlayingLevel = levels[i];
-            setupPreview();
+
+         safeEventListener(deleteLevel, async () => {
+            const alert = new AlertHTML({
+               title: "Delete Level",
+               message: "Are you sure you want to delete this level?",
+            });
+            alert.show();
+            alert.clickBtn1(() => {
+               alert.hide();
+               levelModifier.classList.remove("active");
+            });
+            alert.clickBtn2(async () => {
+               alert.hide();
+               const un = `${tempUser.username}/`;
+               const path = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
+               await deleteData(path);
+               levelModifier.classList.remove("active");
+            });
          });
       });
+
+      safeEventListener(cvs, () => {
+         currentGameMode = "online";
+         currentPlayingLevel = levels[I];
+         setupPreview();
+      });
    }
+
+   for (j = I; j < MAX_LEVEL_CAN_CREATE; j++) htmlCreateLevels[j][0].classList.remove("show");
+   
+
+   // if (htmlCreateLevels.length != levels.length) {
+   //    htmlCreateLevels = createUserLevels(levels, $("#createMode"));
+
+   //    htmlCreateLevels.forEach(([mainEle, cvs, _ctx, count, id, setting, _privacy], i) => {
+   //       mainEle.classList.add("show");
+   //       count.innerText = levels[i].playCount;
+   //       id.innerText = levels[i].id;
+         
+   //       ctx = _ctx;
+   //       const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
+   //       init(aryPtr, length);
+   //       draw();
+
+   //       const isPublic = window.onlineLevels.find(e => e.id === levels[i].id) !== undefined;
+   //       _privacy.classList.toggle("active", !isPublic);
+
+   //       setting.addEventListener("click", async () => {
+   //          waitingWindow.classList.add("active"); 
+   //          const data = await getUserRank(levels[i].id);
+   //          M_lvlNo.innerText = levels[i].id;
+   //          M_lvlRank.innerText = data.userRank !== null ? data.userRank + 1 : "∞";
+   //          M_playCount.innerText = levels[i].playCount;
+
+   //          const isPublic = window.onlineLevels.find(e => e.id === levels[i].id) !== undefined;
+   //          privacyModifier.checked = isPublic;
+
+   //          ctx = MODIFIER_CTX;
+   //          const { aryPtr, length } = create2dAryPointer(levels[i].blocks);
+   //          init(aryPtr, length);
+   //          draw();
+
+   //          levelModifier.classList.add("active");
+   //          waitingWindow.classList.remove("active");
+
+   //          $("#saveModifier").click(async () => {
+   //             if (isPublic ===  privacyModifier.checked) { // same position. don't need to change anything
+   //                levelModifier.classList.remove("active");
+   //             } else {
+   //                const un = `${tempUser.username}/`;
+   //                const oldPath = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
+   //                const newPath = `levels/${isPublic ? "private" : "online"}/${isPublic ? un : ""}${levels[i].id}`;
+                  
+   //                await moveData(oldPath, newPath);
+   //                if (!isPublic) {
+   //                   const index = window.privateLevels.findIndex((e) => e.id === levels[i].id);
+   //                   if (index !== -1) {
+   //                      window.privateLevels.splice(index, 1);
+   //                   }
+   //                }
+   //                _privacy.classList.toggle("active", isPublic);
+   //                levelModifier.classList.remove("active");
+   //             } 
+   //          }, true);
+
+   //          $("#deleteLevel").click(async () => {
+   //             const alert = new AlertHTML({
+   //                title: "Delete Level",
+   //                message: "Are you sure you want to delete this level?",
+   //             });
+   //             alert.show();
+   //             alert.clickBtn1(() => {
+   //                alert.hide();
+   //                levelModifier.classList.remove("active");
+   //             });
+   //             alert.clickBtn2(async () => {
+   //                alert.hide();
+   //                const un = `${tempUser.username}/`;
+   //                const path = `levels/${isPublic ? "online" : "private"}/${isPublic ? "" : un}${levels[i].id}`;
+   //                await deleteData(path);
+   //                levelModifier.classList.remove("active");
+   //             });
+   //          }, true);
+            
+   //       });
+         
+   //       cvs.addEventListener("click", () => {
+   //          currentGameMode = "online";
+   //          currentPlayingLevel = levels[i];
+   //          setupPreview();
+   //       });
+   //    });
+   // }
 }
 
 function loadWasm() {

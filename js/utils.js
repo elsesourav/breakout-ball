@@ -341,11 +341,11 @@ function createOnlineLevels(numOfLevel, levelsMap) {
    return htmlLevels;
 }
 
-function createUserLevels(levels, levelsMap) {
+function createUserLevels(max, levelsMap) {
    levelsMap.innerHTML = "";
    const htmlLevels = [];
-
-   for (let i = 0; i < levels.length; i++) {
+   
+   for (let i = 0; i < max; i++) {
       const mainEle = CE("div", ["level"]);
 
       const privacy = CE("div", ["privacy"], "", mainEle);
@@ -370,6 +370,12 @@ function createUserLevels(levels, levelsMap) {
       htmlLevels.push([mainEle, cvs, ctx, count, id, setting, privacy]);
    }
    return htmlLevels;
+}
+
+function safeEventListener(element, fun, action = "click") {
+   element.removeEventListener(action, element._fn);
+   element._fn = fun;
+   element.addEventListener(action, element._fn);
 }
 
 {

@@ -57,11 +57,11 @@ previewClose.click(() => {
 
 $("#closeModifier").click(() => {
    levelModifier.classList.remove("active");
-})
+});
 homeButton.click(goHome);
 signOut.click(() => {
    auth.signOut();
-})
+});
 
 addEventListener("popstate", function (event) {
    if (event.state != null && event.state.name == "testing") {
@@ -180,20 +180,14 @@ let oldGamma = 0;
 //    });
 // }
 
-async function selectMode(i, is = false) {
-   if (!is) {
-      modeOptions.removeClass("active");
-      modeOptions[i].classList.add("active");
-      pg.index = i;
-      pg.preScrollX = pg.scrollX;
-      pg.scrollX = -pg.width * i;
-      modeType.style.transitionDuration = "100ms";
-      modeType.style.left = `${pg.scrollX}px`;
-   }
-
-   if (i === 2) {
-      setupCreateLevel();
-   }
+async function selectMode(i) {
+   modeOptions.removeClass("active");
+   modeOptions[i].classList.add("active");
+   pg.index = i;
+   pg.preScrollX = pg.scrollX;
+   pg.scrollX = -pg.width * i;
+   modeType.style.transitionDuration = "100ms";
+   modeType.style.left = `${pg.scrollX}px`;
 }
 
 modeOptions.click((e, _, i) => selectMode(i));
@@ -246,7 +240,7 @@ modeType.on("touchend", () => {
    modeType.style.left = `${Math.round(pg.scrollX)}px`;
    pg.preScrollX = pg.scrollX;
 
-   selectMode(pg.index, false);
+   selectMode(pg.index);
 
    pg.isLock = pg.ones = false;
    pg.totalMove = pg.dx = pg.dy = 0;

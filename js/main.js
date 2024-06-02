@@ -4,6 +4,8 @@ const showCountDowns = $("#showCountDowns");
 const showGameStatus = $("#showGameStatus");
 const showTime = $("#showTime");
 const showTimeUsed = $("#showTimeUsed");
+const saveModifier = $("#saveModifier");
+const deleteLevel = $("#deleteLevel");
 
 replaceState();
 
