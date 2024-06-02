@@ -80,6 +80,10 @@ float Paddle::moveTarget(float _tx) {
 float Paddle::moveDirect(float _x) {
    if (_x - w / 2 >= 0 && _x + w / 2 <= windowWidth) {
       x = _x;
+   } else if (_x - w / 2 < 0) {
+      x = w / 2;
+   } else if (_x + w / 2 > windowWidth) {
+      x = windowWidth - w / 2;
    }
    return x;
 }
