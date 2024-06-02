@@ -175,27 +175,28 @@ CVS.addEventListener("touchmove", (e) => {
 
 let oldGamma = 0;
 
-if ("Gyroscope" in window) {
-   const gyro = new Gyroscope();
-   gyro.start();
-   gyro.addEventListener("reading", (e) => {
+// if ("Gyroscope" in window) {
+//    const gyro = new Gyroscope();
+//    gyro.start();
+//    gyro.addEventListener("reading", (e) => {
+//       const ntx = e.gamma * 5 - oldGamma;
+//       // mobileErr.innerHTML = ntx + " :  : " + e.gamma;
+//       tx = moveDirect(ntx);
+//       oldGamma = e.gamma;
+//    });
+//    gyro.addEventListener("error", (e) => {
+//       console.error(e);
+//    });
+// }
+
+if (window.DeviceOrientationEvent) {
+   window.addEventListener("deviceorientation", (e) => {
       const ntx = e.gamma * 5 - oldGamma;
       mobileErr.innerHTML = ntx + " :  : " + e.gamma;
       tx = moveDirect(ntx);
       oldGamma = e.gamma;
    });
-   gyro.addEventListener("error", (e) => {
-      console.error(e);
-   });
 }
-
-// if (window.DeviceOrientationEvent) {
-//    window.addEventListener("deviceorientation", (e) => {
-//       const ntx = e.gamma * 5 - oldGamma;
-//       tx = moveDirect(ntx);
-//       oldGamma = e.gamma;
-//    });
-// }
 
 async function selectMode(i) {
    modeOptions.removeClass("active");
