@@ -71,9 +71,17 @@ async function setupLevelRanking(levelId, time) {
       currentGameMode == "local" ? currentGameMode : "online"
    );
 
-   info.levelsRecord[levelId].time = time;
-   info.levelsRecord[levelId].rank = data.userRank;
-   info.levelsRecord[levelId].completed = true;
+   if (info.levelsRecord[levelId]) {
+      info.levelsRecord[levelId].time = time;
+      info.levelsRecord[levelId].rank = data.userRank;
+      info.levelsRecord[levelId].completed = true;
+   } else {
+      info.levelsRecord[levelId] = {
+         time: time,
+         rank: data.userRank,
+         completed: true,
+      };
+   }
 
    if (tempUser.numLocalLevels - 1 > levelId) {
       info.levelsRecord[`${Number(levelId) + 1}`] = {
@@ -91,21 +99,38 @@ async function setupLevelRanking(levelId, time) {
 async function updateLevelView(levelId) {
    waitingWindow.classList.add("active");
    const refLocal = db.ref(`levels/local/${levelId}/playCount`);
-   const refOnline = db.ref(`levels/online/${levelId}/playCount`);
 
-   const level = await refLocal.get();
-   const ref = level.exists() ? refLocal : refOnline;
+   const palyCount = await refLocal.get();
+   const mode = palyCount.exists() ? "local" : "online";
 
-   await ref.transaction((count) => {
-      if (!count) return 1;
-      return count + 1;
-   });
+   const level = await db.ref(`levels/${mode}/${levelId}/creator`);
+   const ref = await db.ref(`levels/${mode}/${levelId}/playCount`);
+
+   const creator = (await level.get()).val();
+
+   if (creator !== tempUser.username) {
+      await ref.transaction((count) => {
+         if (!count) return 1;
+         return count + 1;
+      });
+   }
 }
 
 async function saveLevel(newLevel, path = "online") {
    waitingWindow.classList.add("active");
    try {
       const ref = db.ref(`levels/${path}/${newLevel.id}`);
+      await ref.set(newLevel);
+      waitingWindow.classList.remove("active");
+      return true;
+   } catch (error) {
+      return false;
+   }
+}
+async function saveLevelPrivate(newLevel) {
+   waitingWindow.classList.add("active");
+   try {
+      const ref = db.ref(`levels/private/${tempUser.username}/${newLevel.id}`);
       await ref.set(newLevel);
       waitingWindow.classList.remove("active");
       return true;
@@ -132,16 +157,52 @@ async function getLevel(levelId) {
    }
 }
 
-// async function getUserCreatedLevels() {
-//    waitingWindow.classList.add("active");
-//    const ref = db.ref(`levels/online`);
-//    const levels = await ref
-//       .orderByChild("creator")
-//       .equalTo(tempUser.username)
-//       .once("value");
-//    waitingWindow.classList.remove("active");
-//    return levels.val();
-// }
+async function moveData(oldPath, newPath) {
+   try {
+      waitingWindow.classList.add("active");
+      const oldRef = db.ref(oldPath);
+      const snapshot = await oldRef.once("value");
+      const data = snapshot.val();
+
+      const newRef = db.ref(newPath);
+      await newRef.set(data);
+
+      await oldRef.remove();
+   } catch (error) {
+      const alert = new AlertHTML({
+         title: "Something is wrong",
+         message: "Database not response please try again.",
+         btnNm1: "Okay",
+         oneBtn: true
+      });
+      waitingWindow.classList.remove("active");
+      alert.show();
+      alert.clickBtn1(() => {
+         alert.hide();
+      });
+   }
+}
+
+async function deleteData(path) {
+   try {
+      waitingWindow.classList.add("active");
+      const ref = db.ref(path);
+      await ref.remove();
+      waitingWindow.classList.remove("active");
+   } catch (error) {
+      const alert = new AlertHTML({
+         title: "Something is wrong",
+         message: "Database not response please try again.",
+         btnNm1: "Okay",
+         oneBtn: true
+      });
+      waitingWindow.classList.remove("active");
+      alert.show();
+      alert.clickBtn1(() => {
+         alert.hide();
+      });
+   }
+}
 
 const createNewUser = (username, password, fullName) => {
    return asyncHandler(async () => {
@@ -221,8 +282,8 @@ Module.onRuntimeInitialized = () => {
    auth.onAuthStateChanged(async (User) => {
       loadWasm();
 
-      waitingWindow.classList.remove("active");
       if (!User) {
+         waitingWindow.classList.remove("active");
          const { fullName, username, password, isSignin } = await userForm(
             floatingInputShow,
             true
@@ -236,34 +297,67 @@ Module.onRuntimeInitialized = () => {
          const info = getUserInfo();
          tempUser = info;
 
+         let loadComplete = false;
+
          setupLocalLevel(info.levelsRecord);
          $("#fullName").innerText = info.fullName;
          $("#username").innerText = `@${info.username}`;
 
          // download online levels
          const onlineRef = db.ref(`levels/online`);
+         const privateRef = db.ref(`levels/private/${tempUser.username}`);
          window.onlineLevels = [];
+         window.privateLevels = [];
 
-         const bounce = debounce(() => {
+         const bounceAll = debounce(() => {
+            loadComplete = true;
             window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
-            const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
+            const maxPagePossible = Math.ceil(
+               window.onlineLevels.length / MAX_PAGE_RENDER
+            );
             PAGES.update(maxPagePossible);
             setupCreateLevel();
             setupOnlineLevels();
+            waitingWindow.classList.remove("active");
          }, 200);
+
+         const bouncePrivate = debounce(() => {
+            setupCreateLevel();
+         }, 500);
+
+         privateRef.on("child_added", (s) => {
+            window.privateLevels.push(s.val());
+            bouncePrivate();
+         });
+
+         privateRef.on("child_removed", (s) => {
+            const index = window.privateLevels.findIndex((e) => e.id === s.key);
+            if (index !== -1) {
+               window.privateLevels.splice(index, 1);
+               bouncePrivate();
+            }
+         });
 
          onlineRef.on("child_added", (s) => {
             window.onlineLevels.push(s.val());
-            bounce();
+            bounceAll();
          });
 
          onlineRef.on("child_removed", (s) => {
             const index = window.onlineLevels.findIndex((e) => e.id === s.key);
             if (index !== -1) {
                window.onlineLevels.splice(index, 1);
-               pageClickAction();
+               bounceAll();
             }
          });
+
+
+         // when on online map exist then remove loading window
+         setTimeout(() => {
+            if (!loadComplete) {
+               waitingWindow.classList.remove("active");
+            }
+         }, 20000);
       }
    });
 };

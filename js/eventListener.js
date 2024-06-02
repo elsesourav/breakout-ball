@@ -1,7 +1,11 @@
 const previewClose = $("#previewClose");
 const showPreview = $("#showPreview");
+const signOut = $("#signOut");
+const levelModifier = $("#levelModifier");
 const modeType = $("#modeType");
+const privacy = $("#privacy");
 const homeButton = $("#homeButton");
+const privacyModifier = $("#privacyModifier");
 const seekBar = $("#seekBar");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
@@ -25,7 +29,7 @@ let isPointerLock = false;
 
 function goHome() {
    showGameStatus.classList.remove("active");
-   showPreview.classList.remove("active");
+   showPreview.classList = [];
    CVS.classList.remove("active");
    showTime.classList.remove("active");
    levelDesigner.classList.remove("active");
@@ -38,15 +42,26 @@ function goHome() {
    isLevelMakerModeOn = false;
 }
 
+function closeTestingPreview() {
+   lvlMaker.show();
+   showPreview.classList = [];
+}
+
 previewClose.click(() => {
    if (currentGameMode == "testing") {
-      lvlMaker.show();
+      closeTestingPreview();
    } else {
       goHome();
    }
 });
 
+$("#closeModifier").click(() => {
+   levelModifier.classList.remove("active");
+})
 homeButton.click(goHome);
+signOut.click(() => {
+   auth.signOut();
+})
 
 addEventListener("popstate", function (event) {
    if (event.state != null && event.state.name == "testing") {
@@ -63,8 +78,6 @@ addEventListener("popstate", function (event) {
       alert.show();
       alert.clickBtn1(() => {
          alert.hide();
-         pushStatus("inGame");
-         pushStatus("inGame");
       });
       alert.clickBtn2(() => {
          alert.hide();

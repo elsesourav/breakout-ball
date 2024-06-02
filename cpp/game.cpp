@@ -10,7 +10,7 @@ using namespace std;
 
 Game::Game() {}
 
-void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight, short _FPS, DrawBallPtr _drawBall, DrawPaddlePtr _drawPaddle, DrawBlockPtr _drawBlock, DrawParticlePtr _drawParticle, DrawStarPtr _drawStar, DrawGlowPtr _drawGlow, DrawLavaPtr _drawLava, ClearCvsPtr _clearCvs, ShowHealthPtr _showHealth, ShowTimePtr _showTime, ShowCountDownPtr _showCountDown, ShowGameOverPtr _showGameOver, ShowGameCompletePtr _showGameComplete, VibratePtr _vibrate) {
+void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight, short _FPS, DrawBallPtr _drawBall, DrawPaddlePtr _drawPaddle, DrawBlockPtr _drawBlock, DrawParticlePtr _drawParticle, DrawStarPtr _drawStar, DrawGlowPtr _drawGlow, DrawLavaPtr _drawLava, ClearCvsPtr _clearCvs, ClearCvsPtr _clearCanvasWidthNoAlpha, ShowHealthPtr _showHealth, ShowTimePtr _showTime, ShowCountDownPtr _showCountDown, ShowGameOverPtr _showGameOver, ShowGameCompletePtr _showGameComplete, VibratePtr _vibrate) {
    WIDTH = _WIDTH;
    HEIGHT = _HEIGHT;
    SIZE = _SIZE;
@@ -37,6 +37,7 @@ void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _p
    drawGlow = _drawGlow;
    drawLava = _drawLava;
    clearCvs = _clearCvs;
+   clearCanvasWidthNoAlpha = _clearCanvasWidthNoAlpha;
    showHealth = _showHealth;
    showTime = _showTime;
    showCountDown = _showCountDown;
@@ -61,6 +62,7 @@ void Game::init(int *array, int length) {
    particles.clear();
    paddle.glows.clear();
    lava.glows.clear();
+   clearCanvasWidthNoAlpha(WIDTH, HEIGHT);
 
    ball.init(ballX, ballY, ballR, 1);
    paddle.init(padX, padY, padW, padH, ballSpeed, WIDTH);

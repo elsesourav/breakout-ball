@@ -10,7 +10,7 @@
    transition: ease-in-out 300ms top;
    z-index: 5;
 
-   &.active {
+   &:is(.play, .playAgain, .testing) {
       top: 0;
    }
 
@@ -295,16 +295,13 @@
       }
    }
 
-   &:not(.inGame, .testing) #startButton p:nth-child(2),
-   &:is(:not(.inGame, .testing), .local) .btn #levelCreatorName,
-   &:not(.inGame) .btn #homeButton,
-   &.inGame #startButton p:first-child,
-   &.testing #startButton p:first-child,
-   &.testing .leaderboard,
-   &.testing .rapper .canvas-and-lvl-details .rank {
+   &.play #startButton p:nth-child(2),
+   &.play .btn #homeButton,
+   &:is(.playAgain, .testing) #startButton p:nth-child(1),
+   &.testing .rapper .canvas-and-lvl-details .rank,
+   &.testing .leaderboard {
       display: none;
    }
-   /* &:not(.inGame, .testing) .rapper .canvas-and-lvl-details .rank { */
 
    #previewClose {
       position: absolute;

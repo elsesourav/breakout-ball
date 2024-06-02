@@ -10,7 +10,7 @@
       <!-- font and icon stylesheet -->
       <link rel="stylesheet" href="icons/css/font.css" />
       <link rel="stylesheet" href="icons/css/icon.css" />
-      
+
       <!-- design stylesheet -->
       <link rel="stylesheet" href="./css/home.css" />
       <link rel="stylesheet" href="./css/form.css" />
@@ -19,6 +19,8 @@
       <link rel="stylesheet" href="./css/gameDesigner.css" />
       <link rel="stylesheet" href="./css/lavel.css" />
       <link rel="stylesheet" href="./css/loding.css" />
+      <link rel="stylesheet" href="./css/profile.css" />
+      <link rel="stylesheet" href="./css/modifier.css" />
 
       <!-- all scripts -->
       <script src="./js/logic.js"></script>
@@ -85,7 +87,7 @@
                   <div id="onlineMode" class="inner"></div>
                   <div id="pages"></div>
                </div>
-               <div class="map extra">
+               <div class="map extra" id="userCreateMap">
                   <div class="top">
                      <div class="box" id="createLevel">
                         <i class="sbi-plus1"></i>
@@ -172,7 +174,49 @@
          <!--====================================================
                User Level Modify (Public, Private and Delete) 
          ======================================================-->
-            
+         <div id="levelModifier" class="">
+            <div class="btn" id="closeModifier">
+               <i class="sbi-cross1"></i>
+            </div>
+            <div class="inner">
+               <div class="cvs">
+                  <canvas id="cvsModifier"></canvas>
+               </div>
+               <div class="lvl-details">
+                  <div class="flex selected-lvl">
+                     <span>Level</span>
+                     <p id="M_lvlNo">1</p>
+                  </div>
+                  <div class="flex rank">
+                     <span>Your Rank</span>
+                     <p id="M_lvlRank">∞</p>
+                  </div>
+                  <div class="flex time">
+                     <span class="sbi-play-circle"></span>
+                     <p id="M_playCount">∞</p>
+                  </div>
+               </div>
+               <div class="switch-button">
+                  <input
+                     class="switch-button-checkbox"
+                     type="checkbox"
+                     name="privacy"
+                     id="privacyModifier"
+                  />
+                  <label class="switch-button-label" for="privacy">
+                     <span class="switch-button-label-span">Private</span>
+                  </label>
+               </div>
+               <div class="buttons">
+                  <button class="btn" id="deleteLevel">
+                     <i class="sbi-trash"></i>
+                  </button>
+                  <button class="btn" id="saveModifier">
+                     <i class="sbi-save2"></i>
+                  </button>
+               </div>
+            </div>
+         </div>
 
          <!--==============================
                   Game Preview
@@ -335,6 +379,7 @@
                      type="checkbox"
                      name="privacy"
                      id="privacy"
+                     checked
                   />
                   <label class="switch-button-label" for="privacy">
                      <span class="switch-button-label-span">Private</span>

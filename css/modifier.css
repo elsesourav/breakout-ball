@@ -1,0 +1,246 @@
+#levelModifier {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   display: none;
+   place-items: center;
+   background: rgba(0, 0, 0, 0.92);
+   z-index: 5;
+   opacity: 0;
+   transition-timing-function: linear;
+   transition-property: overlay display opacity;
+   transition-duration: 300ms;
+   transition-behavior: allow-discrete;
+
+   &.active {
+      display: grid;
+      opacity: 1;
+
+      @starting-style {
+         opacity: 0;
+      }
+   }
+
+   #closeModifier {
+      position: absolute;
+      left: 50%;
+      top: calc(var(--s) * 1);
+      font-size: calc(var(--s) * 1);
+      width: calc(var(--s) * 1);
+      height: calc(var(--s) * 1);
+      display: grid;
+      place-items: center;
+      border-radius: calc(var(--s) * 0.3);
+      background: #0015ff80;
+      border: none;
+      outline: solid 1px #7c7cff;
+      cursor: var(--cursor);
+      z-index: 1;
+
+      i {
+         background: -webkit-linear-gradient(#ff5900, #ff0000);
+         -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
+      }
+   }
+
+
+   .inner {
+      --w: calc(var(--s) * var(--rows) * 0.7);
+      --cvs-w: calc(var(--w) - var(--gap) * 2);
+      --cvs-h: calc(var(--s) * var(--cols) * 0.7 - var(--gap) * 2);
+      --switch-w: calc(var(--s) * 3);
+      --border-r: calc(var(--s) * 0.15);
+      --btn-h: calc(var(--s) * 0.8);
+      --_font-size: calc(var(--s) * 0.5);
+
+
+      position: relative;
+      background: var(--main-bg);
+      width: var(--w);
+      padding: var(--gap);
+      padding-bottom: calc(var(--s) * 0.6);
+      outline: solid 1px #23008c;
+      border-radius: calc(var(--s) * 0.3);
+      height: auto;
+      display: grid;
+      gap: calc(var(--s) * 0.2);
+      place-items: center;
+
+
+   
+      .cvs {
+         position: relative;
+         width: var(--cvs-w);
+         height: var(--cvs-h);
+         margin-bottom: 0px;
+         border-radius: inherit;
+         border-bottom-left-radius: 0;
+         border-bottom-right-radius: 0;
+         background: #0003;
+
+         canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+         }
+      }
+
+      .lvl-details {
+         position: relative;
+         bottom: 0;
+         width: 100%;
+         display: flex;
+         border-radius: inherit;
+         padding: calc(var(--s) * 0.2);
+         justify-content: space-between;
+         background: #000000cc;
+   
+         .flex {
+            position: relative;
+            display: flex;
+            font-size: calc(var(--s) * 0.35);
+            align-items: center;
+            gap: calc(var(--s) * 0.1);
+            z-index: 1;
+   
+            span {
+               color: #ffffff;
+            }
+   
+            p {
+               color: #00f2ff;
+               font-family: f1b;
+            }
+         }
+      }
+
+      .switch-button {
+         --padding: calc(var(--s) * 0.09);
+
+         background: rgba(255, 255, 255, 0.56);
+         border-radius: var(--border-r);
+         width: var(--switch-w);
+         height: var(--btn-h);
+         padding: var(--padding);
+         text-align: center;
+         font-size: calc(var(--s) * 0.3);
+         color: #000;
+         position: relative;
+         box-shadow: inset 0 0 2px #000;
+         outline: solid 1px #fff;
+         padding-right: calc(var(--switch-w) / 2);
+         overflow: hidden;
+         position: relative;
+
+         &:before {
+            content: "Public";
+            position: absolute;
+            font-family: f6b;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: calc(var(--switch-w) / 2 - var(--padding));
+            display: grid;
+            place-items: center;
+            z-index: 3;
+            pointer-events: none;
+         }
+         .switch-button-checkbox {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: var(--cursor);
+            z-index: 2;
+
+            &:checked + .switch-button-label:before {
+               transform: translateX(
+                  calc(var(--switch-w) / 2 - var(--padding))
+               );
+               transition: transform 300ms ease-in-out;
+            }
+            & + .switch-button-label {
+               position: relative;
+               width: 100%;
+               height: 100%;
+               display: grid;
+               place-items: center;
+
+               span {
+                  font-family: f6b;
+               }
+            }
+            & + .switch-button-label:before {
+               content: "";
+               background: #fff;
+               outline: solid 1px #a5a5a5;
+               height: 100%;
+               width: 100%;
+               position: absolute;
+               left: 0;
+               top: 0;
+               border-radius: calc(var(--border-r) * 0.8);
+               transform: translateX(0);
+               transition: transform 300ms;
+            }
+            & + .switch-button-label .switch-button-label-span {
+               position: relative;
+            }
+         }
+      }
+
+      .buttons {
+         position: relative;
+         width: 100%;
+         display: flex;
+         justify-content: space-between;
+         padding: 0 calc(var(--s) * 0.4);
+
+
+         .btn {
+            position: relative;
+            outline: solid 1px #fff;
+            background: rgba(255, 255, 255, 0.56);
+            box-shadow: inset 0 0 2px #000;
+            border: none;
+            padding: 0;
+            width: calc(var(--s));
+            height: var(--btn-h);
+            border-radius: var(--gap);
+            cursor: var(--cursor);
+            transition: linear 200ms background;
+
+            & > i {
+               color: #fff;
+               font-size: calc(var(--_font-size) * 1.2);
+            }
+
+            &#saveModifier > i {
+               background: -webkit-linear-gradient(#6b6b6b, #000000);
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+            }
+            &#deleteLevel > i {
+               background: -webkit-linear-gradient(#ff0000, #6c2800);
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+            }
+
+            @media (hover: hover) and (pointer: fine) {
+               &:hover {
+                  background: #fff;
+               }
+            }
+            &:active {
+               background: #fff;
+            }
+         }
+      }
+   }
+}

@@ -69,8 +69,8 @@ const $ = (selector) => {
    self.on = (event, fun) => {
       self.addEventListener(event, fun);
    };
-   self.click = (fun) => {
-      self.addEventListener("click", fun);
+   self.click = (fun, once = false) => {
+      self.addEventListener("click", fun, { once });
    };
    self.text = (text) => (self.innerText = text);
    self.html = (html) => (self.innerText = html);
@@ -84,9 +84,11 @@ const $$ = (selector) => {
          element.addEventListener(event, fun);
       });
    };
-   self.click = (fun) => {
+   self.click = (fun, once = false) => {
       self.forEach((element, i) => {
-         element.addEventListener("click", (e) => fun(e, element, i));
+         element.addEventListener("click", (e) =>
+            fun(e, element, i), { once }
+         );
       });
    };
    self.removeClass = (className) => {
@@ -102,13 +104,11 @@ const $$ = (selector) => {
 const debounce = (func, delay) => {
    let debounceTimer;
    return function (...args) {
-       const context = this;
-       clearTimeout(debounceTimer);
-       debounceTimer = setTimeout(() => func.apply(context, args), delay);
+      const context = this;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => func.apply(context, args), delay);
    };
 };
-
-
 
 const validEmail = (exp) =>
    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
@@ -119,6 +119,10 @@ const validText = (exp) =>
    /^([A-Za-z0-9à-úÀ-Ú\.\-\,\_\|\?\:\*\&\%\#\!\+\~\₹\'\"\`\@\s]{2,})+$/.test(
       exp
    );
+
+const base36ToBase10 = (base36String) => {
+   return parseInt(base36String, 36);
+};
 
 function generateUniqueId() {
    const timestamp = Date.now();
@@ -332,11 +336,7 @@ function createOnlineLevels(numOfLevel, levelsMap) {
       cvs.height = SIZE * (cols - 2.7);
       const ctx = cvs.getContext("2d");
 
-      function clear() {
-         ctx.clearRect(0, 0, cvs.width, cvs.height);
-      }
-
-      htmlLevels.push([mainEle, ctx, count, id, clear]);
+      htmlLevels.push([mainEle, ctx, count, id]);
    }
    return htmlLevels;
 }
@@ -347,12 +347,16 @@ function createUserLevels(levels, levelsMap) {
 
    for (let i = 0; i < levels.length; i++) {
       const mainEle = CE("div", ["level"]);
+
+      const privacy = CE("div", ["privacy"], "", mainEle);
+      CE("i", ["sbi-groups"], "", privacy);
+      CE("i", ["sbi-person"], "", privacy);
       const cvs = CE("canvas", ["levelCvs"]);
       const details = CE("div", ["details"]);
       const playCount = CE("div", ["playCount"], "", details);
       CE("i", ["sbi-play-circle"], "", playCount);
       const count = CE("p", ["count"], "10", playCount);
-      const id = CE("p", ["id"], "ZAS", details);
+      const id = CE("p", ["id"], "SB", details);
       const setting = CE("p", ["sbi-settings", "setting"], "", details);
 
       mainEle.appendChild(cvs);
@@ -363,11 +367,7 @@ function createUserLevels(levels, levelsMap) {
       cvs.height = SIZE * (cols - 2.7);
       const ctx = cvs.getContext("2d");
 
-      function clear() {
-         ctx.clearRect(0, 0, cvs.width, cvs.height);
-      }
-
-      htmlLevels.push([mainEle, cvs, ctx, count, id, setting, clear]);
+      htmlLevels.push([mainEle, cvs, ctx, count, id, setting, privacy]);
    }
    return htmlLevels;
 }
@@ -412,19 +412,22 @@ function createUserLevels(levels, levelsMap) {
 
 const CVS = $("#mainCanvas");
 const previewCanvas = $("#preview");
+const cvsModifier = $("#cvsModifier");
 const CTX = CVS.getContext("2d");
 const PREVIEW_CTX = previewCanvas.getContext("2d");
+const MODIFIER_CTX = cvsModifier.getContext("2d");
 const paddleImage = createPaddleImage();
 const ballImage = createBallImage();
 const blockImages = createBlockImages();
 let ctx = CTX;
 
-previewCanvas.width = CVS.width = CVS_W;
+cvsModifier.width = previewCanvas.width = CVS.width = CVS_W;
 CVS.height = CVS_H;
-previewCanvas.height = SIZE * (cols - 1);
+cvsModifier.height = previewCanvas.height = SIZE * (cols - 1);
 
-ctx.imageSmoothingQuality = "high";
+CTX.imageSmoothingQuality = "high";
 PREVIEW_CTX.imageSmoothingQuality = "high";
+MODIFIER_CTX.imageSmoothingQuality = "high";
 
 const waitingWindow = $("#waitingWindow");
 waitingWindow.classList.add("active");

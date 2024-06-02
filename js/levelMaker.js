@@ -92,8 +92,10 @@ class LevelMaker {
          });
          alert.clickBtn2(async () => {
             alert.hide();
+            const isPublic = privacy.checked;
             const newLevel = this.getLevel();
-            const isUpload = await saveLevel(newLevel);
+            animation.stop();
+            const isUpload = isPublic ? (await saveLevel(newLevel)) : (await saveLevelPrivate(newLevel));
             if (isUpload) {
                goHome();
             } else {
@@ -199,6 +201,7 @@ class LevelMaker {
       CVS.classList.add("active");
       pushStatus("createMode");
       pushStatus("createMode");
+      privacy.checked = true;
       isLevelMakerModeOn = true;
       makerInit();
       ctx = CTX;

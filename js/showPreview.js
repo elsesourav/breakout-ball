@@ -1,46 +1,49 @@
-async function setupStartPreview(optionalClass = [], data = null, time = null) {
+async function setupPreview(mode = "play", data = null, time = null) {
+   showPreview.classList = [];
+   showPreview.classList.add(mode);
+
    ctx = PREVIEW_CTX;
    ctx.clearRect(0, 0, CVS.width, CVS.height);
    const { aryPtr, length } = create2dAryPointer(currentPlayingLevel.blocks);
    init(aryPtr, length);
    draw();
+   const levelId = currentPlayingLevel.id;
+   let rank, rankTable;
 
-   const DATA = data || await getUserRank(currentPlayingLevel.id);
+   if (mode !== "testing") {
+      const DATA = data || await getUserRank(levelId);
+      rank = DATA.userRank;
+      rankTable = DATA.ranks;
 
-   const { userRank, ranks } = DATA;
-   let tableRows = "";
-
-   for (let i = 0; i < ranks.length; i++) {
-      const [_, element] = ranks[i];
-      tableRows += `<tr ${userRank === i ? 'class="me"' : ""}>
-            <td>${i + 1}</td>
-            <td>${element.fullName}</td>
-            <td>${element.time}<span>s</span></td>
-      </tr>`;
+      let tableRows = "";
+   
+      for (let i = 0; i < rankTable.length; i++) {
+         const [_, element] = rankTable[i];
+         tableRows += `<tr ${rank === i ? 'class="me"' : ""}>
+               <td>${i + 1}</td>
+               <td>${element.fullName}</td>
+               <td>${element.time}<span>s</span></td>
+         </tr>`;
+      }
+   
+      const leaderBoardHTML = `
+            <table>
+               <tr>
+                  <td>Rank</td>
+                  <td>Name</td>
+                  <td>Time</td>
+               </tr>
+               ${tableRows}
+            </table>`;
+   
+      $("#rankingTable").innerHTML = leaderBoardHTML;
    }
 
-   const leaderBoardHTML = `
-         <table>
-            <tr>
-               <td>Rank</td>
-               <td>Name</td>
-               <td>Time</td>
-            </tr>
-            ${tableRows}
-         </table>`;
+   isInOfTheGame = false; // for Mouse Hide and Show
 
-   rankingTable.innerHTML = leaderBoardHTML;
-
-   isInOfTheGame = false;
-
-   const levelId = currentPlayingLevel.id;
-
-   showPreview.classList = [];
-   showPreview.classList.add("active", ...optionalClass);
-   
    animation.stop();
    $("#lvlNo").innerHTML = levelId;
-   $("#levelCreatorName").innerHTML = levelId > 100 ? `@${currentPlayingLevel.creator}` : "";
-   $("#lvlRank").innerHTML = userRank !== null ? userRank + 1 : "∞";
-   $("#lvlTime").innerHTML = time !== null ? time : userRank !== null ? ranks[userRank][1].time : "∞" ;
+   $("#levelCreatorName").innerHTML = base36ToBase10(levelId) > 100 ? `@${currentPlayingLevel.creator}` : "";
+   $("#lvlRank").innerHTML = rank !== null ? rank + 1 : "∞";
+   $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank][1].time : "∞" ;
 }

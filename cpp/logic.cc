@@ -13,6 +13,9 @@ EM_JS(void, clearCanvas, (short w, short h), {
    ctx.fillRect(0, 0, w, h);
    ctx.globalAlpha = 1;
 });
+EM_JS(void, clearCanvasWidthNoAlpha, (short w, short h), {
+   ctx.clearRect(0, 0, w, h);
+});
 EM_JS(void, drawBall, (float x, float y, short r), {
    ctx.drawImage(ballImage, x - r, y - r, r * 2, r * 2);
 });
@@ -91,8 +94,8 @@ EM_JS(void, showGameOver, (short time), {
    setTimeout(() => {
       animation.stop();
       showCountDowns.classList = [];
-      if (currentGameMode == "testing") setupStartPreview(["testing"], null, time);
-      else setupStartPreview(["inGame"], null, time);
+      if (currentGameMode == "testing") setupPreview("testing", null, time);
+      else setupPreview("playAgain", null, time);
    }, 2000);
 });
 EM_JS(void, showGameComplete, (short time), {
@@ -102,11 +105,10 @@ EM_JS(void, showGameComplete, (short time), {
    setTimeout(async () => {
       animation.stop();
       showCountDowns.classList = [];
-      if (currentGameMode == "testing") setupStartPreview(["testing"]);
+      if (currentGameMode == "testing") setupPreview("testing", null, time);
       else {
-         
          const data = await setupLevelRanking(currentPlayingLevel.id, time);
-         setupStartPreview(["inGame"], data);
+         setupPreview("playAgain", data, time);
          const info = getUserInfo();
          setupLocalLevel(info.levelsRecord);
       }
@@ -126,7 +128,7 @@ EMSCRIPTEN_KEEPALIVE void setup(short width, short height, short size, float pad
    WIDTH = width;
    HEIGHT = height;
    FPS = _FPS;
-   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS, drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas, showHealth, showTimes, showCountDown, showGameOver, showGameComplete, vibrate);
+   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS, drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas, clearCanvasWidthNoAlpha, showHealth, showTimes, showCountDown, showGameOver, showGameComplete, vibrate);
 }
 EMSCRIPTEN_KEEPALIVE void init(int *array, int length) {
    game.init(array, length);

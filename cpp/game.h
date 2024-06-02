@@ -45,6 +45,7 @@ public:
    DrawGlowPtr drawGlow;
    DrawLavaPtr drawLava;
    ClearCvsPtr clearCvs;
+   ClearCvsPtr clearCanvasWidthNoAlpha;
    ShowHealthPtr showHealth;
    ShowTimePtr showTime;
    ShowCountDownPtr showCountDown;
@@ -53,7 +54,7 @@ public:
    VibratePtr vibrate;
 
    Game();
-   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS, DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs, ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete, VibratePtr vibrate);
+   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS, DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs, ClearCvsPtr clearCanvasWidthNoAlpha, ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete, VibratePtr vibrate);
    void init(int *array, int length);
  
    void draw();
