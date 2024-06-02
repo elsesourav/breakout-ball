@@ -22,7 +22,7 @@ async function userProfileUpdate(data) {
 async function getLevelRank(levelId) {
    loadingWindow(true);
    const playersRef = db.ref(`ranking/level-${levelId}`);
-   const data = await playersRef.orderByChild("time").once("value");
+   const data = await playersRef.get();
    loadingWindow();
    return data.val();
 }
@@ -30,12 +30,16 @@ async function getLevelRank(levelId) {
 async function getUserRank(levelId) {
    loadingWindow(true);
    const levelRank = await getLevelRank(levelId);
-   const array = levelRank ? Object.entries(levelRank) : [];
-   const rank = array.findIndex(([e]) => e == tempUser.username);
+   let sortedList = [];
+   for (const key in levelRank) {
+      sortedList.push({...levelRank[key], username: key});
+   }
+   sortedList.sort((a, b) => a.time - b.time);
+   const rank = sortedList.findIndex((e) => e.username === tempUser.username);
    loadingWindow();
    return {
       userRank: rank == -1 ? null : rank,
-      ranks: array,
+      ranks: sortedList,
    };
 }
 

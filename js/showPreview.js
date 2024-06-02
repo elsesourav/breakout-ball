@@ -23,11 +23,11 @@ async function setupPreview(mode = "play", data = null, time = null) {
       let tableRows = "";
    
       for (let i = 0; i < rankTable.length; i++) {
-         const [_, element] = rankTable[i];
+         const { fullName, time } = rankTable[i];
          tableRows += `<tr ${rank === i ? 'class="me"' : ""}>
                <td>${i + 1}</td>
-               <td>${element.fullName}</td>
-               <td>${element.time}<span>s</span></td>
+               <td>${fullName}</td>
+               <td>${time}<span>s</span></td>
          </tr>`;
       }
    
@@ -50,5 +50,5 @@ async function setupPreview(mode = "play", data = null, time = null) {
    $("#lvlNo").innerHTML = levelId;
    $("#levelCreatorName").innerHTML = base36ToBase10(levelId) > 100 ? `@${currentPlayingLevel.creator}` : "";
    $("#lvlRank").innerHTML = rank !== null ? rank + 1 : "∞";
-   $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank][1].time : "∞" ;
+   $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank].time : "∞" ;
 }
