@@ -188,8 +188,21 @@ class LevelMaker {
       $("#closeBtn").click(() => this.confirmExit());
 
       $("#createLevel").click(() => {
-         this.show();
-         lvlMaker.init();
+         if (MAX_LEVEL_CAN_CREATE > totalCreatedLevel) {
+            this.show();
+            lvlMaker.init();
+         } else {
+            const alert = new AlertHTML({
+               title: `Level Limit Reached`,
+               message: `You have reached the maximum number of levels you can create. Please delete some levels to create more. (Max Limit ${MAX_LEVEL_CAN_CREATE})`,
+               btnNm1: "Okay",
+               oneBtn: true
+            });
+            alert.show();
+            alert.clickBtn1(() => {
+               alert.hide();
+            });
+         }
       });
       
    }

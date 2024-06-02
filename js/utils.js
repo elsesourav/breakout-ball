@@ -237,9 +237,9 @@ const asyncHandler = (fun) => {
             reloadLocation();
          });
       } else {
-         waitingWindow.classList.add("active");
+         loadingWindow(true);
          const response = await fun(resolve);
-         waitingWindow.classList.remove("active");
+         loadingWindow();
 
          const { data, title, message } = response;
          if (data != null) {
@@ -372,68 +372,76 @@ function createUserLevels(max, levelsMap) {
    return htmlLevels;
 }
 
-function safeEventListener(element, fun, action = "click") {
+function safeEventListener(element, fun, ary = [], action = "click") {
    element.removeEventListener(action, element._fn);
-   element._fn = fun;
+   element._fn = () => {
+      return fun(ary);
+   };
    element.addEventListener(action, element._fn);
 }
+
 
 {
    /* <div class="level">
    <div class="top">
-      <div class="hashtag">
-         <i class="sbi-trophy2"></i>
-         <p>00</p>
-      </div>
-      <div class="is-lock-or-complete">
-         <i class="sbi-lock-outline lock"></i
-         ><i class="sbi-check-circle-outline check"></i>
-      </div>
+   <div class="hashtag">
+   <i class="sbi-trophy2"></i>
+   <p>00</p>
+   </div>
+   <div class="is-lock-or-complete">
+   <i class="sbi-lock-outline lock"></i
+   ><i class="sbi-check-circle-outline check"></i>
+   </div>
    </div>
    <div class="icon-and-no">
-      <i class="sbi-fire"></i>
-      <p class="no">1</p>
+   <i class="sbi-fire"></i>
+   <p class="no">1</p>
    </div>
    <div class="complete-time">
-      <i class="sbi-stopwatch1"></i>
-      <p class="time">000</p>
-      <span>s</span>
+   <i class="sbi-stopwatch1"></i>
+   <p class="time">000</p>
+   <span>s</span>
    </div>
-</div> */
+   </div> */
 }
 
 {
    /* <div class="level">
    <canvas class="levelCvs"></canvas>
    <div class="details">
-      <div class="playCount">
-         <i class="sbi-play-circle"></i>
-         <p class="count">10</p>
-      </div>
+   <div class="playCount">
+   <i class="sbi-play-circle"></i>
+   <p class="count">10</p>
+   </div>
       <p class="id">ZAS</p>
       <p class="delete"></p>
-   </div>
-</div> */
-}
+      </div>
+      </div> */
+   }
+   
+   const CVS = $("#mainCanvas");
+   const previewCanvas = $("#preview");
+   const cvsModifier = $("#cvsModifier");
+   const CTX = CVS.getContext("2d");
+   const PREVIEW_CTX = previewCanvas.getContext("2d");
+   const MODIFIER_CTX = cvsModifier.getContext("2d");
+   const paddleImage = createPaddleImage();
+   const ballImage = createBallImage();
+   const blockImages = createBlockImages();
+   let ctx = CTX;
+   
+   cvsModifier.width = previewCanvas.width = CVS.width = CVS_W;
+   CVS.height = CVS_H;
+   cvsModifier.height = previewCanvas.height = SIZE * (cols - 1);
+   
+   CTX.imageSmoothingQuality = "high";
+   PREVIEW_CTX.imageSmoothingQuality = "high";
+   MODIFIER_CTX.imageSmoothingQuality = "high";
+   
+   const waitingWindow = $("#waitingWindow");
+   
+   function loadingWindow(is = false) {
+      waitingWindow.classList.toggle("active", is);
+   }
 
-const CVS = $("#mainCanvas");
-const previewCanvas = $("#preview");
-const cvsModifier = $("#cvsModifier");
-const CTX = CVS.getContext("2d");
-const PREVIEW_CTX = previewCanvas.getContext("2d");
-const MODIFIER_CTX = cvsModifier.getContext("2d");
-const paddleImage = createPaddleImage();
-const ballImage = createBallImage();
-const blockImages = createBlockImages();
-let ctx = CTX;
-
-cvsModifier.width = previewCanvas.width = CVS.width = CVS_W;
-CVS.height = CVS_H;
-cvsModifier.height = previewCanvas.height = SIZE * (cols - 1);
-
-CTX.imageSmoothingQuality = "high";
-PREVIEW_CTX.imageSmoothingQuality = "high";
-MODIFIER_CTX.imageSmoothingQuality = "high";
-
-const waitingWindow = $("#waitingWindow");
-waitingWindow.classList.add("active");
+   loadingWindow(true);

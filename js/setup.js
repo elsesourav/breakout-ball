@@ -33,15 +33,24 @@ function setupOnlineLevel(eleAry, level) {
    draw();
 }
 
-function setupOnlineLevels(current = currentPageIndex) {
+function setupOnlineLevels(searchData = "", current = currentPageIndex) {
    currentPageIndex = current;
-   let j;
+   let j = 0;
    let i = current * MAX_PAGE_RENDER;
    let n = Math.min(window.onlineLevels.length, (current + 1) * MAX_PAGE_RENDER);
 
-   for (j = 0; i < n; i++, j++) {
-      setupOnlineLevel(htmlOnlineLevels[j], window.onlineLevels[i]);
+   if (searchData.length === 5) {
+      const findLevel = window.onlineLevels.find(e => e.id === searchData);
+      if (findLevel) {
+         setupOnlineLevel(htmlOnlineLevels[0], findLevel);
+         j = 1;
+      }
+   } else {
+      for (j = 0; i < n; i++, j++) {
+         setupOnlineLevel(htmlOnlineLevels[j], window.onlineLevels[i]);
+      }
    }
+
    for (; j < MAX_PAGE_RENDER; j++) {
       const [mainEle] = htmlOnlineLevels[j];
       mainEle.classList.remove("show");
@@ -90,9 +99,7 @@ async function setupCreateLevel() {
       const isPublic = window.onlineLevels.find(e => e.id === levels[I].id) !== undefined;
       _privacy.classList.toggle("active", !isPublic);
 
-      safeEventListener(setting, async () => {
-         let i = I - 1;
-         waitingWindow.classList.add("active"); 
+      safeEventListener(setting, async ([i]) => {
          const data = await getUserRank(levels[i].id);
          M_lvlNo.innerText = levels[i].id;
          M_lvlRank.innerText = data.userRank !== null ? data.userRank + 1 : "∞";
@@ -107,7 +114,6 @@ async function setupCreateLevel() {
          draw();
 
          levelModifier.classList.add("active");
-         waitingWindow.classList.remove("active");
 
 
          safeEventListener(saveModifier, async () => {
@@ -119,12 +125,6 @@ async function setupCreateLevel() {
                const newPath = `levels/${isPublic ? "private" : "online"}/${isPublic ? un : ""}${levels[i].id}`;
                
                await moveData(oldPath, newPath);
-               if (!isPublic) {
-                  const index = window.privateLevels.findIndex((e) => e.id === levels[i].id);
-                  if (index !== -1) {
-                     window.privateLevels.splice(index, 1);
-                  }
-               }
                _privacy.classList.toggle("active", isPublic);
                levelModifier.classList.remove("active");
             }
@@ -148,7 +148,7 @@ async function setupCreateLevel() {
                levelModifier.classList.remove("active");
             });
          });
-      });
+      }, [I]);
 
       safeEventListener(cvs, () => {
          currentGameMode = "online";
@@ -177,7 +177,6 @@ async function setupCreateLevel() {
    //       _privacy.classList.toggle("active", !isPublic);
 
    //       setting.addEventListener("click", async () => {
-   //          waitingWindow.classList.add("active"); 
    //          const data = await getUserRank(levels[i].id);
    //          M_lvlNo.innerText = levels[i].id;
    //          M_lvlRank.innerText = data.userRank !== null ? data.userRank + 1 : "∞";
@@ -192,7 +191,6 @@ async function setupCreateLevel() {
    //          draw();
 
    //          levelModifier.classList.add("active");
-   //          waitingWindow.classList.remove("active");
 
    //          $("#saveModifier").click(async () => {
    //             if (isPublic ===  privacyModifier.checked) { // same position. don't need to change anything

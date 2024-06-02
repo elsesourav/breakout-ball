@@ -117,6 +117,6 @@ class Pages {
 
    clickAction() {
       onlineMap.scrollTo(0, 0); // only for this project (if you use other projects then remove it)
-      this.clickCallback(this.current - 1);
+      this.clickCallback("", this.current - 1);
    }
 }

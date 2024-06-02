@@ -6,6 +6,7 @@ const modeType = $("#modeType");
 const privacy = $("#privacy");
 const homeButton = $("#homeButton");
 const privacyModifier = $("#privacyModifier");
+const searchInput = $("#searchInput");
 const seekBar = $("#seekBar");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
@@ -62,6 +63,21 @@ homeButton.click(goHome);
 signOut.click(() => {
    auth.signOut();
 });
+
+let _once_ = false;
+
+searchInput.on("input", () => {
+   const val = searchInput.value?.trim().toUpperCase();
+   if (val.length === 5) {
+      setupOnlineLevels(val);
+      _once_ = true;
+   }
+   if (val.length !== 5 && _once_) {
+      _once_ = false;
+      setupOnlineLevels();
+   }  
+});
+
 
 addEventListener("popstate", function (event) {
    if (event.state != null && event.state.name == "testing") {
