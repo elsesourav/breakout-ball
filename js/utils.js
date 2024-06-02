@@ -110,6 +110,8 @@ const debounce = (func, delay) => {
    };
 };
 
+
+
 const validEmail = (exp) =>
    /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
 const validName = (exp) => /^[a-zA-Z\s]{3,16}$/.test(exp);
@@ -283,7 +285,7 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
 
       const hashtag = CE("div", ["hashtag"], "", top);
       CE("i", ["sbi-trophy2"], "", hashtag);
-      const p = CE("p", [], "∞", hashtag);
+      const p = CE("p", ["local-user-rank"], "∞", hashtag);
 
       const lockComplete = CE("div", ["is-lock-or-complete"], "", top);
       CE("i", ["sbi-lock-outline", "lock"], "", lockComplete);

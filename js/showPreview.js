@@ -15,6 +15,11 @@ async function setupPreview(mode = "play", data = null, time = null) {
       rank = DATA.userRank;
       rankTable = DATA.ranks;
 
+      if (base36ToBase10(levelId) < 100) {
+         const rankElements = document.querySelectorAll("#localMode .local-user-rank");
+         if(rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank;
+      }
+
       let tableRows = "";
    
       for (let i = 0; i < rankTable.length; i++) {
