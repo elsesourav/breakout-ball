@@ -277,7 +277,7 @@ function loadWasm() {
 
    if (window.DeviceOrientationEvent) {
       window.addEventListener("deviceorientation", (e) => {
-         const p = map(e.gamma, -45, 45, -10, CVS_W);
+         const p = map(Math.round(e.gamma), -15, 15, -10, CVS_W);
          mobileErr.innerHTML = Math.round(p);
          let tx = moveDirect(p);
       });
