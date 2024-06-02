@@ -277,10 +277,9 @@ function loadWasm() {
 
    if (window.DeviceOrientationEvent) {
       window.addEventListener("deviceorientation", (e) => {
-         const ntx = e.gamma * 5 - oldGamma;
-         mobileErr.innerHTML = Math.round(ntx) + " :  : " + Math.round(e.gamma);
-         tx = moveDirect(ntx);
-         oldGamma = e.gamma;
+         const p = map(e.gamma, -45, 45, -10, CVS_W);
+         mobileErr.innerHTML = Math.round(p);
+         let tx = moveDirect(p);
       });
    }
 }
