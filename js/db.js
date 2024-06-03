@@ -328,7 +328,6 @@ Module.onRuntimeInitialized = () => {
       } else {
          const info = getUserInfo();
          tempUser = info;
-         console.log(info);
          volumeInput.value = info.volume;
          vibrateOnOff.classList.toggle("active", info.isVibrateActive)
          gyroOnOff.classList.toggle("active", info.isGyroActive);
