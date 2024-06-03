@@ -11,7 +11,9 @@ void Paddle::init(float _x, float _y, short _w, short _h, float ballSpeed, short
    v = ballSpeed * 2;
    offset = w * 0.1f;
    windowWidth = _windowWidth;
-   percentage = 0.1f;
+   movePercentage = 0.1f;
+   gyroPercentage = 0.3f;
+   percentage = movePercentage;
    isPointerLock = false;
    fixY = y + h * 0.2f;
 
@@ -72,12 +74,14 @@ void Paddle::moveRight() {
    tx += v;
 }
 float Paddle::moveTarget(float _tx) {
+   percentage = movePercentage;
    if (_tx - w / 2 >= 0 && _tx + w / 2 <= windowWidth) {
       tx = _tx;
    }
    return tx;
 }
 float Paddle::moveDirect(float _x) {
+   percentage = gyroPercentage;
    if (_x - w / 2 >= 0 && _x + w / 2 <= windowWidth) {
       x = _x;
    } else if (_x - w / 2 < 0) {

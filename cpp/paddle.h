@@ -11,7 +11,7 @@ typedef void (*DrawGlowPtr)(float, float, float, float, short colorIndex);
 class Paddle {
 public:
    short w, h;
-   float x, y, tx, ty, v, windowWidth, percentage, x1, x2, y1, y2, offset, fixY;
+   float x, y, tx, ty, v, windowWidth, percentage, movePercentage, gyroPercentage, x1, x2, y1, y2, offset, fixY;
    bool isPointerLock, colorIndex;
    std::vector<Glow> glows;
 

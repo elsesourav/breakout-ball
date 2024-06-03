@@ -153,7 +153,11 @@ EMSCRIPTEN_KEEPALIVE float moveTarget(float tx) {
    }
 }
 EMSCRIPTEN_KEEPALIVE float moveDirect(float x) {
-   return game.paddle.moveDirect(x);
+   if (game.gamePose) {
+      return 0;
+   } else {
+      return game.paddle.moveDirect(x);
+   }
 }
 EMSCRIPTEN_KEEPALIVE void drawBlockOnly() {
    game.drawBlockOnly();

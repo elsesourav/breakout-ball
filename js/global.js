@@ -26,6 +26,7 @@ const BALL_SPEED = 15;
 const MAX_PAGE_RENDER = 20;
 const MAX_PAGE_BUTTON = 5;
 const MAX_LEVEL_CAN_CREATE = 30;
+const GYRO_RANGE = 45;
 let totalCreatedLevel = 0;
 let currentPageIndex = 0;
 let maxPagePossible = 5;
