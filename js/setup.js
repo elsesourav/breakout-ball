@@ -273,13 +273,12 @@ function loadWasm() {
 
    makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 
-   let oldGamma = 0;
 
    if (window.DeviceOrientationEvent) {
       window.addEventListener("deviceorientation", (e) => {
-         const p = map(Math.round(e.gamma), -15, 15, -10, CVS_W);
-         mobileErr.innerHTML = Math.round(p);
-         let tx = moveDirect(p);
+         // const p = map(Math.round(e.gamma), -15, 15, -10, CVS_W);
+         // mobileErr.innerHTML = Math.round(p);
+         // let tx = moveDirect(p);
       });
    }
 }

@@ -1,6 +1,5 @@
 async function setupPreview(mode = "play", data = null, time = null) {
    showPreview.classList = [];
-   showPreview.classList.add(mode);
 
    ctx = PREVIEW_CTX;
    ctx.clearRect(0, 0, CVS.width, CVS.height);
@@ -17,7 +16,13 @@ async function setupPreview(mode = "play", data = null, time = null) {
 
       if (base36ToBase10(levelId) < 100) {
          const rankElements = document.querySelectorAll("#localMode .local-user-rank");
-         if (rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank;
+         const info = getUserInfo();
+         
+         if (rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank + 1;
+         if (info.levelsRecord[levelId] && info.levelsRecord[levelId].completed) {
+            info.levelsRecord[levelId].rank = rank + 1;
+            await userProfileUpdate(info);  
+         }
       }
 
       let tableRows = "";
@@ -43,6 +48,8 @@ async function setupPreview(mode = "play", data = null, time = null) {
 
       $("#rankingTable").innerHTML = leaderBoardHTML;
    }
+
+   showPreview.classList.add(mode);
 
    isInOfTheGame = false; // for Mouse Hide and Show
 

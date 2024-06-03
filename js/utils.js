@@ -288,7 +288,7 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
 
       if (i === j) {
          mainEle.classList.remove("lock");
-         p.innerText = userLevels[j + 1].rank + 1 || "∞";
+         p.innerText = userLevels[j + 1].rank || "∞";
          time.innerText = userLevels[j + 1].time || "∞";
          if (userLevels[j + 1].completed) {
             mainEle.classList.add("complete");
