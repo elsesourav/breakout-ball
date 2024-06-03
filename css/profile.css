@@ -345,7 +345,7 @@
       bottom: calc(var(--s) + var(--side));
       right: calc(25% - var(--w) - var(--side));
       color: #ffffff37;
-      font-family: f9;
+      font-family: f9b;
       font-size: calc(var(--s) * 0.3);
       text-decoration: none;
       transition: linear 200ms color;
