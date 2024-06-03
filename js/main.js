@@ -1,36 +1,19 @@
-
-
 replaceState();
 
-// Start Game
-function playLevel(mode = "inGame") {
-   ctx = CTX;
-   CVS.classList.add("active");
-   showGameStatus.classList.add("active");
-   showPreview.classList = [];
-   showTime.classList.remove("active");
-   showHealths.classList = [];
-   pushStatus(mode);
-   pushStatus(mode);
-   showTimeUsed.innerText = "0";
-   isInOfTheGame = true;
+function loopFun() {
+   update();
+   draw();
+   fpsCounter++;
+};
 
-   setTimeout(() => {
-      showHealths.classList.add(`s${3}`);
-      showTime.classList.add("active");
-   }, 600);
+function makerLoopFun() {
+   makerDraw();
+};
+const animation = new Animation(FPS, loopFun);
+const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
+const pagesElement = document.getElementById("pages");
 
-   const { aryPtr, length } = create2dAryPointer(currentPlayingLevel.blocks);
-   init(aryPtr, length);
+const PAGES = new Pages(MAX_PAGE_BUTTON, pagesElement, setupOnlineLevels);
 
-   animation.start(loopFun);
-}
-
-startButton.click(() => {
-   playLevel();
-});
-
-// setInterval(() => {
-//    // mobileErr.innerHTML = fpsCounter;
-//    fpsCounter = 0;
-// }, 1000);
+setup(CVS_W, CVS_H, SIZE, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED, FPS);
+makerSetup(rows, cols, CVS_W, CVS_H, SIZE);

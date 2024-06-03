@@ -17,20 +17,10 @@ const scale = CVS.width / width;
 let tx = WIDTH / 2;
 let isPointerLock = false;
 
-function goHome() {
-   showGameStatus.classList.remove("active");
-   showPreview.classList = [];
-   CVS.classList.remove("active");
-   showTime.classList.remove("active");
-   levelDesigner.classList.remove("active");
-   ctx = CTX;
-   animation.stop();
-   showHealths.classList = [];
-   pushStatus("home");
-   pushStatus("home");
-   isInOfTheGame = false;
-   isLevelMakerModeOn = false;
-}
+
+startButton.click(() => {
+   playLevel();
+});
 
 function closeTestingPreview() {
    lvlMaker.show();

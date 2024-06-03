@@ -1,16 +1,3 @@
-const loopFun = () => {
-   update();
-   draw();
-   fpsCounter++;
-};
-const makerLoopFun = () => {
-   makerDraw();
-};
-const animation = new Animation(FPS, loopFun);
-const lvlMaker = new LevelMaker(rows, cols, SIZE, (SIZE / 4) * 3, CVS);
-const pagesElement = document.getElementById("pages");
-
-const PAGES = new Pages(MAX_PAGE_BUTTON, pagesElement, setupOnlineLevels);
 const htmlOnlineLevels = createOnlineLevels(MAX_PAGE_RENDER, onlineMode);
 
 htmlOnlineLevels.forEach(([level], i) => {

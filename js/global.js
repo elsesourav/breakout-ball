@@ -55,6 +55,3 @@ rootStyle.setProperty("--rows", rows);
 rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
 rootStyle.setProperty("--pScale", pScale);
 if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
-
-setup(CVS_W, CVS_H, SIZE, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED, FPS);
-makerSetup(rows, cols, CVS_W, CVS_H, SIZE);

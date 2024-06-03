@@ -107,7 +107,6 @@ const debounce = (func, delay = 1000) => {
    };
 };
 
-
 const validEmail = (exp) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
 const validName = (exp) => /^[a-zA-Z\s]{3,16}$/.test(exp);
 const validUName = (exp) => /^[a-zA-Z0-9\_\-]{4,16}$/.test(exp);
@@ -118,21 +117,13 @@ const base36ToBase10 = (base36String) => {
    return parseInt(base36String, 36);
 };
 
-function generateUniqueId() {
-   const timestamp = Date.now();
-   const random = Math.floor(Math.random() * Math.pow(36, 2));
-   const combined = timestamp.toString(36) + random.toString(36);
-   return combined.slice(-5).toUpperCase();
+function setDataToLocalStorage(key, object) {
+   var data = JSON.stringify(object);
+   localStorage.setItem(key, data);
 }
 
-function vibrateDevice(time = 200) {
-   if (tempUser.isVibrateActive && navigator.vibrate) {
-      navigator.vibrate(time);
-   }
-}
-
-function reloadLocation() {
-   window.location.reload();
+function getDataToLocalStorage(key) {
+   return JSON.parse(localStorage.getItem(key));
 }
 
 // create element
@@ -144,53 +135,24 @@ const CE = (tagName, className = [], inrHtml = "", parent = null) => {
    return e;
 };
 
-function setDataToLocalStorage(key, object) {
-   var data = JSON.stringify(object);
-   localStorage.setItem(key, data);
-}
-function getDataToLocalStorage(key) {
-   return JSON.parse(localStorage.getItem(key));
-}
-
 function OBJECTtoJSON(data) {
    return JSON.stringify(data);
 }
+
 function JSONtoOBJECT(data) {
    return JSON.parse(data);
 }
 
-function create2dRoundedRectPath(x, y, w, h, r) {
-   const path = new Path2D();
-   path.moveTo(x + r, y);
-   path.lineTo(x + w - r, y);
-   path.arcTo(x + w, y, x + w, y + r, r);
-   path.lineTo(x + w, y + h - r);
-   path.arcTo(x + w, y + h, x + w - r, y + h, r);
-   path.lineTo(x + r, y + h);
-   path.arcTo(x, y + h, x, y + h - r, r);
-   path.lineTo(x, y + r);
-   path.arcTo(x, y, x + r, y, r);
-   path.closePath();
-   return path;
-}
-
-function create2dAryPointer(level) {
-   let ary = [];
-   for (let i = 0; i < level.length; i++) {
-      ary.push(level[i].x);
-      ary.push(level[i].y);
-      ary.push(level[i].h);
-   }
-
-   let nBytes = ary.length * 4;
-   let aryPtr = Module._malloc(nBytes);
-
-   Module.HEAP32.set(ary, aryPtr / 4);
-   return { aryPtr, length: ary.length };
-}
-
 function copyArray(ary) {
    return JSON.parse(JSON.stringify(ary));
+}
+
+function pushStatus(name) {
+   history.pushState({ name }, `${name}`, `./`);
+}
+
+function replaceState(name = "home") {
+   history.replaceState({ name }, `${name}`, `./`);
 }
 
 class ApiError extends Error {
@@ -251,121 +213,49 @@ const asyncHandler = (fun) => {
    });
 };
 
-function pushStatus(name) {
-   history.pushState({ name }, `${name}`, `./`);
+function reloadLocation() {
+   window.location.reload();
 }
-function replaceState(name = "home") {
-   history.replaceState({ name }, `${name}`, `./`);
+
+function create2dRoundedRectPath(x, y, w, h, r) {
+   const path = new Path2D();
+   path.moveTo(x + r, y);
+   path.lineTo(x + w - r, y);
+   path.arcTo(x + w, y, x + w, y + r, r);
+   path.lineTo(x + w, y + h - r);
+   path.arcTo(x + w, y + h, x + w - r, y + h, r);
+   path.lineTo(x + r, y + h);
+   path.arcTo(x, y + h, x, y + h - r, r);
+   path.lineTo(x, y + r);
+   path.arcTo(x, y, x + r, y, r);
+   path.closePath();
+   return path;
 }
-function createHtmlLevels(nLevel, userLevels, levelsMap) {
-   levelsMap.innerHTML = "";
 
-   const htmlLevels = [];
-   let userLevelLength = userLevels.length;
-
-   for (let i = 0; i < nLevel; i++) {
-      const mainEle = CE("div", ["level", "lock"]);
-
-      const top = CE("div", ["top"], "", mainEle);
-
-      const hashtag = CE("div", ["hashtag"], "", top);
-      CE("i", ["sbi-trophy2"], "", hashtag);
-      const p = CE("p", ["local-user-rank"], "∞", hashtag);
-
-      const lockComplete = CE("div", ["is-lock-or-complete"], "", top);
-      CE("i", ["sbi-lock-outline", "lock"], "", lockComplete);
-      CE("i", ["sbi-check-square-o", "check"], "", lockComplete);
-
-      const iconAndNo = CE("div", ["icon-and-no"], "", mainEle);
-      CE("i", ["sbi-fire"], "", iconAndNo);
-      const no = CE("p", ["no"], i + 1, iconAndNo);
-
-      const completeTime = CE("div", ["complete-time"], "", mainEle);
-      CE("i", ["sbi-stopwatch1"], "", completeTime);
-      const time = CE("p", ["time"], "∞", completeTime);
-      CE("span", [], "s", completeTime);
-
-      if (userLevels[i + 1]) {
-         mainEle.classList.remove("lock");
-         p.innerText = userLevels[i + 1].rank || "∞";
-         time.innerText = userLevels[i + 1].time || "∞";
-         if (userLevels[i + 1].completed) {
-            mainEle.classList.add("complete");
-         }
-      }
-
-      levelsMap.appendChild(mainEle);
-      htmlLevels.push([mainEle, p, no, time]);
-      
+function create2dAryPointer(level) {
+   let ary = [];
+   for (let i = 0; i < level.length; i++) {
+      ary.push(level[i].x);
+      ary.push(level[i].y);
+      ary.push(level[i].h);
    }
-   return htmlLevels;
+
+   let nBytes = ary.length * 4;
+   let aryPtr = Module._malloc(nBytes);
+
+   Module.HEAP32.set(ary, aryPtr / 4);
+   return { aryPtr, length: ary.length };
 }
 
-function createOnlineLevels(numOfLevel, levelsMap) {
-   levelsMap.innerHTML = "";
-   const htmlLevels = [];
+function generateUniqueId() {
+   const timestamp = Date.now();
+   const random = Math.floor(Math.random() * Math.pow(36, 2));
+   const combined = timestamp.toString(36) + random.toString(36);
+   return combined.slice(-5).toUpperCase();
+}
 
-   for (let i = 0; i < numOfLevel; i++) {
-      const mainEle = CE("div", ["level"]);
-      const cvs = CE("canvas", ["levelCvs"]);
-      const details = CE("div", ["details"]);
-      const playCount = CE("div", ["playCount"], "", details);
-      CE("i", ["sbi-play-circle"], "", playCount);
-      const count = CE("p", ["count"], "10", playCount);
-      const id = CE("p", ["id"], "ZAS", details);
-      mainEle.appendChild(cvs);
-      mainEle.appendChild(details);
-      levelsMap.appendChild(mainEle);
-
-      cvs.width = CVS_W;
-      cvs.height = SIZE * (cols - 2.7);
-      const ctx = cvs.getContext("2d");
-
-      htmlLevels.push([mainEle, ctx, count, id]);
+function vibrateDevice(time = 200) {
+   if (tempUser.isVibrateActive && navigator.vibrate) {
+      navigator.vibrate(time);
    }
-   return htmlLevels;
-}
-
-function createUserLevels(max, levelsMap) {
-   levelsMap.innerHTML = "";
-   const htmlLevels = [];
-
-   for (let i = 0; i < max; i++) {
-      const mainEle = CE("div", ["level"]);
-
-      const privacy = CE("div", ["privacy"], "", mainEle);
-      CE("i", ["sbi-groups"], "", privacy);
-      CE("i", ["sbi-person"], "", privacy);
-      const cvs = CE("canvas", ["levelCvs"]);
-      const details = CE("div", ["details"]);
-      const playCount = CE("div", ["playCount"], "", details);
-      CE("i", ["sbi-play-circle"], "", playCount);
-      const count = CE("p", ["count"], "10", playCount);
-      const id = CE("p", ["id"], "SB", details);
-      const setting = CE("p", ["sbi-settings", "setting"], "", details);
-
-      mainEle.appendChild(cvs);
-      mainEle.appendChild(details);
-      levelsMap.appendChild(mainEle);
-
-      cvs.width = CVS_W;
-      cvs.height = SIZE * (cols - 2.7);
-      const ctx = cvs.getContext("2d");
-
-      htmlLevels.push([mainEle, cvs, ctx, count, id, setting, privacy]);
-   }
-   return htmlLevels;
-}
-
-function safeEventListener(element, fun, ary = [], action = "click") {
-   element.removeEventListener(action, element._fn);
-   element._fn = () => {
-      return fun(ary);
-   };
-   element.addEventListener(action, element._fn);
-}
-
-
-function loadingWindow(is = false) {
-   waitingWindow.classList.toggle("active", is);
 }

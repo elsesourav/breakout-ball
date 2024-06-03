@@ -42,12 +42,6 @@ const createLevel = $("#createLevel");
 
 
 
-
-
-
-
-
-
 const CVS = $("#mainCanvas");
 const previewCanvas = $("#preview");
 const cvsModifier = $("#cvsModifier");
