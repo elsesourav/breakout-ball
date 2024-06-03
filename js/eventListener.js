@@ -247,6 +247,7 @@ volumeInput.on("input", () => {
 
 gyroSenInput.on("input", () => {
    updateProfileGyroSensitivity(gyroSenInput.value);
+   console.log(gyroSenInput.value);
 });
 
 

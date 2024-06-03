@@ -263,7 +263,7 @@ const createNewUser = (username, password, fullName) => {
             isGyroActive: true,
             isVibrateActive: true,
             numLocalLevels: 10,
-            gyroSensitivity: 0.5,
+            gyroSensitivity: 0.4,
             levelsRecord: {
                1: {
                   rank: null,
