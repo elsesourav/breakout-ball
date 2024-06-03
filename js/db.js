@@ -115,32 +115,32 @@ const updateProfileRank = debounce(async (levelId, rank) => {
    const info = getUserInfo();
    if (info.levelsRecord[levelId] && info.levelsRecord[levelId].completed) {
       info.levelsRecord[levelId].rank = rank;
-      await userProfileUpdate(info);  
+      await userProfileUpdate(info);
    }
-})
+});
 
 const updateProfileVolume = debounce(async (volume) => {
    const info = getUserInfo();
    info.volume = volume;
-   await userProfileUpdate(info);  
+   await userProfileUpdate(info);
 });
 
 const updateProfileGyroOnOff = debounce(async (is) => {
    const info = getUserInfo();
    info.isGyroActive = is;
-   await userProfileUpdate(info);  
+   await userProfileUpdate(info);
 });
 
 const updateProfileGyroSensitivity = debounce(async (sensitivity) => {
    const info = getUserInfo();
    info.gyroSensitivity = sensitivity;
-   await userProfileUpdate(info);  
+   await userProfileUpdate(info);
 });
 
 const updateProfileVibrateOnOff = debounce(async (is) => {
    const info = getUserInfo();
    info.isVibrateActive = is;
-   await userProfileUpdate(info);   
+   await userProfileUpdate(info);
 });
 
 async function updateLevelView(levelId) {
@@ -305,8 +305,9 @@ const signinUser = (username, password) => {
          if (error.code == "auth/invalid-login-credentials" || error.code == "auth/internal-error") {
             return {
                data: null,
-               title: "Authentication Error",
-               message: `The username (${username}) is invalid. Please ensure it meets the required criteria or create a new account if you do not have one.`,
+               title: "Invalid Signin Credentials",
+               message: `Invalid Username or Password. Please ensure it meets the required criteria or create a new account if you do not have one.`,
+               // message: `The username (${username}) is invalid. Please ensure it meets the required criteria or create a new account if you do not have one.`,
             };
          } else {
             return {
@@ -319,85 +320,81 @@ const signinUser = (username, password) => {
    });
 };
 
-Module.onRuntimeInitialized = () => {
-   loadingWindow(true);
-   auth.onAuthStateChanged(async (User) => {
-      loadWasm();
+auth.onAuthStateChanged(async (User) => {
 
-      if (!User) {
-         loadingWindow();
-         const { fullName, username, password, isSignin } = await userForm(floatingInputShow, true);
-         if (isSignin) {
-            await signinUser(username, password);
-         } else {
-            await createNewUser(username, password, fullName);
-         }
+   if (!User) {
+      loadingWindow();
+      const { fullName, username, password, isSignin } = await userForm(floatingInputShow, true);
+      if (isSignin) {
+         await signinUser(username, password);
       } else {
-         const info = getUserInfo();
-         tempUser = info;
-         volumeInput.value = info.volume;
-         vibrateOnOff.classList.toggle("active", info.isVibrateActive)
-         gyroOnOff.classList.toggle("active", info.isGyroActive);
-         gyroSenInput.value = info.gyroSensitivity;
-
-         let loadComplete = false;
-
-         setupLocalLevel(info.levelsRecord);
-         $("#fullName").innerText = info.fullName;
-         $("#username").innerText = `@${info.username}`;
-
-         // download online levels
-         const onlineRef = db.ref(`levels/online`);
-         const privateRef = db.ref(`levels/private/${tempUser.username}`);
-         window.onlineLevels = [];
-         window.privateLevels = [];
-
-         const bounceAll = debounce(() => {
-            loadComplete = true;
-            window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
-            const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
-            PAGES.update(maxPagePossible);
-            setupCreateLevel();
-            setupOnlineLevels();
-            loadingWindow();
-         }, 100);
-
-         const bouncePrivate = debounce(() => {
-            setupCreateLevel();
-         }, 100);
-
-         privateRef.on("child_added", (s) => {
-            window.privateLevels.push(s.val());
-            bouncePrivate();
-         });
-
-         privateRef.on("child_removed", (s) => {
-            const index = window.privateLevels.findIndex((e) => e.id === s.key);
-            if (index !== -1) {
-               window.privateLevels.splice(index, 1);
-               bouncePrivate();
-            }
-         });
-
-         onlineRef.on("child_added", (s) => {
-            window.onlineLevels.push(s.val());
-            bounceAll();
-         });
-
-         onlineRef.on("child_removed", (s) => {
-            const index = window.onlineLevels.findIndex((e) => e.id === s.key);
-            if (index !== -1) {
-               window.onlineLevels.splice(index, 1);
-               bounceAll();
-            }
-         });
-
-         // when on online map exist then remove loading window
-         setTimeout(() => {
-            if (!loadComplete) {
-               loadingWindow(false);
-            }
-         }, 20000);
+         await createNewUser(username, password, fullName);
       }
-   });
-};
+   } else {
+      const info = getUserInfo();
+      tempUser = info;
+      volumeInput.value = info.volume;
+      vibrateOnOff.classList.toggle("active", info.isVibrateActive);
+      gyroOnOff.classList.toggle("active", info.isGyroActive);
+      gyroSenInput.value = info.gyroSensitivity;
+
+      let loadComplete = false;
+
+      setupLocalLevel(info.levelsRecord);
+      $("#fullName").innerText = info.fullName;
+      $("#username").innerText = `@${info.username}`;
+
+      // download online levels
+      const onlineRef = db.ref(`levels/online`);
+      const privateRef = db.ref(`levels/private/${tempUser.username}`);
+      window.onlineLevels = [];
+      window.privateLevels = [];
+
+      const bounceAll = debounce(() => {
+         loadComplete = true;
+         window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
+         const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
+         PAGES.update(maxPagePossible);
+         setupCreateLevel();
+         setupOnlineLevels();
+         loadingWindow();
+      }, 100);
+
+      const bouncePrivate = debounce(() => {
+         setupCreateLevel();
+      }, 100);
+
+      privateRef.on("child_added", (s) => {
+         window.privateLevels.push(s.val());
+         bouncePrivate();
+      });
+
+      privateRef.on("child_removed", (s) => {
+         const index = window.privateLevels.findIndex((e) => e.id === s.key);
+         if (index !== -1) {
+            window.privateLevels.splice(index, 1);
+            bouncePrivate();
+         }
+      });
+
+      onlineRef.on("child_added", (s) => {
+         window.onlineLevels.push(s.val());
+         bounceAll();
+      });
+
+      onlineRef.on("child_removed", (s) => {
+         const index = window.onlineLevels.findIndex((e) => e.id === s.key);
+         if (index !== -1) {
+            window.onlineLevels.splice(index, 1);
+            bounceAll();
+         }
+      });
+
+      // when on online map exist then remove loading window
+      setTimeout(() => {
+         if (!loadComplete) {
+            loadingWindow(false);
+         }
+      }, 20000);
+   }
+});

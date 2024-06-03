@@ -26,7 +26,7 @@ const BALL_SPEED = 15;
 const MAX_PAGE_RENDER = 20;
 const MAX_PAGE_BUTTON = 5;
 const MAX_LEVEL_CAN_CREATE = 30;
-const GYRO_RANGE = 45;
+const GYRO_RANGE = 30;
 let totalCreatedLevel = 0;
 let currentPageIndex = 0;
 let maxPagePossible = 5;
@@ -34,10 +34,7 @@ let maxPagePossible = 5;
 let isLevelMakerModeOn = false;
 let isInOfTheGame = true;
 let fpsCounter = 0;
-let init, setup, draw, update;
-let moveLeft, moveRight, moveTarget, moveDirect, drawBlockOnly, drawOutline;
-let makerSetup, makerInit, makerDraw;
-let makerAddBlock, makerRemoveBlock, makerHoverBlock;
+
 let currentPlayingLevel;
 let currentGameMode = "local";
 
