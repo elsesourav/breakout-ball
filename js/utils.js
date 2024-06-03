@@ -1,5 +1,4 @@
 "use strict";
-"use strict";
 
 const toRadians = (degree) => (degree * Math.PI) / 180; // degree to radian
 const toDegrees = (radian) => (radian * 180) / Math.PI; // radian to Degree
@@ -366,44 +365,6 @@ function safeEventListener(element, fun, ary = [], action = "click") {
    element.addEventListener(action, element._fn);
 }
 
-{
-   /* <div class="level">
-   <div class="top">
-   <div class="hashtag">
-   <i class="sbi-trophy2"></i>
-   <p>00</p>
-   </div>
-   <div class="is-lock-or-complete">
-   <i class="sbi-lock-outline lock"></i
-   ><i class="sbi-check-circle-outline check"></i>
-   </div>
-   </div>
-   <div class="icon-and-no">
-   <i class="sbi-fire"></i>
-   <p class="no">1</p>
-   </div>
-   <div class="complete-time">
-   <i class="sbi-stopwatch1"></i>
-   <p class="time">000</p>
-   <span>s</span>
-   </div>
-   </div> */
-}
-
-{
-   /* <div class="level">
-   <canvas class="levelCvs"></canvas>
-   <div class="details">
-   <div class="playCount">
-   <i class="sbi-play-circle"></i>
-   <p class="count">10</p>
-   </div>
-      <p class="id">ZAS</p>
-      <p class="delete"></p>
-      </div>
-      </div> */
-}
-
 const CVS = $("#mainCanvas");
 const previewCanvas = $("#preview");
 const cvsModifier = $("#cvsModifier");
@@ -428,5 +389,3 @@ const waitingWindow = $("#waitingWindow");
 function loadingWindow(is = false) {
    waitingWindow.classList.toggle("active", is);
 }
-
-loadingWindow(true);

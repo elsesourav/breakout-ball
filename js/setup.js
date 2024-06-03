@@ -280,8 +280,8 @@ function loadWasm() {
          let left = e.gamma -(-GYRO_RANGE + m);
          let right = e.gamma - (GYRO_RANGE + m);
 
-         if (m > left) m = left;
-         else if (m < right) m = right;
+         if (m > left) m = -left;
+         else if (m < right) m = -right;
          const p = map(e.gamma + m, -s, s, CVS_W * -0.2, CVS_W + CVS_W * 0.2);
          mobileErr.innerHTML = Math.round(m);
          moveDirect(p);

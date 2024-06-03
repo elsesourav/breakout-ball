@@ -184,13 +184,4 @@ EMSCRIPTEN_KEEPALIVE void makerRemoveBlock(short j, short i) {
 EMSCRIPTEN_KEEPALIVE void makerHoverBlock(short j, short i, short health) {
    maker.hoverBlock(j, i, health);
 }
-EMSCRIPTEN_KEEPALIVE void processArray(int *array, int len) {
-
-   for (int i = 0; i < len; ++i) {
-      std::cout << "array[" << i << "] = " << array[i] << std::endl;
-   }
-    
-}
-
-
 }
