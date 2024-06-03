@@ -117,15 +117,6 @@ const base36ToBase10 = (base36String) => {
    return parseInt(base36String, 36);
 };
 
-function setDataToLocalStorage(key, object) {
-   var data = JSON.stringify(object);
-   localStorage.setItem(key, data);
-}
-
-function getDataToLocalStorage(key) {
-   return JSON.parse(localStorage.getItem(key));
-}
-
 // create element
 const CE = (tagName, className = [], inrHtml = "", parent = null) => {
    const e = document.createElement(tagName);
