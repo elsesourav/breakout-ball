@@ -30,17 +30,12 @@ const GYRO_RANGE = 45;
 let totalCreatedLevel = 0;
 let currentPageIndex = 0;
 let maxPagePossible = 5;
-let init, setup, draw, update;
-let moveLeft, moveRight, moveTarget, moveDirect, drawBlockOnly, drawOutline;
-let makerSetup, makerInit, makerDraw;
-let makerAddBlock, makerRemoveBlock, makerHoverBlock;
 let isLevelMakerModeOn = false;
 let isInOfTheGame = true;
 let fpsCounter = 0;
 
 let currentPlayingLevel;
 let currentGameMode = "local";
-
 let tempUser = {};
 
 //use cssRoot.style.setProperty("key", "value");
@@ -60,3 +55,6 @@ rootStyle.setProperty("--rows", rows);
 rootStyle.setProperty("--cols", (cols * SCALE_H) / SCALE);
 rootStyle.setProperty("--pScale", pScale);
 if (!isMobile) rootStyle.setProperty("--cursor", "pointer");
+
+setup(CVS_W, CVS_H, SIZE, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED, FPS);
+makerSetup(rows, cols, CVS_W, CVS_H, SIZE);

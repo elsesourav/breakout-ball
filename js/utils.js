@@ -384,8 +384,6 @@ CTX.imageSmoothingQuality = "high";
 PREVIEW_CTX.imageSmoothingQuality = "high";
 MODIFIER_CTX.imageSmoothingQuality = "high";
 
-const waitingWindow = $("#waitingWindow");
-
 function loadingWindow(is = false) {
    waitingWindow.classList.toggle("active", is);
 }

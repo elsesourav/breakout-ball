@@ -1,4 +1,3 @@
-// onload = () => {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
@@ -320,89 +319,80 @@ const signinUser = (username, password) => {
    });
 };
 
+auth.onAuthStateChanged(async (User) => {
+   if (!User) {
+      loadingWindow();
+      const { fullName, username, password, isSignin } = await userForm(floatingInputShow, true);
+      if (isSignin) {
+         await signinUser(username, password);
+      } else {
+         await createNewUser(username, password, fullName);
+      }
+   } else {
+      const info = getUserInfo();
+      tempUser = info;
+      volumeInput.value = info.volume;
+      vibrateOnOff.classList.toggle("active", info.isVibrateActive);
+      gyroOnOff.classList.toggle("active", info.isGyroActive);
+      gyroSenInput.value = info.gyroSensitivity;
 
-window.onload = () => {
-   let run = false;
-   setTimeout(() => { if (!run) reloadLocation()}, 3000);
-   Module.onRuntimeInitialized = () => {
-      run = true;
-      loadWasm();
-      auth.onAuthStateChanged(async (User) => {
-         if (!User) {
-            loadingWindow();
-            const { fullName, username, password, isSignin } = await userForm(floatingInputShow, true);
-            if (isSignin) {
-               await signinUser(username, password);
-            } else {
-               await createNewUser(username, password, fullName);
-            }
-         } else {
-            const info = getUserInfo();
-            tempUser = info;
-            volumeInput.value = info.volume;
-            vibrateOnOff.classList.toggle("active", info.isVibrateActive);
-            gyroOnOff.classList.toggle("active", info.isGyroActive);
-            gyroSenInput.value = info.gyroSensitivity;
+      let loadComplete = false;
 
-            let loadComplete = false;
+      setupLocalLevel(info.levelsRecord);
+      $("#fullName").innerText = info.fullName;
+      $("#username").innerText = `@${info.username}`;
 
-            setupLocalLevel(info.levelsRecord);
-            $("#fullName").innerText = info.fullName;
-            $("#username").innerText = `@${info.username}`;
+      // download online levels
+      const onlineRef = db.ref(`levels/online`);
+      const privateRef = db.ref(`levels/private/${tempUser.username}`);
+      window.onlineLevels = [];
+      window.privateLevels = [];
 
-            // download online levels
-            const onlineRef = db.ref(`levels/online`);
-            const privateRef = db.ref(`levels/private/${tempUser.username}`);
-            window.onlineLevels = [];
-            window.privateLevels = [];
+      const bounceAll = debounce(() => {
+         loadComplete = true;
+         window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
+         const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
+         PAGES.update(maxPagePossible);
+         setupCreateLevel();
+         setupOnlineLevels();
+         loadingWindow();
+      }, 100);
 
-            const bounceAll = debounce(() => {
-               loadComplete = true;
-               window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
-               const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
-               PAGES.update(maxPagePossible);
-               setupCreateLevel();
-               setupOnlineLevels();
-               loadingWindow();
-            }, 100);
+      const bouncePrivate = debounce(() => {
+         setupCreateLevel();
+      }, 100);
 
-            const bouncePrivate = debounce(() => {
-               setupCreateLevel();
-            }, 100);
+      privateRef.on("child_added", (s) => {
+         window.privateLevels.push(s.val());
+         bouncePrivate();
+      });
 
-            privateRef.on("child_added", (s) => {
-               window.privateLevels.push(s.val());
-               bouncePrivate();
-            });
-
-            privateRef.on("child_removed", (s) => {
-               const index = window.privateLevels.findIndex((e) => e.id === s.key);
-               if (index !== -1) {
-                  window.privateLevels.splice(index, 1);
-                  bouncePrivate();
-               }
-            });
-
-            onlineRef.on("child_added", (s) => {
-               window.onlineLevels.push(s.val());
-               bounceAll();
-            });
-
-            onlineRef.on("child_removed", (s) => {
-               const index = window.onlineLevels.findIndex((e) => e.id === s.key);
-               if (index !== -1) {
-                  window.onlineLevels.splice(index, 1);
-                  bounceAll();
-               }
-            });
-
-            // when on online map exist then remove loading window
-            setTimeout(() => {
-               if (!loadComplete) {
-                  loadingWindow(false);
-               }
-            }, 20000);
+      privateRef.on("child_removed", (s) => {
+         const index = window.privateLevels.findIndex((e) => e.id === s.key);
+         if (index !== -1) {
+            window.privateLevels.splice(index, 1);
+            bouncePrivate();
          }
       });
-   };
-};
+
+      onlineRef.on("child_added", (s) => {
+         window.onlineLevels.push(s.val());
+         bounceAll();
+      });
+
+      onlineRef.on("child_removed", (s) => {
+         const index = window.onlineLevels.findIndex((e) => e.id === s.key);
+         if (index !== -1) {
+            window.onlineLevels.splice(index, 1);
+            bounceAll();
+         }
+      });
+
+      // when on online map exist then remove loading window
+      setTimeout(() => {
+         if (!loadComplete) {
+            loadingWindow(false);
+         }
+      }, 20000);
+   }
+});

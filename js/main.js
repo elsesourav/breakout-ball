@@ -6,6 +6,7 @@ const showTime = $("#showTime");
 const showTimeUsed = $("#showTimeUsed");
 const saveModifier = $("#saveModifier");
 const deleteLevel = $("#deleteLevel");
+const waitingWindow = $("#waitingWindow");
 
 replaceState();
 
