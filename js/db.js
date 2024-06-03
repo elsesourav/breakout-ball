@@ -321,9 +321,9 @@ const signinUser = (username, password) => {
 };
 
 
-// window.onload = () => {
+window.onload = () => {
    let run = false;
-   // setTimeout(() => { if (!run) reloadLocation()}, 1000);
+   setTimeout(() => { if (!run) reloadLocation()}, 3000);
    Module.onRuntimeInitialized = () => {
       run = true;
       loadWasm();
@@ -405,4 +405,4 @@ const signinUser = (username, password) => {
          }
       });
    };
-// };
+};
