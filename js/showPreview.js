@@ -54,5 +54,5 @@ async function setupPreview(mode = "play", data = null, time = null) {
    $("#lvlNo").innerHTML = levelId;
    $("#levelCreatorName").innerHTML = base36ToBase10(levelId) > 100 ? `@${currentPlayingLevel.creator}` : "";
    $("#lvlRank").innerHTML = rank !== null ? rank : "∞";
-   $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank].time : "∞";
+   $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank - 1].time : "∞";
 }
