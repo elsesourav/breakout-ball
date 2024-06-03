@@ -277,8 +277,11 @@ function loadWasm() {
       window.addEventListener("deviceorientation", (e) => {
          if (!tempUser.isGyroActive) return;
          const s = (1 - tempUser.gyroSensitivity) * GYRO_RANGE;
-         if (e.gamma < -GYRO_RANGE + m) m = (-GYRO_RANGE + m) - e.gamma;
-         else if (e.gamma > GYRO_RANGE + m) m = (GYRO_RANGE + m) - e.gamma;
+         let left = e.gamma -(-GYRO_RANGE + m);
+         let right = e.gamma - (GYRO_RANGE + m);
+
+         if (m > left) m = left;
+         else if (m < right) m = right;
          const p = map(e.gamma + m, -s, s, CVS_W * -0.2, CVS_W + CVS_W * 0.2);
          mobileErr.innerHTML = Math.round(m);
          moveDirect(p);

@@ -320,9 +320,12 @@ const signinUser = (username, password) => {
    });
 };
 
+
 window.onload = () => {
+   let run = false;
+   setTimeout(() => { if (!run) reloadLocation()}, 1000);
    Module.onRuntimeInitialized = () => {
-      console.log("work");
+      run = true;
       loadWasm();
       auth.onAuthStateChanged(async (User) => {
          if (!User) {
