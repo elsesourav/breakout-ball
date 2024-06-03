@@ -365,24 +365,6 @@ function safeEventListener(element, fun, ary = [], action = "click") {
    element.addEventListener(action, element._fn);
 }
 
-const CVS = $("#mainCanvas");
-const previewCanvas = $("#preview");
-const cvsModifier = $("#cvsModifier");
-const CTX = CVS.getContext("2d");
-const PREVIEW_CTX = previewCanvas.getContext("2d");
-const MODIFIER_CTX = cvsModifier.getContext("2d");
-const paddleImage = createPaddleImage();
-const ballImage = createBallImage();
-const blockImages = createBlockImages();
-let ctx = CTX;
-
-cvsModifier.width = previewCanvas.width = CVS.width = CVS_W;
-CVS.height = CVS_H;
-cvsModifier.height = previewCanvas.height = SIZE * (cols - 1);
-
-CTX.imageSmoothingQuality = "high";
-PREVIEW_CTX.imageSmoothingQuality = "high";
-MODIFIER_CTX.imageSmoothingQuality = "high";
 
 function loadingWindow(is = false) {
    waitingWindow.classList.toggle("active", is);

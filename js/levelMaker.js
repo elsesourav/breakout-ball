@@ -180,15 +180,15 @@ class LevelMaker {
          else if (keyCode === 39) moveRight();
       });
 
-      $("#undoBtn").click(() => lvlMaker.undo());
-      $("#redoBtn").click(() => lvlMaker.redo());
+      undoBtn.click(() => lvlMaker.undo());
+      redoBtn.click(() => lvlMaker.redo());
 
-      $("#saveBtn").click(() => this.#confirmSave());
-      $("#makeTesting").click(() => this.#runLevel());
+      saveBtn.click(() => this.#confirmSave());
+      makeTesting.click(() => this.#runLevel());
 
-      $("#closeBtn").click(() => this.confirmExit());
+      closeBtn.click(() => this.confirmExit());
 
-      $("#createLevel").click(() => {
+      createLevel.click(() => {
          if (MAX_LEVEL_CAN_CREATE > totalCreatedLevel) {
             this.show();
             lvlMaker.init();

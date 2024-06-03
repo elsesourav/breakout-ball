@@ -339,8 +339,8 @@ auth.onAuthStateChanged(async (User) => {
       let loadComplete = false;
 
       setupLocalLevel(info.levelsRecord);
-      $("#fullName").innerText = info.fullName;
-      $("#username").innerText = `@${info.username}`;
+      fullName.innerText = info.fullName;
+      username.innerText = `@${info.username}`;
 
       // download online levels
       const onlineRef = db.ref(`levels/online`);

@@ -1,18 +1,4 @@
-const previewClose = $("#previewClose");
-const showPreview = $("#showPreview");
-const signOut = $("#signOut");
-const levelModifier = $("#levelModifier");
-const modeType = $("#modeType");
-const privacy = $("#privacy");
-const homeButton = $("#homeButton");
-const privacyModifier = $("#privacyModifier");
-const searchInput = $("#searchInput");
-const volumeInput = $("#volumeInput");
-const gyroSenInput = $("#gyroSenInput");
-const vibrateOnOff = $("#vibrateOnOff");
-const gyroOnOff = $("#gyroOnOff");
-const modeOptions = $$(".mode");
-const maps = $$(".map");
+
 const pg = {
    x: 0,
    y: 0,
@@ -59,7 +45,7 @@ previewClose.click(() => {
    }
 });
 
-$("#closeModifier").click(() => {
+closeModifier.click(() => {
    levelModifier.classList.remove("active");
 });
 homeButton.click(goHome);

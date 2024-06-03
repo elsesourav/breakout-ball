@@ -1,12 +1,4 @@
-const startButton = $("#startButton");
-const showHealths = $("#showHealths");
-const showCountDowns = $("#showCountDowns");
-const showGameStatus = $("#showGameStatus");
-const showTime = $("#showTime");
-const showTimeUsed = $("#showTimeUsed");
-const saveModifier = $("#saveModifier");
-const deleteLevel = $("#deleteLevel");
-const waitingWindow = $("#waitingWindow");
+
 
 replaceState();
 
