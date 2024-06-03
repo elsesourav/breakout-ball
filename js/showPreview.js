@@ -26,7 +26,7 @@ async function setupPreview(mode = "play", data = null, time = null) {
 
       for (let i = 0; i < rankTable.length; i++) {
          const { fullName, time } = rankTable[i];
-         tableRows += `<tr ${rank === i - 1 ? 'class="me"' : ""}>
+         tableRows += `<tr ${rank - 1 === i ? 'class="me"' : ""}>
                <td>${i + 1}</td>
                <td>${fullName}</td>
                <td>${time}<span>s</span></td>
