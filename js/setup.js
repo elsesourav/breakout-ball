@@ -1,9 +1,12 @@
 setup(CVS_W, CVS_H, SIZE, PAD_X, PAD_Y, PAD_WIDTH, PAD_HEIGHT, BALL_RADIUS, BALL_SPEED, FPS);
 makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 
+let m = 0;
 if (window.DeviceOrientationEvent) {
    window.addEventListener("deviceorientation", (e) => {
       const s = (1 - tempUser.gyroSensitivity) * GYRO_RANGE;
+      if (e.gamma < -GYRO_RANGE + m) m = e.gamma - (-GYRO_RANGE + m);
+      else if (e.gamma > GYRO_RANGE + m) m = e.gamma - (GYRO_RANGE + m);
       const p = map(e.gamma, -s, s, CVS_W * -0.2, CVS_W + CVS_W * 0.2);
       mobileErr.innerHTML = Math.round(p);
       let tx = moveDirect(p);
@@ -250,5 +253,3 @@ async function setupCreateLevel() {
    //    });
    // }
 }
-
-
