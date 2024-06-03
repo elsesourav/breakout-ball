@@ -82,6 +82,8 @@
       display: grid;
       place-items: center;
       grid-template-columns: 1fr 4fr 2fr;
+      opacity: 1;
+      transition: linear 300ms opacity;
 
       i {
          font-size: calc(var(--s) * 0.6);
@@ -99,6 +101,11 @@
 
       &:has(.seek-bar) {
          grid-template-columns: 1fr 6fr;
+      }
+
+      &.gyro-on-off:not(:has(.switch.active)) ~ &.gyro-sen {
+         pointer-events: none;
+         opacity: 0.3;
       }
 
       .seek-bar {

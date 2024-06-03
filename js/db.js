@@ -10,12 +10,11 @@ function getUserInfo() {
    return JSONtoOBJECT(getUser().photoURL);
 }
 async function userProfileUpdate(data) {
-   loadingWindow(true);
    const myData = OBJECTtoJSON(data);
    await getUser().updateProfile({
       photoURL: myData,
    });
-   loadingWindow();
+   tempUser = data;
    return true;
 }
 
@@ -104,6 +103,38 @@ async function setupLevelRanking(levelId, time) {
    loadingWindow();
    return data;
 }
+
+const updateProfileRank = debounce(async (levelId, rank) => {
+   const info = getUserInfo();
+   if (info.levelsRecord[levelId] && info.levelsRecord[levelId].completed) {
+      info.levelsRecord[levelId].rank = rank;
+      await userProfileUpdate(info);  
+   }
+})
+
+const updateProfileVolume = debounce(async (volume) => {
+   const info = getUserInfo();
+   info.volume = volume;
+   await userProfileUpdate(info);  
+});
+
+const updateProfileGyroOnOff = debounce(async (is) => {
+   const info = getUserInfo();
+   info.isGyroActive = is;
+   await userProfileUpdate(info);  
+});
+
+const updateProfileGyroSensitivity = debounce(async (sensitivity) => {
+   const info = getUserInfo();
+   info.gyroSensitivity = sensitivity;
+   await userProfileUpdate(info);  
+});
+
+const updateProfileVibrateOnOff = debounce(async (is) => {
+   const info = getUserInfo();
+   info.isVibrateActive = is;
+   await userProfileUpdate(info);   
+});
 
 async function updateLevelView(levelId) {
    loadingWindow(true);
@@ -225,6 +256,7 @@ const createNewUser = (username, password, fullName) => {
             isGyroActive: true,
             isVibrateActive: true,
             numLocalLevels: 10,
+            gyroSensitivity: 1,
             levelsRecord: {
                1: {
                   rank: null,
@@ -296,6 +328,11 @@ Module.onRuntimeInitialized = () => {
       } else {
          const info = getUserInfo();
          tempUser = info;
+         console.log(info);
+         volumeInput.value = info.volume;
+         vibrateOnOff.classList.toggle("active", info.isVibrateActive)
+         gyroOnOff.classList.toggle("active", info.isGyroActive);
+         gyroSenInput.value = info.gyroSensitivity;
 
          let loadComplete = false;
 

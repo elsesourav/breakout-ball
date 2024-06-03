@@ -7,7 +7,10 @@ const privacy = $("#privacy");
 const homeButton = $("#homeButton");
 const privacyModifier = $("#privacyModifier");
 const searchInput = $("#searchInput");
-const seekBar = $("#seekBar");
+const volumeInput = $("#volumeInput");
+const gyroSenInput = $("#gyroSenInput");
+const vibrateOnOff = $("#vibrateOnOff");
+const gyroOnOff = $("#gyroOnOff");
 const modeOptions = $$(".mode");
 const maps = $$(".map");
 const pg = {
@@ -231,30 +234,31 @@ modeType.on("touchend", () => {
    pg.totalMove = pg.dx = pg.dy = 0;
 });
 
-$("#seekBar").on("touchstart", () => {
-   pg.isLock = true;
-});
-$("#seekBar").on("touchend", () => {
-   pg.isLock = false;
+const pgLock = (is = true) => (pg.isLock = is);
+
+volumeInput.on("touchstart", () => pgLock());
+volumeInput.on("touchend", () => pgLock(false));
+gyroSenInput.on("touchstart", () => pgLock());
+gyroSenInput.on("touchend", () => pgLock(false));
+
+volumeInput.on("input", () => {
+   updateProfileVolume(volumeInput.value);
 });
 
-$("#seekBar").on("input", function () {
-   user.volume = seekBar.value;
+gyroSenInput.on("input", () => {
+   updateProfileGyroSensitivity(gyroSenInput.value);
 });
 
-$("#vibrateBtn").click(function () {
-   this.classList.toggle("active");
-   if (this.classList.contains("active")) {
-      user.isVibrateActive = true;
-   } else {
-      user.isVibrateActive = false;
-   }
-});
-$("#gyroBtn").click(function () {
-   this.classList.toggle("active");
-   if (this.classList.contains("active")) {
-      user.isGyroActive = true;
-   } else {
-      user.isGyroActive = false;
-   }
-});
+
+vibrateOnOff.on("click", () => {
+   const is = vibrateOnOff.classList.contains("active");
+   vibrateOnOff.classList.toggle("active", !is);
+   updateProfileVibrateOnOff(!is);
+})
+
+gyroOnOff.on("click", () => {
+   const is = gyroOnOff.classList.contains("active");
+   gyroOnOff.classList.toggle("active", !is);
+   updateProfileGyroOnOff(!is);
+})
+

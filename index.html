@@ -109,7 +109,7 @@
                      <i class="sbi-volume-medium"></i>
                      <div class="seek-bar">
                         <input
-                           id="seekBar"
+                           id="volumeInput"
                            type="range"
                            min="0"
                            max="1"
@@ -121,19 +121,32 @@
                   <div class="option">
                      <i class="sbi-vibration"></i>
                      <p>Vibrate</p>
-                     <div class="switch active" id="vibrateBtn">
+                     <div class="switch active" id="vibrateOnOff">
                         <div class="inner">
                            <div class="thumb"></div>
                         </div>
                      </div>
                   </div>
-                  <div class="option">
+                  <div class="option gyro-on-off">
                      <i class="sbi-screen-rotation"></i>
                      <p>Gyroscope</p>
-                     <div class="switch active" id="gyroBtn">
+                     <div class="switch active" id="gyroOnOff">
                         <div class="inner">
                            <div class="thumb"></div>
                         </div>
+                     </div>
+                  </div>
+                  <div class="option gyro-sen">
+                     <i class="sbi-screen-rotation"></i>
+                     <div class="seek-bar">
+                        <input
+                           id="gyroSenInput"
+                           type="range"
+                           min="0"
+                           max="1"
+                           step="0.01"
+                           value="1"
+                        />
                      </div>
                   </div>
                   <div id="signOut"><p>Sign Out</p></div>

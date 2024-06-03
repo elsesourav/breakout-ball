@@ -99,7 +99,7 @@ const $$ = (selector) => {
    return self;
 };
 
-const debounce = (func, delay) => {
+const debounce = (func, delay = 1000) => {
    let debounceTimer;
    return function (...args) {
       const context = this;
@@ -107,6 +107,7 @@ const debounce = (func, delay) => {
       debounceTimer = setTimeout(() => func.apply(context, args), delay);
    };
 };
+
 
 const validEmail = (exp) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(exp);
 const validName = (exp) => /^[a-zA-Z\s]{3,16}$/.test(exp);
@@ -263,8 +264,7 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
    const htmlLevels = [];
    let userLevelLength = userLevels.length;
 
-   for (let i = 0, j = 0; i < nLevel; i++) {
-      if (userLevelLength > j) j++;
+   for (let i = 0; i < nLevel; i++) {
       const mainEle = CE("div", ["level", "lock"]);
 
       const top = CE("div", ["top"], "", mainEle);
@@ -286,20 +286,18 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
       const time = CE("p", ["time"], "∞", completeTime);
       CE("span", [], "s", completeTime);
 
-      if (i === j) {
+      if (userLevels[i + 1]) {
          mainEle.classList.remove("lock");
-         p.innerText = userLevels[j + 1].rank || "∞";
-         time.innerText = userLevels[j + 1].time || "∞";
-         if (userLevels[j + 1].completed) {
+         p.innerText = userLevels[i + 1].rank || "∞";
+         time.innerText = userLevels[i + 1].time || "∞";
+         if (userLevels[i + 1].completed) {
             mainEle.classList.add("complete");
          }
-      }
-      if (i === j + 1 && userLevels[j + 1].completed) {
-         mainEle.classList.remove("lock");
       }
 
       levelsMap.appendChild(mainEle);
       htmlLevels.push([mainEle, p, no, time]);
+      
    }
    return htmlLevels;
 }
