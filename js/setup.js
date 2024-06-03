@@ -4,7 +4,7 @@ makerSetup(rows, cols, CVS_W, CVS_H, SIZE);
 if (window.DeviceOrientationEvent) {
    window.addEventListener("deviceorientation", (e) => {
       const s = (1 - tempUser.gyroSensitivity) * GYRO_RANGE;
-      const p = map(e.gamma, -s, s, 0, CVS_W);
+      const p = map(e.gamma, -s, s, CVS_W * -0.2, CVS_W + CVS_W * 0.2);
       mobileErr.innerHTML = Math.round(p);
       let tx = moveDirect(p);
    });
