@@ -16,8 +16,8 @@ async function setupPreview(mode = "play", data = null, time = null) {
 
       if (base36ToBase10(levelId) < 100) {
          const rankElements = document.querySelectorAll("#localMode .local-user-rank");
-         if (rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank + 1;
-         updateProfileRank(levelId, rank + 1);
+         if (rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank;
+         updateProfileRank(levelId, rank);
       }
 
       showPreview.classList.add(mode);
@@ -26,7 +26,7 @@ async function setupPreview(mode = "play", data = null, time = null) {
 
       for (let i = 0; i < rankTable.length; i++) {
          const { fullName, time } = rankTable[i];
-         tableRows += `<tr ${rank === i ? 'class="me"' : ""}>
+         tableRows += `<tr ${rank === i - 1 ? 'class="me"' : ""}>
                <td>${i + 1}</td>
                <td>${fullName}</td>
                <td>${time}<span>s</span></td>
@@ -53,6 +53,6 @@ async function setupPreview(mode = "play", data = null, time = null) {
    animation.stop();
    $("#lvlNo").innerHTML = levelId;
    $("#levelCreatorName").innerHTML = base36ToBase10(levelId) > 100 ? `@${currentPlayingLevel.creator}` : "";
-   $("#lvlRank").innerHTML = rank !== null ? rank + 1 : "∞";
+   $("#lvlRank").innerHTML = rank !== null ? rank : "∞";
    $("#lvlTime").innerHTML = time !== null ? time : rank !== null ? rankTable[rank].time : "∞";
 }

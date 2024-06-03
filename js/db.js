@@ -37,7 +37,7 @@ async function getUserRank(levelId) {
    const rank = sortedList.findIndex((e) => e.username === tempUser.username);
    loadingWindow();
    return {
-      userRank: rank == -1 ? null : rank,
+      userRank: rank == -1 ? null : rank + 1,
       ranks: sortedList,
    };
 }
@@ -92,11 +92,18 @@ async function setupLevelRanking(levelId, time) {
    }
 
    if (100 > base36ToBase10(levelId)) {
-      info.levelsRecord[`${Number(levelId) + 1}`] = {
-         time: null,
-         rank: null,
-         completed: false,
-      };
+      if (tempUser.numLocalLevels - 1 > Number(levelId)) {
+         info.levelsRecord[`${Number(levelId) + 1}`] = {
+            time: null,
+            rank: null,
+            completed: false,
+         };
+      }
+
+      const rankElements = document.querySelectorAll("#localMode .local-user-rank");
+      const timeElements = document.querySelectorAll("#localMode .time");
+      rankElements[Number(levelId) - 1].innerText = data.userRank;
+      timeElements[Number(levelId) - 1].innerText = time;
    }
 
    await userProfileUpdate(info);
