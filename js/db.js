@@ -91,7 +91,7 @@ async function setupLevelRanking(levelId, time) {
       };
    }
 
-   if (tempUser.numLocalLevels - 1 > levelId) {
+   if (100 > base36ToBase10(levelId)) {
       info.levelsRecord[`${Number(levelId) + 1}`] = {
          time: null,
          rank: null,
