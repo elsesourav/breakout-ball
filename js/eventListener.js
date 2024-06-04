@@ -230,7 +230,7 @@ gyroSenInput.on("touchend", () => pgLock(false));
 
 volumeInput.on("input", () => {
    updateProfileVolume(volumeInput.value);
-   effects.setVolume(volumeInput.value);
+   setVolume(volumeInput.value);
    audioChangeVolume(volumeInput.value);
 });
 

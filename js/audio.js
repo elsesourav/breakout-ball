@@ -1,6 +1,5 @@
-// const audioElements = [new Audio(`./../src/audio/bg0.wav`), new Audio(`./../src/audio/bg0.wav`)];
-// const bgDTvolume = 0.3;
-
+const audioElements = [$("#bg0"), $("#bg1")];
+const bgDTvolume = 0.3;
 
 // class Effect {
 //    constructor(name) {
@@ -40,32 +39,28 @@
 
 // let effects = new Effects();
 
-
 function stopBackgroundAudio() {
-//    audioElements.forEach((audio) => {
-//       if (audio) audio.pause();
-//    });
+   audioElements.forEach((audio) => {
+      if (audio) audio.pause();
+   });
 }
 
-// function audioChangeVolume(volume) {
-//    audioElements.forEach((audio) => {
-//       if (audio) audio.volume = volume * bgDTvolume;
-//    });
-// }
+function audioChangeVolume(volume) {
+   audioElements.forEach((audio) => {
+      if (audio) audio.volume = volume * bgDTvolume;
+   });
+}
 
 function playBackgroundAudio() {
-//    const i = Math.floor(Math.random() * 2);
-//    const audio = audioElements[i];
-//    stopBackgroundAudio();
+   const i = Math.floor(Math.random() * 2);
+   const audio = audioElements[i];
+   stopBackgroundAudio();
 
-//    audio.currentTime = 0;
-//    audio.volume = tempUser.volume * bgDTvolume;
-//    audio.loop = true;
-//    audio.play();
+   audio.currentTime = 0;
+   audio.volume = tempUser.volume * bgDTvolume;
+   audio.loop = true;
+   audio.play();
 }
-
-
-
 
 const wav = {
    click: $("#click"),
@@ -73,5 +68,15 @@ const wav = {
    sideHit: $("#side-hit"),
    damage: $("#damage"),
    gameOver: $("#game-over"),
-   win: $("#win")
+   win: $("#win"),
+};
+
+function setVolume(volume) {
+   wav.click.volume = volume;
+   wav.blockHit.volume = volume;
+   wav.sideHit.volume = volume;
+   wav.damage.volume = volume;
+   wav.win.volume = volume;
+   wav.gameOver.volume = volume;
 }
+
