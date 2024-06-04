@@ -471,18 +471,11 @@ onload = () => {
          document.head.appendChild(script);
       }
 
-      let m = 0;
       if (window.DeviceOrientationEvent) {
          window.addEventListener("deviceorientation", (e) => {
             if (!tempUser.isGyroActive) return;
             const s = (1 - tempUser.gyroSensitivity) * GYRO_RANGE;
-            let left = e.gamma - (-s + m);
-            let right = e.gamma - (s + m);
-
-            if (m > left) m = left;
-            else if (m < right) m = right;
-            const p = map(e.gamma + m, -s + m, s + m, CVS_W * -0.2, CVS_W + CVS_W * 0.2);
-            mobileErr.innerHTML = Math.round(m);
+            const p = map(e.gamma, -s, s, CVS_W * -0.2, CVS_W + CVS_W * 0.2);
             moveDirect(p);
          });
       }

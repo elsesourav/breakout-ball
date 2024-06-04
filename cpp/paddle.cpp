@@ -12,7 +12,7 @@ void Paddle::init(float _x, float _y, short _w, short _h, float ballSpeed, short
    offset = w * 0.1f;
    windowWidth = _windowWidth;
    movePercentage = 0.1f;
-   gyroPercentage = 0.3f;
+   gyroPercentage = 0.2f;
    percentage = movePercentage;
    isPointerLock = false;
    fixY = y + h * 0.2f;

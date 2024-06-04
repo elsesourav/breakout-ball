@@ -16,10 +16,11 @@ async function setupPreview(mode = "play", data = null, time = null) {
       rankTable = DATA.ranks;
 
       if (base36ToBase10(levelId) < 100) {
+         const id = Number(levelId);
          const rankElements = document.querySelectorAll("#localMode .local-user-rank");
-         if (rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank;
+         if (rankElements[id - 1]) rankElements[id - 1].innerText = rank;
          updateProfileRank(levelId, rank);
-         if (rankElements[Number(levelId)]) {
+         if (rankElements[id] && !tempUser.levelsRecord[id]) {
             nextLevelButton.classList.add("show");
          }
       }
