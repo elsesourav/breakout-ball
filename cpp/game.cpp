@@ -184,6 +184,8 @@ void Game::update() {
                    } else if (is == 1) {
                       createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
                      this->vibrate_audio(100, 1);
+                   } else if (is == 0) {
+                     this->vibrate_audio(50, 2);
                    }
 
                    return false;
