@@ -17,7 +17,7 @@ let tx = WIDTH / 2;
 let isPointerLock = false;
 
 startButton.click(() => {
-   effects.click.play();
+   wav.click.play();
    playLevel();
 });
 

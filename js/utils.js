@@ -251,19 +251,24 @@ function vibrateAndAudio(time, audioStatus) {
    }
    switch (audioStatus) {
       case 1: // block-hit
-         effects.blockHit.play();
+         wav.blockHit.currentTime = 0;
+         wav.blockHit.play();
          break;
       case 2: // side-hit
-         effects.sideHit.play();
+         wav.sideHit.currentTime = 0;
+         wav.sideHit.play();
          break;
       case 3: // damage
-         effects.damage.play();
+         wav.damage.currentTime = 0;
+         wav.damage.play();
          break;
       case 4: // win
-         effects.win.play();
+         wav.win.currentTime = 0;
+         wav.win.play();
          break;
       case 5: //game-over
-         effects.gameOver.play();
+         wav.gameOver.currentTime = 0;
+         wav.gameOver.play();
          break;
    }
 }

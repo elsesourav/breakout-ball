@@ -334,7 +334,6 @@ auth.onAuthStateChanged(async (User) => {
       const info = getUserInfo();
       tempUser = info;
       volumeInput.value = info.volume;
-      effects = new Effects();
       vibrateOnOff.classList.toggle("active", info.isVibrateActive);
       gyroOnOff.classList.toggle("active", info.isGyroActive);
       gyroSenInput.value = info.gyroSensitivity;
