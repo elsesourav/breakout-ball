@@ -137,11 +137,11 @@ async function setupCreateLevel() {
          [I]
       );
 
-      safeEventListener(cvs, () => {
+      safeEventListener(cvs, (level) => {
          currentGameMode = "online";
-         currentPlayingLevel = levels[I];
+         currentPlayingLevel = levels;
          setupPreview();
-      });
+      }, [levels[I]]);
    }
 
    for (j = I; j < MAX_LEVEL_CAN_CREATE; j++) htmlCreateLevels[j][0].classList.remove("show");
