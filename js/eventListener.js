@@ -28,6 +28,7 @@ function closeTestingPreview() {
 }
 
 previewClose.click(() => {
+   wav.click.play();
    if (currentGameMode == "testing") {
       closeTestingPreview();
    } else {
@@ -36,6 +37,7 @@ previewClose.click(() => {
 });
 
 nextLevelButton.click(async () => {
+   wav.click.play();
    const info = getUserInfo();
    const id = Number(currentPlayingLevel.id);
    if (info.levelsRecord[id + 1]) {
@@ -45,10 +47,12 @@ nextLevelButton.click(async () => {
 });
 
 closeModifier.click(() => {
+   wav.click.play();
    levelModifier.classList.remove("active");
 });
 homeButton.click(goHome);
 signOut.click(() => {
+   wav.click.play();
    auth.signOut();
 });
 
@@ -160,6 +164,7 @@ CVS.addEventListener("touchmove", (e) => {
 });
 
 async function selectMode(i) {
+   wav.click.play();
    modeOptions.removeClass("active");
    modeOptions[i].classList.add("active");
    pg.index = i;
