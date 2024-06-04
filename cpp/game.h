@@ -23,7 +23,7 @@ typedef void (*ShowTimePtr)(short);
 typedef void (*ShowCountDownPtr)(short);
 typedef void (*ShowGameOverPtr)(short);
 typedef void (*ShowGameCompletePtr)(short);
-typedef void (*VibratePtr)(short);
+typedef void (*VibrateAudioStatusPtr)(short, short);
 
 class Game {
 public:
@@ -51,10 +51,10 @@ public:
    ShowCountDownPtr showCountDown;
    ShowGameOverPtr showGameOver;
    ShowGameCompletePtr showGameComplete;
-   VibratePtr vibrate;
+   VibrateAudioStatusPtr vibrate_audio;
 
    Game();
-   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS, DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs, ClearCvsPtr clearCanvasWidthNoAlpha, ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete, VibratePtr vibrate);
+   void setup(short WIDTH, short HEIGHT, short SIZE, float padX, float padY, short padW, short padH, float ballX, float ballY, short ballR, float BallSpeed, short blockWidth, short blockHeight, short FPS, DrawBallPtr drawBall, DrawPaddlePtr drawPaddle, DrawBlockPtr drawBlock, DrawParticlePtr drawParticle, DrawStarPtr drawStar, DrawGlowPtr drawGlow, DrawLavaPtr drawLava, ClearCvsPtr clearCvs, ClearCvsPtr clearCanvasWidthNoAlpha, ShowHealthPtr showHealth, ShowTimePtr showTime, ShowCountDownPtr showCountDown, ShowGameOverPtr showGameOver, ShowGameCompletePtr showGameComplete, VibrateAudioStatusPtr vibrate_audio);
    void init(int *array, int length);
  
    void draw();

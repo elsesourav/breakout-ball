@@ -450,11 +450,12 @@ onload = () => {
          <div id="floatingInputShow" class="floating-window-outer"></div>
 
 
-         <audio src="./src/audio/block-hit.wav" id="block-hit"></audio>
          <audio src="./src/audio/click.wav" id="click"></audio>
-         <audio src="./src/audio/damage.wav" id="damage"></audio>
+         <audio src="./src/audio/block-hit.wav" id="block-hit"></audio>
          <audio src="./src/audio/side-hit.wav" id="side-hit"></audio>
+         <audio src="./src/audio/damage.wav" id="damage"></audio>
          <audio src="./src/audio/win.wav" id="win"></audio>
+         <audio src="./src/audio/game-over.wav" id="game-over"></audio>
          <audio src="./src/audio/bg0.wav" id="bg0"></audio>
          <audio src="./src/audio/bg1.wav" id="bg1"></audio>
          `;

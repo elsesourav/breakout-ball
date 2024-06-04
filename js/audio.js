@@ -19,19 +19,21 @@ class Effect {
 
 class Effects {
    constructor() {
-      this.blockHit = new Effect("block-hit");
       this.click = new Effect("click");
-      this.damage = new Effect("damage");
+      this.blockHit = new Effect("block-hit");
       this.sideHit = new Effect("side-hit");
+      this.damage = new Effect("damage");
       this.win = new Effect("win");
+      this.gameOver = new Effect("game-over");
    }
 
    setVolume(volume) {
-      this.blockHit.setVolume(volume);
       this.click.setVolume(volume);
-      this.damage.setVolume(volume);
+      this.blockHit.setVolume(volume);
       this.sideHit.setVolume(volume);
+      this.damage.setVolume(volume);
       this.win.setVolume(volume);
+      this.gameOver.setVolume(volume);
    }
 }
 

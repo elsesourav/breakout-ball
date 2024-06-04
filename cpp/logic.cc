@@ -115,8 +115,8 @@ EM_JS(void, showGameComplete, (short time), {
 
    }, 2000);
 });
-EM_JS(void, vibrate, (short time), {
-   vibrateDevice(time);
+EM_JS(void, vibrate_audio, (short time, short audioStatus), {
+   vibrateAndAudio(time, audioStatus);
 });
  
 extern "C" {
@@ -128,7 +128,7 @@ EMSCRIPTEN_KEEPALIVE void setup(short width, short height, short size, float pad
    WIDTH = width;
    HEIGHT = height;
    FPS = _FPS;
-   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS, drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas, clearCanvasWidthNoAlpha, showHealth, showTimes, showCountDown, showGameOver, showGameComplete, vibrate);
+   game.setup(WIDTH, HEIGHT, size, padX, padY, padW, padH, padX, padY - ballR, ballR, ballSpeed, BLOCK_WIDTH, BLOCK_HEIGHT, FPS, drawBall, drawPaddle, drawBlock, drawParticle, drawStar, drawGlow, drawLava, clearCanvas, clearCanvasWidthNoAlpha, showHealth, showTimes, showCountDown, showGameOver, showGameComplete, vibrate_audio);
 }
 EMSCRIPTEN_KEEPALIVE void init(int *array, int length) {
    game.init(array, length);

@@ -10,7 +10,7 @@ using namespace std;
 
 Game::Game() {}
 
-void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight, short _FPS, DrawBallPtr _drawBall, DrawPaddlePtr _drawPaddle, DrawBlockPtr _drawBlock, DrawParticlePtr _drawParticle, DrawStarPtr _drawStar, DrawGlowPtr _drawGlow, DrawLavaPtr _drawLava, ClearCvsPtr _clearCvs, ClearCvsPtr _clearCanvasWidthNoAlpha, ShowHealthPtr _showHealth, ShowTimePtr _showTime, ShowCountDownPtr _showCountDown, ShowGameOverPtr _showGameOver, ShowGameCompletePtr _showGameComplete, VibratePtr _vibrate) {
+void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _padY, short _padW, short _padH, float _ballX, float _ballY, short _ballR, float _ballSpeed, short _blockWidth, short _blockHeight, short _FPS, DrawBallPtr _drawBall, DrawPaddlePtr _drawPaddle, DrawBlockPtr _drawBlock, DrawParticlePtr _drawParticle, DrawStarPtr _drawStar, DrawGlowPtr _drawGlow, DrawLavaPtr _drawLava, ClearCvsPtr _clearCvs, ClearCvsPtr _clearCanvasWidthNoAlpha, ShowHealthPtr _showHealth, ShowTimePtr _showTime, ShowCountDownPtr _showCountDown, ShowGameOverPtr _showGameOver, ShowGameCompletePtr _showGameComplete, VibrateAudioStatusPtr _vibrate_audio) {
    WIDTH = _WIDTH;
    HEIGHT = _HEIGHT;
    SIZE = _SIZE;
@@ -28,7 +28,6 @@ void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _p
    ballSpeed = _ballSpeed;
    numStars = (WIDTH / 80) * (HEIGHT / 80);
 
-   vibrate = _vibrate;
    drawBall = _drawBall;
    drawPaddle = _drawPaddle;
    drawBlock = _drawBlock;
@@ -43,7 +42,7 @@ void Game::setup(short _WIDTH, short _HEIGHT, short _SIZE, float _padX, float _p
    showCountDown = _showCountDown;
    showGameOver = _showGameOver;
    showGameComplete = _showGameComplete;
-   vibrate = _vibrate;
+   vibrate_audio =  _vibrate_audio;
 }
 
 void Game::init(int *array, int length) {
@@ -157,7 +156,7 @@ void Game::update() {
                   ball.vx = -ball.maxV;
 
                paddleHidden = true;
-               vibrate(50);
+               vibrate_audio(50, 2);
             }
          }
 
@@ -180,11 +179,11 @@ void Game::update() {
                    if (is == 2) {
                       createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 1, 2);
                       block.isDead = true;
-                      this->vibrate(50);
+                      this->vibrate_audio(50, 1);
                       return true;
                    } else if (is == 1) {
                       createParticles(block.x, block.y, blockWidth, blockHeight, block.health, 0.5, 1);
-                     this->vibrate(100);
+                     this->vibrate_audio(100, 1);
                    }
 
                    return false;
@@ -217,14 +216,14 @@ void Game::update() {
    // wall collision
    if (ball.x1 <= 0) {
       ball.goRight();
-      this->vibrate(50);
+      this->vibrate_audio(50, 2);
    } else if (ball.x2 >= WIDTH) {
       ball.goLeft();
-      this->vibrate(50);
+      this->vibrate_audio(50, 2);
    }
    if (ball.y1 <= 0) {
       ball.goBottom();
-      this->vibrate(50);
+      this->vibrate_audio(50, 2);
    }
 
    if (!gamePose && ball.y2 >= padY + padH * 4) {
@@ -235,17 +234,18 @@ void Game::update() {
       if (health <= 0) {
          gameOver = true;
          showGameOver((short)totalFrameCount / FPS);
-         this->vibrate(1000);
+         this->vibrate_audio(1000, 5);
          return;
       }
       ball.reset(ballX, ballY);
       paddle.reset(padX, padY);
       startingCountDown = FPS * 3;
-      this->vibrate(500);
+      this->vibrate_audio(500, 3);
    }
 
    if (!gameComplete && wallLength >= blocks.size()) {
       gameComplete = true;
+      this->vibrate_audio(0, 3);
       createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3);
       showGameComplete((short)totalFrameCount / FPS);
    }

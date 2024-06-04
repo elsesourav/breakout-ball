@@ -245,8 +245,25 @@ function generateUniqueId() {
    return combined.slice(-5).toUpperCase();
 }
 
-function vibrateDevice(time = 200) {
+function vibrateAndAudio(time, audioStatus) {
    if (tempUser.isVibrateActive && navigator.vibrate) {
       navigator.vibrate(time);
+   }
+   switch (audioStatus) {
+      case 1: // block-hit
+         effects.blockHit.play();
+         break;
+      case 2: // side-hit
+         effects.sideHit.play();
+         break;
+      case 3: // damage
+         effects.damage.play();
+         break;
+      case 4: // win
+         effects.win.play();
+         break;
+      case 5: //game-over
+         effects.gameOver.play();
+         break;
    }
 }
