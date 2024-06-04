@@ -54,7 +54,6 @@ function audioChangeVolume(volume) {
 function playBackgroundAudio() {
    const i = Math.floor(Math.random() * 2);
    const audio = audioElements[i];
-   stopBackgroundAudio();
 
    audio.currentTime = 0;
    audio.volume = tempUser.volume * bgDTvolume;
