@@ -32,6 +32,8 @@ let currentPageIndex = 0;
 let maxPagePossible = 5;
 let isLevelMakerModeOn = false;
 let isInOfTheGame = true;
+let inGame = false;
+let needUpdateOnlineLevels = false;
 let fpsCounter = 0;
 
 let currentPlayingLevel;

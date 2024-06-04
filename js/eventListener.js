@@ -18,6 +18,7 @@ let isPointerLock = false;
 
 startButton.click(() => {
    wav.click.play();
+   inGame = true;
    playLevel();
 });
 

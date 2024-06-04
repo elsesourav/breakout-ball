@@ -22,6 +22,7 @@ function setupOnlineLevel(eleAry, level) {
 }
 
 function setupOnlineLevels(searchData = "", current = currentPageIndex) {
+   needUpdateOnlineLevels = false;
    currentPageIndex = current;
    let j = 0;
    let i = current * MAX_PAGE_RENDER;

@@ -1,7 +1,9 @@
 function playLevel(mode = "inGame") {
-   playBackgroundAudio()
+   playBackgroundAudio();
    showPreview.classList.remove("active");
-   setTimeout(() => {showPreview.classList = [];}, 300);
+   setTimeout(() => {
+      showPreview.classList = [];
+   }, 300);
    touchForcedCount = 0;
    touchForcedUse = false;
    ctx = CTX;
@@ -13,7 +15,7 @@ function playLevel(mode = "inGame") {
    pushStatus(mode);
    showTimeUsed.innerText = "0";
    isInOfTheGame = true;
-   
+
    setTimeout(() => {
       showHealths.classList.add(`s${3}`);
       showTime.classList.add("active");
@@ -27,8 +29,11 @@ function playLevel(mode = "inGame") {
 
 function goHome() {
    stopBackgroundAudio();
+   inGame = false;
    showPreview.classList.remove("active");
-   setTimeout(() => {showPreview.classList = [];}, 300);
+   setTimeout(() => {
+      showPreview.classList = [];
+   }, 300);
    showGameStatus.classList.remove("active");
    CVS.classList.remove("active");
    showTime.classList.remove("active");
@@ -40,6 +45,12 @@ function goHome() {
    pushStatus("home");
    isInOfTheGame = false;
    isLevelMakerModeOn = false;
+
+   if (needUpdateOnlineLevels) {
+      setupCreateLevel();
+      setupOnlineLevels();
+      loadingWindow();
+   }
 }
 
 function createHtmlLevels(nLevel, userLevels, levelsMap) {
@@ -81,7 +92,6 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
 
       levelsMap.appendChild(mainEle);
       htmlLevels.push([mainEle, p, no, time]);
-      
    }
    return htmlLevels;
 }

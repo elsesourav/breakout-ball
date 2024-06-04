@@ -352,14 +352,18 @@ auth.onAuthStateChanged(async (User) => {
       window.onlineLevels = [];
       window.privateLevels = [];
 
+
       const bounceAll = debounce(() => {
          loadComplete = true;
          window.onlineLevels.sort((a, b) => b.playCount - a.playCount);
          const maxPagePossible = Math.ceil(window.onlineLevels.length / MAX_PAGE_RENDER);
          PAGES.update(maxPagePossible);
-         setupCreateLevel();
-         setupOnlineLevels();
-         loadingWindow();
+         needUpdateOnlineLevels = true;
+         if (!inGame) {
+            setupCreateLevel();
+            setupOnlineLevels();
+            loadingWindow();
+         }
       }, 100);
 
       const bouncePrivate = debounce(() => {

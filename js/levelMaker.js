@@ -208,6 +208,7 @@ class LevelMaker {
    }
 
    show() {
+      inGame = true;
       stopBackgroundAudio();
       showGameStatus.classList.remove("active");
       showPreview.classList.remove("active");
