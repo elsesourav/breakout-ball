@@ -89,7 +89,13 @@ addEventListener("popstate", function (event) {
    }
 });
 
+
 const moveHandler = (x) => {
+   if (touchForcedCount > FPS) {
+      touchForcedUse = true;
+      return;
+   }
+   touchForcedCount++;
    tx = (x - left) * scale;
    tx = moveTarget(tx);
 };

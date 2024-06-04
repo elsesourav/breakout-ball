@@ -1,8 +1,11 @@
 function playLevel(mode = "inGame") {
+   showPreview.classList.remove("active");
+   setTimeout(() => {showPreview.classList = [];}, 300);
+   touchForcedCount = 0;
+   touchForcedUse = false;
    ctx = CTX;
    CVS.classList.add("active");
    showGameStatus.classList.add("active");
-   showPreview.classList = [];
    showTime.classList.remove("active");
    showHealths.classList = [];
    pushStatus(mode);
@@ -22,8 +25,9 @@ function playLevel(mode = "inGame") {
 }
 
 function goHome() {
+   showPreview.classList.remove("active");
+   setTimeout(() => {showPreview.classList = [];}, 300);
    showGameStatus.classList.remove("active");
-   showPreview.classList = [];
    CVS.classList.remove("active");
    showTime.classList.remove("active");
    levelDesigner.classList.remove("active");

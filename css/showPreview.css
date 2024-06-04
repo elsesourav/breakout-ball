@@ -7,10 +7,14 @@
    display: grid;
    place-items: center;
    background: rgba(0, 0, 0, 0.92);
-   transition: ease-in-out 300ms top;
+   transition-property: overlay display opacity top;
+   transition-duration: 300ms;
+   transition-timing-function: ease-in-out;
+   transition-behavior: allow-discrete;
+
    z-index: 5;
 
-   &:is(.play, .playAgain, .testing) {
+   &.active {
       top: 0;
    }
 
@@ -19,9 +23,7 @@
       --preview-h: calc(var(--s) * var(--cols) * var(--pScale));
       --h: calc(var(--s) * 14);
       --button-h: calc(var(--s) * 1.7);
-      --leaderboard-h: calc(
-         var(--h) - calc(var(--preview-h) + var(--button-h))
-      );
+      --leaderboard-h: calc(var(--h) - calc(var(--preview-h) + var(--button-h)));
 
       margin-top: calc(var(--s) * 0.3);
       position: relative;
@@ -147,11 +149,12 @@
                z-index: 3;
             }
          }
-         #homeButton, #nextLevelButton {
+         #homeButton,
+         #nextLevelButton {
             position: relative;
             text-align: center;
             width: calc(var(--s) * 0.9);
-            height: calc(var(--s)  * 0.9);
+            height: calc(var(--s) * 0.9);
             display: grid;
             place-items: center;
             border-radius: calc(var(--s) * 0.2);
@@ -303,16 +306,18 @@
       }
    }
 
+   &:not(.play, .playAgain, .testing) #startButton p:nth-child(1),
    &.play #startButton p:nth-child(2),
    &:is(.playAgain, .testing) #startButton p:nth-child(1),
    &.play .btn #homeButton,
    &:not(.playAgain) .btn #nextLevelButton,
    &.playAgain .btn #nextLevelButton:not(.show),
-   &:has( .btn #nextLevelButton.show) .btn #homeButton,
+   &:has(.btn #nextLevelButton.show) .btn #homeButton,
    &.testing .rapper .canvas-and-lvl-details .rank,
    &.testing .leaderboard {
       display: none;
    }
+
 
    #previewClose {
       position: absolute;

@@ -37,6 +37,8 @@ let fpsCounter = 0;
 let currentPlayingLevel;
 let currentGameMode = "local";
 let tempUser = {};
+let touchForcedUse = false;
+let touchForcedCount = 0;
 
 //use cssRoot.style.setProperty("key", "value");
 const rootStyle = document.querySelector(":root").style;
