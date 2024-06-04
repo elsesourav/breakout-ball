@@ -228,8 +228,6 @@ class LevelMaker {
    }
 
    #setupBlock(e) {
-      wav.click.currentTime = 0;
-      wav.click.play();
       let select;
       const { clientX, clientY } = e.type === "touchmove" ? e.touches[0] : e;
 
