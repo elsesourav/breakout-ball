@@ -134,6 +134,14 @@ function JSONtoOBJECT(data) {
    return JSON.parse(data);
 }
 
+function safeEventListener(element, fun, ary = [], action = "click") {
+   element.removeEventListener(action, element._fn);
+   element._fn = () => {
+      return fun(ary);
+   };
+   element.addEventListener(action, element._fn);
+}
+
 function copyArray(ary) {
    return JSON.parse(JSON.stringify(ary));
 }

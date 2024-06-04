@@ -69,12 +69,14 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       };
       const resetBorder = (input) => (input.style.border = "none");
       const showHidePass = () => {
+         wav.click.play();
          showPassword = !showPassword;
          showHideBtn.classList.toggle("active", showPassword);
          if (showPassword) inputs[2].type = "text";
          else inputs[2].type = "password";
       };
       const closeSingle = (is = true) => {
+         wav.click.play();
          parent.classList.remove("active");
          parent.removeChild(fw);
          removeAllEventListener();
@@ -82,6 +84,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       };
 
       function sendValue(e) {
+         wav.click.play();
          e.preventDefault();
          const vs = [...inputs].map((input) => input.value?.trim());
 
@@ -104,6 +107,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       }
 
       const changeAuthOption = (e) => {
+         wav.click.play();
          title.innerHTML = isSignin ? "Sign Up" : "Sign In";
          linkMessage.innerHTML = isSignin ? messageSignup : messageSignin;
          isSignin = !isSignin;

@@ -291,18 +291,21 @@ class AlertHTML {
 
    clickBtn1(fun) {
       this.button1.addEventListener("click", () => {
+         wav.click.play();
          fun();
       });
    }
 
    clickBtn2(fun) {
       this.button2.addEventListener("click", () => {
+         wav.click.play();
          fun();
       });
    }
 
    clickOutside(fun) {
       this.box.addEventListener("click", () => {
+         wav.click.play();
          fun();
       });
    }

@@ -261,7 +261,7 @@ const createNewUser = (username, password, fullName) => {
             username: username,
             fullName: fullName,
             volume: 1,
-            isGyroActive: true,
+            isGyroActive: false,
             isVibrateActive: true,
             numLocalLevels: 10,
             gyroSensitivity: 0.4,

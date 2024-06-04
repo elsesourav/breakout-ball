@@ -138,7 +138,7 @@ async function setupCreateLevel() {
          [I]
       );
 
-      safeEventListener(cvs, ([level]) => {
+      safeEventListener(cvs, ([levels]) => {
          currentGameMode = "online";
          currentPlayingLevel = levels;
          setupPreview();

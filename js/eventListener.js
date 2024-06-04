@@ -240,12 +240,14 @@ gyroSenInput.on("input", () => {
 });
 
 vibrateOnOff.on("click", () => {
+   wav.click.play();
    const is = vibrateOnOff.classList.contains("active");
    vibrateOnOff.classList.toggle("active", !is);
    updateProfileVibrateOnOff(!is);
 });
 
 gyroOnOff.on("click", () => {
+   wav.click.play();
    const is = gyroOnOff.classList.contains("active");
    gyroOnOff.classList.toggle("active", !is);
    updateProfileGyroOnOff(!is);

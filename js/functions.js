@@ -152,14 +152,6 @@ function createUserLevels(max, levelsMap) {
    return htmlLevels;
 }
 
-function safeEventListener(element, fun, ary = [], action = "click") {
-   element.removeEventListener(action, element._fn);
-   element._fn = () => {
-      return fun(ary);
-   };
-   element.addEventListener(action, element._fn);
-}
-
 function loadingWindow(is = false) {
    waitingWindow.classList.toggle("active", is);
 }

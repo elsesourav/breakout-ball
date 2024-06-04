@@ -70,6 +70,7 @@ class Pages {
    #pageEventListener() {
       this.pages.forEach((page, i) => {
          page.addEventListener("click", () => {
+            wav.click.play();
             const { possible, maxPages, current, pages, nextIcon } = this;
 
             if (page.classList.contains(nextIcon) && possible > maxPages) {
