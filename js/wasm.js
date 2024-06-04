@@ -473,7 +473,7 @@ onload = () => {
 
       if (window.DeviceOrientationEvent) {
          window.addEventListener("deviceorientation", (e) => {
-            if (!tempUser.isGyroActive && !touchForcedUse) return;
+            if (!tempUser.isGyroActive || !touchForcedUse) return;
             const s = (1 - tempUser.gyroSensitivity) * GYRO_RANGE;
             const p = map(e.gamma, -s, s, CVS_W * -0.2, CVS_W + CVS_W * 0.2);
             moveDirect(p);
