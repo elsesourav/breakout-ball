@@ -169,6 +169,8 @@ CVS.addEventListener("touchmove", (e) => {
 });
 
 async function selectMode(i) {
+   wav.click.currentTime = 0;
+   wav.click.play();
    modeOptions.removeClass("active");
    modeOptions[i].classList.add("active");
    pg.index = i;
@@ -180,8 +182,6 @@ async function selectMode(i) {
 
 modeOptions.click((e, _, i) => {
    selectMode(i);
-   wav.click.currentTime = 0;
-   wav.click.play();
 });
 
 modeType.on("touchstart", (e) => {
