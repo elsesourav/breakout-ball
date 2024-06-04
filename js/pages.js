@@ -70,6 +70,7 @@ class Pages {
    #pageEventListener() {
       this.pages.forEach((page, i) => {
          page.addEventListener("click", () => {
+            wav.click.currentTime = 0;
             wav.click.play();
             const { possible, maxPages, current, pages, nextIcon } = this;
 

@@ -17,6 +17,7 @@ let tx = WIDTH / 2;
 let isPointerLock = false;
 
 startButton.click(() => {
+   wav.click.currentTime = 0;
    wav.click.play();
    inGame = true;
    playLevel();
@@ -28,6 +29,7 @@ function closeTestingPreview() {
 }
 
 previewClose.click(() => {
+   wav.click.currentTime = 0;
    wav.click.play();
    if (currentGameMode == "testing") {
       closeTestingPreview();
@@ -37,6 +39,7 @@ previewClose.click(() => {
 });
 
 nextLevelButton.click(async () => {
+   wav.click.currentTime = 0;
    wav.click.play();
    const info = getUserInfo();
    const id = Number(currentPlayingLevel.id);
@@ -47,11 +50,13 @@ nextLevelButton.click(async () => {
 });
 
 closeModifier.click(() => {
+   wav.click.currentTime = 0;
    wav.click.play();
    levelModifier.classList.remove("active");
 });
 homeButton.click(goHome);
 signOut.click(() => {
+   wav.click.currentTime = 0;
    wav.click.play();
    auth.signOut();
 });
@@ -164,6 +169,7 @@ CVS.addEventListener("touchmove", (e) => {
 });
 
 async function selectMode(i) {
+   wav.click.currentTime = 0;
    wav.click.play();
    modeOptions.removeClass("active");
    modeOptions[i].classList.add("active");
@@ -245,6 +251,7 @@ gyroSenInput.on("input", () => {
 });
 
 vibrateOnOff.on("click", () => {
+   wav.click.currentTime = 0;
    wav.click.play();
    const is = vibrateOnOff.classList.contains("active");
    vibrateOnOff.classList.toggle("active", !is);
@@ -252,6 +259,7 @@ vibrateOnOff.on("click", () => {
 });
 
 gyroOnOff.on("click", () => {
+   wav.click.currentTime = 0;
    wav.click.play();
    const is = gyroOnOff.classList.contains("active");
    gyroOnOff.classList.toggle("active", !is);

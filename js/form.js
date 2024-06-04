@@ -60,8 +60,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       const setBorder = () => {
          const vs = [...inputs].map((input) => input.value?.trim());
 
-         if (!validName(vs[0]))
-            inputs[0].style.border = "1px solid #f00";
+         if (!validName(vs[0])) inputs[0].style.border = "1px solid #f00";
 
          if (!validUName(vs[1])) inputs[1].style.border = "1px solid #f00";
 
@@ -69,6 +68,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       };
       const resetBorder = (input) => (input.style.border = "none");
       const showHidePass = () => {
+         wav.click.currentTime = 0;
          wav.click.play();
          showPassword = !showPassword;
          showHideBtn.classList.toggle("active", showPassword);
@@ -76,6 +76,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
          else inputs[2].type = "password";
       };
       const closeSingle = (is = true) => {
+         wav.click.currentTime = 0;
          wav.click.play();
          parent.classList.remove("active");
          parent.removeChild(fw);
@@ -84,15 +85,12 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       };
 
       function sendValue(e) {
+         wav.click.currentTime = 0;
          wav.click.play();
          e.preventDefault();
          const vs = [...inputs].map((input) => input.value?.trim());
 
-         if (
-            (isSignin || validName(vs[0])) &&
-            validUName(vs[1]) &&
-            validPass(vs[2])
-         ) {
+         if ((isSignin || validName(vs[0])) && validUName(vs[1]) && validPass(vs[2])) {
             closeSingle(false);
             removeAllEventListener();
             resolve({
@@ -107,6 +105,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       }
 
       const changeAuthOption = (e) => {
+         wav.click.currentTime = 0;
          wav.click.play();
          title.innerHTML = isSignin ? "Sign Up" : "Sign In";
          linkMessage.innerHTML = isSignin ? messageSignup : messageSignin;
@@ -129,9 +128,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
          showHideBtn.removeEventListener("click", showHidePass);
          linkMessage.removeEventListener("click", changeAuthOption);
 
-         inputs.forEach((inp) =>
-            inp.removeEventListener("input", () => resetBorder(inp))
-         );
+         inputs.forEach((inp) => inp.removeEventListener("input", () => resetBorder(inp)));
       };
 
       fw.addEventListener("click", setIsSectionTrue, true);
@@ -139,9 +136,7 @@ async function userForm(parent, hideClose = false, operationName = "Continue") {
       fw.addEventListener("submit", sendValue);
       showHideBtn.addEventListener("click", showHidePass);
       linkMessage.addEventListener("click", changeAuthOption);
-      inputs.forEach((inp) =>
-         inp.addEventListener("input", () => resetBorder(inp))
-      );
+      inputs.forEach((inp) => inp.addEventListener("input", () => resetBorder(inp)));
    });
 }
 

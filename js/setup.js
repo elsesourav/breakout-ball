@@ -2,6 +2,7 @@ const htmlOnlineLevels = createOnlineLevels(MAX_PAGE_RENDER, onlineMode);
 
 htmlOnlineLevels.forEach(([level], i) => {
    level.addEventListener("click", () => {
+      wav.click.currentTime = 0;
       wav.click.play();
       currentGameMode = "online";
       currentPlayingLevel = window.onlineLevels[currentPageIndex * MAX_PAGE_RENDER + i];
@@ -52,6 +53,7 @@ function setupLocalLevel(levels) {
    htmlLocalLevels.every(([lvl], i) => {
       if (!levels[i + 1]) return false;
       lvl.addEventListener("click", async () => {
+         wav.click.currentTime = 0;
          wav.click.play();
          currentGameMode = "local";
          currentPlayingLevel = await getLevel(i + 1);
@@ -138,14 +140,16 @@ async function setupCreateLevel() {
          [I]
       );
 
-      safeEventListener(cvs, ([levels]) => {
-         currentGameMode = "online";
-         currentPlayingLevel = levels;
-         setupPreview();
-      }, [levels[I]]);
+      safeEventListener(
+         cvs,
+         ([levels]) => {
+            currentGameMode = "online";
+            currentPlayingLevel = levels;
+            setupPreview();
+         },
+         [levels[I]]
+      );
    }
 
    for (j = I; j < MAX_LEVEL_CAN_CREATE; j++) htmlCreateLevels[j][0].classList.remove("show");
 }
-
-

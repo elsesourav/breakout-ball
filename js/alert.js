@@ -291,6 +291,7 @@ class AlertHTML {
 
    clickBtn1(fun) {
       this.button1.addEventListener("click", () => {
+         wav.click.currentTime = 0;
          wav.click.play();
          fun();
       });
@@ -298,6 +299,7 @@ class AlertHTML {
 
    clickBtn2(fun) {
       this.button2.addEventListener("click", () => {
+         wav.click.currentTime = 0;
          wav.click.play();
          fun();
       });
@@ -305,6 +307,7 @@ class AlertHTML {
 
    clickOutside(fun) {
       this.box.addEventListener("click", () => {
+         wav.click.currentTime = 0;
          wav.click.play();
          fun();
       });
