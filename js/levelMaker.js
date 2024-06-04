@@ -208,6 +208,7 @@ class LevelMaker {
    }
 
    show() {
+      stopBackgroundAudio();
       showGameStatus.classList.remove("active");
       showPreview.classList.remove("active");
       levelDesigner.classList.add("active");

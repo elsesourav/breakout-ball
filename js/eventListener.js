@@ -1,4 +1,3 @@
-
 const pg = {
    x: 0,
    y: 0,
@@ -16,7 +15,6 @@ const { left, width } = CVS.getBoundingClientRect();
 const scale = CVS.width / width;
 let tx = WIDTH / 2;
 let isPointerLock = false;
-
 
 startButton.click(() => {
    playLevel();
@@ -42,7 +40,7 @@ nextLevelButton.click(async () => {
       currentPlayingLevel = await getLevel(id + 1);
       setupPreview();
    }
-})
+});
 
 closeModifier.click(() => {
    levelModifier.classList.remove("active");
@@ -89,13 +87,10 @@ addEventListener("popstate", function (event) {
    }
 });
 
-
 const moveHandler = (x) => {
-   if (touchForcedCount > FPS) {
-      touchForcedUse = true;
-      return;
-   }
-   touchForcedCount++;
+   if (touchForcedCount > FPS) touchForcedUse = true;
+   else touchForcedCount++;
+
    tx = (x - left) * scale;
    tx = moveTarget(tx);
 };
@@ -233,24 +228,22 @@ gyroSenInput.on("touchstart", () => pgLock());
 gyroSenInput.on("touchend", () => pgLock(false));
 
 volumeInput.on("input", () => {
+   audioChangeVolume(volumeInput.value);
    updateProfileVolume(volumeInput.value);
 });
 
 gyroSenInput.on("input", () => {
    updateProfileGyroSensitivity(gyroSenInput.value);
-   console.log(gyroSenInput.value);
 });
-
 
 vibrateOnOff.on("click", () => {
    const is = vibrateOnOff.classList.contains("active");
    vibrateOnOff.classList.toggle("active", !is);
    updateProfileVibrateOnOff(!is);
-})
+});
 
 gyroOnOff.on("click", () => {
    const is = gyroOnOff.classList.contains("active");
    gyroOnOff.classList.toggle("active", !is);
    updateProfileGyroOnOff(!is);
-})
-
+});

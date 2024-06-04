@@ -110,10 +110,12 @@ async function setupLevelRanking(levelId, time) {
    return data;
 }
 
-const updateProfileRank = debounce(async (levelId, rank) => {
+const updateProfileRank = debounce(async (levelId, rank, time = null) => {
    const info = getUserInfo();
-   if (info.levelsRecord[levelId] && info.levelsRecord[levelId].completed) {
+   if (info.levelsRecord[levelId]) {
+      if (time) info.levelsRecord[levelId].time = time;
       info.levelsRecord[levelId].rank = rank;
+      info.levelsRecord[levelId].completed = true;
       await userProfileUpdate(info);
    }
 });

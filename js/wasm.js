@@ -66,6 +66,7 @@ onload = () => {
          `./js/pages.js`,
          `./js/utils.js`,
          `./js/elements.js`,
+         `./js/audio.js`,
          `./js/functions.js`,
          `./js/setup.js`,
          `./js/db.js`,

@@ -1,4 +1,5 @@
 function playLevel(mode = "inGame") {
+   playBackgroundAudio()
    showPreview.classList.remove("active");
    setTimeout(() => {showPreview.classList = [];}, 300);
    touchForcedCount = 0;
@@ -12,7 +13,7 @@ function playLevel(mode = "inGame") {
    pushStatus(mode);
    showTimeUsed.innerText = "0";
    isInOfTheGame = true;
-
+   
    setTimeout(() => {
       showHealths.classList.add(`s${3}`);
       showTime.classList.add("active");
@@ -25,6 +26,7 @@ function playLevel(mode = "inGame") {
 }
 
 function goHome() {
+   stopBackgroundAudio();
    showPreview.classList.remove("active");
    setTimeout(() => {showPreview.classList = [];}, 300);
    showGameStatus.classList.remove("active");

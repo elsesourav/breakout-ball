@@ -1,4 +1,5 @@
 async function setupPreview(mode = "play", data = null, time = null) {
+   stopBackgroundAudio();
    showPreview.classList = [];
    showPreview.classList.add("active");
    nextLevelButton.classList = [];
@@ -19,11 +20,11 @@ async function setupPreview(mode = "play", data = null, time = null) {
       if (base36ToBase10(levelId) < 100) {
          const id = Number(levelId);
          const rankElements = document.querySelectorAll("#localMode .local-user-rank");
+         if (rank) updateProfileRank(levelId, rank, rankTable[rank - 1].time);
          if (rankElements[id - 1]) rankElements[id - 1].innerText = rank;
          if (rankElements[id] && tempUser.levelsRecord[id + 1] && !tempUser.levelsRecord[id + 1].completed) {
             nextLevelButton.classList.add("show");
          }
-         updateProfileRank(levelId, rank);
       }
 
       showPreview.classList.add(mode);
