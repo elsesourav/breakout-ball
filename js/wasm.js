@@ -3,10 +3,8 @@ let moveLeft, moveRight, moveTarget, moveDirect, drawBlockOnly, drawOutline;
 let makerSetup, makerInit, makerDraw;
 let makerAddBlock, makerRemoveBlock, makerHoverBlock;
 
-
-
 onload = () => {
-   Module.onRuntimeInitialized = async() => {
+   Module.onRuntimeInitialized = async () => {
       setup = Module.cwrap("setup", null, [
          "number",
          "number",
@@ -37,7 +35,7 @@ onload = () => {
       makerHoverBlock = Module.cwrap("makerHoverBlock", null, ["number", "number", "number"]);
 
       function wait(milliseconds) {
-         return new Promise(resolve => setTimeout(resolve, milliseconds));
+         return new Promise((resolve) => setTimeout(resolve, milliseconds));
       }
 
       const links = [
@@ -450,7 +448,16 @@ onload = () => {
                   Alert Window
          ===============================-->
          <div id="floatingInputShow" class="floating-window-outer"></div>
-         `
+
+
+         <audio src="./src/audio/block-hit.wav" id="block-hit"></audio>
+         <audio src="./src/audio/click.wav" id="click"></audio>
+         <audio src="./src/audio/damage.wav" id="damage"></audio>
+         <audio src="./src/audio/side-hit.wav" id="side-hit"></audio>
+         <audio src="./src/audio/win.wav" id="win"></audio>
+         <audio src="./src/audio/bg0.wav" id="bg0"></audio>
+         <audio src="./src/audio/bg1.wav" id="bg1"></audio>
+         `;
 
       document.getElementById("main").innerHTML += html;
 
@@ -462,7 +469,6 @@ onload = () => {
          link.href = links[i];
          await wait(20);
          document.head.appendChild(link);
-
       }
 
       for (let i = 0; i < scripts.length; i++) {

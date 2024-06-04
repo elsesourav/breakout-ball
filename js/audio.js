@@ -1,6 +1,41 @@
-const audioUseStack = [null, null, null, null, null];
-const audioElements = [null, null, null, null, null];
+const audioElements = [$("#bg0"), $("#bg1")];
 const bgDTvolume = 0.3;
+
+
+class Effect {
+   constructor(name) {
+      this.audio = $(`#${name}`);
+   }
+
+   setVolume(volume) {
+      this.audio.volume = volume;
+   }
+
+   play() {
+      this.audio.currentTime = 0;
+      this.audio.play();
+   }
+}
+
+class Effects {
+   constructor() {
+      this.blockHit = new Effect("block-hit");
+      this.click = new Effect("click");
+      this.damage = new Effect("damage");
+      this.sideHit = new Effect("side-hit");
+      this.win = new Effect("win");
+   }
+
+   setVolume(volume) {
+      this.blockHit.setVolume(volume);
+      this.click.setVolume(volume);
+      this.damage.setVolume(volume);
+      this.sideHit.setVolume(volume);
+      this.win.setVolume(volume);
+   }
+}
+
+let effects = new Effects();
 
 function stopBackgroundAudio() {
    audioElements.forEach((audio) => {
@@ -15,33 +50,13 @@ function audioChangeVolume(volume) {
 }
 
 function playBackgroundAudio() {
-   const i = Math.floor(Math.random() * 5);
-   const selectedAudio = `./src/audio/bg${i}.wav`;
+   const i = Math.floor(Math.random() * 2);
+   const audio = audioElements[i];
 
    stopBackgroundAudio();
 
-   if (audioUseStack[i] !== selectedAudio) {
-      if (audioElements[i]) {
-         document.body.removeChild(audioElements[i]);
-      }
-
-      const audio = document.createElement("audio");
-      audio.src = selectedAudio;
-      document.body.appendChild(audio);
-      audioElements[i] = audio;
-      audioUseStack[i] = selectedAudio;
-
-      audio.addEventListener("canplaythrough", () => {
-         audio.currentTime = 0;
-         audio.volume = tempUser.volume * bgDTvolume;
-         audio.loop = true;
-         audio.play();
-      });
-   } else {
-      const audio = audioElements[i];
-      audio.currentTime = 0;
-      audio.volume = tempUser.volume * bgDTvolume;
-      audio.loop = true;
-      audio.play();
-   }
+   audio.currentTime = 0;
+   audio.volume = tempUser.volume * bgDTvolume;
+   audio.loop = true;
+   audio.play();
 }

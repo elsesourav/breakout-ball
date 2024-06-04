@@ -17,6 +17,7 @@ let tx = WIDTH / 2;
 let isPointerLock = false;
 
 startButton.click(() => {
+   effects.click.play();
    playLevel();
 });
 
@@ -228,8 +229,9 @@ gyroSenInput.on("touchstart", () => pgLock());
 gyroSenInput.on("touchend", () => pgLock(false));
 
 volumeInput.on("input", () => {
-   audioChangeVolume(volumeInput.value);
    updateProfileVolume(volumeInput.value);
+   effects.setVolume(volumeInput.value);
+   audioChangeVolume(volumeInput.value);
 });
 
 gyroSenInput.on("input", () => {
