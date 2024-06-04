@@ -1,5 +1,6 @@
 async function setupPreview(mode = "play", data = null, time = null) {
    showPreview.classList = [];
+   nextLevelButton.classList = [];
 
    ctx = PREVIEW_CTX;
    ctx.clearRect(0, 0, CVS.width, CVS.height);
@@ -18,6 +19,9 @@ async function setupPreview(mode = "play", data = null, time = null) {
          const rankElements = document.querySelectorAll("#localMode .local-user-rank");
          if (rankElements[Number(levelId) - 1]) rankElements[Number(levelId) - 1].innerText = rank;
          updateProfileRank(levelId, rank);
+         if (rankElements[Number(levelId)]) {
+            nextLevelButton.classList.add("show");
+         }
       }
 
       showPreview.classList.add(mode);

@@ -39,6 +39,7 @@ const saveBtn = $("#saveBtn");
 const makeTesting = $("#makeTesting");
 const closeBtn = $("#closeBtn");
 const createLevel = $("#createLevel");
+const nextLevelButton = $("#nextLevelButton");
 
 
 

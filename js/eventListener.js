@@ -35,6 +35,15 @@ previewClose.click(() => {
    }
 });
 
+nextLevelButton.click(async () => {
+   const info = getUserInfo();
+   const id = Number(currentPlayingLevel.id);
+   if (info.levelsRecord[id + 1]) {
+      currentPlayingLevel = await getLevel(id + 1);
+      setupPreview();
+   }
+})
+
 closeModifier.click(() => {
    levelModifier.classList.remove("active");
 });

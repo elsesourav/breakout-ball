@@ -147,20 +147,19 @@
                z-index: 3;
             }
          }
-         #homeButton {
+         #homeButton, #nextLevelButton {
             position: relative;
             text-align: center;
-            padding: calc(var(--s) * 0.15) calc(var(--s) * 0.25);
+            width: calc(var(--s) * 0.9);
+            height: calc(var(--s)  * 0.9);
+            display: grid;
+            place-items: center;
             border-radius: calc(var(--s) * 0.2);
             outline: none;
             border: none;
             cursor: var(--cursor);
             z-index: 2;
             overflow: hidden;
-
-            display: flex;
-            color: #ffffff;
-            font-size: calc(var(--s) * 0.5);
             text-shadow: 0 1px 2px #000000;
             font-family: f1b;
             background: linear-gradient(0deg, #21f4fb 0%, #c04cea 100%);
@@ -177,6 +176,15 @@
                transition: ease-in-out background 200ms;
                z-index: 3;
             }
+
+            i {
+               font-size: calc(var(--s) * 0.55);
+               color: #ffffff;
+            }
+         }
+
+         #nextLevelButton i {
+            font-size: calc(var(--s) * 0.75);
          }
       }
 
@@ -296,8 +304,11 @@
    }
 
    &.play #startButton p:nth-child(2),
-   &.play .btn #homeButton,
    &:is(.playAgain, .testing) #startButton p:nth-child(1),
+   &.play .btn #homeButton,
+   &:not(.playAgain) .btn #nextLevelButton,
+   &.playAgain .btn #nextLevelButton:not(.show),
+   &:has( .btn #nextLevelButton.show) .btn #homeButton,
    &.testing .rapper .canvas-and-lvl-details .rank,
    &.testing .leaderboard {
       display: none;
