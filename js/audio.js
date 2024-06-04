@@ -1,10 +1,11 @@
-const audioElements = [$("#bg0"), $("#bg1")];
+const audioElements = [new Audio(`./../src/audio/bg0.wav`), new Audio(`./../src/audio/bg0.wav`)];
 const bgDTvolume = 0.3;
 
 
 class Effect {
    constructor(name) {
-      this.audio = $(`#${name}`);
+      this.audio = new Audio();
+      this.audio.src = `./../src/audio/${name}.wav`;
    }
 
    setVolume(volume) {
@@ -39,6 +40,7 @@ class Effects {
 
 let effects = new Effects();
 
+
 function stopBackgroundAudio() {
    audioElements.forEach((audio) => {
       if (audio) audio.pause();
@@ -54,7 +56,6 @@ function audioChangeVolume(volume) {
 function playBackgroundAudio() {
    const i = Math.floor(Math.random() * 2);
    const audio = audioElements[i];
-
    stopBackgroundAudio();
 
    audio.currentTime = 0;
