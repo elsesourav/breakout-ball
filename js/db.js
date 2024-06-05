@@ -359,7 +359,6 @@ auth.onAuthStateChanged(async (User) => {
       window.onlineLevels = [];
       window.privateLevels = [];
 
-
       const bounceAll = debounce(() => {
          loadComplete = true;
          window.onlineLevels.sort((a, b) => b.playCount - a.playCount);

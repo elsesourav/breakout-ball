@@ -268,3 +268,13 @@ gyroOnOff.on("click", () => {
    gyroOnOff.classList.toggle("active", !is);
    updateProfileGyroOnOff(!is);
 });
+
+document.addEventListener('visibilitychange', function () {
+   if (document.visibilityState === 'visible') {
+      setVolume(tempUser.volume);
+      audioChangeVolume(tempUser.volume);
+   } else {
+      setVolume(0);
+      audioChangeVolume(0);
+   }
+});

@@ -57,7 +57,6 @@ function createHtmlLevels(nLevel, userLevels, levelsMap) {
    levelsMap.innerHTML = "";
 
    const htmlLevels = [];
-   let userLevelLength = userLevels.length;
 
    for (let i = 0; i < nLevel; i++) {
       const mainEle = CE("div", ["level", "lock"]);
