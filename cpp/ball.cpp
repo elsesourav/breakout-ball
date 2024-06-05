@@ -5,23 +5,23 @@
 
 void Ball::init(float _x, float _y, short _r, float _speed) {
    x = _x;
-   y = _y;
+   y = _y - _y * 0.03;
    preX = _x;
-   preY = _y;
+   preY = y;
    r = _r;
    speed = _speed;
    maxV = speed / 3;
    vx = 0;
-   vy = -speed;
+   vy = speed;
    this->updateX1X2Y1Y2();
 }
 void Ball::reset(float _x, float _y) {
    x = _x;
-   y = _y;
+   y = _y - _y * 0.03;
    preX = _x;
-   preY = _y;
+   preY = y;
    vx = 0;
-   vy = -speed;
+   vy = speed;
    this->updateX1X2Y1Y2();
 }
 
