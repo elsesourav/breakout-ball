@@ -247,7 +247,7 @@ void Game::update() {
 
    if (!gameComplete && wallLength >= blocks.size()) {
       gameComplete = true;
-      this->vibrate_audio(0, 3);
+      this->vibrate_audio(0, 4);
       createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3);
       showGameComplete((short)totalFrameCount / FPS);
    }
