@@ -6,16 +6,16 @@ Breakout Ball is a classic arcade-style game where players control a paddle to b
 
 ## Features
 
-- Classic breakout gameplay with modern twists.
-- Create custom levels and save them publicly or privately.
-- Gyroscope controls for immersive gameplay.
-- Control sound volume and vibration settings.
-- Support for touch-based and keyboard/mouse controls.
-- Dynamic level ranking system.
+-  Classic breakout gameplay with modern twists.
+-  Create custom levels and save them publicly or privately.
+-  Gyroscope controls for immersive gameplay.
+-  Control sound volume and vibration settings.
+-  Support for touch-based and keyboard/mouse controls.
+-  Dynamic level ranking system.
 
 # Technical Challenges and Optimizations
 
-- ### Developing Breakout Ball involved overcoming several technical challenges to ensure smooth gameplay and efficient performance:
+-  ### Developing Breakout Ball involved overcoming several technical challenges to ensure smooth gameplay and efficient performance:
 
 WebAssembly and C++: Implementing the game logic in C++ and compiling it to WebAssembly provided significant performance benefits compared to pure JavaScript. However, integrating WebAssembly with JavaScript required careful optimization to minimize overhead and ensure seamless execution.
 Collision Detection: Implementing efficient collision detection algorithms for block collisions was crucial for responsive gameplay and realistic physics. Utilizing techniques like AABB (Axis-Aligned Bounding Box) collision detection helped optimize performance while maintaining accuracy.
@@ -33,27 +33,30 @@ Touch Controls: Swipe to move the paddle.
 Keyboard/Mouse Controls: Use arrow keys or mouse movement to control the paddle.
 Screenshots
 
-
 ## Screenshot
 
-<div style="display:grid;gap:1rem;grid-template-columns: 1fr 1fr;">
-   <span>
+<table>
+  <tr>
+    <td>
       <h4>Overview</h4>
       <img src="./src/img/overview.gif">
-   </span>
-   <span>
+    </td>
+    <td>
       <h4>Game Play</h4>
       <img src="./src/img/game-play.gif">
-   </span>
-   <span>
+    </td>
+  </tr>
+  <tr>
+    <td>
       <h4>Creating Level</h4>
       <img src="./src/img/create-level.gif">
-   </span>
-   <span>
+    </td>
+    <td>
       <h4>Level Modification</h4>
       <img src="./src/img/save-public-private.gif">
-   </span>
-</div>
+    </td>
+  </tr>
+</table>
 
 ## Ranking System
 
@@ -76,8 +79,8 @@ This project is licensed under the [MIT License](./MIT-LICENSE.txt).
 
 For questions or feedback, please contact me
 
-- [Email](https://elsesourav@gmail.com)
-- [Twitter](#https://twitter.com/elsesourav)
-- [Linkedin](#https://linkedin.com/in/elsesourav)
-- [Facebook](#https://fb.com/elsesourav)
-- [Instagram](#https://instagram.com/elsesourav)
+-  [Email](https://elsesourav@gmail.com)
+-  [Twitter](#https://twitter.com/elsesourav)
+-  [Linkedin](#https://linkedin.com/in/elsesourav)
+-  [Facebook](#https://fb.com/elsesourav)
+-  [Instagram](#https://instagram.com/elsesourav)
