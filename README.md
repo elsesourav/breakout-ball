@@ -36,14 +36,24 @@ Screenshots
 
 ## Screenshot
 
-*Overview*
-![Overview](./src/img/overview.gif)
-*Game Play*
-![Game Play](./src/img/game-play.gif)
-*Creating Level*
-![Creating Level](./src/img/create-level.gif)
-*Level Modification*
-![Level Modification](./src/img/save-public-private.gif)
+<div style="display:grid;gap:1rem;grid-template-columns: 1fr 1fr;">
+   <span>
+      <h4>Overview</h4>
+      <img src="./src/img/overview.gif">
+   </span>
+   <span>
+      <h4>Game Play</h4>
+      <img src="./src/img/game-play.gif">
+   </span>
+   <span>
+      <h4>Creating Level</h4>
+      <img src="./src/img/create-level.gif">
+   </span>
+   <span>
+      <h4>Level Modification</h4>
+      <img src="./src/img/save-public-private.gif">
+   </span>
+</div>
 
 ## Ranking System
 
