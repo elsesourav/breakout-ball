@@ -1,4 +1,4 @@
-* Breakout Ball Game
+* Breakout Ball Game *
 
 ** Overview
 
