@@ -1,5 +1,4 @@
 #include "./ball.h"
-#include "./random.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -12,7 +11,7 @@ void Ball::init(float _x, float _y, short _r, float _speed) {
    r = _r;
    speed = _speed;
    maxV = speed / 3;
-   vx = rnd(-maxV, maxV);
+   vx = 0;
    vy = -speed;
    this->updateX1X2Y1Y2();
 }
@@ -21,7 +20,7 @@ void Ball::reset(float _x, float _y) {
    y = _y;
    preX = _x;
    preY = _y;
-   vx = rnd(-maxV, maxV);
+   vx = 0;
    vy = -speed;
    this->updateX1X2Y1Y2();
 }

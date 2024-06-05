@@ -73,7 +73,7 @@ const wav = {
 function setVolume(volume) {
    wav.click.volume = volume;
    wav.blockHit.volume = volume;
-   wav.sideHit.volume = volume;
+   wav.sideHit.volume = volume * 0.5;
    wav.damage.volume = volume;
    wav.win.volume = volume;
    wav.gameOver.volume = volume;
