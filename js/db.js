@@ -321,7 +321,14 @@ const signinUser = (username, password) => {
    });
 };
 
+let isRun = false;
+addEventListener("error", (event) => {
+   if (!isRun) {
+      window.location.reload();
+   }
+});
 auth.onAuthStateChanged(async (User) => {
+   isRun = true;
    if (!User) {
       loadingWindow();
       const { fullName, username, password, isSignin } = await userForm(floatingInputShow, true);

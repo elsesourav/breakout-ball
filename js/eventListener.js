@@ -169,8 +169,6 @@ CVS.addEventListener("touchmove", (e) => {
 });
 
 async function selectMode(i) {
-   wav.click.currentTime = 0;
-   wav.click.play();
    modeOptions.removeClass("active");
    modeOptions[i].classList.add("active");
    pg.index = i;
@@ -181,6 +179,8 @@ async function selectMode(i) {
 }
 
 modeOptions.click((e, _, i) => {
+   wav.click.currentTime = 0;
+   wav.click.play();
    selectMode(i);
 });
 
@@ -223,12 +223,13 @@ modeType.on("touchend", () => {
       pg.scrollX = -pg.width * pg.index;
       modeOptions.removeClass("active");
       modeOptions[pg.index].classList.add("active");
+      wav.click.currentTime = 0;
+      wav.click.play();
    }
 
    modeType.style.transitionDuration = `${Math.round(Math.abs((dx / pg.width) * 100))}ms`;
    modeType.style.left = `${Math.round(pg.scrollX)}px`;
    pg.preScrollX = pg.scrollX;
-
    selectMode(pg.index);
 
    pg.isLock = pg.ones = false;

@@ -460,14 +460,9 @@ onload = () => {
       <audio src="./src/audio/bg0.mp3" id="bg0"></audio>
       <audio src="./src/audio/bg1.mp3" id="bg1"></audio>`;
 
-      document.body.innerHTML += audiosHtml;
-
+      
       await wait(20);
-
-      document.getElementById("main").innerHTML += html;
-
-      await wait(20);
-
+      
       for (let i = 0; i < links.length; i++) {
          const link = document.createElement("link");
          link.rel = "stylesheet";
@@ -475,6 +470,13 @@ onload = () => {
          await wait(20);
          document.head.appendChild(link);
       }
+      
+      document.body.innerHTML += audiosHtml;
+      
+      await wait(20);
+
+      document.getElementById("main").innerHTML += html;
+
 
       for (let i = 0; i < scripts.length; i++) {
          const script = document.createElement("script");
