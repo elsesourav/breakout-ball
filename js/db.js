@@ -402,6 +402,7 @@ auth.onAuthStateChanged(async (User) => {
          }
       });
 
+
       // when on online map exist then remove loading window
       setTimeout(() => {
          if (!loadComplete) {
@@ -410,3 +411,25 @@ auth.onAuthStateChanged(async (User) => {
       }, 20000);
    }
 });
+
+
+// for level updating purposes
+// (async () => {
+//    async function getLevels_() {
+//       return await db.ref("levels/private/its_sourav/").get();
+//       // return await db.ref("levels/online/PO1NC").get();
+//    }
+
+//    // const level = (await getLevels_()).val();
+//    // let id = 9;
+//    // level.id = id;
+//    // level.creator = "elsesourav";
+//    // db.ref(`levels/local/${id}`).set(level)
+
+//    const levels = (await getLevels_()).val();
+//    levels.forEach(async (level) => {
+//       const ref = db.ref(`levels/online/${level.id}`);
+//       await ref.set(level);
+//    });
+// })
+// ()

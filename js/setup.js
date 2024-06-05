@@ -32,6 +32,7 @@ function setupOnlineLevels(searchData = "", current = currentPageIndex) {
    if (searchData.length === 5) {
       const findLevel = window.onlineLevels.find((e) => e.id === searchData);
       if (findLevel) {
+         currentPlayingLevel = findLevel;
          setupOnlineLevel(htmlOnlineLevels[0], findLevel);
          j = 1;
       }
