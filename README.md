@@ -80,11 +80,7 @@ This project is licensed under the [MIT License](./MIT-LICENSE.txt).
 For questions or feedback, please contact me
 
 -  [Email](https://elsesourav@gmail.com)
-
--  [Twitter](#https://twitter.com/elsesourav)
-
--  [Linkedin](#https://linkedin.com/in/elsesourav)
-
--  [Facebook](#https://fb.com/elsesourav)
-
--  [Instagram](#https://instagram.com/elsesourav)
+-  [Twitter](https://twitter.com/elsesourav)
+-  [Linkedin](https://linkedin.com/in/elsesourav)
+-  [Facebook](https://fb.com/elsesourav)
+-  [Instagram](https://instagram.com/elsesourav)
