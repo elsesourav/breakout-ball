@@ -19,15 +19,16 @@ typedef void (*DrawLavaPtr)(float, float, float, float);
 typedef void (*DrawGlowPtr)(float, float, float, float, short colorIndex);
 typedef void (*ClearCvsPtr)(short, short);
 typedef void (*ShowHealthPtr)(short);
-typedef void (*ShowTimePtr)(short);
-typedef void (*ShowCountDownPtr)(short);
-typedef void (*ShowGameOverPtr)(short);
-typedef void (*ShowGameCompletePtr)(short);
+typedef void (*ShowTimePtr)(int);
+typedef void (*ShowCountDownPtr)(int);
+typedef void (*ShowGameOverPtr)(int);
+typedef void (*ShowGameCompletePtr)(int);
 typedef void (*VibrateAudioStatusPtr)(short, short);
 
 class Game {
 public:
-   short WIDTH, HEIGHT, SIZE, FPS, health, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR, totalFrameCount, startingCountDown, wallLength;
+   short WIDTH, HEIGHT, SIZE, FPS, health, blockWidth, blockHeight, paddleWidth, paddleHeight, padW, padH, ballR, wallLength;
+   int totalFrameCount, startingCountDown;
    float paddleMaxHidden, paddleHiddenCount, numStars, padX, padY, ballX, ballY, ballSpeed;
    bool paddleHidden, gamePose, gameOver, gameComplete;
    std::vector<Block> blocks;

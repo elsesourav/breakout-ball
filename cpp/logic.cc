@@ -79,14 +79,14 @@ EM_JS(void, showHealth, (short health), {
    showHealths.classList = [];
    showHealths.classList.add(`s${health - 1}`);
 });
-EM_JS(void, showTimes, (short time), {
+EM_JS(void, showTimes, (int time), {
    showTimeUsed.innerText = time;
 }); 
-EM_JS(void, showCountDown, (short time), {
+EM_JS(void, showCountDown, (int time), {
    showCountDowns.classList = [];
    showCountDowns.classList.add(`s${time}`);
 });
-EM_JS(void, showGameOver, (short time), {
+EM_JS(void, showGameOver, (int time), {
    showCountDowns.classList = [];
    showCountDowns.classList.add("gameOver");
    
@@ -98,7 +98,7 @@ EM_JS(void, showGameOver, (short time), {
       else setupPreview("playAgain", null, time);
    }, 2000);
 });
-EM_JS(void, showGameComplete, (short time), {
+EM_JS(void, showGameComplete, (int time), {
    showCountDowns.classList = [];
    showCountDowns.classList.add("gameWin");
 

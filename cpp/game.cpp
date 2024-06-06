@@ -235,7 +235,7 @@ void Game::update() {
 
       if (health <= 0) {
          gameOver = true;
-         showGameOver((short)totalFrameCount / FPS);
+         showGameOver((int)totalFrameCount / FPS);
          this->vibrate_audio(1000, 5);
          return;
       }
@@ -249,12 +249,12 @@ void Game::update() {
       gameComplete = true;
       this->vibrate_audio(0, 4);
       createParticles(ball.x, ball.y - ballR * 2, ballR * 1.6, ballR * 1.6, 4, 0.4, 3);
-      showGameComplete((short)totalFrameCount / FPS);
+      showGameComplete((int)totalFrameCount / FPS);
    }
 
    if (startingCountDown >= 0) {
       if (startingCountDown % FPS == 0) {
-         showCountDown((short)startingCountDown / FPS);
+         showCountDown((int)startingCountDown / FPS);
       }
       startingCountDown--;
       if (startingCountDown == 0)
@@ -262,7 +262,7 @@ void Game::update() {
    } else if (!gameOver && !gameComplete) {
       totalFrameCount++;
       if (totalFrameCount % FPS == 0) {
-         showTime((short)totalFrameCount / FPS);
+         showTime((int)totalFrameCount / FPS);
       }
    }
 }
