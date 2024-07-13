@@ -2,7 +2,7 @@
 
 ## Overview
 
-Breakout Ball is a classic arcade-style game where players control a paddle to bounce a ball and break blocks. This repository contains the source code for the game, developed using WebAssembly, C++, JavaScript, HTML, CSS, and Firebase Database.
+Breakout Ball is a classic arcade-style game where players control a paddle to bounce a ball and break blocks. developed using WebAssembly, C++, JavaScript, HTML, CSS, and Firebase Database.
 
 ## Features
 
