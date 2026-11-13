@@ -3,6 +3,7 @@ import { useGame } from '../context/GameContext';
 import { LevelData } from '../types/game';
 import { drawLevelPreviewOnCanvas } from '../utils/helpers';
 import { CANVAS_WIDTH } from '../constants/game';
+import { levelSearchEngine } from '../services/search';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -12,11 +13,7 @@ export const OnlineMode: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const filteredLevels = useMemo(() => {
-    if (!searchTerm.trim()) return onlineLevels;
-    const term = searchTerm.trim().toUpperCase();
-    return onlineLevels.filter(
-      (l) => l.id.toUpperCase().includes(term) || (l.name && l.name.toUpperCase().includes(term))
-    );
+    return levelSearchEngine.search(onlineLevels, searchTerm);
   }, [onlineLevels, searchTerm]);
 
   const totalPages = Math.max(1, Math.ceil(filteredLevels.length / ITEMS_PER_PAGE));
