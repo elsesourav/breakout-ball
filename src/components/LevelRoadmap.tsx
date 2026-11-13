@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
-import { Lock, Play, Trophy, Sparkles, Check, Zap } from 'lucide-react';
+import {
+  Lock,
+  Play,
+  Trophy,
+  Sparkles,
+  Check,
+  ShieldAlert,
+  Zap,
+  Radio,
+  Flame,
+} from 'lucide-react';
 
 interface SectorInfo {
   number: string;
@@ -28,6 +38,15 @@ interface FloatingBrick {
   glow: string;
   rotation: number;
   opacity: number;
+}
+
+interface Obstacle {
+  id: string;
+  type: 'titanium' | 'forcefield' | 'plasma';
+  x: number;
+  y: number;
+  label?: string;
+  locked?: boolean;
 }
 
 const TOTAL_LEVELS = 20;
@@ -69,7 +88,7 @@ const SECTOR_CONFIG: Record<number, SectorInfo> = {
 };
 
 export const LevelRoadmap: React.FC = () => {
-  const { localLevels, localProgress, openPreview } = useGame();
+  const { localLevels, localProgress, openPreview, showAlert } = useGame();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const activeNodeRef = useRef<HTMLDivElement | null>(null);
   const hasInitialScrolled = useRef<boolean>(false);
@@ -101,6 +120,17 @@ export const LevelRoadmap: React.FC = () => {
     }
     return list;
   }, []);
+
+  // Find player's current active unlocked level
+  const currentUnlockedId = useMemo(() => {
+    let highest = 1;
+    for (let i = 1; i <= TOTAL_LEVELS; i++) {
+      if (localProgress[String(i)] !== undefined) {
+        highest = i;
+      }
+    }
+    return highest;
+  }, [localProgress]);
 
   // Ambient floating Breakout Bricks in background (theme aligned)
   const floatingBricks: FloatingBrick[] = useMemo(() => {
@@ -134,16 +164,47 @@ export const LevelRoadmap: React.FC = () => {
     return bricks;
   }, []);
 
-  // Find player's current active unlocked level
-  const currentUnlockedId = useMemo(() => {
-    let highest = 1;
-    for (let i = 1; i <= TOTAL_LEVELS; i++) {
-      if (localProgress[String(i)] !== undefined) {
-        highest = i;
-      }
-    }
-    return highest;
-  }, [localProgress]);
+  // Breakout Obstacles placed strategically along the roadmap
+  const obstacles: Obstacle[] = useMemo(() => {
+    return [
+      // 1. Titanium Indestructible Hazard Bricks
+      { id: 'titanium-1', type: 'titanium', x: 260, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 2.5 * SPACING, label: '∞' },
+      { id: 'titanium-2', type: 'titanium', x: 100, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5 * SPACING, label: '∞' },
+      { id: 'titanium-3', type: 'titanium', x: 265, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 12.5 * SPACING, label: '∞' },
+      { id: 'titanium-4', type: 'titanium', x: 95, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING, label: '∞' },
+
+      // 2. Cyber Laser Forcefields at Sector Gates
+      {
+        id: 'gate-sector-2',
+        type: 'forcefield',
+        x: 180,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 4.5 * SPACING,
+        label: 'SECTOR 02 FIREWALL',
+        locked: currentUnlockedId < 6,
+      },
+      {
+        id: 'gate-sector-3',
+        type: 'forcefield',
+        x: 180,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 9.5 * SPACING,
+        label: 'SECTOR 03 QUANTUM SHIELD',
+        locked: currentUnlockedId < 11,
+      },
+      {
+        id: 'gate-sector-4',
+        type: 'forcefield',
+        x: 180,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 14.5 * SPACING,
+        label: 'SECTOR 04 APEX BARRIER',
+        locked: currentUnlockedId < 16,
+      },
+
+      // 3. Plasma Deflection Hazard Orbs
+      { id: 'plasma-1', type: 'plasma', x: 110, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.8 * SPACING },
+      { id: 'plasma-2', type: 'plasma', x: 250, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 8.8 * SPACING },
+      { id: 'plasma-3', type: 'plasma', x: 105, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.8 * SPACING },
+    ];
+  }, [currentUnlockedId]);
 
   // Compute smooth high-tech laser conduit path
   const conduitPathData = useMemo(() => {
@@ -163,7 +224,6 @@ export const LevelRoadmap: React.FC = () => {
   }, [nodes]);
 
   // FIXED SCROLL: On first load, immediately center viewport on current active level
-  // WITHOUT any erratic top-to-bottom sweep or jump
   useEffect(() => {
     if (hasInitialScrolled.current) return;
     const container = scrollContainerRef.current;
@@ -173,7 +233,6 @@ export const LevelRoadmap: React.FC = () => {
     if (activeNode) {
       const containerHeight = container.clientHeight || 560;
       const targetScrollTop = Math.max(0, activeNode.y - containerHeight / 2);
-      // Immediately set scrollTop without sweeping from top to bottom
       container.scrollTop = targetScrollTop;
       hasInitialScrolled.current = true;
     }
@@ -181,7 +240,16 @@ export const LevelRoadmap: React.FC = () => {
 
   const handleLevelClick = (levelNumber: number) => {
     const isUnlocked = localProgress[String(levelNumber)] !== undefined;
-    if (!isUnlocked) return;
+    if (!isUnlocked) {
+      showAlert({
+        title: `CORE ${String(levelNumber).padStart(2, '0')} IS LOCKED`,
+        message: `Clear Core ${levelNumber - 1} first to unlock this sector gateway!`,
+        singleBtn: true,
+        btn1Text: 'GOT IT',
+        btn1Color: 'var(--color1-bg)',
+      });
+      return;
+    }
 
     let levelData = localLevels.find((l) => l.id === String(levelNumber));
     if (!levelData) {
@@ -344,6 +412,105 @@ export const LevelRoadmap: React.FC = () => {
           })}
         </svg>
 
+        {/* MAP OBSTACLES: Forcefield Gates, Titanium Blocks, Plasma Orbs */}
+        {obstacles.map((obs) => {
+          if (obs.type === 'forcefield') {
+            return (
+              <div
+                key={obs.id}
+                className="absolute z-10 -translate-x-1/2 flex flex-col items-center pointer-events-none"
+                style={{
+                  left: `${(obs.x / SVG_WIDTH) * 100}%`,
+                  top: `${obs.y}px`,
+                }}
+              >
+                {/* Laser Forcefield Barrier Line */}
+                <div
+                  className="w-48 h-1.5 rounded-full mb-1 flex items-center justify-between px-1"
+                  style={{
+                    backgroundColor: obs.locked ? '#ff0844' : '#10b981',
+                    boxShadow: obs.locked
+                      ? '0 0 16px #ff0844, 0 0 30px rgba(255, 8, 68, 0.6)'
+                      : '0 0 16px #10b981, 0 0 25px rgba(16, 185, 129, 0.5)',
+                  }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                </div>
+
+                {/* Barrier Security Tag */}
+                <div
+                  className="flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[9px] font-tech font-bold tracking-wider uppercase backdrop-blur-md"
+                  style={{
+                    backgroundColor: obs.locked ? 'rgba(30, 7, 18, 0.92)' : 'rgba(6, 26, 20, 0.92)',
+                    borderColor: obs.locked ? '#ff0844' : '#10b981',
+                    color: obs.locked ? '#ff4b72' : '#34d399',
+                    boxShadow: obs.locked
+                      ? '0 0 12px rgba(255, 8, 68, 0.35)'
+                      : '0 0 12px rgba(16, 185, 129, 0.35)',
+                  }}
+                >
+                  <ShieldAlert className="w-3 h-3 flex-shrink-0" />
+                  <span>{obs.label} // {obs.locked ? 'LOCKED' : 'CLEARED'}</span>
+                </div>
+              </div>
+            );
+          }
+
+          if (obs.type === 'titanium') {
+            return (
+              <div
+                key={obs.id}
+                className="absolute z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                style={{
+                  left: `${(obs.x / SVG_WIDTH) * 100}%`,
+                  top: `${obs.y}px`,
+                }}
+              >
+                {/* Indestructible Titanium Block */}
+                <div
+                  className="w-10 h-5 rounded-md flex items-center justify-center font-mono font-black text-xs text-slate-200 border-2"
+                  style={{
+                    backgroundColor: '#1e293b',
+                    backgroundImage: 'linear-gradient(135deg, #334155 0%, #0f172a 100%)',
+                    borderColor: '#cbd5e1',
+                    boxShadow: '0 0 12px rgba(203, 213, 225, 0.4), inset 0 1px 1px #fff',
+                  }}
+                >
+                  <span style={{ color: '#ffffff', fontWeight: 900 }}>∞</span>
+                </div>
+              </div>
+            );
+          }
+
+          if (obs.type === 'plasma') {
+            return (
+              <div
+                key={obs.id}
+                className="absolute z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                style={{
+                  left: `${(obs.x / SVG_WIDTH) * 100}%`,
+                  top: `${obs.y}px`,
+                }}
+              >
+                {/* Plasma Hazard Deflector Orb */}
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center border animate-pulse"
+                  style={{
+                    backgroundColor: 'rgba(244, 63, 94, 0.25)',
+                    borderColor: '#f43f5e',
+                    boxShadow: '0 0 12px rgba(244, 63, 94, 0.6)',
+                  }}
+                >
+                  <Flame className="w-3.5 h-3.5 text-rose-400" />
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        })}
+
         {/* Sector Gateway Headers (Themed Milestones) */}
         {nodes.map((node) => {
           if (!node.sector) return null;
@@ -427,7 +594,7 @@ export const LevelRoadmap: React.FC = () => {
           </span>
         </div>
 
-        {/* Level Energy Cells (Locked / Unlocked only, NO stars) */}
+        {/* Level Energy Cells: Clear Locked / Unlocked Indicators */}
         {nodes.map((node) => {
           const progress = localProgress[String(node.id)];
           const isUnlocked = progress !== undefined;
@@ -448,7 +615,7 @@ export const LevelRoadmap: React.FC = () => {
             <div
               key={`node-${node.id}`}
               ref={isCurrent ? activeNodeRef : undefined}
-              className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
+              className="absolute -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center"
               style={{
                 left: `${(node.x / SVG_WIDTH) * 100}%`,
                 top: `${node.y}px`,
@@ -482,7 +649,6 @@ export const LevelRoadmap: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleLevelClick(node.id)}
-                disabled={!isUnlocked}
                 aria-label={`Level ${node.id} ${isUnlocked ? (isComplete ? 'Completed' : 'Unlocked') : 'Locked'}`}
                 style={{
                   width: '58px',
@@ -493,35 +659,38 @@ export const LevelRoadmap: React.FC = () => {
                       : isCurrent
                       ? '#0e1233'
                       : '#0a102c'
-                    : '#0a0d1e',
+                    : '#080a18',
+                  backgroundImage: !isUnlocked
+                    ? 'repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 4px, transparent 4px, transparent 8px)'
+                    : undefined,
                   borderColor: isUnlocked
                     ? isComplete
                       ? '#10b981'
                       : isCurrent
                       ? '#00f7ff'
                       : sectorColor
-                    : '#334155',
+                    : '#242e42',
                   boxShadow: isUnlocked
                     ? isCurrent
                       ? '0 0 24px rgba(0, 247, 255, 0.7), inset 0 0 12px rgba(0, 247, 255, 0.3)'
                       : isComplete
                       ? '0 0 16px rgba(16, 185, 129, 0.5)'
                       : '0 4px 12px rgba(0,0,0,0.6)'
-                    : '0 4px 10px rgba(0,0,0,0.5)',
+                    : '0 4px 10px rgba(0,0,0,0.7)',
                 }}
                 className={`relative group rounded-2xl flex flex-col items-center justify-center transition-all duration-200 outline-none select-none cursor-pointer border-[2.5px] ${
                   isUnlocked
                     ? isCurrent
                       ? 'scale-105 animate-pulse'
                       : 'hover:scale-105 active:scale-95'
-                    : 'cursor-not-allowed opacity-90'
+                    : 'hover:border-slate-500 active:scale-95 opacity-85'
                 }`}
               >
                 {/* Decorative Top Brick Accent Cap */}
                 <div
                   className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-5 h-1.5 rounded-full pointer-events-none"
                   style={{
-                    backgroundColor: isUnlocked ? (isComplete ? '#10b981' : sectorColor) : '#475569',
+                    backgroundColor: isUnlocked ? (isComplete ? '#10b981' : sectorColor) : '#334155',
                     boxShadow: isUnlocked ? `0 0 8px ${isComplete ? '#10b981' : sectorColor}` : 'none',
                   }}
                 />
@@ -559,20 +728,21 @@ export const LevelRoadmap: React.FC = () => {
                     )}
                   </div>
                 ) : (
-                  /* High-Contrast Locked State: Clear Silver Lock + Bright Crisp Level Number */
+                  /* Prominent Locked State: Silver Lock Shield + Crisp Level Number */
                   <div className="flex flex-col items-center justify-center gap-0.5">
-                    <Lock
-                      style={{ color: '#f1f5f9' }}
-                      className="w-4 h-4 stroke-[2.4] drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
-                    />
+                    <div className="w-5 h-5 rounded-full bg-slate-800/80 border border-slate-600/60 flex items-center justify-center shadow-inner">
+                      <Lock
+                        style={{ color: '#cbd5e1' }}
+                        className="w-3 h-3 stroke-[2.4]"
+                      />
+                    </div>
                     <span
                       className="font-tech"
                       style={{
-                        color: '#ffffff',
-                        fontSize: '13px',
+                        color: '#94a3b8',
+                        fontSize: '12px',
                         fontWeight: 800,
                         lineHeight: 1,
-                        textShadow: '0 1px 3px rgba(0,0,0,0.9)',
                       }}
                     >
                       {node.id}
@@ -581,8 +751,17 @@ export const LevelRoadmap: React.FC = () => {
                 )}
 
                 {/* Inner Acrylic Border Bezel */}
-                <div className="absolute inset-0.5 rounded-[13px] border border-white/15 pointer-events-none" />
+                <div className="absolute inset-0.5 rounded-[13px] border border-white/10 pointer-events-none" />
               </button>
+
+              {/* Under-node Locked Tag for Clear Differentiation */}
+              {!isUnlocked && (
+                <div
+                  className="mt-1 px-1.5 py-0.2 rounded bg-black/60 border border-slate-700/60 text-[8px] font-tech font-bold text-slate-400 tracking-wider uppercase pointer-events-none"
+                >
+                  LOCKED
+                </div>
+              )}
             </div>
           );
         })}
