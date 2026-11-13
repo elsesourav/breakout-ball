@@ -2,6 +2,7 @@ import React from 'react';
 import { useGame } from '../context/GameContext';
 import { ActiveTab } from '../types/game';
 import { SegmentedControl } from '@elsesourav/react-ui';
+import { UserAvatarMenu } from './auth/UserAvatarMenu';
 
 export const Navigation: React.FC = () => {
   const { activeTab, setActiveTab } = useGame();
@@ -14,8 +15,8 @@ export const Navigation: React.FC = () => {
   ];
 
   return (
-    <header className="mobile-nav-header">
-      <div className="w-full px-2 py-1.5">
+    <header className="mobile-nav-header flex items-center justify-between px-2.5 py-1.5 gap-2">
+      <div className="flex-1">
         <SegmentedControl
           label="Game Navigation"
           options={options}
@@ -25,6 +26,7 @@ export const Navigation: React.FC = () => {
           className="w-full shadow-lg"
         />
       </div>
+      <UserAvatarMenu />
     </header>
   );
 };

@@ -54,8 +54,7 @@
 
 body {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100svh;
   min-height: 100svh;
   width: 100vw;
   width: 100svw;
@@ -74,7 +73,7 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100%;
+  height: 100svh;
 }
 
 main {
@@ -97,8 +96,8 @@ main {
 
   main {
     width: 100vw !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
+    height: 100svh !important;
+    max-height: 100svh !important;
     border-radius: 0 !important;
     outline: none !important;
     box-shadow: none !important;
@@ -718,7 +717,7 @@ main {
 .rapper {
   width: 92%;
   max-width: 440px;
-  max-height: 92dvh;
+  max-height: 92svh;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;

@@ -86,13 +86,18 @@ export const LevelPreviewModal: React.FC = () => {
           </div>
         </div>
 
+        {/* Level Creator Info */}
+        <div className="flex items-center justify-between px-1 my-0.5 text-xs text-cyan-400 font-semibold">
+          <span>
+            By <span className="text-cyan-300 font-bold">@{selectedLevel.creator}</span>
+          </span>
+          <span className="text-slate-400 text-[10px] uppercase tracking-wider">
+            {!isNaN(Number(selectedLevel.id)) ? 'Campaign' : 'Community'}
+          </span>
+        </div>
+
         {/* Action Controls using ArcadeButton */}
         <div className="flex items-center gap-2 w-full my-1">
-          <span id="levelCreatorName" className="truncate text-xs font-semibold text-cyan-400">
-            <small>@</small>
-            {selectedLevel.creator}
-          </span>
-
           <ArcadeButton
             variant="breakout-start"
             size="md"
@@ -102,7 +107,7 @@ export const LevelPreviewModal: React.FC = () => {
             mask={true}
             glow={true}
             onClick={() => startPlayLevel(selectedLevel)}
-            className="flex-1 py-2 text-sm"
+            className="flex-1 py-2 text-sm font-black tracking-wider"
           >
             {progress?.completed ? 'PLAY AGAIN' : 'START'}
           </ArcadeButton>

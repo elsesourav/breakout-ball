@@ -9,14 +9,10 @@ import {
   UserProfile,
   AlertConfig,
 } from '../types/game';
-import {
-  DEFAULT_SETTINGS,
-  DEFAULT_USER,
-  INITIAL_LOCAL_LEVELS,
-  INITIAL_ONLINE_LEVELS,
-  MOCK_LEADERBOARDS,
-} from '../constants/game';
+import { DEFAULT_SETTINGS, DEFAULT_USER } from '../constants/game';
 import { soundManager } from '../utils/audio';
+import { dbService } from '../services/db';
+import { authService } from '../services/auth';
 
 interface GameContextType {
   activeTab: ActiveTab;
@@ -48,10 +44,10 @@ interface GameContextType {
   openDesigner: () => void;
   openModifier: (level: LevelData) => void;
   closeModifier: () => void;
-  saveUserLevel: (level: LevelData) => boolean;
-  deleteUserLevel: (id: string) => void;
-  updateLevelPrivacy: (id: string, isPublic: boolean) => void;
-  recordLevelCompletion: (levelId: string, time: number) => { rank: number; isNewBest: boolean };
+  saveUserLevel: (level: LevelData) => Promise<boolean>;
+  deleteUserLevel: (id: string) => Promise<void>;
+  updateLevelPrivacy: (id: string, isPublic: boolean) => Promise<void>;
+  recordLevelCompletion: (levelId: string, time: number) => Promise<{ rank: number; isNewBest: boolean }>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -59,28 +55,14 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTabState] = useState<ActiveTab>('local');
   const [screen, setScreenState] = useState<GameScreen>('menu');
-  const [selectedLevel, setSelectedLevel] = useState<LevelData | null>(INITIAL_LOCAL_LEVELS[0]);
+  const [selectedLevel, setSelectedLevel] = useState<LevelData | null>(null);
   const [editingLevel, setEditingLevel] = useState<LevelData | null>(null);
 
-  const [localLevels] = useState<LevelData[]>(INITIAL_LOCAL_LEVELS);
-  const [onlineLevels, setOnlineLevels] = useState<LevelData[]>(() => {
-    const saved = localStorage.getItem('breakout_online_levels');
-    return saved ? JSON.parse(saved) : INITIAL_ONLINE_LEVELS;
-  });
-
-  const [userCreatedLevels, setUserCreatedLevels] = useState<LevelData[]>(() => {
-    const saved = localStorage.getItem('breakout_user_levels');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [localProgress, setLocalProgress] = useState<Record<string, LocalLevelProgress>>(() => {
-    const saved = localStorage.getItem('breakout_local_progress');
-    if (saved) return JSON.parse(saved);
-    // Level 1 is unlocked by default
-    return {
-      '1': { levelNumber: 1, completed: false, rank: null, bestTime: null },
-    };
-  });
+  const [localLevels, setLocalLevels] = useState<LevelData[]>([]);
+  const [onlineLevels, setOnlineLevels] = useState<LevelData[]>([]);
+  const [userCreatedLevels, setUserCreatedLevels] = useState<LevelData[]>([]);
+  const [localProgress, setLocalProgress] = useState<Record<string, LocalLevelProgress>>({});
+  const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>({});
 
   const [settings, setSettings] = useState<GameSettings>(() => {
     const saved = localStorage.getItem('breakout_settings');
@@ -88,45 +70,46 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [user, setUser] = useState<UserProfile>(() => {
-    const saved = localStorage.getItem('breakout_user');
-    return saved ? JSON.parse(saved) : DEFAULT_USER;
-  });
-
-  const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>(() => {
-    const saved = localStorage.getItem('breakout_leaderboards');
-    return saved ? JSON.parse(saved) : MOCK_LEADERBOARDS;
+    const authUser = authService.getCurrentUser();
+    return {
+      fullName: authUser.fullName,
+      username: authUser.username,
+      email: authUser.email,
+      isLoggedIn: authUser.isLoggedIn,
+    };
   });
 
   const [alertConfig, setAlertConfig] = useState<AlertConfig | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
-  // Sync settings with audio manager and localStorage
+  // Load from Standard Database on mount
+  useEffect(() => {
+    const loadInitialData = async () => {
+      const [locals, onlines, userProgress] = await Promise.all([
+        dbService.getLocalLevels(),
+        dbService.getOnlineLevels(),
+        dbService.getProgress(),
+      ]);
+
+      setLocalLevels(locals);
+      setOnlineLevels(onlines);
+      setLocalProgress(userProgress);
+      setSelectedLevel(locals[0] || null);
+
+      const userLevels = await dbService.getUserCreatedLevels(user.username);
+      setUserCreatedLevels(userLevels);
+    };
+
+    loadInitialData();
+  }, [user.username]);
+
+  // Sync settings with audio manager
   useEffect(() => {
     soundManager.setVolume(settings.volume);
     soundManager.setVibrate(settings.vibrate);
     localStorage.setItem('breakout_settings', JSON.stringify(settings));
   }, [settings]);
-
-  useEffect(() => {
-    localStorage.setItem('breakout_user', JSON.stringify(user));
-  }, [user]);
-
-  useEffect(() => {
-    localStorage.setItem('breakout_user_levels', JSON.stringify(userCreatedLevels));
-  }, [userCreatedLevels]);
-
-  useEffect(() => {
-    localStorage.setItem('breakout_online_levels', JSON.stringify(onlineLevels));
-  }, [onlineLevels]);
-
-  useEffect(() => {
-    localStorage.setItem('breakout_local_progress', JSON.stringify(localProgress));
-  }, [localProgress]);
-
-  useEffect(() => {
-    localStorage.setItem('breakout_leaderboards', JSON.stringify(leaderboards));
-  }, [leaderboards]);
 
   const setActiveTab = (tab: ActiveTab) => {
     soundManager.playClick();
@@ -142,7 +125,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUser = (newUser: Partial<UserProfile>) => {
-    setUser((prev) => ({ ...prev, ...newUser }));
+    setUser((prev) => {
+      const updated = { ...prev, ...newUser };
+      authService.setCurrentUser({
+        id: updated.username,
+        fullName: updated.fullName,
+        username: updated.username,
+        email: updated.email,
+        isLoggedIn: updated.isLoggedIn,
+        provider: 'credentials',
+      });
+      return updated;
+    });
   };
 
   const showAlert = (config: AlertConfig) => {
@@ -158,11 +152,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSelectedLevel(level);
     setScreen('playing');
     soundManager.startBgMusic();
+    dbService.incrementPlayCount(level.id);
   };
 
-  const openPreview = (level: LevelData) => {
+  const openPreview = async (level: LevelData) => {
     soundManager.playClick();
     setSelectedLevel(level);
+    const board = await dbService.getLeaderboard(level.id);
+    setLeaderboards((prev) => ({ ...prev, [level.id]: board }));
     setScreen('preview');
   };
 
@@ -181,55 +178,57 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setEditingLevel(null);
   };
 
-  const saveUserLevel = (newLevel: LevelData): boolean => {
-    const exists = userCreatedLevels.some((l) => l.id === newLevel.id);
-    let updated: LevelData[];
-    if (exists) {
-      updated = userCreatedLevels.map((l) => (l.id === newLevel.id ? newLevel : l));
-    } else {
-      updated = [newLevel, ...userCreatedLevels];
+  const saveUserLevel = async (newLevel: LevelData): Promise<boolean> => {
+    const success = await dbService.saveLevel(newLevel);
+    if (success) {
+      const [userLevels, onlines] = await Promise.all([
+        dbService.getUserCreatedLevels(user.username),
+        dbService.getOnlineLevels(),
+      ]);
+      setUserCreatedLevels(userLevels);
+      setOnlineLevels(onlines);
     }
-    setUserCreatedLevels(updated);
-
-    // If public, add or update in onlineLevels
-    if (newLevel.isPublic) {
-      setOnlineLevels((prev) => {
-        const filtered = prev.filter((l) => l.id !== newLevel.id);
-        return [newLevel, ...filtered];
-      });
-    } else {
-      setOnlineLevels((prev) => prev.filter((l) => l.id !== newLevel.id));
-    }
-    return true;
+    return success;
   };
 
-  const deleteUserLevel = (id: string) => {
-    setUserCreatedLevels((prev) => prev.filter((l) => l.id !== id));
-    setOnlineLevels((prev) => prev.filter((l) => l.id !== id));
+  const deleteUserLevel = async (id: string): Promise<void> => {
+    await dbService.deleteLevel(id);
+    const [userLevels, onlines] = await Promise.all([
+      dbService.getUserCreatedLevels(user.username),
+      dbService.getOnlineLevels(),
+    ]);
+    setUserCreatedLevels(userLevels);
+    setOnlineLevels(onlines);
     if (editingLevel?.id === id) {
       setEditingLevel(null);
     }
   };
 
-  const updateLevelPrivacy = (id: string, isPublic: boolean) => {
-    const target = userCreatedLevels.find((l) => l.id === id);
-    if (!target) return;
-    const updated = { ...target, isPublic };
-    saveUserLevel(updated);
+  const updateLevelPrivacy = async (id: string, isPublic: boolean): Promise<void> => {
+    await dbService.updateLevelPrivacy(id, isPublic);
+    const [userLevels, onlines] = await Promise.all([
+      dbService.getUserCreatedLevels(user.username),
+      dbService.getOnlineLevels(),
+    ]);
+    setUserCreatedLevels(userLevels);
+    setOnlineLevels(onlines);
   };
 
-  const recordLevelCompletion = (levelId: string, time: number) => {
-    let rank = 1;
-    let isNewBest = false;
+  const recordLevelCompletion = async (levelId: string, time: number) => {
+    const { rank, isNewBest, updatedLeaderboard } = await dbService.submitScore(
+      levelId,
+      user.username,
+      time
+    );
 
-    // Update local progress if it's a numeric local level
+    setLeaderboards((prev) => ({ ...prev, [levelId]: updatedLeaderboard }));
+
+    // Update local progress for numbered progression
     const levelNum = parseInt(levelId, 10);
     if (!isNaN(levelNum)) {
       setLocalProgress((prev) => {
         const current = prev[levelId];
         const isBetter = !current?.bestTime || time < current.bestTime;
-        isNewBest = isBetter;
-
         const nextLevelId = String(levelNum + 1);
         const nextUnlocked = prev[nextLevelId] || {
           levelNumber: levelNum + 1,
@@ -238,38 +237,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           bestTime: null,
         };
 
-        return {
+        const updatedProgress = {
           ...prev,
           [levelId]: {
             levelNumber: levelNum,
             completed: true,
             bestTime: isBetter ? time : current.bestTime,
-            rank: 1,
+            rank,
           },
           [nextLevelId]: nextUnlocked,
         };
+
+        dbService.saveProgress(updatedProgress);
+        return updatedProgress;
       });
     }
-
-    // Update leaderboard
-    setLeaderboards((prev) => {
-      const existing = prev[levelId] || prev.default || [];
-      const updatedList = [
-        ...existing.filter((e) => e.username !== user.username),
-        { rank: 0, username: user.username, time },
-      ];
-      updatedList.sort((a, b) => a.time - b.time);
-      updatedList.forEach((item, idx) => {
-        item.rank = idx + 1;
-      });
-      const userRankEntry = updatedList.find((e) => e.username === user.username);
-      if (userRankEntry) rank = userRankEntry.rank;
-
-      return {
-        ...prev,
-        [levelId]: updatedList.slice(0, 10),
-      };
-    });
 
     return { rank, isNewBest };
   };

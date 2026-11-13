@@ -15,7 +15,7 @@ import { AuthModal } from './components/AuthModal';
 export const AppContent: React.FC = () => {
   const { screen, activeTab, editingLevel } = useGame();
 
-  // Dynamic mobile-first responsive layout scaling
+  // Dynamic mobile-first responsive layout scaling (strictly using 100svh for height)
   useEffect(() => {
     const handleResize = () => {
       const oW = window.innerWidth;
@@ -24,10 +24,9 @@ export const AppContent: React.FC = () => {
       if (oW <= 540) {
         // Fullscreen mobile viewport
         const width = oW;
-        const height = oH;
-        const deltaSize = Math.max(34, Math.floor(width / 9));
+        const deltaSize = Math.max(28, Math.floor(width / 9));
         document.documentElement.style.setProperty('--window-width', `${width}px`);
-        document.documentElement.style.setProperty('--window-height', `${height}px`);
+        document.documentElement.style.setProperty('--window-height', `100svh`);
         document.documentElement.style.setProperty('--s', `${deltaSize}px`);
       } else {
         // Desktop / Tablet 9x16 centered arcade display
