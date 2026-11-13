@@ -34,6 +34,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           fullName: res.user.fullName,
           username: res.user.username,
           email: res.user.email,
+          avatarUrl: res.user.avatarUrl,
+          provider: res.user.provider,
           isLoggedIn: true,
         });
         onSuccess();

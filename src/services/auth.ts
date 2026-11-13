@@ -84,9 +84,9 @@ class AuthService {
       } catch {}
     }
     return {
-      id: 'guest',
-      fullName: 'Guest Player',
-      username: 'guest',
+      id: 'anonymous',
+      fullName: 'Anonymous',
+      username: 'anonymous',
       email: '',
       provider: 'credentials',
       isLoggedIn: false,

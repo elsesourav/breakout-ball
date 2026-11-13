@@ -10,8 +10,8 @@ export const UserAvatarMenu: React.FC = () => {
   const handleLogout = () => {
     authService.logout();
     updateUser({
-      fullName: 'Guest Player',
-      username: 'guest',
+      fullName: 'Anonymous',
+      username: 'anonymous',
       email: '',
       isLoggedIn: false,
     });

@@ -33,6 +33,9 @@ export interface UserProfile {
   username: string;
   email: string;
   isLoggedIn: boolean;
+  avatarUrl?: string;
+  provider?: 'credentials' | 'google' | 'github' | 'sso';
+  role?: string;
 }
 
 export interface GameSettings {

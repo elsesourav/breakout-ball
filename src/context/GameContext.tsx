@@ -72,9 +72,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile>(() => {
     const authUser = authService.getCurrentUser();
     return {
-      fullName: authUser.fullName,
-      username: authUser.username,
-      email: authUser.email,
+      fullName: authUser.fullName || 'Anonymous',
+      username: authUser.username || 'anonymous',
+      email: authUser.email || '',
+      avatarUrl: authUser.avatarUrl,
+      provider: authUser.provider,
       isLoggedIn: authUser.isLoggedIn,
     };
   });
@@ -132,8 +134,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fullName: updated.fullName,
         username: updated.username,
         email: updated.email,
+        avatarUrl: updated.avatarUrl,
+        provider: updated.provider || 'credentials',
         isLoggedIn: updated.isLoggedIn,
-        provider: 'credentials',
       });
       return updated;
     });

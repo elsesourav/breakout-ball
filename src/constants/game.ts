@@ -42,9 +42,9 @@ export const DEFAULT_SETTINGS: GameSettings = {
 };
 
 export const DEFAULT_USER: UserProfile = {
-  fullName: 'Guest Player',
-  username: 'guest',
-  email: 'player@breakoutball.app',
+  fullName: 'Anonymous',
+  username: 'anonymous',
+  email: '',
   isLoggedIn: false,
 };
 

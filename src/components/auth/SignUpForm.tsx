@@ -33,6 +33,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSwitchToLog
           fullName: res.user.fullName,
           username: res.user.username,
           email: res.user.email,
+          avatarUrl: res.user.avatarUrl,
+          provider: res.user.provider,
           isLoggedIn: true,
         });
         onSuccess();
