@@ -108,7 +108,7 @@ main {
 @media (max-width: 540px) {
   body {
     background-image: none;
-    background-color: #0a0b14;
+    background-color: #060714;
   }
 
   main {
@@ -121,6 +121,45 @@ main {
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+}
+
+/* Breakout Cyber Theme Background & Grid */
+.cyber-grid-bg {
+  background-color: #060714;
+  background-image: 
+    linear-gradient(rgba(0, 247, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 247, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 15%, rgba(99, 102, 241, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse at 50% 85%, rgba(0, 247, 255, 0.15) 0%, transparent 65%);
+  background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+}
+
+@keyframes bounceBallFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: drop-shadow(0 0 12px #00f7ff);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.08);
+    filter: drop-shadow(0 0 20px #00f7ff);
+  }
+}
+
+.animate-ball-bounce {
+  animation: bounceBallFloat 2s ease-in-out infinite;
+}
+
+@keyframes energyPulseFlow {
+  0% {
+    stroke-dashoffset: 48;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-energy-flow {
+  animation: energyPulseFlow 2.5s linear infinite;
 }
 
 .mobile-nav-header {

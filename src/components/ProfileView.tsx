@@ -47,21 +47,21 @@ export const ProfileView: React.FC = () => {
           {/* User Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <h2 className="text-sm font-bold text-white truncate font-sans tracking-wide">
+              <h2 className="text-sm font-bold text-white truncate font-ui tracking-wide">
                 {user.fullName}
               </h2>
               {user.isLoggedIn && (
                 <UserCheck className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
               )}
             </div>
-            <p className="text-xs text-cyan-400/90 font-mono truncate">
+            <p className="text-xs text-cyan-400 font-tech truncate">
               @{user.username}
             </p>
           </div>
 
           {/* Status Badge */}
           <span
-            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border tracking-wider ${
+            className={`text-[10px] font-tech font-bold px-2 py-0.5 rounded-full border tracking-wider ${
               user.isLoggedIn
                 ? 'border-emerald-500/40 text-emerald-300 bg-emerald-950/50'
                 : 'border-slate-600/50 text-slate-300 bg-slate-800/40'
@@ -74,21 +74,21 @@ export const ProfileView: React.FC = () => {
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/10 text-center">
           <div className="bg-black/30 rounded-xl p-1.5 border border-white/5">
-            <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-medium">
+            <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
               <Trophy className="w-3.5 h-3.5 text-yellow-400" />
-              <span>Campaign</span>
+              <span>Arcade Sector</span>
             </div>
-            <p className="text-xs font-bold text-white mt-0.5 font-mono">
-              {completedCount} <span className="text-slate-300 text-[10px]">/ 20</span>
+            <p className="text-sm font-bold text-white mt-0.5 font-tech">
+              {completedCount} <span className="text-slate-300 text-[11px]">/ 20</span>
             </p>
           </div>
 
           <div className="bg-black/30 rounded-xl p-1.5 border border-white/5">
-            <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-medium">
+            <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
               <span className="text-cyan-400 text-xs font-mono">⏱</span>
               <span>Best Record</span>
             </div>
-            <p className="text-xs font-bold text-cyan-300 mt-0.5 font-mono">
+            <p className="text-sm font-bold text-cyan-300 mt-0.5 font-tech">
               {bestRecord}
             </p>
           </div>
@@ -97,13 +97,13 @@ export const ProfileView: React.FC = () => {
 
       {/* 2. Audio & Haptics Group */}
       <div className="w-full max-w-sm rounded-2xl bg-surface/70 border border-border p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-md">
-        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-cyan-400 text-[11px] font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-cyan-400 text-[11px] font-display font-bold uppercase tracking-wider">
           <Volume2 className="w-3.5 h-3.5" />
           <span>Sound & Feedback</span>
         </div>
 
         {/* Master Volume */}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 font-ui">
           <div className="flex justify-between items-center text-xs">
             <span style={{ color: '#ffffff', fontWeight: 600 }}>Master Volume</span>
           </div>
@@ -150,13 +150,13 @@ export const ProfileView: React.FC = () => {
 
       {/* 3. Controls & Graphics Group */}
       <div className="w-full max-w-sm rounded-2xl bg-surface/70 border border-border p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-md">
-        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-purple-400 text-[11px] font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-purple-400 text-[11px] font-display font-bold uppercase tracking-wider">
           <Compass className="w-3.5 h-3.5" />
           <span>Controls & Simulation</span>
         </div>
 
         {/* Gyroscope Tilt */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center font-ui">
           <div className="flex items-center gap-2">
             <Compass className="w-4 h-4 text-purple-400" style={{ color: '#c084fc' }} />
             <div className="flex flex-col">
@@ -179,7 +179,7 @@ export const ProfileView: React.FC = () => {
         </div>
 
         {/* Gyroscope Sensitivity Slider */}
-        <div className="flex flex-col gap-1.5 pt-1">
+        <div className="flex flex-col gap-1.5 pt-1 font-ui">
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-pink-400" style={{ color: '#f472b6' }} />
@@ -213,7 +213,7 @@ export const ProfileView: React.FC = () => {
           mask={true}
           glow={true}
           onClick={handleAuthAction}
-          className="w-full py-2.5 font-bold tracking-wider text-xs flex items-center justify-center gap-2"
+          className="w-full py-2.5 font-display font-bold tracking-wider text-xs flex items-center justify-center gap-2"
         >
           {user.isLoggedIn ? (
             <>

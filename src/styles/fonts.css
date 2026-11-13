@@ -38,3 +38,22 @@
    font-family: f9b;
    src: url("/fonts/Mali-Bold.ttf") format("truetype");
 }
+
+/* 3 Core Typography Families for Breakout Ball */
+:root {
+   --font-display: 'Orbitron', 'f1b', 'Exo-Bold', system-ui, sans-serif;
+   --font-tech: 'Chakra Petch', 'f2b', 'Oswald-Bold', monospace;
+   --font-ui: 'Outfit', 'f6', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-display {
+   font-family: var(--font-display) !important;
+}
+
+.font-tech {
+   font-family: var(--font-tech) !important;
+}
+
+.font-ui {
+   font-family: var(--font-ui) !important;
+}

@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Map, Globe, Layers, User } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { ActiveTab } from '../../types/game';
 import { soundManager } from '../../utils/audio';
+import { NavArcadeIcon, NavArenaIcon, NavStudioIcon, NavProfileIcon } from './NavIcons';
 
 export const MobileBottomNav: React.FC = () => {
   const { activeTab, setActiveTab, settings, user } = useGame();
@@ -18,10 +18,10 @@ export const MobileBottomNav: React.FC = () => {
   };
 
   const navItems = [
-    { id: 'local' as ActiveTab, label: 'Campaign', icon: Map },
-    { id: 'online' as ActiveTab, label: 'Online', icon: Globe },
-    { id: 'create' as ActiveTab, label: 'Create', icon: Layers },
-    { id: 'profile' as ActiveTab, label: user.isLoggedIn ? `@${user.username}` : 'Profile', icon: User },
+    { id: 'local' as ActiveTab, label: 'Arcade', icon: NavArcadeIcon },
+    { id: 'online' as ActiveTab, label: 'Arena', icon: NavArenaIcon },
+    { id: 'create' as ActiveTab, label: 'Studio', icon: NavStudioIcon },
+    { id: 'profile' as ActiveTab, label: user.isLoggedIn ? `@${user.username}` : 'Profile', icon: NavProfileIcon },
   ];
 
   return (
@@ -76,7 +76,7 @@ export const MobileBottomNav: React.FC = () => {
                     <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-black shadow-[0_0_4px_#34d399]" />
                   </div>
                 ) : (
-                  <Icon className="w-5 h-5 stroke-[2.2]" style={{ color: isActive ? '#00f7ff' : '#cbd5e1' }} />
+                  <Icon active={isActive} className="w-5 h-5" style={{ color: isActive ? '#00f7ff' : '#cbd5e1' }} />
                 )}
               </motion.div>
 
@@ -85,7 +85,9 @@ export const MobileBottomNav: React.FC = () => {
                 className="relative z-10 text-[11px] tracking-tight mt-1 truncate max-w-[74px] transition-all duration-200"
                 style={{
                   color: isActive ? '#00f7ff' : '#cbd5e1',
-                  fontWeight: isActive ? 900 : 700,
+                  fontFamily: 'var(--font-ui)',
+                  fontWeight: isActive ? 800 : 600,
+                  letterSpacing: '0.02em',
                   textShadow: isActive ? '0 0 8px rgba(0,247,255,0.7)' : 'none',
                 }}
               >
