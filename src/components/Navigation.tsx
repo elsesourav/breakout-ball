@@ -1,50 +1,30 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { ActiveTab } from '../types/game';
+import { SegmentedControl } from '@elsesourav/react-ui';
 
 export const Navigation: React.FC = () => {
   const { activeTab, setActiveTab } = useGame();
 
-  const tabs: { key: ActiveTab; label: string }[] = [
-    { key: 'local', label: 'Local' },
-    { key: 'online', label: 'Online' },
-    { key: 'create', label: 'Create' },
-    { key: 'profile', label: 'Profile' },
+  const options = [
+    { value: 'local', label: 'Local' },
+    { value: 'online', label: 'Online' },
+    { value: 'create', label: 'Create' },
+    { value: 'profile', label: 'Profile' },
   ];
 
-  const getMoveLeft = () => {
-    switch (activeTab) {
-      case 'local':
-        return '0%';
-      case 'online':
-        return '25%';
-      case 'create':
-        return '50%';
-      case 'profile':
-        return '75%';
-      default:
-        return '0%';
-    }
-  };
-
   return (
-    <header id="selectMode">
-      {tabs.map((tab) => (
-        <div
-          key={tab.key}
-          className={`mode ${activeTab === tab.key ? 'active' : ''}`}
-          onClick={() => setActiveTab(tab.key)}
-        >
-          <p>{tab.label}</p>
-        </div>
-      ))}
-      <div
-        className="move"
-        style={{
-          left: getMoveLeft(),
-          background: activeTab === 'profile' ? '#07002680' : 'transparent',
-        }}
-      />
+    <header className="mobile-nav-header">
+      <div className="w-full px-2 py-1.5">
+        <SegmentedControl
+          label="Game Navigation"
+          options={options}
+          value={activeTab}
+          onValueChange={(val) => setActiveTab(val as ActiveTab)}
+          variant="primary"
+          className="w-full shadow-lg"
+        />
+      </div>
     </header>
   );
 };

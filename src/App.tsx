@@ -15,22 +15,38 @@ import { AuthModal } from './components/AuthModal';
 export const AppContent: React.FC = () => {
   const { screen, activeTab, editingLevel } = useGame();
 
-  // Dynamic 9x16 responsive layout scaling
+  // Dynamic mobile-first responsive layout scaling
   useEffect(() => {
     const handleResize = () => {
       const oW = window.innerWidth;
       const oH = window.innerHeight;
-      const deltaSize = Math.floor(oW * (16 / 9) < oH ? oW / 9 : oH / 16);
-      const width = deltaSize * 9;
-      const height = deltaSize * 16;
-      document.documentElement.style.setProperty('--window-width', `${width}px`);
-      document.documentElement.style.setProperty('--window-height', `${height}px`);
-      document.documentElement.style.setProperty('--s', `${deltaSize}px`);
+
+      if (oW <= 540) {
+        // Fullscreen mobile viewport
+        const width = oW;
+        const height = oH;
+        const deltaSize = Math.max(34, Math.floor(width / 9));
+        document.documentElement.style.setProperty('--window-width', `${width}px`);
+        document.documentElement.style.setProperty('--window-height', `${height}px`);
+        document.documentElement.style.setProperty('--s', `${deltaSize}px`);
+      } else {
+        // Desktop / Tablet 9x16 centered arcade display
+        const deltaSize = Math.floor(oW * (16 / 9) < oH ? oW / 9 : oH / 16);
+        const width = deltaSize * 9;
+        const height = deltaSize * 16;
+        document.documentElement.style.setProperty('--window-width', `${width}px`);
+        document.documentElement.style.setProperty('--window-height', `${height}px`);
+        document.documentElement.style.setProperty('--s', `${deltaSize}px`);
+      }
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, []);
 
   return (

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { drawLevelPreviewOnCanvas } from '../utils/helpers';
 import { CANVAS_WIDTH } from '../constants/game';
+import { ArcadeButton, ArcadeSwitch } from '@elsesourav/react-ui';
 
 export const LevelModifierModal: React.FC = () => {
   const {
@@ -67,7 +68,7 @@ export const LevelModifierModal: React.FC = () => {
             <p id="M_lvlNo">{editingLevel.id}</p>
           </div>
           <div className="flex rank">
-            <span>Visibility</span>
+            <span>Status</span>
             <p id="M_lvlRank">{isPublic ? 'Public' : 'Private'}</p>
           </div>
           <div className="flex time">
@@ -76,27 +77,51 @@ export const LevelModifierModal: React.FC = () => {
           </div>
         </div>
 
-        <div className="switch-button">
-          <input
-            className="switch-button-checkbox"
-            type="checkbox"
-            name="privacy"
-            id="privacyModifier"
-            checked={!isPublic}
-            onChange={(e) => setIsPublic(!e.target.checked)}
+        {/* Privacy Setting with ArcadeSwitch */}
+        <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-black/40 border border-white/10">
+          <span className="text-xs uppercase tracking-wider font-bold text-slate-300">
+            Publish Online:
+          </span>
+          <ArcadeSwitch
+            checked={isPublic}
+            onChange={(checked) => setIsPublic(checked)}
+            variant="neon-green"
+            size="md"
+            showText={true}
+            onLabel="PUB"
+            offLabel="PRV"
+            showBezel={true}
+            showGlow={true}
+            ariaLabel="Toggle Public or Private"
           />
-          <label className="switch-button-label" htmlFor="privacyModifier">
-            <span className="switch-button-label-span">Private</span>
-          </label>
         </div>
 
-        <div className="buttons">
-          <button className="btn" id="deleteLevel" onClick={handleDelete} title="Delete Level">
-            <i className="sbi-trash" />
-          </button>
-          <button className="btn" id="saveModifier" onClick={handleSave} title="Save Changes">
-            <i className="sbi-save2" />
-          </button>
+        {/* Action Buttons using ArcadeButton */}
+        <div className="flex justify-between items-center gap-3 mt-1">
+          <ArcadeButton
+            variant="magenta"
+            size="md"
+            shape="rounded"
+            mask={true}
+            leftIcon={<i className="sbi-trash text-sm mr-1" />}
+            onClick={handleDelete}
+            className="flex-1 py-2"
+          >
+            Delete
+          </ArcadeButton>
+
+          <ArcadeButton
+            variant="cyan"
+            size="md"
+            shape="rounded"
+            mask={true}
+            glow={true}
+            leftIcon={<i className="sbi-save2 text-sm mr-1" />}
+            onClick={handleSave}
+            className="flex-1 py-2"
+          >
+            Save
+          </ArcadeButton>
         </div>
       </div>
     </div>

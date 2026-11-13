@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { drawLevelPreviewOnCanvas } from '../utils/helpers';
 import { CANVAS_WIDTH } from '../constants/game';
+import { ArcadeButton, LeaderboardTable, LeaderboardItem } from '@elsesourav/react-ui';
 
 export const LevelPreviewModal: React.FC = () => {
   const {
@@ -11,6 +12,7 @@ export const LevelPreviewModal: React.FC = () => {
     localLevels,
     localProgress,
     leaderboards,
+    user,
   } = useGame();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,6 +30,15 @@ export const LevelPreviewModal: React.FC = () => {
   const bestTime = progress?.bestTime ? progress.bestTime.toFixed(1) : '∞';
 
   const rankingList = leaderboards[selectedLevel.id] || leaderboards.default || [];
+
+  const leaderboardItems: LeaderboardItem[] = rankingList.map((entry, idx) => ({
+    id: String(idx + 1),
+    rank: entry.rank || idx + 1,
+    name: entry.username,
+    score: Math.round(10000 / Math.max(1, entry.time)),
+    time: `${entry.time.toFixed(1)}s`,
+    isCurrentUser: entry.username === user.username,
+  }));
 
   const handleNextLevel = () => {
     const currentNum = parseInt(selectedLevel.id, 10);
@@ -75,36 +86,63 @@ export const LevelPreviewModal: React.FC = () => {
           </div>
         </div>
 
-        <div className="btn">
-          <span id="levelCreatorName">
+        {/* Action Controls using ArcadeButton */}
+        <div className="flex items-center gap-2 w-full my-1">
+          <span id="levelCreatorName" className="truncate text-xs font-semibold text-cyan-400">
             <small>@</small>
             {selectedLevel.creator}
           </span>
-          <button id="startButton" onClick={() => startPlayLevel(selectedLevel)}>
-            <p className="play">{progress?.completed ? 'PLAY AGAIN' : 'START'}</p>
-          </button>
-          <button id="nextLevelButton" onClick={handleNextLevel} title="Next Level">
-            <i className="sbi-double-arrow" />
-          </button>
-          <button id="homeButton" onClick={() => setScreen('menu')} title="Home">
-            <i className="sbi-home" />
-          </button>
+
+          <ArcadeButton
+            variant="breakout-start"
+            size="md"
+            shape="pill"
+            shine={true}
+            shineMode="starburst"
+            mask={true}
+            glow={true}
+            onClick={() => startPlayLevel(selectedLevel)}
+            className="flex-1 py-2 text-sm"
+          >
+            {progress?.completed ? 'PLAY AGAIN' : 'START'}
+          </ArcadeButton>
+
+          <ArcadeButton
+            variant="cyan"
+            size="sm"
+            shape="rounded"
+            mask={true}
+            onClick={handleNextLevel}
+            title="Next Level"
+            className="w-10 h-10 p-0"
+          >
+            <i className="sbi-double-arrow text-base" />
+          </ArcadeButton>
+
+          <ArcadeButton
+            variant="blue"
+            size="sm"
+            shape="rounded"
+            mask={true}
+            onClick={() => setScreen('menu')}
+            title="Home"
+            className="w-10 h-10 p-0"
+          >
+            <i className="sbi-home text-base" />
+          </ArcadeButton>
         </div>
 
-        <div className="leaderboard">
-          <div className="title">
-            <i className="sbi-trophy2" />
-            <p>Players Ranking</p>
-          </div>
-          <div className="ranking-table" id="rankingTable">
-            {rankingList.map((entry, idx) => (
-              <div key={idx} className="leaderboard-row">
-                <span className="rank-num">#{entry.rank || idx + 1}</span>
-                <span className="rank-name">{entry.username}</span>
-                <span className="rank-time">{entry.time.toFixed(1)}s</span>
-              </div>
-            ))}
-          </div>
+        {/* Players Ranking with LeaderboardTable */}
+        <div className="w-full mt-1">
+          <LeaderboardTable
+            variant="breakout"
+            title="Players Ranking"
+            items={leaderboardItems}
+            searchable={false}
+            highlightPodium={true}
+            maxRows={4}
+            className="w-full text-xs"
+          />
         </div>
       </div>
     </div>

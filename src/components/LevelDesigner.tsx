@@ -10,6 +10,7 @@ import {
 } from '../constants/game';
 import { generateLevelId } from '../utils/helpers';
 import { soundManager } from '../utils/audio';
+import { ArcadeButton, ArcadeSwitch } from '@elsesourav/react-ui';
 
 export const LevelDesigner: React.FC = () => {
   const { setScreen, saveUserLevel, startPlayLevel, user, showAlert } = useGame();
@@ -59,46 +60,6 @@ export const LevelDesigner: React.FC = () => {
     },
     [selectedTool, pushState]
   );
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    let spaceDown = false;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') spaceDown = true;
-
-      if (spaceDown) {
-        if (e.key >= '1' && e.key <= '5') {
-          setSelectedTool(parseInt(e.key, 10));
-        } else if (e.key === 'w' || e.key === 'W') {
-          setSelectedTool(6);
-        } else if (e.key === 'e' || e.key === 'E') {
-          setSelectedTool(0);
-        } else if (e.key === 'z' || e.key === 'Z') {
-          handleUndo();
-        } else if (e.key === 'y' || e.key === 'Y') {
-          handleRedo();
-        } else if (e.key === 't' || e.key === 'T') {
-          handleTestLevel();
-        } else if (e.key === 's' || e.key === 'S') {
-          handleSave();
-        } else if (e.key === 'c' || e.key === 'C') {
-          handleClose();
-        }
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') spaceDown = false;
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [grid, historyIndex, history]);
 
   // Undo / Redo
   const handleUndo = () => {
@@ -215,15 +176,15 @@ export const LevelDesigner: React.FC = () => {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // Dark space background
-    ctx.fillStyle = '#010015';
+    ctx.fillStyle = '#010014';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     const cellW = CANVAS_WIDTH / GRID_ROWS;
     const cellH = 128 * 0.75;
     const padding = 2;
 
-    // Draw grid lines for block placement area
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    // Draw grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
     ctx.lineWidth = 1;
     for (let r = 0; r <= GRID_COLS; r++) {
       ctx.beginPath();
@@ -272,7 +233,7 @@ export const LevelDesigner: React.FC = () => {
       });
     });
 
-    // Draw hover outline or ghost
+    // Draw hover outline
     if (hoverPos && hoverPos.y < GRID_COLS) {
       const bx = hoverPos.x * cellW + padding;
       const by = hoverPos.y * cellH + padding;
@@ -344,146 +305,70 @@ export const LevelDesigner: React.FC = () => {
   return (
     <div id="levelDesigner" className="active">
       {/* Top Section: Tool Palette */}
-      <div className="selection one">
-        <p className="tag">BLOCKS</p>
-        <div className="options">
-          {[1, 2, 3, 4, 5].map((hp) => (
+      <div className="selection one flex justify-between items-center px-3 py-1.5 bg-[#090033]/90">
+        <div>
+          <p className="tag text-[10px] text-cyan-300 font-bold tracking-wider">BLOCKS</p>
+          <div className="options flex gap-1.5 mt-1">
+            {[1, 2, 3, 4, 5].map((hp) => (
+              <div
+                key={hp}
+                className={`option ${selectedTool === hp ? 'active' : ''}`}
+                onClick={() => setSelectedTool(hp)}
+              >
+                <div className="block">
+                  <span>{hp}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="tag text-[10px] text-pink-300 font-bold tracking-wider">SPECIAL</p>
+          <div className="options flex gap-1.5 mt-1">
             <div
-              key={hp}
-              className={`option ${selectedTool === hp ? 'active' : ''}`}
-              onClick={() => setSelectedTool(hp)}
+              className={`option ${selectedTool === 6 ? 'active' : ''}`}
+              onClick={() => setSelectedTool(6)}
+              title="Wall (Unbreakable)"
             >
               <div className="block">
-                <span>{hp}</span>
-              </div>
-              <div className="tool-tip-text">
-                <i className="sbi-info-with-circle">
-                  Hit Points(HP) <b>{hp}</b>
-                </i>
-                <i className="sbi-keyboard"> SPACE+{hp}</i>
+                <span>∞</span>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="selection two">
-        <div className="names">
-          <p className="tag">WALL</p>
-          <p className="tag">ERASER</p>
-        </div>
-        <div className="options">
-          <div
-            className={`option ${selectedTool === 6 ? 'active' : ''}`}
-            onClick={() => setSelectedTool(6)}
-          >
-            <div className="block">
-              <span></span>
-            </div>
-            <div className="tool-tip-text">
-              <i className="sbi-info-with-circle">
-                Hit Points(HP) <b>∞</b>
-              </i>
-              <i className="sbi-keyboard"> SPACE+W</i>
-            </div>
-          </div>
-
-          <div
-            className={`option ${selectedTool === 0 ? 'active' : ''}`}
-            onClick={() => setSelectedTool(0)}
-          >
-            <div className="block eraser">
-              <span>
-                <i className="sbi-gavel1" />
-              </span>
-            </div>
-            <div className="tool-tip-text">
-              <i className="sbi-info-with-circle"> Remove Block & Wall</i>
-              <i className="sbi-keyboard"> SPACE+E</i>
+            <div
+              className={`option ${selectedTool === 0 ? 'active' : ''}`}
+              onClick={() => setSelectedTool(0)}
+              title="Eraser"
+            >
+              <div className="block eraser">
+                <span>
+                  <i className="sbi-gavel1 text-xs" />
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons Toolbar 1 */}
-      <div className="buttons one">
+      {/* Floating Undo/Redo Controls */}
+      <div className="buttons one flex flex-col gap-2">
         <button
           className="btn"
-          id="undoBtn"
           onClick={handleUndo}
           disabled={historyIndex <= 0}
-          title="Undo (SPACE+Z)"
+          title="Undo"
         >
-          <i className="sbi-undo1" />
-          <div className="tool-tip-text">
-            <i className="sbi-info-with-circle"> Undo Edit</i>
-            <i className="sbi-keyboard"> SPACE+Z</i>
-          </div>
+          <i className="sbi-undo1 text-sm" />
         </button>
 
         <button
           className="btn"
-          id="redoBtn"
           onClick={handleRedo}
           disabled={historyIndex >= history.length - 1}
-          title="Redo (SPACE+Y)"
+          title="Redo"
         >
-          <i className="sbi-undo1 rotate" />
-          <div className="tool-tip-text">
-            <i className="sbi-info-with-circle"> Redo Edit</i>
-            <i className="sbi-keyboard"> SPACE+Y</i>
-          </div>
-        </button>
-
-        <button
-          className="btn"
-          id="makeTesting"
-          onClick={handleTestLevel}
-          title="Run Level (SPACE+T)"
-        >
-          <i className="sbi-play-circle" />
-          <div className="tool-tip-text">
-            <i className="sbi-info-with-circle"> Run Level</i>
-            <i className="sbi-keyboard"> SPACE+T</i>
-          </div>
-        </button>
-      </div>
-
-      {/* Action Buttons Toolbar 2 */}
-      <div className="buttons two">
-        <div className="switch-button">
-          <input
-            className="switch-button-checkbox"
-            type="checkbox"
-            name="privacy"
-            id="designerPrivacy"
-            checked={isPrivate}
-            onChange={(e) => setIsPrivate(e.target.checked)}
-          />
-          <label className="switch-button-label" htmlFor="designerPrivacy">
-            <span className="switch-button-label-span">Private</span>
-          </label>
-        </div>
-
-        <button className="btn" id="saveBtn" onClick={handleSave} title="Save Level (SPACE+S)">
-          <i className="sbi-save2" />
-          <div className="tool-tip-text">
-            <i className="sbi-info-with-circle"> Save Level</i>
-            <i className="sbi-keyboard"> SPACE+S</i>
-          </div>
-        </button>
-
-        <button
-          className="btn"
-          id="closeBtn"
-          onClick={handleClose}
-          title="Close Making (SPACE+C)"
-        >
-          <i className="sbi-sign-out" />
-          <div className="tool-tip-text">
-            <i className="sbi-info-with-circle"> Close Making</i>
-            <i className="sbi-keyboard"> SPACE+C</i>
-          </div>
+          <i className="sbi-undo1 rotate text-sm" />
         </button>
       </div>
 
@@ -502,6 +387,64 @@ export const LevelDesigner: React.FC = () => {
         onTouchMove={handlePointerMove}
         onTouchEnd={handlePointerUp}
       />
+
+      {/* Bottom Control Bar with ArcadeButton & ArcadeSwitch */}
+      <div className="buttons two px-3 py-2 bg-[#050024]/90 backdrop-blur border-t border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold text-slate-300 uppercase">
+            {isPrivate ? 'Priv' : 'Pub'}
+          </span>
+          <ArcadeSwitch
+            checked={!isPrivate}
+            onChange={(pub) => setIsPrivate(!pub)}
+            variant="amber-gold"
+            size="sm"
+            showText={true}
+            onLabel="PUB"
+            offLabel="PRV"
+            ariaLabel="Toggle Privacy"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <ArcadeButton
+            variant="green"
+            size="sm"
+            shape="rounded"
+            mask={true}
+            leftIcon={<i className="sbi-play-circle text-xs" />}
+            onClick={handleTestLevel}
+            className="px-2.5 py-1 text-xs"
+          >
+            Test
+          </ArcadeButton>
+
+          <ArcadeButton
+            variant="cyan"
+            size="sm"
+            shape="rounded"
+            mask={true}
+            glow={true}
+            leftIcon={<i className="sbi-save2 text-xs" />}
+            onClick={handleSave}
+            className="px-2.5 py-1 text-xs"
+          >
+            Save
+          </ArcadeButton>
+
+          <ArcadeButton
+            variant="magenta"
+            size="sm"
+            shape="rounded"
+            mask={true}
+            leftIcon={<i className="sbi-sign-out text-xs" />}
+            onClick={handleClose}
+            className="px-2.5 py-1 text-xs"
+          >
+            Exit
+          </ArcadeButton>
+        </div>
+      </div>
     </div>
   );
 };

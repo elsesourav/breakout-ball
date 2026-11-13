@@ -1,5 +1,4 @@
 import React from 'react';
-import { useGame } from '../context/GameContext';
 
 interface GameHUDProps {
   lives: number;
@@ -25,8 +24,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({ lives, timeUsed, countdown, on
         <button
           onClick={onExit}
           style={{
-            background: 'rgba(0, 0, 0, 0.6)',
-            border: '1px solid rgba(255, 255, 255, 0.4)',
+            background: 'rgba(10, 11, 20, 0.75)',
+            border: '1.5px solid rgba(255, 255, 255, 0.3)',
             color: '#fff',
             borderRadius: '50%',
             width: '40px',
@@ -35,6 +34,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({ lives, timeUsed, countdown, on
             placeItems: 'center',
             cursor: 'pointer',
             fontSize: '18px',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
           }}
           title="Exit to Menu"
         >
@@ -42,15 +42,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({ lives, timeUsed, countdown, on
         </button>
       </div>
 
-      <div id="showGameStatus" className="active">
-        {/* Lives Display: 3 Hearts */}
-        <div id="showHealths" className={`s${lives}`}>
-          <i className="sbi-heart" />
-          <i className="sbi-heart" />
-          <i className="sbi-heart" />
-        </div>
-
-        {/* Countdown / Outcome Overlay */}
+      {/* Floating Center Countdown / Outcome Overlay */}
+      {countdown && (
         <div
           id="showCountDowns"
           className={
@@ -68,21 +61,22 @@ export const GameHUD: React.FC<GameHUDProps> = ({ lives, timeUsed, countdown, on
           }
         >
           <span>
-            <p>Level Win!</p>
-          </span>
-          <span>
-            <p>Game Over!</p>
-          </span>
-          <span>
-            <p>1</p>
-          </span>
-          <span>
-            <p>2</p>
-          </span>
-          <span>
-            <p>3</p>
+            <p key={countdown}>{countdown}</p>
           </span>
         </div>
+      )}
+
+      {/* Bottom Status Bar */}
+      <div id="showGameStatus" className="active">
+        {/* Lives Display: 3 Hearts */}
+        <div id="showHealths" className={`s${lives}`}>
+          <i className="sbi-heart" />
+          <i className="sbi-heart" />
+          <i className="sbi-heart" />
+        </div>
+
+        {/* Empty middle spacer since countdown is centered floating overlay */}
+        <div />
 
         {/* Stopwatch Timer */}
         <div id="showTime" className="active">
