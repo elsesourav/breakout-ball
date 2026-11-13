@@ -1,25 +1,12 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Gamepad2, Globe, Layers, User } from 'lucide-react';
+import { Map, Globe, Layers, User } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { ActiveTab } from '../../types/game';
 import { soundManager } from '../../utils/audio';
 
-interface NavItem {
-  id: ActiveTab;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'local', label: 'Local', icon: Gamepad2 },
-  { id: 'online', label: 'Online', icon: Globe },
-  { id: 'create', label: 'Create', icon: Layers },
-  { id: 'profile', label: 'Profile', icon: User },
-];
-
 export const MobileBottomNav: React.FC = () => {
-  const { activeTab, setActiveTab, settings } = useGame();
+  const { activeTab, setActiveTab, settings, user } = useGame();
 
   const handleTabChange = (tab: ActiveTab) => {
     if (tab === activeTab) return;
@@ -30,37 +17,45 @@ export const MobileBottomNav: React.FC = () => {
     setActiveTab(tab);
   };
 
+  const navItems = [
+    { id: 'local' as ActiveTab, label: 'Campaign', icon: Map },
+    { id: 'online' as ActiveTab, label: 'Online', icon: Globe },
+    { id: 'create' as ActiveTab, label: 'Create', icon: Layers },
+    { id: 'profile' as ActiveTab, label: user.isLoggedIn ? `@${user.username}` : 'Profile', icon: User },
+  ];
+
   return (
     <nav
-      className="w-full bg-[#0a0c1a]/95 backdrop-blur-xl border-t border-white/10 z-30 flex-shrink-0 select-none shadow-[0_-8px_25px_rgba(0,0,0,0.6)]"
+      className="w-full bg-[#080a18]/95 backdrop-blur-xl border-t border-white/10 z-40 flex-shrink-0 select-none shadow-[0_-8px_25px_rgba(0,0,0,0.7)]"
       style={{
         paddingBottom: 'max(8px, env(safe-area-inset-bottom, 8px))',
       }}
-      aria-label="Bottom Navigation"
+      aria-label="Game Navigation"
     >
-      <div className="flex items-center justify-around px-2 py-1.5 max-w-lg mx-auto">
-        {NAV_ITEMS.map((item) => {
+      <div className="flex items-center justify-around px-2 py-1.5 max-w-md mx-auto">
+        {navItems.map((item) => {
           const isActive = activeTab === item.id;
+          const isProfile = item.id === 'profile';
           const Icon = item.icon;
 
           return (
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
-              className="relative flex-1 py-1.5 px-1 flex flex-col items-center justify-center transition-all duration-200 outline-none rounded-xl group"
+              className="relative flex-1 py-1.5 px-0.5 flex flex-col items-center justify-center transition-all duration-200 outline-none rounded-xl group cursor-pointer"
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Smooth spring sliding active background pill */}
+              {/* Spring sliding active background pill */}
               {isActive && (
                 <motion.div
                   layoutId="mobileBottomNavActivePill"
-                  className="absolute inset-0 bg-gradient-to-b from-cyan-500/20 via-purple-500/15 to-pink-500/15 border border-cyan-400/50 rounded-xl shadow-[0_0_15px_rgba(0,247,255,0.3)] pointer-events-none"
+                  className="absolute inset-0 bg-gradient-to-b from-cyan-500/20 via-purple-500/15 to-pink-500/15 border border-cyan-400/50 rounded-xl shadow-[0_0_15px_rgba(0,247,255,0.35)] pointer-events-none"
                   transition={{ type: 'spring', stiffness: 450, damping: 32 }}
                 />
               )}
 
-              {/* Icon with spring scale bounce */}
+              {/* Icon / Avatar with spring scale */}
               <motion.div
                 animate={{
                   scale: isActive ? 1.15 : 1,
@@ -73,12 +68,21 @@ export const MobileBottomNav: React.FC = () => {
                     : 'text-slate-400 group-hover:text-slate-200'
                 }`}
               >
-                <Icon className="w-5 h-5 stroke-[2.2]" />
+                {isProfile && user.isLoggedIn ? (
+                  <div className="relative">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-black font-mono">
+                      {user.username.slice(0, 1).toUpperCase()}
+                    </div>
+                    <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 border border-black shadow-[0_0_4px_#34d399]" />
+                  </div>
+                ) : (
+                  <Icon className="w-5 h-5 stroke-[2.2]" />
+                )}
               </motion.div>
 
               {/* Text Label */}
               <span
-                className={`relative z-10 text-[10px] font-medium tracking-wide mt-1 transition-all duration-200 ${
+                className={`relative z-10 text-[10px] font-medium tracking-tight mt-1 truncate max-w-[70px] transition-all duration-200 ${
                   isActive
                     ? 'font-bold text-cyan-200 drop-shadow-[0_0_6px_rgba(0,247,255,0.5)]'
                     : 'text-slate-400 group-hover:text-slate-300'
@@ -87,7 +91,7 @@ export const MobileBottomNav: React.FC = () => {
                 {item.label}
               </span>
 
-              {/* Tiny glowing dot indicator beneath active tab */}
+              {/* Glowing active indicator dot */}
               {isActive && (
                 <motion.span
                   layoutId="bottomNavDot"

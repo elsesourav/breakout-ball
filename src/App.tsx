@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { useGame } from './context/GameContext';
-import { TopHeader } from './components/navigation/TopHeader';
 import { MobileBottomNav } from './components/navigation/MobileBottomNav';
-import { LocalMode } from './components/LocalMode';
+import { LevelRoadmap } from './components/LevelRoadmap';
 import { OnlineMode } from './components/OnlineMode';
 import { CreateMode } from './components/CreateMode';
 import { ProfileView } from './components/ProfileView';
@@ -12,7 +11,6 @@ import { LevelModifierModal } from './components/LevelModifierModal';
 import { GameCanvas } from './components/GameCanvas';
 import { AlertModal } from './components/AlertModal';
 import { AuthModal } from './components/AuthModal';
-import { ParticleBackdrop } from './components/ParticleBackdrop';
 
 export const AppContent: React.FC = () => {
   const { screen, activeTab, editingLevel } = useGame();
@@ -58,10 +56,8 @@ export const AppContent: React.FC = () => {
         <LevelDesigner />
       ) : (
         <div id="gameMode">
-          <ParticleBackdrop />
-          <TopHeader />
           <div id="modeType">
-            {activeTab === 'local' && <LocalMode />}
+            {activeTab === 'local' && <LevelRoadmap />}
             {activeTab === 'online' && <OnlineMode />}
             {activeTab === 'create' && <CreateMode />}
             {activeTab === 'profile' && <ProfileView />}

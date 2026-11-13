@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { ArcadeButton, ArcadeSlider, ArcadeSwitch } from '@elsesourav/react-ui';
-import { Volume2, Vibrate, Compass, Sliders, Cpu, UserCheck, LogIn, LogOut, Trophy } from 'lucide-react';
+import { Volume2, Vibrate, Compass, Sliders, UserCheck, LogIn, LogOut, Trophy } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
   const { user, settings, updateSettings, updateUser, setIsAuthModalOpen, setAuthMode, localProgress } = useGame();
@@ -200,29 +200,6 @@ export const ProfileView: React.FC = () => {
             formatValue={(v) => `${Math.round(v * 100)}%`}
             className="w-full"
             ariaLabel="Gyroscope Sensitivity"
-          />
-        </div>
-
-        {/* WASM Particle Background */}
-        <div className="flex justify-between items-center pt-2 border-t border-white/10">
-          <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-cyan-400" />
-            <div className="flex flex-col">
-              <span className="text-xs font-medium text-slate-200">WASM Particles</span>
-              <span className="text-[10px] text-slate-400">Locked 60fps C++ WebGL</span>
-            </div>
-          </div>
-          <ArcadeSwitch
-            checked={settings.wasmParticles ?? true}
-            onChange={(checked) => updateSettings({ wasmParticles: checked })}
-            variant="neon-cyan"
-            size="md"
-            showText={true}
-            onLabel="ON"
-            offLabel="OFF"
-            showBezel={true}
-            showGlow={true}
-            ariaLabel="WASM Particles Toggle"
           />
         </div>
       </div>
