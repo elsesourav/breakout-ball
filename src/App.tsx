@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useGame } from './context/GameContext';
-import { Navigation } from './components/Navigation';
+import { TopHeader } from './components/navigation/TopHeader';
+import { MobileBottomNav } from './components/navigation/MobileBottomNav';
 import { LocalMode } from './components/LocalMode';
 import { OnlineMode } from './components/OnlineMode';
 import { CreateMode } from './components/CreateMode';
@@ -58,13 +59,14 @@ export const AppContent: React.FC = () => {
       ) : (
         <div id="gameMode">
           <ParticleBackdrop />
-          <Navigation />
+          <TopHeader />
           <div id="modeType">
             {activeTab === 'local' && <LocalMode />}
             {activeTab === 'online' && <OnlineMode />}
             {activeTab === 'create' && <CreateMode />}
             {activeTab === 'profile' && <ProfileView />}
           </div>
+          <MobileBottomNav />
         </div>
       )}
 

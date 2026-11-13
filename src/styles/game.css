@@ -183,10 +183,11 @@ main {
 #modeType {
   position: relative;
   flex: 1;
+  min-height: 0;
   width: 100%;
-  height: calc(100% - var(--s) * 1.1);
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* =======================================================
@@ -199,7 +200,7 @@ main {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: calc(var(--s) * 0.3);
-  padding: calc(var(--s) * 0.3);
+  padding: calc(var(--s) * 0.3) calc(var(--s) * 0.3) calc(var(--s) * 0.8);
   place-items: center;
 }
 

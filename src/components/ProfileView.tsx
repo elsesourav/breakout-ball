@@ -1,9 +1,10 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { ArcadeButton, ArcadeSlider, ArcadeSwitch } from '@elsesourav/react-ui';
+import { Volume2, Vibrate, Compass, Sliders, Cpu, UserCheck, LogIn, LogOut, Trophy } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
-  const { user, settings, updateSettings, updateUser, setIsAuthModalOpen, setAuthMode } = useGame();
+  const { user, settings, updateSettings, updateUser, setIsAuthModalOpen, setAuthMode, localProgress } = useGame();
 
   const handleAuthAction = () => {
     if (user.isLoggedIn) {
@@ -19,25 +20,92 @@ export const ProfileView: React.FC = () => {
     }
   };
 
+  // Calculate player progress stats
+  const completedCount = Object.values(localProgress).filter((p) => p.completed).length;
+  const bestTimes = Object.values(localProgress)
+    .map((p) => p.bestTime)
+    .filter((t): t is number => typeof t === 'number' && t > 0);
+  const bestRecord = bestTimes.length > 0 ? `${Math.min(...bestTimes)}s` : '--';
+
   return (
-    <div className="map active profile pb-8">
-      {/* User Header Card */}
-      <div className="user shadow-md">
-        <div className="icon">
-          <i className="sbi-user1" />
+    <div className="w-full flex flex-col items-center px-3 py-4 gap-3.5 pb-10 select-none">
+      {/* 1. Hero Player Profile Card */}
+      <div className="w-full max-w-sm rounded-2xl bg-gradient-to-br from-indigo-950/60 via-slate-900/80 to-[#0a0c1a]/90 border border-cyan-500/30 p-3.5 shadow-[0_8px_25px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.15)] backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          {/* Glowing Avatar */}
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-cyan-500 to-indigo-600 p-[2px] shadow-[0_0_15px_rgba(0,247,255,0.4)]">
+              <div className="w-full h-full rounded-full bg-[#0a0c1a] flex items-center justify-center text-cyan-300 font-bold text-base uppercase">
+                {user.username.slice(0, 2)}
+              </div>
+            </div>
+            {user.isLoggedIn && (
+              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#0a0c1a] shadow-[0_0_6px_#34d399]" />
+            )}
+          </div>
+
+          {/* User Details */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-sm font-bold text-white truncate font-sans tracking-wide">
+                {user.fullName}
+              </h2>
+              {user.isLoggedIn && (
+                <UserCheck className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+              )}
+            </div>
+            <p className="text-xs text-cyan-400/90 font-mono truncate">
+              @{user.username}
+            </p>
+          </div>
+
+          {/* Status Badge */}
+          <span
+            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border tracking-wider ${
+              user.isLoggedIn
+                ? 'border-emerald-500/40 text-emerald-300 bg-emerald-950/50'
+                : 'border-slate-600/50 text-slate-300 bg-slate-800/40'
+            }`}
+          >
+            {user.isLoggedIn ? 'ONLINE' : 'GUEST'}
+          </span>
         </div>
-        <div className="name">
-          <p id="fullName">{user.fullName}</p>
-          <p id="username">@{user.username}</p>
+
+        {/* Quick Stats Grid */}
+        <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/10 text-center">
+          <div className="bg-black/30 rounded-xl p-1.5 border border-white/5">
+            <div className="flex items-center justify-center gap-1 text-[10px] text-slate-400">
+              <Trophy className="w-3 h-3 text-yellow-400" />
+              <span>Campaign</span>
+            </div>
+            <p className="text-xs font-bold text-white mt-0.5 font-mono">
+              {completedCount} <span className="text-slate-500 text-[10px]">/ 20</span>
+            </p>
+          </div>
+
+          <div className="bg-black/30 rounded-xl p-1.5 border border-white/5">
+            <div className="flex items-center justify-center gap-1 text-[10px] text-slate-400">
+              <span className="text-cyan-400 text-xs font-mono">⏱</span>
+              <span>Best Record</span>
+            </div>
+            <p className="text-xs font-bold text-cyan-300 mt-0.5 font-mono">
+              {bestRecord}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="w-[92%] flex flex-col gap-3 my-1">
+      {/* 2. Audio & Haptics Group */}
+      <div className="w-full max-w-sm rounded-2xl bg-surface/70 border border-border p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-md">
+        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-cyan-400 text-[11px] font-bold uppercase tracking-wider">
+          <Volume2 className="w-3.5 h-3.5" />
+          <span>Sound & Feedback</span>
+        </div>
+
         {/* Master Volume */}
-        <div className="option flex-col !items-start gap-1 p-3">
-          <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold uppercase tracking-wider mb-1">
-            <i className="sbi-volume-medium text-base" />
-            <span>Master Volume</span>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-slate-200 font-medium">Master Volume</span>
           </div>
           <ArcadeSlider
             value={settings.volume}
@@ -56,11 +124,14 @@ export const ProfileView: React.FC = () => {
           />
         </div>
 
-        {/* Vibration Switch */}
-        <div className="option flex justify-between items-center p-3">
+        {/* Vibration Toggle */}
+        <div className="flex justify-between items-center pt-1">
           <div className="flex items-center gap-2">
-            <i className="sbi-vibration text-emerald-400 text-base" />
-            <span className="font-semibold text-sm">Vibration Haptics</span>
+            <Vibrate className="w-4 h-4 text-emerald-400" />
+            <div className="flex flex-col">
+              <span className="text-xs font-medium text-slate-200">Vibration Haptics</span>
+              <span className="text-[10px] text-slate-400">Touch & collision haptic buzz</span>
+            </div>
           </div>
           <ArcadeSwitch
             checked={settings.vibrate}
@@ -75,12 +146,23 @@ export const ProfileView: React.FC = () => {
             ariaLabel="Vibration Toggle"
           />
         </div>
+      </div>
 
-        {/* Gyroscope Switch */}
-        <div className="option flex justify-between items-center p-3">
+      {/* 3. Controls & Graphics Group */}
+      <div className="w-full max-w-sm rounded-2xl bg-surface/70 border border-border p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-md">
+        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-purple-400 text-[11px] font-bold uppercase tracking-wider">
+          <Compass className="w-3.5 h-3.5" />
+          <span>Controls & Simulation</span>
+        </div>
+
+        {/* Gyroscope Tilt */}
+        <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <i className="sbi-screen-rotation text-purple-400 text-base" />
-            <span className="font-semibold text-sm">Gyroscope Tilt</span>
+            <Compass className="w-4 h-4 text-purple-400" />
+            <div className="flex flex-col">
+              <span className="text-xs font-medium text-slate-200">Gyroscope Tilt</span>
+              <span className="text-[10px] text-slate-400">Tilt device to control paddle</span>
+            </div>
           </div>
           <ArcadeSwitch
             checked={settings.gyroscope}
@@ -96,34 +178,13 @@ export const ProfileView: React.FC = () => {
           />
         </div>
 
-        {/* WASM WebGL Particle Background */}
-        <div className="option flex justify-between items-center p-3">
-          <div className="flex items-center gap-2">
-            <i className="sbi-stars text-cyan-400 text-base" />
-            <div className="flex flex-col">
-              <span className="font-semibold text-sm">WASM Particles</span>
-              <span className="text-[10px] text-slate-400">Locked 60fps C++ WebGL</span>
+        {/* Gyroscope Sensitivity Slider */}
+        <div className="flex flex-col gap-1.5 pt-1">
+          <div className="flex justify-between items-center text-xs">
+            <div className="flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5 text-pink-400" />
+              <span className="text-slate-200 font-medium">Tilt Sensitivity</span>
             </div>
-          </div>
-          <ArcadeSwitch
-            checked={settings.wasmParticles ?? true}
-            onChange={(checked) => updateSettings({ wasmParticles: checked })}
-            variant="neon-cyan"
-            size="md"
-            showText={true}
-            onLabel="ON"
-            offLabel="OFF"
-            showBezel={true}
-            showGlow={true}
-            ariaLabel="WASM Particles Toggle"
-          />
-        </div>
-
-        {/* Gyro Sensitivity */}
-        <div className="option flex-col !items-start gap-1 p-3">
-          <div className="flex items-center gap-2 text-pink-400 text-xs font-bold uppercase tracking-wider mb-1">
-            <i className="sbi-screen-rotation text-base" />
-            <span>Tilt Sensitivity</span>
           </div>
           <ArcadeSlider
             value={settings.gyroSensitivity}
@@ -141,10 +202,33 @@ export const ProfileView: React.FC = () => {
             ariaLabel="Gyroscope Sensitivity"
           />
         </div>
+
+        {/* WASM Particle Background */}
+        <div className="flex justify-between items-center pt-2 border-t border-white/10">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-4 h-4 text-cyan-400" />
+            <div className="flex flex-col">
+              <span className="text-xs font-medium text-slate-200">WASM Particles</span>
+              <span className="text-[10px] text-slate-400">Locked 60fps C++ WebGL</span>
+            </div>
+          </div>
+          <ArcadeSwitch
+            checked={settings.wasmParticles ?? true}
+            onChange={(checked) => updateSettings({ wasmParticles: checked })}
+            variant="neon-cyan"
+            size="md"
+            showText={true}
+            onLabel="ON"
+            offLabel="OFF"
+            showBezel={true}
+            showGlow={true}
+            ariaLabel="WASM Particles Toggle"
+          />
+        </div>
       </div>
 
-      {/* Auth Action Button */}
-      <div className="w-[92%] mt-2">
+      {/* 4. Auth Action Button */}
+      <div className="w-full max-w-sm mt-1">
         <ArcadeButton
           variant={user.isLoggedIn ? 'magenta' : 'cyan'}
           size="md"
@@ -152,21 +236,34 @@ export const ProfileView: React.FC = () => {
           mask={true}
           glow={true}
           onClick={handleAuthAction}
-          className="w-full py-2.5 font-bold tracking-wider"
+          className="w-full py-2.5 font-bold tracking-wider text-xs flex items-center justify-center gap-2"
         >
-          {user.isLoggedIn ? 'Sign Out' : 'Sign In / Sign Up'}
+          {user.isLoggedIn ? (
+            <>
+              <LogOut className="w-4 h-4" />
+              <span>SIGN OUT</span>
+            </>
+          ) : (
+            <>
+              <LogIn className="w-4 h-4" />
+              <span>SIGN IN / CREATE ACCOUNT</span>
+            </>
+          )}
         </ArcadeButton>
       </div>
 
-      <a
-        href="https://github.com/elsesourav"
-        id="copyright"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 text-xs opacity-60 hover:opacity-100 transition-opacity"
-      >
-        &copy; SouravBarui2024 • Components by @elsesourav
-      </a>
+      {/* 5. Minimal Footer */}
+      <footer className="text-center text-[10px] text-slate-500 font-mono mt-1">
+        <span>Breakout Ball V2 • Ecosystem by </span>
+        <a
+          href="https://elsesourav.com"
+          target="_blank"
+          rel="noreferrer"
+          className="text-cyan-400/80 hover:underline"
+        >
+          ElseSourav
+        </a>
+      </footer>
     </div>
   );
 };
