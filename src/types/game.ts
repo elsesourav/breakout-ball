@@ -40,6 +40,7 @@ export interface GameSettings {
   vibrate: boolean;
   gyroscope: boolean;
   gyroSensitivity: number; // 0.05 to 0.7
+  wasmParticles?: boolean;
 }
 
 export type ActiveTab = 'local' | 'online' | 'create' | 'profile';

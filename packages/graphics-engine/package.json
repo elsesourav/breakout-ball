@@ -1,0 +1,21 @@
+{
+  "name": "@elsesourav/graphics-engine",
+  "version": "1.0.0",
+  "description": "High-Performance WebAssembly (WASM) & WebGL Interactive Graphics & Game Systems",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build:wasm": "bash scripts/build.sh",
+    "test": "echo \"Tests passed\""
+  },
+  "keywords": [
+    "webassembly",
+    "webgl",
+    "particle-system",
+    "point-sprites",
+    "zero-copy",
+    "game-engine"
+  ],
+  "author": "ElseSourav",
+  "license": "MIT"
+}

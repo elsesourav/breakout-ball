@@ -11,6 +11,7 @@ import { LevelModifierModal } from './components/LevelModifierModal';
 import { GameCanvas } from './components/GameCanvas';
 import { AlertModal } from './components/AlertModal';
 import { AuthModal } from './components/AuthModal';
+import { ParticleBackdrop } from './components/ParticleBackdrop';
 
 export const AppContent: React.FC = () => {
   const { screen, activeTab, editingLevel } = useGame();
@@ -56,6 +57,7 @@ export const AppContent: React.FC = () => {
         <LevelDesigner />
       ) : (
         <div id="gameMode">
+          <ParticleBackdrop />
           <Navigation />
           <div id="modeType">
             {activeTab === 'local' && <LocalMode />}

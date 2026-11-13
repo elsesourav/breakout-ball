@@ -96,6 +96,29 @@ export const ProfileView: React.FC = () => {
           />
         </div>
 
+        {/* WASM WebGL Particle Background */}
+        <div className="option flex justify-between items-center p-3">
+          <div className="flex items-center gap-2">
+            <i className="sbi-stars text-cyan-400 text-base" />
+            <div className="flex flex-col">
+              <span className="font-semibold text-sm">WASM Particles</span>
+              <span className="text-[10px] text-slate-400">Locked 60fps C++ WebGL</span>
+            </div>
+          </div>
+          <ArcadeSwitch
+            checked={settings.wasmParticles ?? true}
+            onChange={(checked) => updateSettings({ wasmParticles: checked })}
+            variant="neon-cyan"
+            size="md"
+            showText={true}
+            onLabel="ON"
+            offLabel="OFF"
+            showBezel={true}
+            showGlow={true}
+            ariaLabel="WASM Particles Toggle"
+          />
+        </div>
+
         {/* Gyro Sensitivity */}
         <div className="option flex-col !items-start gap-1 p-3">
           <div className="flex items-center gap-2 text-pink-400 text-xs font-bold uppercase tracking-wider mb-1">
