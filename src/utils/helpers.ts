@@ -23,28 +23,57 @@ export function drawLevelPreviewOnCanvas(
   const h = height || canvas.height;
   ctx.clearRect(0, 0, w, h);
 
-  // Background tint
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  // 1. Arcade Cyber Backdrop with grid pattern
+  ctx.fillStyle = '#060818';
   ctx.fillRect(0, 0, w, h);
 
-  const cellW = w / GRID_ROWS;
-  const cellH = h / GRID_COLS;
-  const padding = Math.max(1, cellW * 0.05);
+  // Subtle gridlines
+  ctx.strokeStyle = 'rgba(0, 247, 255, 0.05)';
+  ctx.lineWidth = 1;
+  const gridSize = Math.floor(w / 12);
+  for (let x = 0; x < w; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // 2. Playfield side rails / borders
+  ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(4, 4, w - 8, h - 8);
+
+  // 3. Calculate block dimensions scaled to fit width cleanly
+  const marginX = 8;
+  const playW = w - marginX * 2;
+  const cellW = playW / GRID_ROWS;
+  const cellH = cellW * 0.7; // Match game block ratio (128x90)
+  const padding = Math.max(1, cellW * 0.06);
 
   blocks.forEach((block) => {
     if (block.h <= 0) return;
     const config = BLOCK_COLORS[block.h] || BLOCK_COLORS[1];
 
-    const bx = block.x * cellW + padding;
-    const by = block.y * cellH + padding;
+    const bx = marginX + block.x * cellW + padding;
+    const by = 12 + block.y * cellH + padding;
     const bw = cellW - padding * 2;
     const bh = cellH - padding * 2;
-    const r = Math.min(bw, bh) * 0.2;
+    const r = Math.min(bw, bh) * 0.22;
 
     ctx.save();
     // Rounded block path
     ctx.beginPath();
-    ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, r) : ctx.rect(bx, by, bw, bh);
+    if (ctx.roundRect) {
+      ctx.roundRect(bx, by, bw, bh, r);
+    } else {
+      ctx.rect(bx, by, bw, bh);
+    }
 
     // Gradient fill
     const grad = ctx.createLinearGradient(bx, by, bx, by + bh);
@@ -53,19 +82,66 @@ export function drawLevelPreviewOnCanvas(
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Border stroke
+    // Specular shine at top of brick
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.fillRect(bx + r * 0.5, by + 1.5, bw - r, bh * 0.25);
+
+    // Glowing border stroke
     ctx.strokeStyle = config.border;
-    ctx.lineWidth = Math.max(1, cellW * 0.04);
+    ctx.lineWidth = Math.max(1.5, cellW * 0.05);
     ctx.stroke();
 
     // HP label or icon
-    if (cellW > 20) {
+    if (cellW > 16) {
       ctx.fillStyle = config.text;
-      ctx.font = `bold ${Math.floor(cellH * 0.45)}px sans-serif`;
+      ctx.font = `900 ${Math.floor(cellH * 0.55)}px monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(config.label, bx + bw / 2, by + bh / 2 + 1);
     }
     ctx.restore();
   });
+
+  // 4. Draw Player Paddle above the bottom HUD overlay bar
+  const paddleW = cellW * 2.2;
+  const paddleH = cellH * 0.38;
+  const paddleX = (w - paddleW) / 2;
+  const paddleY = h - paddleH - 34;
+
+  ctx.save();
+  ctx.fillStyle = '#00f7ff';
+  ctx.shadowColor = '#00f7ff';
+  ctx.shadowBlur = 10;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(paddleX, paddleY, paddleW, paddleH, paddleH / 2);
+    ctx.fill();
+  } else {
+    ctx.fillRect(paddleX, paddleY, paddleW, paddleH);
+  }
+
+  // Paddle core light
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(paddleX + paddleW * 0.25, paddleY + paddleH * 0.25, paddleW * 0.5, paddleH * 0.5);
+
+  // 5. Draw Bouncing Breakout Ball
+  const ballX = w / 2;
+  const ballY = paddleY - 18;
+  const ballR = cellW * 0.22;
+
+  // Ball motion trail
+  ctx.fillStyle = 'rgba(0, 247, 255, 0.25)';
+  ctx.beginPath();
+  ctx.arc(ballX, ballY + 12, ballR * 0.7, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Main Energy Ball
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = '#00f7ff';
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.arc(ballX, ballY, ballR, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
 }

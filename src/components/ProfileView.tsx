@@ -196,77 +196,88 @@ export const ProfileView: React.FC = () => {
 
       {/* 2. Authentication Actions: Separate SIGN IN and CREATE ACCOUNT Buttons */}
       {!user.isLoggedIn ? (
-        <div className="w-full max-w-sm rounded-2xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
-          <div className="flex items-center gap-1.5 text-cyan-400 text-[11px] font-display font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>ElseSourav Account Access</span>
+        <div className="w-full max-w-sm rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3 flex flex-col gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-cyan-400 text-[11px] font-display font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>ElseSourav Cloud Sync</span>
+            </div>
+            <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              LOCAL SAVE
+            </span>
           </div>
 
-          <p className="text-xs text-slate-300 font-ui leading-relaxed" style={{ color: '#cbd5e1' }}>
-            Playing as <strong style={{ color: '#00f7ff' }}>Anonymous</strong> saves data locally.
-            Sign in or create an account to sync progress and compete globally.
+          <p className="text-[11px] font-ui leading-snug" style={{ color: '#cbd5e1' }}>
+            Playing as <strong style={{ color: '#00f7ff' }}>Anonymous</strong> saves progress locally. Sign in with ElseSourav to sync saves to the cloud and compete on global leaderboards.
           </p>
 
-          {/* TWO SEPARATE BUTTONS AS REQUESTED */}
-          <div className="grid grid-cols-2 gap-2 mt-1">
+          {/* TWO SEPARATE BUTTONS WITH MODERATE BORDER-RADIUS MATCHING INNER & OUTER */}
+          <div className="grid grid-cols-2 gap-2 mt-0.5">
             {/* 1. SIGN IN BUTTON */}
-            <ArcadeButton
-              variant="cyan"
-              size="md"
-              shape="rounded"
-              mask={true}
-              glow={true}
+            <button
+              type="button"
               onClick={handleSignIn}
-              className="w-full py-2.5 font-display font-bold tracking-wider text-xs flex items-center justify-center gap-1.5"
+              style={{
+                borderRadius: '12px',
+                border: '1.5px solid #00f7ff',
+                backgroundColor: 'rgba(0, 247, 255, 0.12)',
+                boxShadow: '0 0 14px rgba(0, 247, 255, 0.3), inset 0 0 10px rgba(0, 247, 255, 0.1)',
+              }}
+              className="w-full h-10 flex items-center justify-center gap-1.5 font-display font-black text-xs text-white hover:bg-cyan-500/20 active:scale-[0.98] transition-all cursor-pointer"
             >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>SIGN IN</span>
-            </ArcadeButton>
+              <LogIn className="w-4 h-4 text-cyan-400" />
+              <span style={{ color: '#00f7ff' }}>SIGN IN</span>
+            </button>
 
             {/* 2. CREATE ACCOUNT BUTTON */}
-            <ArcadeButton
-              variant="magenta"
-              size="md"
-              shape="rounded"
-              mask={true}
-              glow={true}
+            <button
+              type="button"
               onClick={handleCreateAccount}
-              className="w-full py-2.5 font-display font-bold tracking-wider text-xs flex items-center justify-center gap-1.5"
+              style={{
+                borderRadius: '12px',
+                border: '1.5px solid #ff20c4',
+                backgroundImage: 'linear-gradient(135deg, #ff0844 0%, #b773ff 100%)',
+                boxShadow: '0 0 14px rgba(255, 32, 196, 0.4)',
+              }}
+              className="w-full h-10 flex items-center justify-center gap-1.5 font-display font-black text-xs text-white hover:opacity-95 active:scale-[0.98] transition-all cursor-pointer"
             >
-              <UserPlus className="w-3.5 h-3.5" />
+              <UserPlus className="w-4 h-4 text-white" />
               <span>CREATE</span>
-            </ArcadeButton>
+            </button>
           </div>
         </div>
       ) : (
         /* Logged In Sign Out Button */
         <div className="w-full max-w-sm">
-          <ArcadeButton
-            variant="magenta"
-            size="md"
-            shape="rounded"
-            mask={true}
-            glow={true}
+          <button
+            type="button"
             onClick={handleSignOut}
-            className="w-full py-2.5 font-display font-bold tracking-wider text-xs flex items-center justify-center gap-2"
+            style={{
+              borderRadius: '12px',
+              border: '1.5px solid rgba(239, 68, 68, 0.4)',
+              backgroundColor: 'rgba(239, 68, 68, 0.12)',
+            }}
+            className="w-full h-10 flex items-center justify-center gap-2 font-display font-bold tracking-wider text-xs text-red-300 hover:bg-red-500/20 active:scale-[0.98] transition-all cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 text-red-400" />
             <span>SIGN OUT</span>
-          </ArcadeButton>
+          </button>
         </div>
       )}
 
-      {/* 3. Audio & Haptics Group */}
-      <div className="w-full max-w-sm rounded-2xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
+      {/* 3. Audio & Haptics Group with Dedicated Settings Font */}
+      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
         <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-cyan-400 text-[11px] font-display font-bold uppercase tracking-wider">
           <Volume2 className="w-3.5 h-3.5" />
           <span>Sound & Feedback</span>
         </div>
 
         {/* Master Volume */}
-        <div className="flex flex-col gap-1.5 font-ui">
+        <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center text-xs">
-            <span style={{ color: '#ffffff', fontWeight: 600 }}>Master Volume</span>
+            <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+              MASTER VOLUME
+            </span>
           </div>
           <ArcadeSlider
             value={settings.volume}
@@ -286,12 +297,16 @@ export const ProfileView: React.FC = () => {
         </div>
 
         {/* Vibration Toggle */}
-        <div className="flex justify-between items-center pt-1 font-ui">
+        <div className="flex justify-between items-center pt-1">
           <div className="flex items-center gap-2">
             <Vibrate className="w-4 h-4 text-emerald-400" style={{ color: '#34d399' }} />
             <div className="flex flex-col">
-              <span className="text-xs font-semibold" style={{ color: '#ffffff' }}>Vibration Haptics</span>
-              <span className="text-[11px]" style={{ color: '#cbd5e1' }}>Touch & collision buzz</span>
+              <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+                VIBRATION HAPTICS
+              </span>
+              <span className="font-settings text-xs text-slate-300" style={{ color: '#cbd5e1' }}>
+                Touch & collision vibration buzz
+              </span>
             </div>
           </div>
           <ArcadeSwitch
@@ -309,20 +324,24 @@ export const ProfileView: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Controls & Simulation Group */}
-      <div className="w-full max-w-sm rounded-2xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
+      {/* 4. Controls & Simulation Group with Dedicated Settings Font */}
+      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
         <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-purple-400 text-[11px] font-display font-bold uppercase tracking-wider">
           <Compass className="w-3.5 h-3.5" />
           <span>Controls & Simulation</span>
         </div>
 
         {/* Gyroscope Tilt */}
-        <div className="flex justify-between items-center font-ui">
+        <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Compass className="w-4 h-4 text-purple-400" style={{ color: '#c084fc' }} />
             <div className="flex flex-col">
-              <span className="text-xs font-semibold" style={{ color: '#ffffff' }}>Gyroscope Tilt</span>
-              <span className="text-[11px]" style={{ color: '#cbd5e1' }}>Tilt device to steer paddle</span>
+              <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+                GYROSCOPE TILT
+              </span>
+              <span className="font-settings text-xs text-slate-300" style={{ color: '#cbd5e1' }}>
+                Tilt device to steer paddle
+              </span>
             </div>
           </div>
           <ArcadeSwitch
@@ -340,11 +359,13 @@ export const ProfileView: React.FC = () => {
         </div>
 
         {/* Gyroscope Sensitivity Slider */}
-        <div className="flex flex-col gap-1.5 pt-1 font-ui">
+        <div className="flex flex-col gap-1.5 pt-1">
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-pink-400" style={{ color: '#f472b6' }} />
-              <span style={{ color: '#ffffff', fontWeight: 600 }}>Tilt Sensitivity</span>
+              <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+                TILT SENSITIVITY
+              </span>
             </div>
           </div>
           <ArcadeSlider

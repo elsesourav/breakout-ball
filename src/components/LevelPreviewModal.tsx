@@ -1,8 +1,17 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { drawLevelPreviewOnCanvas } from '../utils/helpers';
-import { CANVAS_WIDTH } from '../constants/game';
-import { ArcadeButton, LeaderboardTable, LeaderboardItem } from '@elsesourav/react-ui';
+import { CyberRankingTable, RankingEntry } from './leaderboard/CyberRankingTable';
+import {
+  Play,
+  ChevronsRight,
+  Home,
+  ArrowLeft,
+  Clock,
+  Boxes,
+  RotateCcw,
+  Sparkles,
+} from 'lucide-react';
 
 export const LevelPreviewModal: React.FC = () => {
   const {
@@ -17,136 +26,218 @@ export const LevelPreviewModal: React.FC = () => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Redraw canvas with proper buffer resolution matching display aspect ratio
   useEffect(() => {
     if (selectedLevel && canvasRef.current) {
-      drawLevelPreviewOnCanvas(canvasRef.current, selectedLevel.blocks, 360, 360);
+      const canvas = canvasRef.current;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const displayW = canvas.clientWidth || 320;
+      const displayH = canvas.clientHeight || 155;
+      canvas.width = Math.round(displayW * dpr);
+      canvas.height = Math.round(displayH * dpr);
+      drawLevelPreviewOnCanvas(canvas, selectedLevel.blocks, canvas.width, canvas.height);
     }
   }, [selectedLevel]);
 
   if (!selectedLevel) return null;
 
   const progress = localProgress[selectedLevel.id];
-  const userRank = progress?.rank ? progress.rank : '∞';
-  const bestTime = progress?.bestTime ? progress.bestTime.toFixed(1) : '∞';
+  const isCompleted = progress?.completed;
+  const bestTime = progress?.bestTime ? `${progress.bestTime.toFixed(1)}s` : '--';
 
-  const rankingList = leaderboards[selectedLevel.id] || leaderboards.default || [];
-
-  const leaderboardItems: LeaderboardItem[] = rankingList.map((entry, idx) => ({
-    id: String(idx + 1),
-    rank: entry.rank || idx + 1,
-    name: entry.username,
-    score: Math.round(10000 / Math.max(1, entry.time)),
-    time: `${entry.time.toFixed(1)}s`,
-    isCurrentUser: entry.username === user.username,
-  }));
+  // Determine if next level should be accessible
+  // NEXT button ONLY shows when one level is complete; if locked, next level does NOT show
+  const currentNum = parseInt(selectedLevel.id, 10);
+  const nextLevelData = !isNaN(currentNum)
+    ? localLevels.find((l) => l.id === String(currentNum + 1))
+    : null;
+  const isNextUnlocked = nextLevelData ? localProgress[nextLevelData.id] !== undefined : false;
+  const canShowNext = Boolean(isCompleted && isNextUnlocked && nextLevelData);
 
   const handleNextLevel = () => {
-    const currentNum = parseInt(selectedLevel.id, 10);
-    if (!isNaN(currentNum)) {
-      const nextNum = currentNum + 1;
-      const nextLvl = localLevels.find((l) => l.id === String(nextNum));
-      if (nextLvl) {
-        startPlayLevel(nextLvl);
-        return;
+    if (canShowNext && nextLevelData) {
+      startPlayLevel(nextLevelData);
+    }
+  };
+
+  // Prepare clean ranking items
+  const rankingList = leaderboards[selectedLevel.id] || leaderboards.default || [];
+  const leaderboardEntries: RankingEntry[] = useMemo(() => {
+    const list: RankingEntry[] = rankingList.map((entry, idx) => ({
+      rank: entry.rank || idx + 1,
+      username: entry.username,
+      score: Math.round(10000 / Math.max(1, entry.time)),
+      time: entry.time,
+      isCurrentUser: entry.username === user.username,
+    }));
+
+    // If current user has completed this level, ensure user appears in ranking
+    if (isCompleted && progress?.bestTime) {
+      const userAlreadyInList = list.some((e) => e.isCurrentUser);
+      if (!userAlreadyInList) {
+        list.push({
+          rank: progress.rank || list.length + 1,
+          username: user.isLoggedIn ? user.username : 'Anonymous',
+          score: Math.round(10000 / Math.max(1, progress.bestTime)),
+          time: progress.bestTime,
+          isCurrentUser: true,
+        });
+        list.sort((a, b) => (typeof a.time === 'number' && typeof b.time === 'number' ? a.time - b.time : 0));
+        list.forEach((item, i) => { item.rank = i + 1; });
       }
     }
-    startPlayLevel(selectedLevel);
-  };
+    return list;
+  }, [rankingList, isCompleted, progress, user]);
+
+  const blockCount = selectedLevel.blocks.filter((b) => b.h > 0).length;
+  const isCampaign = !isNaN(Number(selectedLevel.id));
 
   return (
     <div id="showPreview" className="active">
-      <button id="previewClose" onClick={() => setScreen('menu')}>
-        <i className="sbi-arrow-left2" />
-      </button>
-
       <div className="rapper">
-        <div className="canvas-and-lvl-details">
+        {/* Top Header Bar: Back Button, Title, Mode Pill */}
+        <div className="flex items-center justify-between w-full pb-1 border-b border-white/10">
+          <button
+            type="button"
+            onClick={() => setScreen('menu')}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 border border-white/15 text-slate-200 text-xs font-ui transition-all cursor-pointer"
+            aria-label="Back to Campaign"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" />
+            <span style={{ color: '#ffffff', fontWeight: 600 }}>Back</span>
+          </button>
+
+          <div className="flex flex-col items-center">
+            <span
+              className="font-display font-black text-xs tracking-wider"
+              style={{ color: '#00f7ff' }}
+            >
+              {isCampaign ? `CORE ${selectedLevel.id.padStart(2, '0')}` : selectedLevel.name}
+            </span>
+            <span className="font-ui text-[9px] text-slate-400">
+              By @{selectedLevel.creator}
+            </span>
+          </div>
+
+          <span className="px-2 py-0.5 rounded-full text-[9px] font-tech font-bold uppercase tracking-wider bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">
+            {isCampaign ? 'Campaign' : 'Community'}
+          </span>
+        </div>
+
+        {/* Compact Game Canvas Preview Container */}
+        <div
+          className="relative w-full rounded-xl overflow-hidden border border-cyan-500/30 bg-[#050716] shadow-[0_0_20px_rgba(0,0,0,0.8)] flex-shrink-0"
+          style={{ width: '100%', height: '155px', minHeight: '155px' }}
+        >
           <canvas
             ref={canvasRef}
             id="preview"
-            width={CANVAS_WIDTH}
-            height={CANVAS_WIDTH * 0.9}
+            className="w-full h-full block"
+            style={{ width: '100%', height: '155px', display: 'block' }}
           />
-          <div className="lvl-details">
-            <div className="flex selected-lvl">
-              <p>Level</p>
-              <div id="lvlNo">{selectedLevel.id}</div>
+
+          {/* Bottom HUD Overlay on Canvas */}
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent px-3 py-1.5 flex items-center justify-between border-t border-white/10">
+            {/* Status */}
+            <div className="flex items-center gap-1">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isCompleted ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]' : 'bg-cyan-400 shadow-[0_0_6px_#00f7ff]'
+                }`}
+              />
+              <span
+                className="font-tech font-bold text-[11px] tracking-wide"
+                style={{ color: isCompleted ? '#34d399' : '#00f7ff' }}
+              >
+                {isCompleted ? 'CLEARED' : 'UNLOCKED'}
+              </span>
             </div>
-            <div className="flex rank">
-              <p>Your Rank</p>
-              <div id="lvlRank">{userRank}</div>
-            </div>
-            <div className="flex time">
-              <i className="sbi-stopwatch1" />
-              <div>
-                <p id="lvlTime">{bestTime}</p>
-                <span>s</span>
+
+            {/* Block count & Best time */}
+            <div className="flex items-center gap-3 font-tech text-xs">
+              <div className="flex items-center gap-1 text-slate-300">
+                <Boxes className="w-3 h-3 text-purple-400" />
+                <span>{blockCount} Bricks</span>
+              </div>
+              <div className="flex items-center gap-1 text-slate-300">
+                <Clock className="w-3 h-3 text-cyan-400" />
+                <span style={{ color: '#00f7ff', fontWeight: 700 }}>{bestTime}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Level Creator Info */}
-        <div className="flex items-center justify-between px-1 my-0.5 text-xs text-cyan-400 font-semibold">
-          <span>
-            By <span className="text-cyan-300 font-bold">@{selectedLevel.creator}</span>
-          </span>
-          <span className="text-slate-400 text-[10px] uppercase tracking-wider">
-            {!isNaN(Number(selectedLevel.id)) ? 'Campaign' : 'Community'}
-          </span>
-        </div>
-
-        {/* Action Controls using ArcadeButton */}
-        <div className="flex items-center gap-2 w-full my-1">
-          <ArcadeButton
-            variant="breakout-start"
-            size="md"
-            shape="pill"
-            shine={true}
-            shineMode="starburst"
-            mask={true}
-            glow={true}
+        {/* Action Controls: Compact, Moderate Radius (12px outer, matching inner) */}
+        <div className="flex items-center gap-2 w-full mt-1">
+          {/* 1. START / REPLAY Button */}
+          <button
+            type="button"
             onClick={() => startPlayLevel(selectedLevel)}
-            className="flex-1 py-2 text-sm font-black tracking-wider"
+            style={{
+              borderRadius: '12px',
+              backgroundColor: '#ff0055',
+              backgroundImage: 'linear-gradient(135deg, #ff0844 0%, #ff4b8b 100%)',
+              boxShadow: '0 0 16px rgba(255, 8, 68, 0.45)',
+              border: '1.5px solid #ff7ebd',
+            }}
+            className="flex-1 h-11 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider text-white active:scale-[0.98] transition-all cursor-pointer"
           >
-            {progress?.completed ? 'PLAY AGAIN' : 'START'}
-          </ArcadeButton>
+            {isCompleted ? (
+              <>
+                <RotateCcw className="w-4 h-4 stroke-[2.5]" />
+                <span>PLAY AGAIN</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 fill-white stroke-[2.5]" />
+                <span>START GAME</span>
+              </>
+            )}
+          </button>
 
-          <ArcadeButton
-            variant="cyan"
-            size="sm"
-            shape="rounded"
-            mask={true}
-            onClick={handleNextLevel}
-            title="Next Level"
-            className="w-10 h-10 p-0"
-          >
-            <i className="sbi-double-arrow text-base" />
-          </ArcadeButton>
+          {/* 2. NEXT LEVEL Button: ONLY shows when level is completed AND next level is unlocked */}
+          {canShowNext && (
+            <button
+              type="button"
+              onClick={handleNextLevel}
+              title="Next Level"
+              style={{
+                borderRadius: '12px',
+                backgroundColor: '#00e5ff',
+                backgroundImage: 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
+                boxShadow: '0 0 16px rgba(0, 247, 255, 0.45)',
+                border: '1.5px solid #a5f3fc',
+              }}
+              className="w-11 h-11 flex items-center justify-center text-black active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
+            >
+              <ChevronsRight className="w-5 h-5 stroke-[2.8]" />
+            </button>
+          )}
 
-          <ArcadeButton
-            variant="blue"
-            size="sm"
-            shape="rounded"
-            mask={true}
+          {/* 3. HOME Button: Moderate Radius matching others */}
+          <button
+            type="button"
             onClick={() => setScreen('menu')}
-            title="Home"
-            className="w-10 h-10 p-0"
+            title="Return to Menu"
+            style={{
+              borderRadius: '12px',
+              backgroundColor: '#1e293b',
+              backgroundImage: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+              border: '1.5px solid #475569',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+            }}
+            className="w-11 h-11 flex items-center justify-center text-slate-200 hover:text-white active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
           >
-            <i className="sbi-home text-base" />
-          </ArcadeButton>
+            <Home className="w-5 h-5 stroke-[2.2]" />
+          </button>
         </div>
 
-        {/* Players Ranking with LeaderboardTable */}
+        {/* Players Ranking Component */}
         <div className="w-full mt-1">
-          <LeaderboardTable
-            variant="breakout"
-            title="Players Ranking"
-            items={leaderboardItems}
-            searchable={false}
-            highlightPodium={true}
-            maxRows={4}
-            className="w-full text-xs"
+          <CyberRankingTable
+            entries={leaderboardEntries}
+            title="CORE RANKINGS"
+            currentUser={user.username}
           />
         </div>
       </div>
