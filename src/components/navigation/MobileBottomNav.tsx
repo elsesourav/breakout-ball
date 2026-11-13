@@ -62,31 +62,32 @@ export const MobileBottomNav: React.FC = () => {
                   y: isActive ? -2 : 0,
                 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                className={`relative z-10 transition-colors duration-200 ${
-                  isActive
-                    ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(0,247,255,0.85)]'
-                    : 'text-slate-400 group-hover:text-slate-200'
-                }`}
+                className="relative z-10 transition-colors duration-200"
+                style={{
+                  color: isActive ? '#00f7ff' : '#cbd5e1',
+                  filter: isActive ? 'drop-shadow(0 0 8px rgba(0,247,255,0.8))' : 'none',
+                }}
               >
                 {isProfile && user.isLoggedIn ? (
                   <div className="relative">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-black font-mono">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-[11px] font-black text-black font-mono shadow-[0_0_6px_#00f7ff]">
                       {user.username.slice(0, 1).toUpperCase()}
                     </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 border border-black shadow-[0_0_4px_#34d399]" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-black shadow-[0_0_4px_#34d399]" />
                   </div>
                 ) : (
-                  <Icon className="w-5 h-5 stroke-[2.2]" />
+                  <Icon className="w-5 h-5 stroke-[2.2]" style={{ color: isActive ? '#00f7ff' : '#cbd5e1' }} />
                 )}
               </motion.div>
 
               {/* Text Label */}
               <span
-                className={`relative z-10 text-[10px] font-medium tracking-tight mt-1 truncate max-w-[70px] transition-all duration-200 ${
-                  isActive
-                    ? 'font-bold text-cyan-200 drop-shadow-[0_0_6px_rgba(0,247,255,0.5)]'
-                    : 'text-slate-400 group-hover:text-slate-300'
-                }`}
+                className="relative z-10 text-[11px] tracking-tight mt-1 truncate max-w-[74px] transition-all duration-200"
+                style={{
+                  color: isActive ? '#00f7ff' : '#cbd5e1',
+                  fontWeight: isActive ? 900 : 700,
+                  textShadow: isActive ? '0 0 8px rgba(0,247,255,0.7)' : 'none',
+                }}
               >
                 {item.label}
               </span>

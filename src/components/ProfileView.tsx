@@ -74,17 +74,17 @@ export const ProfileView: React.FC = () => {
         {/* Quick Stats Grid */}
         <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/10 text-center">
           <div className="bg-black/30 rounded-xl p-1.5 border border-white/5">
-            <div className="flex items-center justify-center gap-1 text-[10px] text-slate-400">
-              <Trophy className="w-3 h-3 text-yellow-400" />
+            <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-medium">
+              <Trophy className="w-3.5 h-3.5 text-yellow-400" />
               <span>Campaign</span>
             </div>
             <p className="text-xs font-bold text-white mt-0.5 font-mono">
-              {completedCount} <span className="text-slate-500 text-[10px]">/ 20</span>
+              {completedCount} <span className="text-slate-300 text-[10px]">/ 20</span>
             </p>
           </div>
 
           <div className="bg-black/30 rounded-xl p-1.5 border border-white/5">
-            <div className="flex items-center justify-center gap-1 text-[10px] text-slate-400">
+            <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-medium">
               <span className="text-cyan-400 text-xs font-mono">⏱</span>
               <span>Best Record</span>
             </div>
@@ -105,7 +105,7 @@ export const ProfileView: React.FC = () => {
         {/* Master Volume */}
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-slate-200 font-medium">Master Volume</span>
+            <span style={{ color: '#ffffff', fontWeight: 600 }}>Master Volume</span>
           </div>
           <ArcadeSlider
             value={settings.volume}
@@ -127,10 +127,10 @@ export const ProfileView: React.FC = () => {
         {/* Vibration Toggle */}
         <div className="flex justify-between items-center pt-1">
           <div className="flex items-center gap-2">
-            <Vibrate className="w-4 h-4 text-emerald-400" />
+            <Vibrate className="w-4 h-4 text-emerald-400" style={{ color: '#34d399' }} />
             <div className="flex flex-col">
-              <span className="text-xs font-medium text-slate-200">Vibration Haptics</span>
-              <span className="text-[10px] text-slate-400">Touch & collision haptic buzz</span>
+              <span className="text-xs font-semibold" style={{ color: '#ffffff' }}>Vibration Haptics</span>
+              <span className="text-[11px]" style={{ color: '#cbd5e1' }}>Touch & collision haptic buzz</span>
             </div>
           </div>
           <ArcadeSwitch
@@ -158,10 +158,10 @@ export const ProfileView: React.FC = () => {
         {/* Gyroscope Tilt */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-purple-400" />
+            <Compass className="w-4 h-4 text-purple-400" style={{ color: '#c084fc' }} />
             <div className="flex flex-col">
-              <span className="text-xs font-medium text-slate-200">Gyroscope Tilt</span>
-              <span className="text-[10px] text-slate-400">Tilt device to control paddle</span>
+              <span className="text-xs font-semibold" style={{ color: '#ffffff' }}>Gyroscope Tilt</span>
+              <span className="text-[11px]" style={{ color: '#cbd5e1' }}>Tilt device to control paddle</span>
             </div>
           </div>
           <ArcadeSwitch
@@ -182,8 +182,8 @@ export const ProfileView: React.FC = () => {
         <div className="flex flex-col gap-1.5 pt-1">
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-pink-400" />
-              <span className="text-slate-200 font-medium">Tilt Sensitivity</span>
+              <Sliders className="w-3.5 h-3.5 text-pink-400" style={{ color: '#f472b6' }} />
+              <span style={{ color: '#ffffff', fontWeight: 600 }}>Tilt Sensitivity</span>
             </div>
           </div>
           <ArcadeSlider
@@ -230,13 +230,13 @@ export const ProfileView: React.FC = () => {
       </div>
 
       {/* 5. Minimal Footer */}
-      <footer className="text-center text-[10px] text-slate-500 font-mono mt-1">
+      <footer className="text-center text-xs text-slate-300 font-mono mt-1">
         <span>Breakout Ball V2 • Ecosystem by </span>
         <a
           href="https://elsesourav.com"
           target="_blank"
           rel="noreferrer"
-          className="text-cyan-400/80 hover:underline"
+          className="text-cyan-300 font-bold hover:underline"
         >
           ElseSourav
         </a>
