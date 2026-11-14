@@ -119,6 +119,7 @@ export const GameCanvas: React.FC = () => {
     });
 
     engine.setVibrate(settings.vibrate);
+    engine.setBallSkin(settings.ballSkin);
     engineRef.current = engine;
 
     let t1: ReturnType<typeof setTimeout> | undefined;

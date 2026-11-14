@@ -38,12 +38,25 @@ export interface UserProfile {
   role?: string;
 }
 
+export type BallSkin = 'cyan' | 'fire' | 'void' | 'matrix' | 'gold';
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  category: 'combat' | 'speed' | 'mastery' | 'creative';
+  unlocked: boolean;
+  unlockedAt?: number;
+}
+
 export interface GameSettings {
   volume: number; // 0.0 to 1.0
   vibrate: boolean;
   gyroscope: boolean;
   gyroSensitivity: number; // 0.05 to 0.7
   wasmParticles?: boolean;
+  ballSkin?: BallSkin;
 }
 
 export type ActiveTab = 'local' | 'online' | 'create' | 'profile';

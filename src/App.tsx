@@ -11,6 +11,7 @@ import { LevelModifierModal } from './components/LevelModifierModal';
 import { GameCanvas } from './components/GameCanvas';
 import { AlertModal } from './components/AlertModal';
 import { AuthModal } from './components/AuthModal';
+import { AchievementToast } from './components/AchievementToast';
 
 export const AppContent: React.FC = () => {
   const { screen, activeTab, editingLevel } = useGame();
@@ -71,6 +72,7 @@ export const AppContent: React.FC = () => {
       {editingLevel && <LevelModifierModal />}
       <AlertModal />
       <AuthModal />
+      <AchievementToast />
     </main>
   );
 };

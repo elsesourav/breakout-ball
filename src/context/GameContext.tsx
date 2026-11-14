@@ -11,6 +11,8 @@ import {
 } from '../types/game';
 import { DEFAULT_SETTINGS, DEFAULT_USER } from '../constants/game';
 import { soundManager } from '../utils/audio';
+import { achievementManager } from '../services/achievements';
+import { synthAudio } from '../utils/synthAudio';
 import { dbService } from '../services/db';
 import { authService } from '../services/auth';
 
@@ -156,6 +158,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setScreen('playing');
     soundManager.startBgMusic();
     dbService.incrementPlayCount(level.id);
+    if (level.isPublic || isNaN(parseInt(level.id, 10))) {
+      achievementManager.unlock('arena_challenger');
+    }
   };
 
   const openPreview = async (level: LevelData) => {
@@ -184,6 +189,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const saveUserLevel = async (newLevel: LevelData): Promise<boolean> => {
     const success = await dbService.saveLevel(newLevel);
     if (success) {
+      achievementManager.unlock('level_architect');
       const [userLevels, onlines] = await Promise.all([
         dbService.getUserCreatedLevels(user.username),
         dbService.getOnlineLevels(),
@@ -226,6 +232,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setLeaderboards((prev) => ({ ...prev, [levelId]: updatedLeaderboard }));
 
+    if (time < 30) {
+      achievementManager.unlock('speed_demon');
+    }
+
     // Update local progress for numbered progression
     const levelNum = parseInt(levelId, 10);
     if (!isNaN(levelNum)) {
@@ -250,6 +260,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
           [nextLevelId]: nextUnlocked,
         };
+
+        const totalCompleted = Object.values(updatedProgress).filter((p) => p.completed).length;
+        if (totalCompleted >= 10) achievementManager.unlock('campaign_10');
+        if (totalCompleted >= 30) achievementManager.unlock('apex_champion');
 
         dbService.saveProgress(updatedProgress, user.username);
         return updatedProgress;

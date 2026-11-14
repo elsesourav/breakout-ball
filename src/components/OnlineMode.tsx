@@ -4,6 +4,7 @@ import { levelSearchEngine } from '../services/search';
 import { Search, Flame, Globe, X, Boxes } from 'lucide-react';
 import { ArenaLevelCard } from './arena/ArenaLevelCard';
 import { ArenaPagination } from './arena/ArenaPagination';
+import { DailyFeaturedBanner } from './arena/DailyFeaturedBanner';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -178,6 +179,11 @@ export const OnlineMode: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Daily Featured Challenge Banner (Active on All Stages Page 1) */}
+      {!searchTerm && filterMode === 'all' && currentPage === 1 && (
+        <DailyFeaturedBanner levels={onlineLevels} />
+      )}
 
       {/* Arena Levels Grid */}
       <div className="w-full max-w-sm grid grid-cols-2 gap-3 mt-1">

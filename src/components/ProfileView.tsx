@@ -1,11 +1,6 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
-import { ArcadeSlider, ArcadeSwitch } from '@elsesourav/react-ui';
 import {
-  Volume2,
-  Vibrate,
-  Compass,
-  Sliders,
   UserCheck,
   LogIn,
   LogOut,
@@ -17,12 +12,13 @@ import {
   Layers,
   User as UserIcon,
 } from 'lucide-react';
+import { BallSkinSelector } from './profile/BallSkinSelector';
+import { AchievementsList } from './profile/AchievementsList';
+import { ProfileSettingsGroup } from './profile/ProfileSettingsGroup';
 
 export const ProfileView: React.FC = () => {
   const {
     user,
-    settings,
-    updateSettings,
     updateUser,
     setIsAuthModalOpen,
     setAuthMode,
@@ -115,7 +111,7 @@ export const ProfileView: React.FC = () => {
             />
           </div>
 
-          {/* User Details: Clean, No Duplicate Anonymous */}
+          {/* User Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
               <h2 className="text-base font-bold text-white truncate font-display tracking-wide">
@@ -136,7 +132,7 @@ export const ProfileView: React.FC = () => {
             )}
           </div>
 
-          {/* Clean Status Badge: GUEST instead of duplicate ANONYMOUS */}
+          {/* Status Badge */}
           <span
             className={`text-[10px] font-tech font-bold px-2 py-0.5 rounded-full border tracking-wider flex-shrink-0 ${
               user.isLoggedIn
@@ -148,7 +144,7 @@ export const ProfileView: React.FC = () => {
           </span>
         </div>
 
-        {/* Additional Logged-in Identity Details */}
+        {/* Logged-in Identity Details */}
         {user.isLoggedIn && (
           <div className="mt-3 pt-2.5 border-t border-white/10 flex flex-col gap-1.5 text-[11px] font-ui">
             {user.email && (
@@ -171,7 +167,7 @@ export const ProfileView: React.FC = () => {
           </div>
         )}
 
-        {/* Quick Stats Grid: All 30 Cores & Formatted Best Time */}
+        {/* Quick Stats Grid */}
         <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/10 text-center">
           <div className="bg-black/35 rounded-xl p-2 border border-white/5">
             <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
@@ -205,7 +201,7 @@ export const ProfileView: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Authentication Actions: Separate SIGN IN and CREATE ACCOUNT Buttons */}
+      {/* 2. Authentication Actions */}
       {!user.isLoggedIn ? (
         <div className="w-full max-w-sm rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3 flex flex-col gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.5)] backdrop-blur-xl">
           <div className="flex items-center justify-between">
@@ -222,9 +218,7 @@ export const ProfileView: React.FC = () => {
             Guest progress is saved locally. Connect with an ElseSourav account to sync saves across devices and appear on global leaderboards.
           </p>
 
-          {/* TWO SEPARATE BUTTONS WITH MODERATE BORDER-RADIUS */}
           <div className="grid grid-cols-2 gap-2 mt-0.5">
-            {/* 1. SIGN IN BUTTON */}
             <button
               type="button"
               onClick={handleSignIn}
@@ -240,7 +234,6 @@ export const ProfileView: React.FC = () => {
               <span style={{ color: '#00f7ff' }}>SIGN IN</span>
             </button>
 
-            {/* 2. CREATE ACCOUNT BUTTON */}
             <button
               type="button"
               onClick={handleCreateAccount}
@@ -258,7 +251,6 @@ export const ProfileView: React.FC = () => {
           </div>
         </div>
       ) : (
-        /* Logged In Sign Out Button */
         <div className="w-full max-w-sm">
           <button
             type="button"
@@ -276,128 +268,16 @@ export const ProfileView: React.FC = () => {
         </div>
       )}
 
-      {/* 3. Audio & Haptics Settings Group with Premium Typography */}
-      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-cyan-400 text-xs font-display font-black tracking-wider uppercase">
-          <Volume2 className="w-4 h-4 text-cyan-400" />
-          <span>Sound & Feedback</span>
-        </div>
+      {/* 3. Ball Core Energy Customization */}
+      <BallSkinSelector />
 
-        {/* Master Volume */}
-        <div className="flex flex-col gap-1.5">
-          <div className="flex justify-between items-center text-xs">
-            <span className="font-settings-title text-xs font-bold text-white tracking-wider">
-              MASTER VOLUME
-            </span>
-          </div>
-          <ArcadeSlider
-            value={settings.volume}
-            onChange={(val) => updateSettings({ volume: val })}
-            min={0}
-            max={1}
-            step={0.01}
-            variant="neon-cyan"
-            size="md"
-            showBezel={true}
-            showGlow={true}
-            showValue={true}
-            formatValue={(v) => `${Math.round(v * 100)}%`}
-            className="w-full"
-            ariaLabel="Master Volume"
-          />
-        </div>
+      {/* 4. Trophy Hall Achievements */}
+      <AchievementsList />
 
-        {/* Vibration Toggle */}
-        <div className="flex justify-between items-center pt-1">
-          <div className="flex items-center gap-2.5">
-            <Vibrate className="w-4 h-4 text-emerald-400 flex-shrink-0" style={{ color: '#34d399' }} />
-            <div className="flex flex-col">
-              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
-                VIBRATION HAPTICS
-              </span>
-              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
-                Touch & collision haptic buzz
-              </span>
-            </div>
-          </div>
-          <ArcadeSwitch
-            checked={settings.vibrate}
-            onChange={(checked) => updateSettings({ vibrate: checked })}
-            variant="neon-green"
-            size="md"
-            showText={true}
-            onLabel="ON"
-            offLabel="OFF"
-            showBezel={true}
-            showGlow={true}
-            ariaLabel="Vibration Toggle"
-          />
-        </div>
-      </div>
+      {/* 5. Sound & Simulation Controls */}
+      <ProfileSettingsGroup />
 
-      {/* 4. Controls & Simulation Settings Group with Premium Typography */}
-      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-purple-400 text-xs font-display font-black tracking-wider uppercase">
-          <Compass className="w-4 h-4 text-purple-400" />
-          <span>Controls & Simulation</span>
-        </div>
-
-        {/* Gyroscope Tilt */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2.5">
-            <Compass className="w-4 h-4 text-purple-400 flex-shrink-0" style={{ color: '#c084fc' }} />
-            <div className="flex flex-col">
-              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
-                GYROSCOPE TILT
-              </span>
-              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
-                Tilt hardware to steer paddle
-              </span>
-            </div>
-          </div>
-          <ArcadeSwitch
-            checked={settings.gyroscope}
-            onChange={(checked) => updateSettings({ gyroscope: checked })}
-            variant="cyber-purple"
-            size="md"
-            showText={true}
-            onLabel="ON"
-            offLabel="OFF"
-            showBezel={true}
-            showGlow={true}
-            ariaLabel="Gyroscope Toggle"
-          />
-        </div>
-
-        {/* Gyroscope Sensitivity Slider */}
-        <div className="flex flex-col gap-1.5 pt-1">
-          <div className="flex justify-between items-center text-xs">
-            <div className="flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-pink-400" style={{ color: '#f472b6' }} />
-              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
-                TILT SENSITIVITY
-              </span>
-            </div>
-          </div>
-          <ArcadeSlider
-            value={settings.gyroSensitivity}
-            onChange={(val) => updateSettings({ gyroSensitivity: val })}
-            min={0.05}
-            max={0.7}
-            step={0.01}
-            variant="candy-pink"
-            size="md"
-            showBezel={true}
-            showGlow={true}
-            showValue={true}
-            formatValue={(v) => `${Math.round(v * 100)}%`}
-            className="w-full"
-            ariaLabel="Gyroscope Sensitivity"
-          />
-        </div>
-      </div>
-
-      {/* 5. Minimal Ecosystem Footer */}
+      {/* 6. Minimal Ecosystem Footer */}
       <footer className="text-center text-xs text-slate-400 font-mono mt-1">
         <span>Breakout Ball V2 • Ecosystem by </span>
         <a

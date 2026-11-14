@@ -3,6 +3,14 @@ import { ParticleSystem } from './particles';
 import { BLOCK_COLORS } from '../constants/game';
 import { PowerUpManager } from './powerUps';
 
+const BALL_SKIN_PALETTES: Record<string, { c1: string; c2: string; c3: string; glow: string }> = {
+  cyan: { c1: '#ffffff', c2: '#7df9ff', c3: '#00f7ff', glow: '#00f7ff' },
+  fire: { c1: '#ffffff', c2: '#ff9900', c3: '#ff0055', glow: '#ff5500' },
+  void: { c1: '#ffffff', c2: '#e879f9', c3: '#7c3aed', glow: '#c084fc' },
+  matrix: { c1: '#ffffff', c2: '#6ee7b7', c3: '#059669', glow: '#10b981' },
+  gold: { c1: '#ffffff', c2: '#fef08a', c3: '#eab308', glow: '#ffd700' },
+};
+
 export class GameRenderer {
   private width: number;
   private height: number;
@@ -29,7 +37,8 @@ export class GameRenderer {
     paddle: PaddleState,
     blocks: BlockEngineState[],
     particles: ParticleSystem,
-    powerUps?: PowerUpManager
+    powerUps?: PowerUpManager,
+    ballSkin: string = 'cyan'
   ) {
     const w = this.width;
     const h = this.height;
@@ -408,14 +417,15 @@ export class GameRenderer {
     ctx.restore();
 
     // 7. Render All Active Balls with 3D Shading
+    const palette = BALL_SKIN_PALETTES[ballSkin] || BALL_SKIN_PALETTES.cyan;
     for (const b of ballList) {
       if (b.isActive && b.trail && b.trail.length > 0) {
         ctx.save();
         for (let i = 0; i < b.trail.length; i++) {
           const t = b.trail[i];
           ctx.globalAlpha = t.alpha * 0.45;
-          ctx.fillStyle = b.isMega ? '#ffd700' : '#00f7ff';
-          ctx.shadowColor = b.isMega ? '#ff0055' : '#00f7ff';
+          ctx.fillStyle = b.isMega ? '#ffd700' : palette.glow;
+          ctx.shadowColor = b.isMega ? '#ff0055' : palette.glow;
           ctx.shadowBlur = 12;
           ctx.beginPath();
           ctx.arc(t.x, t.y, t.size, 0, Math.PI * 2);
@@ -429,7 +439,7 @@ export class GameRenderer {
       const br = b.radius;
 
       ctx.save();
-      ctx.shadowColor = b.isMega ? '#ffd700' : '#00f7ff';
+      ctx.shadowColor = b.isMega ? '#ffd700' : palette.glow;
       ctx.shadowBlur = b.isMega ? 32 : 24;
 
       const ballGrad = ctx.createRadialGradient(
@@ -447,10 +457,9 @@ export class GameRenderer {
         ballGrad.addColorStop(0.7, '#ff5500');
         ballGrad.addColorStop(1, '#ff0055');
       } else {
-        ballGrad.addColorStop(0, '#ffffff');
-        ballGrad.addColorStop(0.25, '#7df9ff');
-        ballGrad.addColorStop(0.7, '#0048ff');
-        ballGrad.addColorStop(1, '#00f7ff');
+        ballGrad.addColorStop(0, palette.c1);
+        ballGrad.addColorStop(0.35, palette.c2);
+        ballGrad.addColorStop(1, palette.c3);
       }
 
       ctx.fillStyle = ballGrad;

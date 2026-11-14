@@ -1,0 +1,155 @@
+import { Achievement } from '../types/game';
+
+const STORAGE_KEY = 'breakout_achievements_v1';
+
+export const INITIAL_ACHIEVEMENTS: Achievement[] = [
+  {
+    id: 'first_blood',
+    title: 'First Impact',
+    description: 'Break your first energy block in any stage',
+    icon: 'zap',
+    category: 'combat',
+    unlocked: false,
+  },
+  {
+    id: 'combo_5',
+    title: 'Combo Spark',
+    description: 'Achieve a 5x combo streak without losing ball',
+    icon: 'flame',
+    category: 'combat',
+    unlocked: false,
+  },
+  {
+    id: 'combo_10',
+    title: 'Unstoppable Flow',
+    description: 'Reach a blistering 10x combo streak',
+    icon: 'sparkles',
+    category: 'combat',
+    unlocked: false,
+  },
+  {
+    id: 'portal_hopper',
+    title: 'Quantum Leaper',
+    description: 'Warp a ball through a pair of cyber portals',
+    icon: 'compass',
+    category: 'mastery',
+    unlocked: false,
+  },
+  {
+    id: 'emp_detonator',
+    title: 'Shockwave Master',
+    description: 'Detonate an EMP explosive block',
+    icon: 'target',
+    category: 'combat',
+    unlocked: false,
+  },
+  {
+    id: 'speed_demon',
+    title: 'Supersonic',
+    description: 'Clear any level in under 30 seconds',
+    icon: 'timer',
+    category: 'speed',
+    unlocked: false,
+  },
+  {
+    id: 'campaign_10',
+    title: 'Sector Veteran',
+    description: 'Conquer 10 arcade campaign stages',
+    icon: 'shield',
+    category: 'mastery',
+    unlocked: false,
+  },
+  {
+    id: 'apex_champion',
+    title: 'Apex Legend',
+    description: 'Conquer all 30 arcade campaign stages',
+    icon: 'crown',
+    category: 'mastery',
+    unlocked: false,
+  },
+  {
+    id: 'level_architect',
+    title: 'Master Architect',
+    description: 'Create and save a custom stage in the Studio',
+    icon: 'palette',
+    category: 'creative',
+    unlocked: false,
+  },
+  {
+    id: 'arena_challenger',
+    title: 'Global Contender',
+    description: 'Challenge a community stage in Global Arena',
+    icon: 'globe',
+    category: 'mastery',
+    unlocked: false,
+  },
+];
+
+class AchievementManager {
+  private unlockedIds: Set<string> = new Set();
+  private listeners: ((achievement: Achievement) => void)[] = [];
+
+  constructor() {
+    this.load();
+  }
+
+  private load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const arr: string[] = JSON.parse(raw);
+        this.unlockedIds = new Set(arr);
+      }
+    } catch {
+      this.unlockedIds = new Set();
+    }
+  }
+
+  private save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(this.unlockedIds)));
+    } catch {}
+  }
+
+  public getAll(): Achievement[] {
+    return INITIAL_ACHIEVEMENTS.map((a) => ({
+      ...a,
+      unlocked: this.unlockedIds.has(a.id),
+    }));
+  }
+
+  public getUnlockedCount(): number {
+    return this.unlockedIds.size;
+  }
+
+  public unlock(id: string): Achievement | null {
+    if (this.unlockedIds.has(id)) return null;
+
+    const ach = INITIAL_ACHIEVEMENTS.find((a) => a.id === id);
+    if (!ach) return null;
+
+    this.unlockedIds.add(id);
+    this.save();
+
+    const unlockedAch = { ...ach, unlocked: true, unlockedAt: Date.now() };
+    this.listeners.forEach((fn) => fn(unlockedAch));
+
+    // Dispatch global window event for components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('achievement_unlocked', { detail: unlockedAch })
+      );
+    }
+
+    return unlockedAch;
+  }
+
+  public onUnlock(fn: (achievement: Achievement) => void): () => void {
+    this.listeners.push(fn);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== fn);
+    };
+  }
+}
+
+export const achievementManager = new AchievementManager();

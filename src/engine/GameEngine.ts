@@ -28,6 +28,7 @@ export class GameEngine {
   private renderer: GameRenderer;
   private audio: AudioBridge;
   public powerUps: PowerUpManager;
+  private ballSkin: string = 'cyan';
 
   private useWasm: boolean = false;
   private animFrameId: number | null = null;
@@ -404,6 +405,10 @@ export class GameEngine {
     this.callbacks.onLevelWin?.(this.state);
   }
 
+  public setBallSkin(skin?: string) {
+    if (skin) this.ballSkin = skin;
+  }
+
   public render() {
     this.renderer.render(
       this.ctx,
@@ -411,7 +416,8 @@ export class GameEngine {
       this.tsPhysics.paddle,
       this.tsPhysics.blocks,
       this.particles,
-      this.powerUps
+      this.powerUps,
+      this.ballSkin
     );
   }
 
