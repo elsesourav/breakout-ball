@@ -101,47 +101,4 @@ export function drawLevelPreviewOnCanvas(
     }
     ctx.restore();
   });
-
-  // 4. Draw Player Paddle above the bottom HUD overlay bar
-  const paddleW = cellW * 2.2;
-  const paddleH = cellH * 0.38;
-  const paddleX = (w - paddleW) / 2;
-  const paddleY = h - paddleH - 34;
-
-  ctx.save();
-  ctx.fillStyle = '#00f7ff';
-  ctx.shadowColor = '#00f7ff';
-  ctx.shadowBlur = 10;
-  if (ctx.roundRect) {
-    ctx.beginPath();
-    ctx.roundRect(paddleX, paddleY, paddleW, paddleH, paddleH / 2);
-    ctx.fill();
-  } else {
-    ctx.fillRect(paddleX, paddleY, paddleW, paddleH);
-  }
-
-  // Paddle core light
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(paddleX + paddleW * 0.25, paddleY + paddleH * 0.25, paddleW * 0.5, paddleH * 0.5);
-
-  // 5. Draw Bouncing Breakout Ball
-  const ballX = w / 2;
-  const ballY = paddleY - 18;
-  const ballR = cellW * 0.22;
-
-  // Ball motion trail
-  ctx.fillStyle = 'rgba(0, 247, 255, 0.25)';
-  ctx.beginPath();
-  ctx.arc(ballX, ballY + 12, ballR * 0.7, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Main Energy Ball
-  ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = '#00f7ff';
-  ctx.shadowBlur = 14;
-  ctx.beginPath();
-  ctx.arc(ballX, ballY, ballR, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.restore();
 }
