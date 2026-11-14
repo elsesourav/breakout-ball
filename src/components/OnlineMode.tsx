@@ -9,9 +9,9 @@ import { DailyFeaturedBanner } from './arena/DailyFeaturedBanner';
 const ITEMS_PER_PAGE = 25;
 
 const SEARCH_TARGETS = [
-  { text: 'Level Name...', color: '#00f7ff' },
-  { text: 'Stage ID (#ARC88)...', color: '#38bdf8' },
-  { text: 'Creator (@elsesourav)...', color: '#ffd700' },
+  'Level Name...',
+  'Stage ID (ARC88)...',
+  'Creator (elsesourav)...',
 ];
 
 export const OnlineMode: React.FC = () => {
@@ -114,7 +114,7 @@ export const OnlineMode: React.FC = () => {
             }}
           >
             <Search
-              className="w-4 h-4 mr-3 flex-shrink-0 transition-colors duration-200"
+              className="w-4 h-4 mr-4 flex-shrink-0 transition-colors duration-200"
               style={{ color: isSearchFocused ? '#00f7ff' : '#22d3ee' }}
             />
             <div className="relative flex-1 flex items-center h-full min-w-0">
@@ -137,10 +137,9 @@ export const OnlineMode: React.FC = () => {
                   <div className="relative h-5 overflow-hidden flex items-center">
                     <span
                       key={searchTargetIdx}
-                      className="search-ticker-item font-bold tracking-wide"
-                      style={{ color: SEARCH_TARGETS[searchTargetIdx].color }}
+                      className="search-ticker-item text-slate-400 font-tech tracking-wide"
                     >
-                      {SEARCH_TARGETS[searchTargetIdx].text}
+                      {SEARCH_TARGETS[searchTargetIdx]}
                     </span>
                   </div>
                 </div>
