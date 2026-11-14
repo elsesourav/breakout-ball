@@ -1,20 +1,56 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { RoadmapNode, SVG_WIDTH, TOTAL_HEIGHT } from './types';
 
 interface RoadmapConduitSvgProps {
   nodes: RoadmapNode[];
   pathData: string;
   activePathData?: string;
+  currentUnlockedId: number;
 }
 
 export const RoadmapConduitSvg: React.FC<RoadmapConduitSvgProps> = ({
   nodes,
   pathData,
   activePathData,
+  currentUnlockedId,
 }) => {
+  // Compute per-segment paths (cleared connected conduits vs blocked/dormant conduits)
+  const segments = useMemo(() => {
+    return nodes.slice(0, -1).map((curr, idx) => {
+      const next = nodes[idx + 1];
+      const levelId = idx + 1;
+      const isCleared = levelId < currentUnlockedId;
+      const isCurrentRoute = levelId === currentUnlockedId;
+      const isFutureRoute = levelId > currentUnlockedId;
+
+      const dy = (next.y - curr.y) * 0.5;
+      const fullPath = `M ${curr.x} ${curr.y} C ${curr.x} ${curr.y + dy}, ${next.x} ${next.y - dy}, ${next.x} ${next.y}`;
+
+      const midX = (curr.x + next.x) / 2;
+      const midY = (curr.y + next.y) / 2;
+
+      // Half from current node to blocker
+      const toBlockerPath = `M ${curr.x} ${curr.y} C ${curr.x} ${curr.y + dy * 0.5}, ${midX} ${midY - dy * 0.25}, ${midX} ${midY}`;
+      // Half from blocker to next locked node
+      const fromBlockerPath = `M ${midX} ${midY} C ${midX} ${midY + dy * 0.25}, ${next.x} ${next.y - dy * 0.5}, ${next.x} ${next.y}`;
+
+      return {
+        levelId,
+        fullPath,
+        toBlockerPath,
+        fromBlockerPath,
+        midX,
+        midY,
+        isCleared,
+        isCurrentRoute,
+        isFutureRoute,
+      };
+    });
+  }, [nodes, currentUnlockedId]);
+
   return (
     <>
-      {/* 1. Static Hardware-Accelerated Conduit Base (Zero SVG Filters for 120 FPS Performance) */}
+      {/* 1. Hardware-Accelerated Cyber Honeycomb Grid & Base Conduit Track */}
       <svg
         className="absolute top-0 left-0 w-full pointer-events-none z-0"
         style={{
@@ -32,6 +68,11 @@ export const RoadmapConduitSvg: React.FC<RoadmapConduitSvgProps> = ({
             <stop offset="30%" stopColor="#818cf8" stopOpacity="0.85" />
             <stop offset="65%" stopColor="#f43f5e" stopOpacity="0.85" />
             <stop offset="100%" stopColor="#ffd700" stopOpacity="0.95" />
+          </linearGradient>
+
+          <linearGradient id="clearedLaserGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#10b981" />
+            <stop offset="100%" stopColor="#34d399" />
           </linearGradient>
 
           <linearGradient id="conduitBaseGrad" x1="0%" y1="100%" x2="0%" y2="0%">
@@ -57,7 +98,7 @@ export const RoadmapConduitSvg: React.FC<RoadmapConduitSvgProps> = ({
           </pattern>
         </defs>
 
-        {/* Hexagonal Cyber Honeycomb Matrix Base (Replaces Square Grid) */}
+        {/* Hexagonal Cyber Honeycomb Matrix Base */}
         <rect
           x="0"
           y="0"
@@ -67,75 +108,120 @@ export const RoadmapConduitSvg: React.FC<RoadmapConduitSvgProps> = ({
           opacity="0.85"
         />
 
-        {/* Outer Soft Ambient Aura (Multi-pass opacity strokes replace CPU-heavy Gaussian Blur) */}
-        <path
-          d={pathData}
-          fill="none"
-          stroke="url(#laserBeamGrad)"
-          strokeWidth="32"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.12"
-        />
-        <path
-          d={pathData}
-          fill="none"
-          stroke="url(#laserBeamGrad)"
-          strokeWidth="24"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.25"
-        />
+        {/* Base Structural Conduit Track across all segments */}
+        {segments.map((seg) => (
+          <g key={`base-track-${seg.levelId}`}>
+            {/* Outer track chassis */}
+            <path
+              d={seg.fullPath}
+              fill="none"
+              stroke="url(#conduitBaseGrad)"
+              strokeWidth="18"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Inner track groove */}
+            <path
+              d={seg.fullPath}
+              fill="none"
+              stroke="#040714"
+              strokeWidth="12"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </g>
+        ))}
 
-        {/* Cyber Circuit Conduit Bus Track */}
-        <path
-          d={pathData}
-          fill="none"
-          stroke="url(#conduitBaseGrad)"
-          strokeWidth="18"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        {/* Dynamic Route Segments: Cleared (Connected) vs Blocked (Severed) */}
+        {segments.map((seg) => {
+          if (seg.isCleared) {
+            // CLEARED ROUTE: Fully connected, energized laser conduit
+            return (
+              <g key={`cleared-seg-${seg.levelId}`}>
+                {/* Ambient Aura */}
+                <path
+                  d={seg.fullPath}
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="20"
+                  strokeLinecap="round"
+                  opacity="0.22"
+                />
+                {/* Laser Power Conduit */}
+                <path
+                  d={seg.fullPath}
+                  fill="none"
+                  stroke="#34d399"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  opacity="0.9"
+                />
+                {/* Core White Pulse Line */}
+                <path
+                  d={seg.fullPath}
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  opacity="0.8"
+                />
+              </g>
+            );
+          }
 
-        {/* Outer Neon Guard Rail Edges */}
-        <path
-          d={pathData}
-          fill="none"
-          stroke="url(#laserBeamGrad)"
-          strokeWidth="20"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.45"
-        />
-        <path
-          d={pathData}
-          fill="none"
-          stroke="url(#conduitBaseGrad)"
-          strokeWidth="14"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+          if (seg.isCurrentRoute) {
+            // CURRENT ACTIVE ROUTE: Energy flows to the blocker, halted by firewall!
+            return (
+              <g key={`current-seg-${seg.levelId}`}>
+                {/* Energy Conduit Leading into Blocker */}
+                <path
+                  d={seg.toBlockerPath}
+                  fill="none"
+                  stroke="#00f7ff"
+                  strokeWidth="16"
+                  strokeLinecap="round"
+                  opacity="0.25"
+                />
+                <path
+                  d={seg.toBlockerPath}
+                  fill="none"
+                  stroke="#00f7ff"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <path
+                  d={seg.toBlockerPath}
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                />
 
-        {/* Inner Dormant Guide Line */}
-        <path
-          d={pathData}
-          fill="none"
-          stroke="rgba(0, 247, 255, 0.22)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeDasharray="4 6"
-        />
+                {/* Severed / Disconnected Conduit from Blocker to Next Node (Broken Line) */}
+                <path
+                  d={seg.fromBlockerPath}
+                  fill="none"
+                  stroke="#ff0844"
+                  strokeWidth="2"
+                  strokeDasharray="4 6"
+                  strokeLinecap="round"
+                  opacity="0.6"
+                />
+              </g>
+            );
+          }
 
-        {/* Deflection Junction Points between levels */}
-        {nodes.map((n, idx) => {
-          if (idx === nodes.length - 1) return null;
-          const nextNode = nodes[idx + 1];
-          const midX = (n.x + nextNode.x) / 2;
-          const midY = (n.y + nextNode.y) / 2;
+          // FUTURE DORMANT ROUTE: Inactive, disconnected dashed conduit
           return (
-            <g key={`junction-${n.id}`}>
-              <circle cx={midX} cy={midY} r="3" fill="#00f7ff" opacity="0.6" />
-              <circle cx={midX} cy={midY} r="1.5" fill="#ffffff" />
+            <g key={`dormant-seg-${seg.levelId}`}>
+              <path
+                d={seg.fullPath}
+                fill="none"
+                stroke="rgba(100, 116, 139, 0.25)"
+                strokeWidth="2"
+                strokeDasharray="3 6"
+                strokeLinecap="round"
+              />
             </g>
           );
         })}
@@ -154,11 +240,11 @@ export const RoadmapConduitSvg: React.FC<RoadmapConduitSvgProps> = ({
           viewBox={`0 0 ${SVG_WIDTH} ${TOTAL_HEIGHT}`}
           preserveAspectRatio="none"
         >
-          {/* Active Flowing Laser Energy Pulse */}
+          {/* Active Flowing Laser Energy Pulse along cleared paths */}
           <path
             d={activePathData}
             fill="none"
-            stroke="#00f7ff"
+            stroke="#34d399"
             strokeWidth="3.5"
             strokeLinecap="round"
             strokeDasharray="8 8"

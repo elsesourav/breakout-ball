@@ -129,47 +129,165 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           </div>
         )}
 
-        {/* 3D Tactile Cyber Core Orb (High-tech Arcade Stage Node) */}
+        {/* 3D Celestial Cyber Globe (High-tech Arcade Stage Node) */}
         <button
           type="button"
           onClick={() => onLevelClick(node.id)}
           aria-label={`Level ${node.id} ${isUnlocked ? (isComplete ? 'Completed' : 'Unlocked') : 'Locked'}`}
           style={{
-            width: '68px',
-            height: '68px',
-            background: orbBg,
-            borderColor: orbBorder,
-            boxShadow: orbShadow,
+            width: '70px',
+            height: '70px',
             WebkitTapHighlightColor: 'transparent',
             outline: 'none',
           }}
-          className={`relative rounded-full flex items-center justify-center transition-all duration-200 select-none cursor-pointer border-[2.5px] ${
+          className={`relative rounded-full flex items-center justify-center transition-all duration-200 select-none cursor-pointer ${
             isUnlocked
               ? isCurrent
-                ? 'scale-105 ring-2 ring-cyan-400 ring-offset-2 ring-offset-[#03040c]'
+                ? 'scale-105'
                 : 'hover:scale-105 active:scale-95'
-              : 'hover:border-slate-300 active:scale-95 opacity-95 hover:opacity-100'
+              : 'hover:scale-[1.02] active:scale-95'
           }`}
         >
-          {/* Top Curved Specular Sheen (Spherical 3D Glass Arc) */}
-          <div
+          {/* 3D Saturnian Orbital Ring for Current Active Node */}
+          {isCurrent && (
+            <div
+              className="absolute -inset-2 rounded-full pointer-events-none animate-spin-slow"
+              style={{
+                border: '2px solid rgba(0, 247, 255, 0.75)',
+                boxShadow: '0 0 16px rgba(0, 247, 255, 0.6), inset 0 0 8px rgba(0, 247, 255, 0.35)',
+                transform: 'rotateX(70deg) rotateZ(-25deg)',
+                transformStyle: 'preserve-3d',
+              }}
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-cyan-300 shadow-[0_0_10px_#00f7ff,0_0_4px_#ffffff] absolute -top-1.5 left-1/2 -translate-x-1/2" />
+            </div>
+          )}
+
+          {/* 3D Spherical Vector Cyber Globe Base */}
+          <svg
+            viewBox="0 0 70 70"
+            className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
             style={{
-              position: 'absolute',
-              top: '6px',
-              left: '14px',
-              right: '14px',
-              height: '16px',
-              borderRadius: '9999px',
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 60%, transparent 100%)',
-              pointerEvents: 'none',
+              filter: isCurrent
+                ? 'drop-shadow(0 0 14px rgba(0, 247, 255, 0.8))'
+                : isComplete
+                ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.6))'
+                : 'drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8))',
             }}
-          />
+          >
+            <defs>
+              {/* 3D Sphere Shading with Specular Light Reflection */}
+              <radialGradient id={`globe-shell-${node.id}`} cx="35%" cy="28%" r="65%">
+                <stop
+                  offset="0%"
+                  stopColor={isComplete ? '#6ee7b7' : isCurrent ? '#a5f3fc' : '#94a3b8'}
+                  stopOpacity={isUnlocked ? '0.45' : '0.25'}
+                />
+                <stop
+                  offset="28%"
+                  stopColor={isComplete ? '#065f46' : isCurrent ? '#0e7490' : '#1e293b'}
+                  stopOpacity="0.85"
+                />
+                <stop
+                  offset="72%"
+                  stopColor={isComplete ? '#022c22' : isCurrent ? '#082f49' : '#0f172a'}
+                  stopOpacity="0.95"
+                />
+                <stop offset="100%" stopColor="#02040a" stopOpacity="0.98" />
+              </radialGradient>
+
+              {/* Glowing Inner Core Nucleus */}
+              <radialGradient id={`core-glow-${node.id}`} cx="50%" cy="50%" r="50%">
+                <stop
+                  offset="0%"
+                  stopColor={isComplete ? '#34d399' : isCurrent ? '#00f7ff' : sectorColor}
+                  stopOpacity={isUnlocked ? '0.8' : '0.25'}
+                />
+                <stop
+                  offset="70%"
+                  stopColor={isComplete ? '#059669' : isCurrent ? '#0284c7' : '#334155'}
+                  stopOpacity="0.3"
+                />
+                <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+
+            {/* Base Spherical Shell */}
+            <circle
+              cx="35"
+              cy="35"
+              r="33"
+              fill={`url(#globe-shell-${node.id})`}
+              stroke={orbBorder}
+              strokeWidth={isCurrent ? '2.5' : '2'}
+            />
+
+            {/* 3D Globe Equator & Latitude Arcs (Curved Spherical Latitude Lines) */}
+            <ellipse
+              cx="35"
+              cy="35"
+              rx="32"
+              ry="11"
+              fill="none"
+              stroke={isComplete ? '#34d399' : isCurrent ? '#00f7ff' : '#64748b'}
+              strokeWidth="1"
+              strokeDasharray={isUnlocked ? '3 3' : '2 4'}
+              opacity={isUnlocked ? 0.7 : 0.35}
+            />
+            <ellipse
+              cx="35"
+              cy="23"
+              rx="28"
+              ry="8"
+              fill="none"
+              stroke={isComplete ? '#34d399' : isCurrent ? '#00f7ff' : '#64748b'}
+              strokeWidth="0.75"
+              opacity={isUnlocked ? 0.5 : 0.25}
+            />
+            <ellipse
+              cx="35"
+              cy="47"
+              rx="28"
+              ry="8"
+              fill="none"
+              stroke={isComplete ? '#34d399' : isCurrent ? '#00f7ff' : '#64748b'}
+              strokeWidth="0.75"
+              opacity={isUnlocked ? 0.5 : 0.25}
+            />
+
+            {/* 3D Globe Central Meridian Curved Arc */}
+            <ellipse
+              cx="35"
+              cy="35"
+              rx="15"
+              ry="32"
+              fill="none"
+              stroke={isComplete ? '#34d399' : isCurrent ? '#00f7ff' : '#64748b'}
+              strokeWidth="1"
+              opacity={isUnlocked ? 0.6 : 0.25}
+            />
+
+            {/* Inner Pulsing Core Nucleus */}
+            <circle
+              cx="35"
+              cy="35"
+              r="17"
+              fill={`url(#core-glow-${node.id})`}
+            />
+
+            {/* Top Specular Curved Glass Highlight Crescent */}
+            <path
+              d="M 16 22 C 22 10, 48 10, 54 22 C 46 14, 24 14, 16 22 Z"
+              fill="#ffffff"
+              opacity={isUnlocked ? 0.45 : 0.2}
+            />
+          </svg>
 
           {/* Level Number with Authentic Arcade Game Font */}
           <span
             className="font-display font-black leading-none select-none"
             style={{
-              fontSize: '28px',
+              fontSize: '26px',
               color: numberColor,
               textShadow: numberShadow,
               position: 'relative',
@@ -179,7 +297,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             {formattedNumber}
           </span>
 
-          {/* Floating Completed Checkmark Badge on Orb Rim */}
+          {/* Floating Completed Checkmark Badge on Globe Rim */}
           {isComplete && (
             <div
               style={{

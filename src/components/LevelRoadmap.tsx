@@ -11,6 +11,7 @@ import {
   RoadmapNode,
   FloatingBrick,
   Obstacle,
+  RouteBlocker,
 } from './roadmap/types';
 import { RoadmapConduitSvg } from './roadmap/RoadmapConduitSvg';
 import { RoadmapObstacles } from './roadmap/RoadmapObstacles';
@@ -184,6 +185,35 @@ export const LevelRoadmap: React.FC = () => {
     ];
   }, [currentUnlockedId]);
 
+  // Generate Kinetic Obstacles directly blocking the route between levels
+  const routeBlockers: RouteBlocker[] = useMemo(() => {
+    const list: RouteBlocker[] = [];
+    for (let i = 1; i < TOTAL_LEVELS; i++) {
+      const curr = nodes[i - 1];
+      const next = nodes[i];
+      if (!curr || !next) continue;
+
+      const midX = Math.round((curr.x + next.x) / 2);
+      const midY = Math.round((curr.y + next.y) / 2);
+
+      const isCleared = i < currentUnlockedId;
+      const isActive = i === currentUnlockedId;
+
+      list.push({
+        id: `route-blocker-${i}`,
+        fromLevel: i,
+        toLevel: i + 1,
+        x: midX,
+        y: midY,
+        type: i % 3 === 0 ? 'quantum_gate' : i % 2 === 0 ? 'plasma_shield' : 'firewall',
+        title: `FIREWALL ${i < 10 ? '0' + i : i}`,
+        isCleared,
+        isActive,
+      });
+    }
+    return list;
+  }, [nodes, currentUnlockedId]);
+
   // Construct smooth cubic bezier conduit path
   const conduitPathData = useMemo(() => {
     if (nodes.length === 0) return '';
@@ -248,9 +278,9 @@ export const LevelRoadmap: React.FC = () => {
 
     if (!isUnlocked) {
       showAlert({
-        title: 'CORE OFFLINE',
-        message: `Clear Core ${levelId - 1} to break the firewall and unlock Core ${levelId < 10 ? '0' + levelId : levelId}.`,
-        titleColor: '#00f7ff',
+        title: 'ROUTE BLOCKED',
+        message: `Firewall obstacle active! Clear Level ${levelId - 1} to shatter the route blocker and connect the path to Level ${levelId < 10 ? '0' + levelId : levelId}.`,
+        titleColor: '#ff0844',
         btn1Text: 'DISMISS',
         btn1Color: '#00f7ff',
       });
@@ -261,6 +291,17 @@ export const LevelRoadmap: React.FC = () => {
     if (level) {
       openPreview(level);
     }
+  };
+
+  // Handle route blocker tap
+  const handleBlockerClick = (blocker: RouteBlocker) => {
+    showAlert({
+      title: 'FIREWALL ENGAGED',
+      message: `The route to Level ${blocker.toLevel} is blocked! Complete Level ${blocker.fromLevel} to shatter this obstacle and unlock the path.`,
+      titleColor: '#ff0844',
+      btn1Text: 'DEPLOY CORE',
+      btn1Color: '#00f7ff',
+    });
   };
 
   return (
@@ -340,15 +381,20 @@ export const LevelRoadmap: React.FC = () => {
           />
         ))}
 
-        {/* Laser Conduit SVG */}
+        {/* Laser Conduit SVG with Cleared Connected vs Blocked Severed Paths */}
         <RoadmapConduitSvg
           nodes={nodes}
           pathData={conduitPathData}
           activePathData={activePathData}
+          currentUnlockedId={currentUnlockedId}
         />
 
-        {/* Map Obstacles */}
-        <RoadmapObstacles obstacles={obstacles} />
+        {/* Route Blockers & Map Obstacles */}
+        <RoadmapObstacles
+          obstacles={obstacles}
+          routeBlockers={routeBlockers}
+          onBlockerClick={handleBlockerClick}
+        />
 
         {/* Sector Gateway Banners */}
         <RoadmapSectorBanner nodes={nodes} />

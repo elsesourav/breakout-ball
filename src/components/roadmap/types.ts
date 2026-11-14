@@ -26,6 +26,20 @@ export interface FloatingBrick {
   opacity: number;
 }
 
+export type RouteBlockerType = 'firewall' | 'plasma_shield' | 'quantum_gate' | 'titanium_vault';
+
+export interface RouteBlocker {
+  id: string;
+  fromLevel: number;
+  toLevel: number;
+  x: number;
+  y: number;
+  type: RouteBlockerType;
+  title: string;
+  isCleared: boolean;
+  isActive: boolean;
+}
+
 export interface Obstacle {
   id: string;
   type: 'titanium' | 'forcefield' | 'plasma';
