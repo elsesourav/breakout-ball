@@ -44,7 +44,6 @@ export const LocalMode: React.FC = () => {
         const isUnlocked = progress !== undefined;
         const isComplete = progress?.completed;
         const rank = progress?.rank ? progress.rank : '∞';
-        const bestTime = progress?.bestTime ? progress.bestTime.toFixed(1) : '∞';
 
         let levelClasses = 'level';
         if (!isUnlocked) levelClasses += ' lock';
@@ -70,12 +69,6 @@ export const LocalMode: React.FC = () => {
             <div className="icon-and-no">
               <i className="sbi-fire" />
               <p className="no">{levelNum}</p>
-            </div>
-
-            <div className="complete-time">
-              <i className="sbi-stopwatch1" />
-              <p className="time">{bestTime}</p>
-              <span>s</span>
             </div>
           </div>
         );

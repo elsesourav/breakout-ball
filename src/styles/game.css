@@ -152,8 +152,8 @@ main {
   overflow: hidden;
 }
 
-/* Mobile-Specific Adaptations */
-@media (max-width: 540px) {
+/* Mobile & Tablet Full-Screen Adaptations (Edge-to-Edge) */
+@media (max-width: 768px) {
   body {
     background-image: none;
     background-color: #060714;

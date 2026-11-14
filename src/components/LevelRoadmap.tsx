@@ -300,9 +300,9 @@ export const LevelRoadmap: React.FC = () => {
           willChange: 'transform, scroll-position',
           width: '112%',
           marginLeft: '-6%',
-          height: '142%',
-          marginTop: '-35%',
-          paddingBottom: '90px',
+          height: '145%',
+          marginTop: '-38%',
+          paddingBottom: '100px',
           backgroundColor: '#03040c',
           backgroundImage: `
             radial-gradient(ellipse 95% 18% at 50% 1%, rgba(255, 215, 0, 0.16) 0%, transparent 75%),
@@ -314,9 +314,8 @@ export const LevelRoadmap: React.FC = () => {
         }}
       >
       <div
-        className="relative mx-auto overflow-x-hidden"
+        className="relative mx-auto overflow-x-hidden w-full max-w-[440px]"
         style={{
-          width: `${SVG_WIDTH}px`,
           height: `${TOTAL_HEIGHT}px`,
           transform: 'translateZ(0)',
           willChange: 'scroll-position',

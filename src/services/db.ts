@@ -65,15 +65,10 @@ class StandardDatabaseService {
         const stored: LevelData[] = JSON.parse(raw);
         // Strictly filter out numeric arcade levels from stored online levels
         const cleanStored = Array.isArray(stored) ? stored.filter((lvl) => isNaN(Number(lvl.id))) : [];
-        // Update existing levels with latest initial metadata (e.g. creator: 'elsesourav')
-        const updated = cleanStored.map((lvl) => {
-          const matched = INITIAL_ONLINE_LEVELS.find((init) => init.id === lvl.id);
-          return matched
-            ? { ...lvl, creator: matched.creator, name: matched.name, isPublic: matched.isPublic }
-            : lvl;
-        });
-        const missing = INITIAL_ONLINE_LEVELS.filter((initLvl) => !updated.some((s) => s.id === initLvl.id));
-        const merged = [...updated, ...missing];
+        // Preserve curated INITIAL_ONLINE_LEVELS order (featuring @elsesourav stages first)
+        const initialIds = new Set(INITIAL_ONLINE_LEVELS.map((l) => l.id));
+        const customUserLevels = cleanStored.filter((lvl) => !initialIds.has(lvl.id));
+        const merged = [...INITIAL_ONLINE_LEVELS, ...customUserLevels];
         localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
       }
     } catch {

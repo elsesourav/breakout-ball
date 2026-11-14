@@ -98,14 +98,14 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
               rankBadge = (
                 <div
                   style={{
-                    background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.28) 0%, rgba(245, 158, 11, 0.15) 100%)',
+                    background: 'radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, rgba(245, 158, 11, 0.08) 100%)',
                     border: '1.5px solid #ffd700',
-                    boxShadow: '0 0 12px rgba(255, 215, 0, 0.6), inset 0 0 6px rgba(255, 215, 0, 0.25)',
+                    boxShadow: '0 0 12px rgba(255, 215, 0, 0.55), inset 0 0 4px rgba(255, 215, 0, 0.2)',
                   }}
-                  className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
-                  title="Rank 1 - Champion"
+                  className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-full mx-auto"
+                  title="Rank 1 - Gold Champion"
                 >
-                  <Flame className="w-3.5 h-3.5 text-amber-300 fill-amber-400 animate-pulse drop-shadow-[0_0_8px_#ffd700]" />
+                  <Flame className="w-3 h-3 text-amber-300 fill-amber-400 animate-pulse drop-shadow-[0_0_6px_#ffd700]" />
                   <span className="font-display font-black text-xs text-yellow-200">1</span>
                 </div>
               );
@@ -113,30 +113,30 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
               rankBadge = (
                 <div
                   style={{
-                    background: 'linear-gradient(135deg, rgba(0, 247, 255, 0.25) 0%, rgba(148, 163, 184, 0.15) 100%)',
-                    border: '1.5px solid #00f7ff',
-                    boxShadow: '0 0 10px rgba(0, 247, 255, 0.45), inset 0 0 6px rgba(0, 247, 255, 0.2)',
+                    background: 'radial-gradient(circle, rgba(203, 213, 225, 0.25) 0%, rgba(148, 163, 184, 0.08) 100%)',
+                    border: '1.5px solid #cbd5e1',
+                    boxShadow: '0 0 10px rgba(203, 213, 225, 0.45), inset 0 0 4px rgba(203, 213, 225, 0.2)',
                   }}
-                  className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
-                  title="Rank 2 - Elite"
+                  className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-full mx-auto"
+                  title="Rank 2 - Silver Elite"
                 >
-                  <Flame className="w-3.5 h-3.5 text-cyan-300 fill-cyan-400 animate-pulse drop-shadow-[0_0_8px_#00f7ff]" />
-                  <span className="font-display font-black text-xs text-cyan-200">2</span>
+                  <Flame className="w-3 h-3 text-slate-200 fill-slate-300 animate-pulse drop-shadow-[0_0_6px_#cbd5e1]" />
+                  <span className="font-display font-black text-xs text-slate-100">2</span>
                 </div>
               );
             } else if (isRank3) {
               rankBadge = (
                 <div
                   style={{
-                    background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%)',
-                    border: '1.5px solid #f97316',
-                    boxShadow: '0 0 10px rgba(249, 115, 22, 0.45), inset 0 0 6px rgba(249, 115, 22, 0.2)',
+                    background: 'radial-gradient(circle, rgba(217, 119, 6, 0.25) 0%, rgba(180, 83, 9, 0.08) 100%)',
+                    border: '1.5px solid #d97706',
+                    boxShadow: '0 0 10px rgba(217, 119, 6, 0.45), inset 0 0 4px rgba(217, 119, 6, 0.2)',
                   }}
-                  className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
-                  title="Rank 3 - Ace"
+                  className="flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-full mx-auto"
+                  title="Rank 3 - Bronze Ace"
                 >
-                  <Flame className="w-3.5 h-3.5 text-orange-400 fill-orange-500 animate-pulse drop-shadow-[0_0_8px_#f97316]" />
-                  <span className="font-display font-black text-xs text-orange-200">3</span>
+                  <Flame className="w-3 h-3 text-amber-500 fill-amber-600 animate-pulse drop-shadow-[0_0_6px_#d97706]" />
+                  <span className="font-display font-black text-xs text-amber-300">3</span>
                 </div>
               );
             }

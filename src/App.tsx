@@ -22,20 +22,20 @@ export const AppContent: React.FC = () => {
       const oW = window.innerWidth;
       const oH = window.innerHeight;
 
-      if (oW <= 540) {
-        // Fullscreen mobile viewport
+      if (oW <= 768) {
+        // Fullscreen mobile / tablet viewport
         const width = oW;
         const deltaSize = Math.max(28, Math.floor(width / 9));
         document.documentElement.style.setProperty('--window-width', `${width}px`);
         document.documentElement.style.setProperty('--window-height', `100svh`);
         document.documentElement.style.setProperty('--s', `${deltaSize}px`);
       } else {
-        // Desktop / Tablet 9x16 centered arcade display
-        const deltaSize = Math.floor(oW * (16 / 9) < oH ? oW / 9 : oH / 16);
-        const width = deltaSize * 9;
-        const height = deltaSize * 16;
+        // Desktop full-height centered mobile arcade chassis
+        const height = oH;
+        const width = Math.min(460, Math.floor(height * (9 / 19.5)));
+        const deltaSize = Math.max(32, Math.floor(width / 9));
         document.documentElement.style.setProperty('--window-width', `${width}px`);
-        document.documentElement.style.setProperty('--window-height', `${height}px`);
+        document.documentElement.style.setProperty('--window-height', `100svh`);
         document.documentElement.style.setProperty('--s', `${deltaSize}px`);
       }
     };

@@ -7,7 +7,6 @@ import {
   ChevronsRight,
   Home,
   ArrowLeft,
-  Clock,
   Boxes,
   RotateCcw,
   Sparkles,
@@ -48,7 +47,6 @@ export const LevelPreviewModal: React.FC = () => {
 
   const progress = localProgress[selectedLevel.id];
   const isCompleted = progress?.completed;
-  const bestTime = progress?.bestTime ? `${progress.bestTime.toFixed(1)}s` : '--';
 
   // Determine if next level should be accessible
   // NEXT button ONLY shows when one level is complete; if locked, next level does NOT show
@@ -190,10 +188,6 @@ export const LevelPreviewModal: React.FC = () => {
                   <span>{stats.portalCount}</span>
                 </div>
               )}
-              <div className="flex items-center gap-1 text-slate-300">
-                <Clock className="w-3 h-3 text-cyan-400" />
-                <span style={{ color: '#00f7ff', fontWeight: 700 }}>{bestTime}</span>
-              </div>
             </div>
           </div>
         </div>

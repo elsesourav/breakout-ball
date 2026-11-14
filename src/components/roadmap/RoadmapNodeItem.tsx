@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Play, Check, Clock } from 'lucide-react';
+import { Play, Check } from 'lucide-react';
 import { RoadmapNode, SVG_WIDTH } from './types';
 import { LocalLevelProgress } from '../../types/game';
 
@@ -54,21 +54,16 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         : `0 0 16px ${sectorColor}55, inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -4px 8px rgba(0,0,0,0.9)`
       : '0 4px 12px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -3px 6px rgba(0,0,0,0.95)';
 
-    const numberColor = isUnlocked
-      ? isComplete
-        ? '#34d399'
-        : isCurrent
-        ? '#00f7ff'
-        : '#ffffff'
-      : '#64748b';
+    // 3D Extruded Tactile Lettering for Level Numbers
+    const numberColor = isUnlocked ? '#ffffff' : '#94a3b8';
 
     const numberShadow = isUnlocked
       ? isComplete
-        ? '0 0 16px rgba(52, 211, 153, 0.95), 0 0 6px #34d399, 0 2px 4px #000'
+        ? '0 1px 0 #a7f3d0, 0 2px 0 #34d399, 0 3px 0 #059669, 0 4px 0 #064e3b, 0 5px 6px rgba(0, 0, 0, 0.9), 0 0 16px rgba(52, 211, 153, 0.85)'
         : isCurrent
-        ? '0 0 18px rgba(0, 247, 255, 0.95), 0 0 8px #00f7ff, 0 2px 4px #000'
-        : '0 0 10px rgba(255,255,255,0.4), 0 2px 4px #000'
-      : '0 2px 4px rgba(0,0,0,0.9)';
+        ? '0 1px 0 #cffafe, 0 2px 0 #00f7ff, 0 3px 0 #00b4d8, 0 4px 0 #0077b6, 0 5px 0 #03045e, 0 6px 8px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 247, 255, 0.95)'
+        : `0 1px 0 rgba(255,255,255,0.8), 0 2px 0 ${sectorColor}, 0 3px 0 ${sectorColor}cc, 0 4px 0 rgba(0,0,0,0.8), 0 5px 6px rgba(0,0,0,0.9), 0 0 14px ${sectorColor}88`
+      : '0 1px 0 rgba(255,255,255,0.25), 0 2px 0 #475569, 0 3px 0 #334155, 0 4px 0 #1e293b, 0 5px 6px rgba(0,0,0,0.95)';
 
     return (
       <div
@@ -98,19 +93,28 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               <div className="absolute inset-0 rounded-full bg-cyan-400/30 blur-sm animate-pulse pointer-events-none" />
             </div>
 
-            {/* High-tech Arcade PLAY Button with Game Font */}
+            {/* High-tech Arcade PLAY Button with 3D Extruded Game Font */}
             <div
               style={{
-                background: 'linear-gradient(135deg, #00f7ff 0%, #00d2eb 50%, #0096c7 100%)',
-                color: '#030816',
+                background: 'linear-gradient(180deg, #00f7ff 0%, #00b4d8 60%, #0077b6 100%)',
+                color: '#ffffff',
                 border: '1.5px solid #ffffff',
-                boxShadow: '0 0 20px rgba(0, 247, 255, 0.9), 0 4px 12px rgba(0, 0, 0, 0.7), inset 0 1px 2px #ffffff',
+                boxShadow: '0 3px 0 #023e8a, 0 6px 14px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 247, 255, 0.8), inset 0 1px 2px #ffffff',
                 borderRadius: '9999px',
+                transform: 'perspective(400px) rotateX(-6deg)',
               }}
               className="flex items-center gap-1.5 px-3.5 py-1 font-display font-black text-xs tracking-widest uppercase shadow-lg"
             >
-              <Play className="w-3.5 h-3.5 fill-[#030816] text-[#030816]" />
-              <span style={{ textShadow: '0 1px 1px rgba(255,255,255,0.4)' }}>PLAY</span>
+              <Play className="w-3.5 h-3.5 fill-white text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />
+              <span
+                style={{
+                  color: '#ffffff',
+                  textShadow: '0 1px 0 #cffafe, 0 2px 0 #0077b6, 0 3px 0 #023e8a, 0 4px 5px rgba(0,0,0,0.8)',
+                  letterSpacing: '0.12em',
+                }}
+              >
+                PLAY
+              </span>
             </div>
 
             {/* Glowing Pointer Notch */}
@@ -199,29 +203,8 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             </div>
           )}
 
-          {/* Status / Time Pill Anchored Cleanly BELOW Orb with Game Font */}
-          {isComplete && progress?.bestTime ? (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '-16px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: 'rgba(3, 8, 20, 0.96)',
-                border: '1.5px solid rgba(16, 185, 129, 0.7)',
-                boxShadow: '0 0 12px rgba(16, 185, 129, 0.5), 0 2px 6px rgba(0,0,0,0.8)',
-                pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-                zIndex: 10,
-              }}
-              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full"
-            >
-              <Clock className="w-2.5 h-2.5 text-emerald-400" />
-              <span className="font-tech font-bold text-[10px] text-emerald-300 leading-none">
-                {progress.bestTime.toFixed(1)}s
-              </span>
-            </div>
-          ) : isCurrent ? (
+          {/* Ready Status Pill Anchored Cleanly BELOW Active Current Node */}
+          {isCurrent ? (
             <div
               style={{
                 position: 'absolute',
@@ -238,7 +221,12 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               className="flex items-center gap-1.5 px-3 py-0.5 rounded-full"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f7ff] animate-pulse" />
-              <span className="font-tech font-bold text-[10px] tracking-widest text-cyan-300 leading-none">
+              <span
+                className="font-display font-black text-[10px] tracking-widest text-white leading-none"
+                style={{
+                  textShadow: '0 1px 0 #00f7ff, 0 2px 0 #0077b6, 0 3px 4px rgba(0,0,0,0.9)',
+                }}
+              >
                 READY
               </span>
             </div>

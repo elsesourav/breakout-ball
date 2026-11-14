@@ -10,7 +10,7 @@ const ITEMS_PER_PAGE = 25;
 
 const SEARCH_TARGETS = [
   'Level Name...',
-  'Stage ID (ARC88)...',
+  'Stage ID...',
   'Creator (elsesourav)...',
 ];
 
@@ -102,7 +102,7 @@ export const OnlineMode: React.FC = () => {
         {/* Cyber Search Terminal Input */}
         <div className="relative w-full mt-0.5">
           <div
-            className="flex gap-1 items-center w-full h-11 px-4 rounded-xl transition-all duration-200"
+            className="flex items-center gap-3 w-full h-11 px-4 rounded-xl transition-all duration-200"
             style={{
               backgroundColor: 'rgba(8, 14, 38, 0.95)',
               border: isSearchFocused
@@ -114,7 +114,7 @@ export const OnlineMode: React.FC = () => {
             }}
           >
             <Search
-              className="w-4 h-4 mr-4 flex-shrink-0 transition-colors duration-200"
+              className="w-4 h-4 flex-shrink-0 transition-colors duration-200"
               style={{ color: isSearchFocused ? '#00f7ff' : '#22d3ee' }}
             />
             <div className="relative flex-1 flex items-center h-full min-w-0">
