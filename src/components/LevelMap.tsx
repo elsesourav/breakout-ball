@@ -12,7 +12,7 @@ import {
   Obstacle,
   RouteBlocker,
 } from './roadmap/types';
-import { RoadmapConduitSvg } from './roadmap/RoadmapConduitSvg';
+import { LevelPathSvg } from './roadmap/LevelPathSvg';
 import { RoadmapObstacles } from './roadmap/RoadmapObstacles';
 import { RoadmapSectorBanner } from './roadmap/RoadmapSectorBanner';
 import { RoadmapNodeItem } from './roadmap/RoadmapNodeItem';
@@ -28,7 +28,7 @@ const SCALE_MAX = 0.85;          // strict maximum size limit for closer objects
 const FOREGROUND_LIMIT_Y = 0.65; // foreground threshold where size growth reaches its limit
 const FADE_ZONE = 0.08;          // top 8% of viewport dissolves into horizon haze
 
-export const LevelRoadmap: React.FC = () => {
+export const LevelMap: React.FC = () => {
   const { localLevels, localProgress, openPreview, showAlert } = useGame();
   const scrollRef    = useRef<HTMLDivElement>(null);
   const activeRef    = useRef<HTMLDivElement | null>(null);
@@ -371,8 +371,8 @@ export const LevelRoadmap: React.FC = () => {
             />
           ))}
 
-          {/* Laser Conduit SVG */}
-          <RoadmapConduitSvg
+          {/* Breakout Ball Kinetic Trajectory Laser SVG */}
+          <LevelPathSvg
             nodes={nodes}
             pathData={conduitPathData}
             activePathData={activePathData}

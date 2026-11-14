@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useGame } from './context/GameContext';
 import { MobileBottomNav } from './components/navigation/MobileBottomNav';
-import { LevelRoadmap } from './components/LevelRoadmap';
+import { LevelMap } from './components/LevelMap';
 import { OnlineMode } from './components/OnlineMode';
 import { CreateMode } from './components/CreateMode';
 import { ProfileView } from './components/ProfileView';
@@ -59,7 +59,7 @@ export const AppContent: React.FC = () => {
         <div id="gameMode">
           <div id="modeType" className="w-full h-full relative overflow-hidden">
             <div key={activeTab} className="cyber-page-transition w-full h-full">
-              {activeTab === 'local' && <LevelRoadmap />}
+              {activeTab === 'local' && <LevelMap />}
               {activeTab === 'online' && <OnlineMode />}
               {activeTab === 'create' && <CreateMode />}
               {activeTab === 'profile' && <ProfileView />}
