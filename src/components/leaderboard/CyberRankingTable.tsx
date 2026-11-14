@@ -65,7 +65,14 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
       </div>
 
       {/* Ranking Rows - Fixed compact scrollable height showing ~4 rows */}
-      <div className="flex flex-col divide-y divide-white/5 max-h-[148px] overflow-y-auto overscroll-contain cyber-scroll pr-1">
+      <div
+        style={{
+          maxHeight: '144px',
+          overflowY: 'auto',
+          overscrollBehaviorY: 'contain',
+        }}
+        className="flex flex-col divide-y divide-white/5 cyber-scroll pr-1"
+      >
         {entries.length === 0 ? (
           <div className="py-3 text-center text-xs font-ui text-slate-400">
             No rankings yet. Be the first to clear this level!

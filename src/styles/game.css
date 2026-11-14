@@ -1442,3 +1442,41 @@ main {
   display: inline-block;
   animation: tickerSlideUpIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+/* =======================================================
+   Strict Cyber Game Typography Overrides
+   Force arcade switches, sliders, settings, and controls
+   to use authentic game font instead of Times New Roman / Serif.
+======================================================= */
+.font-serif,
+span.font-serif,
+div[role="switch"] span,
+div[role="slider"] span,
+button[role="switch"] span,
+.arcade-switch span {
+  font-family: 'Orbitron', 'Chakra Petch', f1b, sans-serif !important;
+  font-style: normal !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* Custom sleek cyber scrollbar for compact ranking tables */
+.cyber-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 247, 255, 0.45) rgba(0, 0, 0, 0.3);
+}
+.cyber-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.cyber-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+}
+.cyber-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 247, 255, 0.45);
+  border-radius: 9999px;
+  box-shadow: 0 0 6px rgba(0, 247, 255, 0.5);
+}
+.cyber-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 247, 255, 0.8);
+}
