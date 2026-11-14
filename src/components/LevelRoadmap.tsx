@@ -18,14 +18,15 @@ import { RoadmapSectorBanner } from './roadmap/RoadmapSectorBanner';
 import { RoadmapNodeItem } from './roadmap/RoadmapNodeItem';
 
 // ─── Scroll-linked perspective scale ─────────────────────────────────────────
-// Screen-linked perspective depth:
+// Screen-linked perspective depth with strict foreground size ceiling:
 //   normalizedY = 0  → top of viewport (far / vanishing point)  → SCALE_MIN
-//   normalizedY = 1  → bottom of viewport (close to user)       → SCALE_MAX
-// Applies to all roadmap objects: level globes, red barrier clamps,
-// dormant clamps, obstacles, hazards, sector banners, and floating bricks.
-const SCALE_MIN = 0.33;
-const SCALE_MAX = 1.00;
-const FADE_ZONE = 0.08; // top 8% of viewport dissolves into horizon haze
+//   normalizedY >= FOREGROUND_LIMIT_Y → closer objects          → capped at SCALE_MAX
+// Objects smoothly scale from distant horizon size up to a strict maximum limit
+// in the closer foreground, preventing closer elements from ballooning or becoming oversized.
+const SCALE_MIN = 0.35;          // horizon vanishing size limit
+const SCALE_MAX = 0.85;          // strict maximum size limit for closer objects
+const FOREGROUND_LIMIT_Y = 0.65; // foreground threshold where size growth reaches its limit
+const FADE_ZONE = 0.08;          // top 8% of viewport dissolves into horizon haze
 
 export const LevelRoadmap: React.FC = () => {
   const { localLevels, localProgress, openPreview, showAlert } = useGame();
@@ -189,9 +190,14 @@ export const LevelRoadmap: React.FC = () => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
         const centerY = rect.top - contTop + rect.height * 0.5;
-        // 0 = top of scroll view (far), 1 = bottom (near)
+        // ny: 0 = top of scroll view (far), 1 = bottom of scroll view (near)
         const ny = Math.max(0, Math.min(1, centerY / viewH));
-        const scale = SCALE_MIN + ny * (SCALE_MAX - SCALE_MIN);
+
+        // Strict limit for closer objects: growth caps at FOREGROUND_LIMIT_Y so
+        // elements closer to the screen stay comfortably within SCALE_MAX and never over-inflate.
+        const progress = Math.max(0, Math.min(1, ny / FOREGROUND_LIMIT_Y));
+        const eased = Math.sin((progress * Math.PI) / 2);
+        const scale = SCALE_MIN + eased * (SCALE_MAX - SCALE_MIN);
 
         const baseTransform = el.getAttribute('data-base-transform') || 'translate(-50%, -50%)';
         el.style.transform = `${baseTransform} scale(${scale.toFixed(3)})`;
