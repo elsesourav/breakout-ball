@@ -38,9 +38,9 @@ export const ArenaPagination: React.FC<ArenaPaginationProps> = ({
   const visiblePages = getVisiblePages();
 
   return (
-    <div className="flex flex-col items-center gap-2 mt-3 select-none">
+    <div className="flex flex-col items-center gap-1.5 mt-2 select-none">
       {/* Range Status Label */}
-      <div className="flex items-center gap-2 text-[11px] font-tech tracking-wider text-slate-400">
+      <div className="flex items-center gap-1.5 text-[10px] font-tech tracking-wider text-slate-400">
         <span>
           STAGES <span className="text-cyan-400 font-bold">{startIdx}–{endIdx}</span> OF{' '}
           <span className="text-white font-bold">{totalItems}</span>

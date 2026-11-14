@@ -39,20 +39,20 @@ export const OnlineMode: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 py-4 gap-3 pb-28 select-none cyber-grid-bg"
+      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center px-3 py-2.5 gap-2 pb-24 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',
       }}
     >
       {/* Arena Header Bar */}
-      <div className="w-full max-w-sm flex flex-col gap-2">
+      <div className="w-full max-w-sm flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-cyan-400" />
+          <div className="flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5 text-cyan-400" />
             <span
-              className="font-display font-black text-sm tracking-wider"
-              style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.4)' }}
+              className="font-display font-black text-xs tracking-wider"
+              style={{ color: '#00f7ff', textShadow: '0 0 8px rgba(0, 247, 255, 0.4)' }}
             >
               GLOBAL ARENA
             </span>
@@ -63,32 +63,32 @@ export const OnlineMode: React.FC = () => {
               border: '1px solid rgba(0, 247, 255, 0.4)',
               color: '#00f7ff',
             }}
-            className="font-tech text-xs font-bold px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(0,247,255,0.2)]"
+            className="font-tech text-[10px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_6px_rgba(0,247,255,0.2)]"
           >
             {filteredLevels.length} STAGES
           </span>
         </div>
 
-        <p className="text-xs text-slate-400 font-ui leading-relaxed">
-          Challenge community-crafted breakout stages and climb global rankings.
+        <p className="text-[11px] text-slate-400 font-ui leading-tight truncate">
+          Challenge community-crafted breakout stages and climb rankings.
         </p>
 
         {/* Cyber Search Terminal Input */}
-        <div className="relative w-full mt-1">
+        <div className="relative w-full">
           <div
-            className="flex items-center w-full h-11 px-3.5 rounded-xl transition-all duration-200"
+            className="flex items-center w-full h-8.5 px-3 rounded-lg transition-all duration-200"
             style={{
               backgroundColor: 'rgba(8, 14, 38, 0.95)',
               border: isSearchFocused
                 ? '1.5px solid #00f7ff'
                 : '1.5px solid rgba(0, 247, 255, 0.35)',
               boxShadow: isSearchFocused
-                ? '0 0 18px rgba(0, 247, 255, 0.4), inset 0 0 8px rgba(0, 247, 255, 0.15)'
-                : '0 2px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.05)',
+                ? '0 0 14px rgba(0, 247, 255, 0.4), inset 0 0 6px rgba(0, 247, 255, 0.15)'
+                : '0 2px 8px rgba(0, 0, 0, 0.5)',
             }}
           >
             <Search
-              className="w-4 h-4 mr-2.5 flex-shrink-0 transition-colors duration-200"
+              className="w-3.5 h-3.5 mr-2 flex-shrink-0 transition-colors duration-200"
               style={{ color: isSearchFocused ? '#00f7ff' : '#22d3ee' }}
             />
             <input
@@ -103,7 +103,7 @@ export const OnlineMode: React.FC = () => {
               }}
               spellCheck="false"
               autoComplete="off"
-              className="bare-input flex-1 min-w-0 text-xs font-tech tracking-wide text-white placeholder:text-slate-400"
+              className="bare-input flex-1 min-w-0 text-[11px] font-tech tracking-wide text-white placeholder:text-slate-400"
             />
             {searchTerm && (
               <button
@@ -112,17 +112,17 @@ export const OnlineMode: React.FC = () => {
                   setSearchTerm('');
                   setCurrentPage(1);
                 }}
-                className="p-1 rounded-md text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-1.5"
+                className="p-1 rounded-md text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-1"
                 title="Clear search"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => {
@@ -135,19 +135,19 @@ export const OnlineMode: React.FC = () => {
                     backgroundColor: 'rgba(0, 247, 255, 0.18)',
                     border: '1.5px solid #00f7ff',
                     color: '#00f7ff',
-                    boxShadow: '0 0 14px rgba(0, 247, 255, 0.4)',
-                    borderRadius: '10px',
+                    boxShadow: '0 0 10px rgba(0, 247, 255, 0.35)',
+                    borderRadius: '8px',
                   }
                 : {
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     border: '1.5px solid rgba(255, 255, 255, 0.12)',
                     color: '#94a3b8',
-                    borderRadius: '10px',
+                    borderRadius: '8px',
                   }
             }
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-tech font-bold transition-all cursor-pointer active:scale-95"
           >
-            <Boxes className="w-3.5 h-3.5" />
+            <Boxes className="w-3 h-3" />
             <span>ALL STAGES</span>
           </button>
           <button
@@ -162,19 +162,19 @@ export const OnlineMode: React.FC = () => {
                     backgroundColor: 'rgba(255, 170, 0, 0.18)',
                     border: '1.5px solid #ffa500',
                     color: '#ffd700',
-                    boxShadow: '0 0 14px rgba(255, 170, 0, 0.4)',
-                    borderRadius: '10px',
+                    boxShadow: '0 0 10px rgba(255, 170, 0, 0.35)',
+                    borderRadius: '8px',
                   }
                 : {
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
                     border: '1.5px solid rgba(255, 255, 255, 0.12)',
                     color: '#94a3b8',
-                    borderRadius: '10px',
+                    borderRadius: '8px',
                   }
             }
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-tech font-bold transition-all cursor-pointer active:scale-95"
           >
-            <Flame className="w-3.5 h-3.5 fill-current" />
+            <Flame className="w-3 h-3 fill-current" />
             <span>TOP PLAYED</span>
           </button>
         </div>
@@ -186,7 +186,7 @@ export const OnlineMode: React.FC = () => {
       )}
 
       {/* Arena Levels Grid */}
-      <div className="w-full max-w-sm grid grid-cols-2 gap-3 mt-1">
+      <div className="w-full max-w-sm grid grid-cols-2 gap-2 mt-0.5">
         {pageLevels.map((lvl) => (
           <ArenaLevelCard
             key={lvl.id}
