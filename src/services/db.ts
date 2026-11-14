@@ -63,11 +63,18 @@ class StandardDatabaseService {
         localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
       } else {
         const stored: LevelData[] = JSON.parse(raw);
-        const missing = INITIAL_ONLINE_LEVELS.filter((initLvl) => !stored.some((s) => s.id === initLvl.id));
-        if (missing.length > 0) {
-          const merged = [...stored, ...missing];
-          localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
-        }
+        // Strictly filter out numeric arcade levels from stored online levels
+        const cleanStored = Array.isArray(stored) ? stored.filter((lvl) => isNaN(Number(lvl.id))) : [];
+        // Update existing levels with latest initial metadata (e.g. creator: 'elsesourav')
+        const updated = cleanStored.map((lvl) => {
+          const matched = INITIAL_ONLINE_LEVELS.find((init) => init.id === lvl.id);
+          return matched
+            ? { ...lvl, creator: matched.creator, name: matched.name, isPublic: matched.isPublic }
+            : lvl;
+        });
+        const missing = INITIAL_ONLINE_LEVELS.filter((initLvl) => !updated.some((s) => s.id === initLvl.id));
+        const merged = [...updated, ...missing];
+        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
       }
     } catch {
       localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
@@ -88,7 +95,9 @@ class StandardDatabaseService {
 
   public async getOnlineLevels(searchTerm?: string): Promise<LevelData[]> {
     const raw = localStorage.getItem(this.onlineLevelsKey);
-    const levels: LevelData[] = raw ? JSON.parse(raw) : INITIAL_ONLINE_LEVELS;
+    const rawLevels: LevelData[] = raw ? JSON.parse(raw) : INITIAL_ONLINE_LEVELS;
+    // Strictly exclude numeric arcade levels from online results
+    const levels = rawLevels.filter((l) => isNaN(Number(l.id)));
 
     if (!searchTerm || !searchTerm.trim()) {
       return levels;

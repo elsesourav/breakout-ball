@@ -30,6 +30,7 @@ export class ClientSearchEngine<T extends { id: string; name?: string; creator?:
   public search<U extends T>(items: U[], query: string): U[] {
     const rawQuery = query.trim().toLowerCase();
     if (!rawQuery) return items;
+    const cleanQuery = rawQuery.replace(/^[@#]/, '');
 
     // Tokenize query words
     const tokens = rawQuery.split(/\s+/).filter(Boolean);
@@ -47,43 +48,48 @@ export class ClientSearchEngine<T extends { id: string; name?: string; creator?:
       let score = 0;
 
       // 1. Exact Name/Title or ID match (+100)
-      if (name === rawQuery || id === rawQuery) {
+      if (name === rawQuery || id === rawQuery || (cleanQuery && id === cleanQuery)) {
         score += 100;
       }
 
       // 2. Title/Name Prefix match (+50)
-      if (name.startsWith(rawQuery) || id.startsWith(rawQuery)) {
+      if (name.startsWith(rawQuery) || id.startsWith(rawQuery) || (cleanQuery && id.startsWith(cleanQuery))) {
         score += 50;
       }
 
       // 3. Primary Category / Creator match (+30)
-      if (creator.includes(rawQuery) || (category && category.includes(rawQuery))) {
+      if (
+        creator.includes(rawQuery) ||
+        (cleanQuery && creator.includes(cleanQuery)) ||
+        (category && category.includes(rawQuery))
+      ) {
         score += 30;
       }
 
       // 4. Token-level matching
       for (const token of tokens) {
+        const cleanToken = token.replace(/^[@#]/, '');
         // Tag match (+25 per matching tag)
         for (const tag of tags) {
-          if (tag === token) {
+          if (tag === token || (cleanToken && tag === cleanToken)) {
             score += 25;
-          } else if (tag.includes(token)) {
+          } else if (tag.includes(token) || (cleanToken && tag.includes(cleanToken))) {
             score += 15;
           }
         }
 
-        // Substring matches (+10)
-        if (name.includes(token)) {
+        // Substring matches (+10 to +20)
+        if (name.includes(token) || (cleanToken && name.includes(cleanToken))) {
           score += 20;
         }
-        if (id.includes(token)) {
+        if (id.includes(token) || (cleanToken && id.includes(cleanToken))) {
           score += 15;
         }
         if (description.includes(token)) {
           score += 10;
         }
-        if (creator.includes(token)) {
-          score += 10;
+        if (creator.includes(token) || (cleanToken && creator.includes(cleanToken))) {
+          score += 15;
         }
       }
 

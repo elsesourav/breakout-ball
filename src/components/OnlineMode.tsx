@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { levelSearchEngine } from '../services/search';
 import { Search, Flame, Globe, X, Boxes } from 'lucide-react';
@@ -8,21 +8,47 @@ import { DailyFeaturedBanner } from './arena/DailyFeaturedBanner';
 
 const ITEMS_PER_PAGE = 25;
 
+const SEARCH_TARGETS = [
+  { text: 'Level Name...', color: '#00f7ff' },
+  { text: 'Stage ID (#ARC88)...', color: '#38bdf8' },
+  { text: 'Creator (@elsesourav)...', color: '#ffd700' },
+];
+
 export const OnlineMode: React.FC = () => {
-  const { onlineLevels, openPreview } = useGame();
+  const { onlineLevels, localLevels, openPreview } = useGame();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterMode, setFilterMode] = useState<'all' | 'popular'>('all');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchTargetIdx, setSearchTargetIdx] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Cycle search target placeholder ticker bottom-to-top
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSearchTargetIdx((prev) => (prev + 1) % SEARCH_TARGETS.length);
+    }, 2600);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Strictly filter out arcade / campaign levels from Global Arena
+  const arenaLevels = useMemo(() => {
+    return onlineLevels.filter((lvl) => {
+      // Exclude numeric arcade level IDs (e.g. '1', '2', ..., '30')
+      if (!isNaN(Number(lvl.id))) return false;
+      // Exclude any stage whose ID matches local/campaign levels
+      if (localLevels.some((local) => local.id === lvl.id)) return false;
+      return true;
+    });
+  }, [onlineLevels, localLevels]);
+
   const filteredLevels = useMemo(() => {
-    let list = levelSearchEngine.search(onlineLevels, searchTerm);
+    let list = levelSearchEngine.search(arenaLevels, searchTerm);
     if (filterMode === 'popular') {
       list = [...list].sort((a, b) => (b.playCount || 0) - (a.playCount || 0));
     }
     return list;
-  }, [onlineLevels, searchTerm, filterMode]);
+  }, [arenaLevels, searchTerm, filterMode]);
 
   const totalPages = Math.max(1, Math.ceil(filteredLevels.length / ITEMS_PER_PAGE));
 
@@ -76,7 +102,7 @@ export const OnlineMode: React.FC = () => {
         {/* Cyber Search Terminal Input */}
         <div className="relative w-full mt-0.5">
           <div
-            className="flex items-center w-full h-11 px-3.5 rounded-xl transition-all duration-200"
+            className="flex items-center w-full h-11 px-4 rounded-xl transition-all duration-200"
             style={{
               backgroundColor: 'rgba(8, 14, 38, 0.95)',
               border: isSearchFocused
@@ -88,23 +114,38 @@ export const OnlineMode: React.FC = () => {
             }}
           >
             <Search
-              className="w-4 h-4 mr-2.5 flex-shrink-0 transition-colors duration-200"
+              className="w-4 h-4 mr-3 flex-shrink-0 transition-colors duration-200"
               style={{ color: isSearchFocused ? '#00f7ff' : '#22d3ee' }}
             />
-            <input
-              type="text"
-              placeholder="Search by Level, ID or Creator..."
-              value={searchTerm}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              spellCheck="false"
-              autoComplete="off"
-              className="bare-input flex-1 min-w-0 text-xs py-2 font-tech tracking-wide text-white placeholder:text-slate-400"
-            />
+            <div className="relative flex-1 flex items-center h-full min-w-0">
+              <input
+                type="text"
+                value={searchTerm}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                spellCheck="false"
+                autoComplete="off"
+                className="bare-input w-full h-full text-xs py-2 font-tech tracking-wide text-white bg-transparent relative z-10"
+              />
+              {!searchTerm && (
+                <div className="absolute inset-0 flex items-center pointer-events-none select-none text-xs font-tech text-slate-400 overflow-hidden">
+                  <span className="flex-shrink-0 text-slate-400">Search by&nbsp;</span>
+                  <div className="relative h-5 overflow-hidden flex items-center">
+                    <span
+                      key={searchTargetIdx}
+                      className="search-ticker-item font-bold tracking-wide"
+                      style={{ color: SEARCH_TARGETS[searchTargetIdx].color }}
+                    >
+                      {SEARCH_TARGETS[searchTargetIdx].text}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
             {searchTerm && (
               <button
                 type="button"
@@ -112,7 +153,7 @@ export const OnlineMode: React.FC = () => {
                   setSearchTerm('');
                   setCurrentPage(1);
                 }}
-                className="p-1.5 rounded-lg text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-2"
+                className="p-1.5 rounded-lg text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-2 relative z-20"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
@@ -182,7 +223,7 @@ export const OnlineMode: React.FC = () => {
 
       {/* Daily Featured Challenge Banner (Active on All Stages Page 1) */}
       {!searchTerm && filterMode === 'all' && currentPage === 1 && (
-        <DailyFeaturedBanner levels={onlineLevels} />
+        <DailyFeaturedBanner levels={arenaLevels} />
       )}
 
       {/* Arena Levels Grid */}
