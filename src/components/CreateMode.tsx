@@ -161,15 +161,15 @@ const StudioLevelCard: React.FC<{
       </div>
 
       {/* Details Bar */}
-      <div className="p-2.5 flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <span className="font-tech font-black text-xs text-cyan-300 truncate">
+      <div className="p-2.5 flex flex-col gap-1.5 min-w-0">
+        <div className="flex items-center justify-between min-w-0">
+          <span className="font-tech font-black text-xs text-cyan-300 truncate min-w-0 flex-1 mr-1.5">
             {level.name || `Core #${level.id}`}
           </span>
           <button
             type="button"
             onClick={onSettings}
-            className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
+            className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer flex-shrink-0"
             title="Edit Level Settings"
           >
             <Settings2 className="w-3.5 h-3.5" />

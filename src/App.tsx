@@ -57,11 +57,13 @@ export const AppContent: React.FC = () => {
         <LevelDesigner />
       ) : (
         <div id="gameMode">
-          <div id="modeType">
-            {activeTab === 'local' && <LevelRoadmap />}
-            {activeTab === 'online' && <OnlineMode />}
-            {activeTab === 'create' && <CreateMode />}
-            {activeTab === 'profile' && <ProfileView />}
+          <div id="modeType" className="w-full h-full relative overflow-hidden">
+            <div key={activeTab} className="cyber-page-transition w-full h-full">
+              {activeTab === 'local' && <LevelRoadmap />}
+              {activeTab === 'online' && <OnlineMode />}
+              {activeTab === 'create' && <CreateMode />}
+              {activeTab === 'profile' && <ProfileView />}
+            </div>
           </div>
           <MobileBottomNav />
         </div>

@@ -26,7 +26,14 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="auth-modal-overlay">
+    <div
+      className="auth-modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
       <div className="auth-modal-box">
         {/* Cyber Close Button */}
         <button

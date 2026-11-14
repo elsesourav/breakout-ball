@@ -30,7 +30,15 @@ export const AlertModal: React.FC = () => {
   };
 
   return (
-    <div id="floatingInputShow" className="floating-window-outer active">
+    <div
+      id="floatingInputShow"
+      className="floating-window-outer active"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleBtn1();
+        }
+      }}
+    >
       <div className="floating-window-inner">
         <h3 className="floating-title" style={{ color: titleColor || '#00ffff' }}>
           {title}

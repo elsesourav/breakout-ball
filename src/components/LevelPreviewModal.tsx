@@ -95,7 +95,15 @@ export const LevelPreviewModal: React.FC = () => {
   const isCampaign = !isNaN(Number(selectedLevel.id));
 
   return (
-    <div id="showPreview" className="active">
+    <div
+      id="showPreview"
+      className="active"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setScreen('menu');
+        }
+      }}
+    >
       <div className="rapper">
         {/* Top Header Bar: Back Button, Title, Mode Pill */}
         <div className="flex items-center justify-between w-full pb-1 border-b border-white/10">

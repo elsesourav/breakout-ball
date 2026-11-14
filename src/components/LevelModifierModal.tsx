@@ -47,7 +47,15 @@ export const LevelModifierModal: React.FC = () => {
   };
 
   return (
-    <div id="levelModifier" className="active">
+    <div
+      id="levelModifier"
+      className="active"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          closeModifier();
+        }
+      }}
+    >
       <div className="btn" id="closeModifier" onClick={closeModifier}>
         <i className="sbi-cross1" />
       </div>
