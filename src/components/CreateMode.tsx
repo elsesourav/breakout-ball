@@ -19,7 +19,11 @@ export const CreateMode: React.FC = () => {
       <div className="w-full max-w-sm flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-cyan-400" />
+            <img
+              src="/logo.png"
+              alt="Breakout Ball"
+              className="w-4 h-4 rounded-full object-cover shadow-[0_0_8px_#ff4500]"
+            />
             <span
               className="font-display font-black text-sm tracking-wider text-cyan-300"
               style={{ color: '#00f7ff' }}

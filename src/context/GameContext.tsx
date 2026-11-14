@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   ActiveTab,
   GameScreen,
@@ -9,12 +9,18 @@ import {
   UserProfile,
   AlertConfig,
 } from '../types/game';
-import { DEFAULT_SETTINGS, DEFAULT_USER } from '../constants/game';
+import { DEFAULT_SETTINGS } from '../constants/game';
 import { soundManager } from '../utils/audio';
 import { achievementManager } from '../services/achievements';
-import { synthAudio } from '../utils/synthAudio';
 import { dbService } from '../services/db';
 import { authService } from '../services/auth';
+import {
+  parseCurrentRoute,
+  getRoutePath,
+  pushAppRoute,
+  replaceAppRoute,
+  scrubUrlParams,
+} from '../services/router';
 
 interface GameContextType {
   activeTab: ActiveTab;
@@ -55,7 +61,8 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTabState] = useState<ActiveTab>('local');
+  const initialRoute = parseCurrentRoute();
+  const [activeTab, setActiveTabState] = useState<ActiveTab>(initialRoute.tab);
   const [screen, setScreenState] = useState<GameScreen>('menu');
   const [selectedLevel, setSelectedLevel] = useState<LevelData | null>(null);
   const [editingLevel, setEditingLevel] = useState<LevelData | null>(null);
@@ -87,26 +94,88 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
-  // Load from Standard Database on mount
+  // Load from database on mount & synchronize initial URL route
   useEffect(() => {
     const loadInitialData = async () => {
+      scrubUrlParams();
       const [locals, onlines, userProgress] = await Promise.all([
         dbService.getLocalLevels(),
         dbService.getOnlineLevels(),
         dbService.getProgress(user.username),
       ]);
 
+      const userLevels = await dbService.getUserCreatedLevels(user.username);
       setLocalLevels(locals);
       setOnlineLevels(onlines);
       setLocalProgress(userProgress);
-      setSelectedLevel(locals[0] || null);
-
-      const userLevels = await dbService.getUserCreatedLevels(user.username);
       setUserCreatedLevels(userLevels);
+
+      const allLevels = [...locals, ...onlines, ...userLevels];
+      const route = parseCurrentRoute();
+
+      if (route.type === 'level' && route.levelId) {
+        const found = allLevels.find((lvl) => lvl.id === route.levelId);
+        if (found) {
+          setSelectedLevel(found);
+          const board = await dbService.getLeaderboard(found.id);
+          setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
+          setScreenState('preview');
+          const isNumeric = !isNaN(Number(found.id));
+          setActiveTabState(isNumeric ? 'local' : 'online');
+          replaceAppRoute(`/level/${encodeURIComponent(found.id)}`);
+          return;
+        }
+      } else if (route.type === 'play' && route.levelId) {
+        const found = allLevels.find((lvl) => lvl.id === route.levelId);
+        if (found) {
+          setSelectedLevel(found);
+          setScreenState('playing');
+          soundManager.startBgMusic();
+          dbService.incrementPlayCount(found.id);
+          replaceAppRoute(`/play/${encodeURIComponent(found.id)}`);
+          return;
+        }
+      }
+
+      // Canonicalize tab route cleanly
+      const canonicalPath = getRoutePath(route.tab, 'menu');
+      replaceAppRoute(canonicalPath);
+      setSelectedLevel(locals[0] || null);
     };
 
     loadInitialData();
   }, [user.username]);
+
+  // Synchronize browser Back / Forward (popstate) navigation
+  useEffect(() => {
+    const handlePopState = async () => {
+      scrubUrlParams();
+      const route = parseCurrentRoute();
+      const allLevels = [...localLevels, ...onlineLevels, ...userCreatedLevels];
+
+      if (route.type === 'tab') {
+        setActiveTabState(route.tab);
+        setScreenState('menu');
+      } else if (route.type === 'level' && route.levelId) {
+        const found = allLevels.find((lvl) => lvl.id === route.levelId);
+        if (found) {
+          setSelectedLevel(found);
+          const board = await dbService.getLeaderboard(found.id);
+          setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
+          setScreenState('preview');
+        }
+      } else if (route.type === 'play' && route.levelId) {
+        const found = allLevels.find((lvl) => lvl.id === route.levelId);
+        if (found) {
+          setSelectedLevel(found);
+          setScreenState('playing');
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [localLevels, onlineLevels, userCreatedLevels]);
 
   // Sync settings with audio manager
   useEffect(() => {
@@ -115,14 +184,25 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('breakout_settings', JSON.stringify(settings));
   }, [settings]);
 
-  const setActiveTab = (tab: ActiveTab) => {
-    soundManager.playClick();
-    setActiveTabState(tab);
-  };
+  const setActiveTab = useCallback(
+    (tab: ActiveTab) => {
+      soundManager.playClick();
+      setActiveTabState(tab);
+      setScreenState('menu');
+      pushAppRoute(getRoutePath(tab, 'menu'));
+    },
+    []
+  );
 
-  const setScreen = (newScreen: GameScreen) => {
-    setScreenState(newScreen);
-  };
+  const setScreen = useCallback(
+    (newScreen: GameScreen) => {
+      setScreenState(newScreen);
+      if (newScreen === 'menu') {
+        pushAppRoute(getRoutePath(activeTab, 'menu'));
+      }
+    },
+    [activeTab]
+  );
 
   const updateSettings = (newSettings: Partial<GameSettings>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }));
@@ -152,28 +232,36 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAlertConfig(null);
   };
 
-  const startPlayLevel = (level: LevelData) => {
-    soundManager.playClick();
-    setSelectedLevel(level);
-    setScreen('playing');
-    soundManager.startBgMusic();
-    dbService.incrementPlayCount(level.id);
-    if (level.isPublic || isNaN(parseInt(level.id, 10))) {
-      achievementManager.unlock('arena_challenger');
-    }
-  };
+  const startPlayLevel = useCallback(
+    (level: LevelData) => {
+      soundManager.playClick();
+      setSelectedLevel(level);
+      setScreenState('playing');
+      soundManager.startBgMusic();
+      dbService.incrementPlayCount(level.id);
+      pushAppRoute(getRoutePath(activeTab, 'playing', level.id));
+      if (level.isPublic || isNaN(parseInt(level.id, 10))) {
+        achievementManager.unlock('arena_challenger');
+      }
+    },
+    [activeTab]
+  );
 
-  const openPreview = async (level: LevelData) => {
-    soundManager.playClick();
-    setSelectedLevel(level);
-    const board = await dbService.getLeaderboard(level.id);
-    setLeaderboards((prev) => ({ ...prev, [level.id]: board }));
-    setScreen('preview');
-  };
+  const openPreview = useCallback(
+    async (level: LevelData) => {
+      soundManager.playClick();
+      setSelectedLevel(level);
+      const board = await dbService.getLeaderboard(level.id);
+      setLeaderboards((prev) => ({ ...prev, [level.id]: board }));
+      setScreenState('preview');
+      pushAppRoute(getRoutePath(activeTab, 'preview', level.id));
+    },
+    [activeTab]
+  );
 
   const openDesigner = () => {
     soundManager.playClick();
-    setScreen('designer');
+    setScreenState('designer');
   };
 
   const openModifier = (level: LevelData) => {
@@ -236,7 +324,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       achievementManager.unlock('speed_demon');
     }
 
-    // Update local progress for numbered progression
     const levelNum = parseInt(levelId, 10);
     if (!isNaN(levelNum)) {
       setLocalProgress((prev) => {

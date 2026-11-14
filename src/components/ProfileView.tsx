@@ -367,7 +367,12 @@ export const ProfileView: React.FC = () => {
       )}
 
       {/* 4. Minimal Ecosystem Footer */}
-      <footer className="text-center text-xs text-slate-400 font-mono mt-1">
+      <footer className="flex items-center justify-center gap-2 text-center text-xs text-slate-400 font-mono mt-1">
+        <img
+          src="/logo.png"
+          alt="Breakout Ball"
+          className="w-4 h-4 rounded-full object-cover shadow-[0_0_8px_#ff4500]"
+        />
         <span>Breakout Ball V2 • Ecosystem by </span>
         <a
           href="https://elsesourav.com"

@@ -118,18 +118,25 @@ export const LevelPreviewModal: React.FC = () => {
             <span style={{ color: '#ffffff', fontWeight: 600 }}>Back</span>
           </button>
 
-          <div className="flex flex-col items-center">
-            <span
-              className="font-display font-black text-sm tracking-widest uppercase"
-              style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.5)' }}
-            >
-              {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
-            </span>
-            {!isCampaign && selectedLevel.creator && (
-              <span className="font-ui text-[10px] text-slate-400 mt-0.5">
-                By @{selectedLevel.creator}
+          <div className="flex items-center gap-2">
+            <img
+              src="/logo.png"
+              alt="Breakout Comet"
+              className="w-5 h-5 rounded-full object-cover shadow-[0_0_8px_#ff4500]"
+            />
+            <div className="flex flex-col items-start">
+              <span
+                className="font-display font-black text-sm tracking-widest uppercase"
+                style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.5)' }}
+              >
+                {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
               </span>
-            )}
+              {!isCampaign && selectedLevel.creator && (
+                <span className="font-ui text-[10px] text-slate-400 mt-0.5">
+                  By @{selectedLevel.creator}
+                </span>
+              )}
+            </div>
           </div>
 
           <span className="px-2 py-0.5 rounded-full text-[9px] font-tech font-bold uppercase tracking-wider bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">

@@ -54,7 +54,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   return (
     <div className="w-full flex flex-col">
       {/* Cyber Header */}
-      <div className="text-center mb-2.5">
+      <div className="text-center mb-2.5 flex flex-col items-center">
+        <img
+          src="/logo.png"
+          alt="Breakout Ball"
+          className="w-10 h-10 mb-2 rounded-full object-cover shadow-[0_0_14px_#ff4500]"
+        />
         <h2 className="font-display font-black text-base md:text-lg tracking-wider text-[#00f7ff] [text-shadow:0_0_12px_rgba(0,247,255,0.4)]">
           WELCOME BACK
         </h2>

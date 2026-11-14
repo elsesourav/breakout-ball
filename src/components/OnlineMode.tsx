@@ -75,7 +75,11 @@ export const OnlineMode: React.FC = () => {
       <div className="w-full max-w-sm flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4 text-cyan-400" />
+            <img
+              src="/logo.png"
+              alt="Breakout Ball"
+              className="w-4 h-4 rounded-full object-cover shadow-[0_0_8px_#ff4500]"
+            />
             <span
               className="font-display font-black text-xs tracking-wider"
               style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.4)' }}
