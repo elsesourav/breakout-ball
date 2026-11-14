@@ -31,7 +31,7 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               style={{
                 left: `${(b.x / SVG_WIDTH) * 100}%`,
                 top: `${b.y}px`,
-                transform: 'translate(-50%, -50%) translateZ(22px) rotateX(-14deg)',
+                transform: 'translate(-50%, -50%) translateZ(22px) rotateX(-12deg)',
                 transformStyle: 'preserve-3d',
               }}
               title="Route Blocked: Complete previous level to destroy this barrier"
@@ -230,7 +230,7 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
-                transform: 'translateX(-50%) translateZ(30px) rotateX(-14deg)',
+                transform: 'translateX(-50%) translateZ(30px) rotateX(-12deg)',
                 transformStyle: 'preserve-3d',
               }}
             >

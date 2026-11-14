@@ -272,7 +272,7 @@ export const LevelRoadmap: React.FC = () => {
     <div
       className="relative w-full h-full overflow-hidden select-none bg-[#03040c]"
       style={{
-        perspective: '900px',
+        perspective: '1000px',
         perspectiveOrigin: '50% 88%',
         backgroundImage: `
           radial-gradient(ellipse 95% 20% at 50% 0%, rgba(255, 215, 0, 0.12) 0%, transparent 75%),
@@ -282,12 +282,12 @@ export const LevelRoadmap: React.FC = () => {
         `,
       }}
     >
-      {/* Top Atmospheric Horizon Gradient overlay */}
+      {/* Top Atmospheric Horizon Gradient overlay - Sci-fi distance haze */}
       <div
-        className="absolute top-0 inset-x-0 h-24 pointer-events-none z-30"
+        className="absolute top-0 inset-x-0 h-32 pointer-events-none z-30"
         style={{
           background:
-            'linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.9) 45%, transparent 100%)',
+            'radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0, 247, 255, 0.14) 0%, transparent 80%), linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.94) 45%, rgba(3, 4, 12, 0.5) 75%, transparent 100%)',
         }}
       />
 
@@ -313,14 +313,16 @@ export const LevelRoadmap: React.FC = () => {
           `,
         }}
       >
-        {/* 3D Tilted Board: Oversized 136% width so 3D perspective narrowing never clips or exposes corners */}
+        {/* 3D Tilted Board: Full-bleed 210% width with -55% margin so 3D perspective narrowing never exposes corners */}
         <div
           className="relative mx-auto overflow-visible select-none"
           style={{
-            width: '136%',
-            marginLeft: '-18%',
-            height: `${TOTAL_HEIGHT}px`,
-            transform: 'rotateX(14deg)',
+            width: '210%',
+            marginLeft: '-55%',
+            marginTop: '-120px',
+            paddingTop: '120px',
+            height: `${TOTAL_HEIGHT + 160}px`,
+            transform: 'rotateX(12deg)',
             transformOrigin: '50% 100%',
             transformStyle: 'preserve-3d',
             willChange: 'transform',
