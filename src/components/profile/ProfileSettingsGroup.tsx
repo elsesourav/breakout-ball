@@ -1,10 +1,26 @@
 import React from 'react';
 import { useGame } from '../../context/GameContext';
 import { ArcadeSlider, ArcadeSwitch } from '@elsesourav/react-ui';
-import { Volume2, Vibrate, Compass, Sliders } from 'lucide-react';
+import { Volume2, Vibrate, Compass, Sliders, Trash2 } from 'lucide-react';
 
 export const ProfileSettingsGroup: React.FC = () => {
-  const { settings, updateSettings } = useGame();
+  const { settings, updateSettings, showAlert } = useGame();
+
+  const handleResetProgress = () => {
+    showAlert({
+      title: 'RESET PROGRESS?',
+      message: 'This will reset your local campaign progress back to Core 01. This action cannot be undone.',
+      titleColor: '#ef4444',
+      btn1Text: 'CANCEL',
+      btn1Color: '#94a3b8',
+      btn2Text: 'RESET ALL',
+      btn2Color: '#ef4444',
+      onConfirm: () => {
+        localStorage.removeItem('breakout_db_progress');
+        window.location.reload();
+      },
+    });
+  };
 
   return (
     <>
@@ -126,6 +142,33 @@ export const ProfileSettingsGroup: React.FC = () => {
             className="w-full"
             ariaLabel="Gyroscope Sensitivity"
           />
+        </div>
+      </div>
+
+      {/* Data Management & Storage */}
+      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
+        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-slate-300 text-xs font-display font-black tracking-wider uppercase">
+          <Trash2 className="w-4 h-4 text-red-400" />
+          <span>Data & Storage</span>
+        </div>
+
+        <div className="flex items-center justify-between pt-0.5">
+          <div className="flex flex-col">
+            <span className="font-settings-title text-xs font-bold text-white tracking-wider">
+              RESET CAMPAIGN
+            </span>
+            <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+              Reset stage unlocks & best records
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleResetProgress}
+            className="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-tech font-bold text-xs transition-all active:scale-95 cursor-pointer"
+          >
+            RESET
+          </button>
         </div>
       </div>
     </>
