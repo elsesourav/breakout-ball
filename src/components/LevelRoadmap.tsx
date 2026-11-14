@@ -272,6 +272,8 @@ export const LevelRoadmap: React.FC = () => {
     <div
       className="relative w-full h-full overflow-hidden select-none bg-[#03040c]"
       style={{
+        perspective: '900px',
+        perspectiveOrigin: '50% 88%',
         backgroundImage: `
           radial-gradient(ellipse 95% 20% at 50% 0%, rgba(255, 215, 0, 0.12) 0%, transparent 75%),
           radial-gradient(ellipse 90% 20% at 50% 30%, rgba(244, 63, 94, 0.1) 0%, transparent 75%),
@@ -282,10 +284,10 @@ export const LevelRoadmap: React.FC = () => {
     >
       {/* Top Atmospheric Horizon Gradient overlay */}
       <div
-        className="absolute top-0 inset-x-0 h-20 pointer-events-none z-30"
+        className="absolute top-0 inset-x-0 h-24 pointer-events-none z-30"
         style={{
           background:
-            'linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.85) 40%, transparent 100%)',
+            'linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.9) 45%, transparent 100%)',
         }}
       />
 
@@ -311,66 +313,81 @@ export const LevelRoadmap: React.FC = () => {
           `,
         }}
       >
+        {/* 3D Tilted Board: Oversized 136% width so 3D perspective narrowing never clips or exposes corners */}
         <div
-          className="relative mx-auto overflow-x-hidden w-full max-w-[440px]"
+          className="relative mx-auto overflow-visible select-none"
           style={{
+            width: '136%',
+            marginLeft: '-18%',
             height: `${TOTAL_HEIGHT}px`,
+            transform: 'rotateX(14deg)',
+            transformOrigin: '50% 100%',
+            transformStyle: 'preserve-3d',
+            willChange: 'transform',
           }}
         >
-          {/* Floating Breakout Bricks in generous margins */}
-          {floatingBricks.map((b) => (
-            <div
-              key={`brick-${b.id}`}
-              className="absolute rounded-md pointer-events-none transition-transform"
-              style={{
-                left: `${b.x}px`,
-                top: `${b.y}px`,
-                width: `${b.w}px`,
-                height: `${b.h}px`,
-                backgroundColor: b.color,
-                opacity: b.opacity,
-                boxShadow: `0 0 14px ${b.glow}, inset 0 1px 1px #fff`,
-                transform: `rotate(${b.rotation}deg)`,
-                border: '1px solid rgba(255,255,255,0.2)',
-              }}
-            />
-          ))}
-
-          {/* Laser Conduit SVG with Cleared Connected vs Blocked Severed Paths */}
-          <RoadmapConduitSvg
-            nodes={nodes}
-            pathData={conduitPathData}
-            activePathData={activePathData}
-            currentUnlockedId={currentUnlockedId}
-          />
-
-          {/* Route Blockers & Map Obstacles (Physical 3D Clamps & Ambient Hazards) */}
-          <RoadmapObstacles
-            obstacles={obstacles}
-            routeBlockers={routeBlockers}
-            onBlockerClick={handleBlockerClick}
-          />
-
-          {/* Sector Gateway Banners */}
-          <RoadmapSectorBanner nodes={nodes} />
-
-          {/* Level Energy Cells */}
-          {nodes.map((node) => {
-            const progress = localProgress[String(node.id)];
-            const isComplete = progress?.completed;
-            const isCurrent = node.id === currentUnlockedId && !isComplete;
-
-            return (
-              <RoadmapNodeItem
-                key={`node-${node.id}`}
-                ref={isCurrent ? activeNodeRef : undefined}
-                node={node}
-                progress={progress}
-                isCurrent={isCurrent}
-                onLevelClick={handleLevelClick}
+          <div
+            className="relative mx-auto overflow-visible w-full max-w-[440px]"
+            style={{
+              height: `${TOTAL_HEIGHT}px`,
+              transformStyle: 'preserve-3d',
+            }}
+          >
+            {/* Floating Breakout Bricks in generous margins */}
+            {floatingBricks.map((b) => (
+              <div
+                key={`brick-${b.id}`}
+                className="absolute rounded-md pointer-events-none transition-transform"
+                style={{
+                  left: `${b.x}px`,
+                  top: `${b.y}px`,
+                  width: `${b.w}px`,
+                  height: `${b.h}px`,
+                  backgroundColor: b.color,
+                  opacity: b.opacity,
+                  boxShadow: `0 0 14px ${b.glow}, inset 0 1px 1px #fff`,
+                  transform: `rotate(${b.rotation}deg)`,
+                  border: '1px solid rgba(255,255,255,0.2)',
+                }}
               />
-            );
-          })}
+            ))}
+
+            {/* Laser Conduit SVG with Cleared Connected vs Blocked Severed Paths */}
+            <RoadmapConduitSvg
+              nodes={nodes}
+              pathData={conduitPathData}
+              activePathData={activePathData}
+              currentUnlockedId={currentUnlockedId}
+            />
+
+            {/* Route Blockers & Map Obstacles (Physical 3D Clamps & Ambient Hazards) */}
+            <RoadmapObstacles
+              obstacles={obstacles}
+              routeBlockers={routeBlockers}
+              onBlockerClick={handleBlockerClick}
+            />
+
+            {/* Sector Gateway Banners */}
+            <RoadmapSectorBanner nodes={nodes} />
+
+            {/* Level Energy Cells */}
+            {nodes.map((node) => {
+              const progress = localProgress[String(node.id)];
+              const isComplete = progress?.completed;
+              const isCurrent = node.id === currentUnlockedId && !isComplete;
+
+              return (
+                <RoadmapNodeItem
+                  key={`node-${node.id}`}
+                  ref={isCurrent ? activeNodeRef : undefined}
+                  node={node}
+                  progress={progress}
+                  isCurrent={isCurrent}
+                  onLevelClick={handleLevelClick}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

@@ -72,7 +72,8 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         style={{
           left: `${(node.x / SVG_WIDTH) * 100}%`,
           top: `${node.y}px`,
-          transform: 'translate(-50%, -50%)',
+          transform: 'translate(-50%, -50%) translateZ(28px)',
+          transformStyle: 'preserve-3d',
         }}
       >
         {/* Floating Bouncing Energy Ball & High-Tech PLAY Beacon above Current Active Level */}
@@ -84,7 +85,8 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               position: 'absolute',
               top: '-56px',
               left: '50%',
-              transform: 'translateX(-50%)',
+              transform: 'translateX(-50%) translateZ(20px) rotateX(-12deg)',
+              transformStyle: 'preserve-3d',
             }}
           >
             {/* 3D Glowing Cyber Ball with Radiant Core */}

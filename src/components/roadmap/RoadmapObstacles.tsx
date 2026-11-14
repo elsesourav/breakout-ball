@@ -31,7 +31,8 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               style={{
                 left: `${(b.x / SVG_WIDTH) * 100}%`,
                 top: `${b.y}px`,
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, -50%) translateZ(22px) rotateX(-14deg)',
+                transformStyle: 'preserve-3d',
               }}
               title="Route Blocked: Complete previous level to destroy this barrier"
             >
@@ -152,10 +153,12 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
         return (
           <div
             key={b.id}
-            className="absolute z-10 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none opacity-70"
+            className="absolute z-10 select-none pointer-events-none opacity-70"
             style={{
               left: `${(b.x / SVG_WIDTH) * 100}%`,
               top: `${b.y}px`,
+              transform: 'translate(-50%, -50%) translateZ(12px)',
+              transformStyle: 'preserve-3d',
             }}
           >
             {/* Dormant Mechanical Track Clamp Object */}
@@ -223,10 +226,12 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
           return (
             <div
               key={obs.id}
-              className="absolute z-10 -translate-x-1/2 flex flex-col items-center pointer-events-none select-none"
+              className="absolute z-10 flex flex-col items-center pointer-events-none select-none"
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
+                transform: 'translateX(-50%) translateZ(30px) rotateX(-14deg)',
+                transformStyle: 'preserve-3d',
               }}
             >
               {/* Visual Laser Forcefield Arch stretched across the Roadmap */}
