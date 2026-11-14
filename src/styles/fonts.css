@@ -44,7 +44,7 @@
    --font-display: 'Orbitron', 'f1b', 'Exo-Bold', system-ui, sans-serif;
    --font-tech: 'Chakra Petch', 'f2b', 'Oswald-Bold', monospace;
    --font-ui: 'Outfit', 'f6', -apple-system, BlinkMacSystemFont, sans-serif;
-   --font-settings: 'Rajdhani', 'Chakra Petch', 'f2b', sans-serif;
+   --font-settings: 'Chakra Petch', 'Orbitron', 'f2b', sans-serif;
 }
 
 .font-display {
@@ -61,4 +61,14 @@
 
 .font-settings {
    font-family: var(--font-settings) !important;
+}
+
+.font-settings-title {
+   font-family: 'Chakra Petch', 'Orbitron', monospace !important;
+   letter-spacing: 0.05em;
+}
+
+.font-settings-desc {
+   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+   letter-spacing: 0.01em;
 }

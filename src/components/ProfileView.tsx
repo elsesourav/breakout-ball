@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
-import { ArcadeButton, ArcadeSlider, ArcadeSwitch } from '@elsesourav/react-ui';
+import { ArcadeSlider, ArcadeSwitch } from '@elsesourav/react-ui';
 import {
   Volume2,
   Vibrate,
@@ -15,6 +15,7 @@ import {
   Mail,
   Sparkles,
   Layers,
+  User as UserIcon,
 } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
@@ -55,14 +56,12 @@ export const ProfileView: React.FC = () => {
   const bestTimes = Object.values(localProgress)
     .map((p) => p.bestTime)
     .filter((t): t is number => typeof t === 'number' && t > 0);
-  const bestRecord = bestTimes.length > 0 ? `${Math.min(...bestTimes)}s` : '--';
+  const minTime = bestTimes.length > 0 ? Math.min(...bestTimes) : null;
+  const bestRecord = minTime !== null ? `${minTime.toFixed(1)}s` : '--';
 
-  // Format initials for avatar
+  // Format identity details
   const displayName = user.isLoggedIn ? (user.fullName || 'Pilot') : 'Anonymous';
-  const displayHandle = user.isLoggedIn ? (user.username || 'pilot') : 'anonymous';
-  const avatarInitials = user.isLoggedIn
-    ? displayHandle.slice(0, 2).toUpperCase()
-    : 'AN';
+  const displayHandle = user.isLoggedIn ? user.username : null;
 
   const providerLabel =
     user.provider === 'google'
@@ -92,48 +91,60 @@ export const ProfileView: React.FC = () => {
                 alt={displayName}
                 className="w-13 h-13 rounded-full object-cover border-2 border-cyan-400 shadow-[0_0_16px_rgba(0,247,255,0.5)]"
               />
-            ) : (
+            ) : user.isLoggedIn ? (
               <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-cyan-500 via-indigo-600 to-purple-600 p-[2px] shadow-[0_0_16px_rgba(0,247,255,0.45)]">
                 <div className="w-full h-full rounded-full bg-[#070a1a] flex items-center justify-center text-cyan-300 font-tech font-bold text-base tracking-wider">
-                  {avatarInitials}
+                  {(user.username || 'P').slice(0, 2).toUpperCase()}
+                </div>
+              </div>
+            ) : (
+              <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-cyan-500/50 via-slate-600 to-slate-800 p-[2px] shadow-[0_0_12px_rgba(0,247,255,0.3)]">
+                <div className="w-full h-full rounded-full bg-[#070a1a] flex items-center justify-center text-cyan-400">
+                  <UserIcon className="w-6 h-6 stroke-[2]" />
                 </div>
               </div>
             )}
 
-            {/* Online / Active Indicator Dot */}
+            {/* Status Indicator Dot */}
             <span
               className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#090d24] ${
                 user.isLoggedIn
                   ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]'
-                  : 'bg-amber-400 shadow-[0_0_6px_#fbbf24]'
+                  : 'bg-cyan-400/80 shadow-[0_0_6px_#00f7ff]'
               }`}
             />
           </div>
 
-          {/* User Details */}
+          {/* User Details: Clean, No Duplicate Anonymous */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <h2 className="text-base font-bold text-white truncate font-ui tracking-wide">
+              <h2 className="text-base font-bold text-white truncate font-display tracking-wide">
                 {displayName}
               </h2>
               {user.isLoggedIn && (
                 <UserCheck className="w-4 h-4 text-cyan-400 flex-shrink-0" />
               )}
             </div>
-            <p className="text-xs text-cyan-400 font-tech truncate mt-0.5">
-              @{displayHandle}
-            </p>
+            {displayHandle ? (
+              <p className="text-xs text-cyan-400 font-tech truncate mt-0.5">
+                @{displayHandle}
+              </p>
+            ) : (
+              <p className="text-[11px] text-slate-400 font-ui truncate mt-0.5">
+                Guest Pilot • Local Progress
+              </p>
+            )}
           </div>
 
-          {/* Status Badge */}
+          {/* Clean Status Badge: GUEST instead of duplicate ANONYMOUS */}
           <span
             className={`text-[10px] font-tech font-bold px-2 py-0.5 rounded-full border tracking-wider flex-shrink-0 ${
               user.isLoggedIn
                 ? 'border-emerald-500/50 text-emerald-300 bg-emerald-950/60 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
-                : 'border-amber-500/40 text-amber-300 bg-amber-950/50'
+                : 'border-cyan-500/40 text-cyan-300 bg-cyan-950/50'
             }`}
           >
-            {user.isLoggedIn ? 'ONLINE' : 'ANONYMOUS'}
+            {user.isLoggedIn ? 'ONLINE' : 'GUEST'}
           </span>
         </div>
 
@@ -160,7 +171,7 @@ export const ProfileView: React.FC = () => {
           </div>
         )}
 
-        {/* Quick Stats Grid */}
+        {/* Quick Stats Grid: All 30 Cores & Formatted Best Time */}
         <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/10 text-center">
           <div className="bg-black/35 rounded-xl p-2 border border-white/5">
             <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
@@ -168,7 +179,7 @@ export const ProfileView: React.FC = () => {
               <span>Cores</span>
             </div>
             <p className="text-sm font-bold text-white mt-0.5 font-tech">
-              {completedCount} <span className="text-slate-400 text-[10px]">/ 20</span>
+              {completedCount} <span className="text-slate-400 text-[10px]">/ 30</span>
             </p>
           </div>
 
@@ -177,7 +188,7 @@ export const ProfileView: React.FC = () => {
               <span className="text-cyan-400 text-xs font-mono">⏱</span>
               <span>Best</span>
             </div>
-            <p className="text-sm font-bold text-cyan-300 mt-0.5 font-tech">
+            <p className="text-sm font-bold text-cyan-300 mt-0.5 font-tech truncate">
               {bestRecord}
             </p>
           </div>
@@ -202,16 +213,16 @@ export const ProfileView: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5" />
               <span>ElseSourav Cloud Sync</span>
             </div>
-            <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
               LOCAL SAVE
             </span>
           </div>
 
           <p className="text-[11px] font-ui leading-snug" style={{ color: '#cbd5e1' }}>
-            Playing as <strong style={{ color: '#00f7ff' }}>Anonymous</strong> saves progress locally. Sign in with ElseSourav to sync saves to the cloud and compete on global leaderboards.
+            Guest progress is saved locally. Connect with an ElseSourav account to sync saves across devices and appear on global leaderboards.
           </p>
 
-          {/* TWO SEPARATE BUTTONS WITH MODERATE BORDER-RADIUS MATCHING INNER & OUTER */}
+          {/* TWO SEPARATE BUTTONS WITH MODERATE BORDER-RADIUS */}
           <div className="grid grid-cols-2 gap-2 mt-0.5">
             {/* 1. SIGN IN BUTTON */}
             <button
@@ -265,17 +276,17 @@ export const ProfileView: React.FC = () => {
         </div>
       )}
 
-      {/* 3. Audio & Haptics Group with Dedicated Settings Font */}
+      {/* 3. Audio & Haptics Settings Group with Premium Typography */}
       <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-cyan-400 text-[11px] font-display font-bold uppercase tracking-wider">
-          <Volume2 className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-cyan-400 text-xs font-display font-black tracking-wider uppercase">
+          <Volume2 className="w-4 h-4 text-cyan-400" />
           <span>Sound & Feedback</span>
         </div>
 
         {/* Master Volume */}
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center text-xs">
-            <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+            <span className="font-settings-title text-xs font-bold text-white tracking-wider">
               MASTER VOLUME
             </span>
           </div>
@@ -298,14 +309,14 @@ export const ProfileView: React.FC = () => {
 
         {/* Vibration Toggle */}
         <div className="flex justify-between items-center pt-1">
-          <div className="flex items-center gap-2">
-            <Vibrate className="w-4 h-4 text-emerald-400" style={{ color: '#34d399' }} />
+          <div className="flex items-center gap-2.5">
+            <Vibrate className="w-4 h-4 text-emerald-400 flex-shrink-0" style={{ color: '#34d399' }} />
             <div className="flex flex-col">
-              <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
                 VIBRATION HAPTICS
               </span>
-              <span className="font-settings text-xs text-slate-300" style={{ color: '#cbd5e1' }}>
-                Touch & collision vibration buzz
+              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+                Touch & collision haptic buzz
               </span>
             </div>
           </div>
@@ -324,23 +335,23 @@ export const ProfileView: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Controls & Simulation Group with Dedicated Settings Font */}
+      {/* 4. Controls & Simulation Settings Group with Premium Typography */}
       <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 text-purple-400 text-[11px] font-display font-bold uppercase tracking-wider">
-          <Compass className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-purple-400 text-xs font-display font-black tracking-wider uppercase">
+          <Compass className="w-4 h-4 text-purple-400" />
           <span>Controls & Simulation</span>
         </div>
 
         {/* Gyroscope Tilt */}
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-purple-400" style={{ color: '#c084fc' }} />
+          <div className="flex items-center gap-2.5">
+            <Compass className="w-4 h-4 text-purple-400 flex-shrink-0" style={{ color: '#c084fc' }} />
             <div className="flex flex-col">
-              <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
                 GYROSCOPE TILT
               </span>
-              <span className="font-settings text-xs text-slate-300" style={{ color: '#cbd5e1' }}>
-                Tilt device to steer paddle
+              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+                Tilt hardware to steer paddle
               </span>
             </div>
           </div>
@@ -363,7 +374,7 @@ export const ProfileView: React.FC = () => {
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-pink-400" style={{ color: '#f472b6' }} />
-              <span className="font-settings text-sm font-bold tracking-wider" style={{ color: '#ffffff' }}>
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
                 TILT SENSITIVITY
               </span>
             </div>
@@ -387,13 +398,13 @@ export const ProfileView: React.FC = () => {
       </div>
 
       {/* 5. Minimal Ecosystem Footer */}
-      <footer className="text-center text-xs text-slate-300 font-mono mt-1" style={{ color: '#cbd5e1' }}>
+      <footer className="text-center text-xs text-slate-400 font-mono mt-1">
         <span>Breakout Ball V2 • Ecosystem by </span>
         <a
           href="https://elsesourav.com"
           target="_blank"
           rel="noreferrer"
-          className="text-cyan-300 font-bold hover:underline"
+          className="text-cyan-400 font-bold hover:underline"
         >
           ElseSourav
         </a>
