@@ -37,7 +37,10 @@ export const LevelPreviewModal: React.FC = () => {
       const displayH = canvas.clientHeight || 155;
       canvas.width = Math.round(displayW * dpr);
       canvas.height = Math.round(displayH * dpr);
-      drawLevelPreviewOnCanvas(canvas, selectedLevel.blocks, canvas.width, canvas.height);
+      const reservedBottom = Math.round(36 * dpr);
+      drawLevelPreviewOnCanvas(canvas, selectedLevel.blocks, canvas.width, canvas.height, {
+        reservedBottom,
+      });
     }
   }, [selectedLevel]);
 
@@ -124,9 +127,11 @@ export const LevelPreviewModal: React.FC = () => {
             >
               {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
             </span>
-            <span className="font-ui text-[10px] text-slate-400 mt-0.5">
-              By @{selectedLevel.creator}
-            </span>
+            {!isCampaign && selectedLevel.creator && (
+              <span className="font-ui text-[10px] text-slate-400 mt-0.5">
+                By @{selectedLevel.creator}
+              </span>
+            )}
           </div>
 
           <span className="px-2 py-0.5 rounded-full text-[9px] font-tech font-bold uppercase tracking-wider bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">

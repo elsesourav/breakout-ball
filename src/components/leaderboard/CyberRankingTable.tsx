@@ -76,38 +76,97 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
               entry.isCurrentUser ||
               (currentUser && currentUser !== 'anonymous' && entry.username === currentUser);
 
-            // Custom Rank Badge for Top 3 vs 4+
+            const isRank1 = entry.rank === 1;
+            const isRank2 = entry.rank === 2;
+            const isRank3 = entry.rank === 3;
+
+            // Custom Animated Rank Badge for Top 3 vs 4+
             let rankBadge = (
               <span className="font-tech font-bold text-xs text-slate-400">
                 #{entry.rank}
               </span>
             );
 
-            if (entry.rank === 1) {
+            if (isRank1) {
               rankBadge = (
-                <div className="flex items-center justify-center gap-0.5 w-6 h-6 rounded-md bg-amber-500/20 border border-amber-400/50 shadow-[0_0_8px_rgba(255,215,0,0.4)] mx-auto">
-                  <Flame className="w-3 h-3 text-amber-300 fill-amber-300" />
-                  <span className="font-tech font-black text-[11px] text-amber-300">1</span>
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.28) 0%, rgba(245, 158, 11, 0.15) 100%)',
+                    border: '1.5px solid #ffd700',
+                    boxShadow: '0 0 12px rgba(255, 215, 0, 0.6), inset 0 0 6px rgba(255, 215, 0, 0.25)',
+                  }}
+                  className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
+                  title="Rank 1 - Champion"
+                >
+                  <Flame className="w-3.5 h-3.5 text-amber-300 fill-amber-400 animate-pulse drop-shadow-[0_0_8px_#ffd700]" />
+                  <span className="font-display font-black text-xs text-yellow-200">1</span>
                 </div>
               );
-            } else if (entry.rank === 2) {
+            } else if (isRank2) {
               rankBadge = (
-                <div className="flex items-center justify-center gap-0.5 w-6 h-6 rounded-md bg-slate-300/20 border border-slate-300/40 shadow-[0_0_6px_rgba(203,213,225,0.3)] mx-auto">
-                  <Medal className="w-3 h-3 text-slate-200" />
-                  <span className="font-tech font-black text-[11px] text-slate-200">2</span>
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(0, 247, 255, 0.25) 0%, rgba(148, 163, 184, 0.15) 100%)',
+                    border: '1.5px solid #00f7ff',
+                    boxShadow: '0 0 10px rgba(0, 247, 255, 0.45), inset 0 0 6px rgba(0, 247, 255, 0.2)',
+                  }}
+                  className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
+                  title="Rank 2 - Elite"
+                >
+                  <Medal
+                    className="w-3.5 h-3.5 text-cyan-300 drop-shadow-[0_0_6px_#00f7ff] animate-bounce"
+                    style={{ animationDuration: '2.5s' }}
+                  />
+                  <span className="font-display font-black text-xs text-cyan-200">2</span>
                 </div>
               );
-            } else if (entry.rank === 3) {
+            } else if (isRank3) {
               rankBadge = (
-                <div className="flex items-center justify-center gap-0.5 w-6 h-6 rounded-md bg-amber-700/20 border border-amber-600/40 shadow-[0_0_6px_rgba(217,119,6,0.3)] mx-auto">
-                  <Award className="w-3 h-3 text-amber-400" />
-                  <span className="font-tech font-black text-[11px] text-amber-400">3</span>
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.12) 100%)',
+                    border: '1.5px solid #f59e0b',
+                    boxShadow: '0 0 10px rgba(245, 158, 11, 0.4), inset 0 0 6px rgba(245, 158, 11, 0.15)',
+                  }}
+                  className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
+                  title="Rank 3 - Ace"
+                >
+                  <Award
+                    className="w-3.5 h-3.5 text-amber-400 drop-shadow-[0_0_6px_#f59e0b] animate-pulse"
+                    style={{ animationDuration: '2s' }}
+                  />
+                  <span className="font-display font-black text-xs text-amber-300">3</span>
                 </div>
               );
             }
 
             const formattedTime =
               typeof entry.time === 'number' ? `${entry.time.toFixed(1)}s` : String(entry.time);
+
+            let rowBgStyle: React.CSSProperties = {};
+            let rowBorderClass = 'hover:bg-white/[0.02]';
+
+            if (isUser) {
+              rowBgStyle = {
+                background: 'linear-gradient(90deg, rgba(0, 247, 255, 0.16) 0%, rgba(0, 160, 255, 0.05) 100%)',
+              };
+              rowBorderClass = 'border-l-2 border-cyan-400';
+            } else if (isRank1) {
+              rowBgStyle = {
+                background: 'linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 180, 0, 0.02) 70%, transparent 100%)',
+              };
+              rowBorderClass = 'border-l-2 border-amber-400/80';
+            } else if (isRank2) {
+              rowBgStyle = {
+                background: 'linear-gradient(90deg, rgba(0, 247, 255, 0.08) 0%, rgba(0, 200, 255, 0.02) 70%, transparent 100%)',
+              };
+              rowBorderClass = 'border-l-2 border-cyan-400/70';
+            } else if (isRank3) {
+              rowBgStyle = {
+                background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.07) 0%, rgba(217, 119, 6, 0.01) 70%, transparent 100%)',
+              };
+              rowBorderClass = 'border-l-2 border-amber-500/60';
+            }
 
             return (
               <div
@@ -116,12 +175,9 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                   display: 'grid',
                   gridTemplateColumns: '36px 1fr 60px 52px',
                   alignItems: 'center',
+                  ...rowBgStyle,
                 }}
-                className={`px-3 py-1.5 transition-colors ${
-                  isUser
-                    ? 'bg-cyan-950/40 border-l-2 border-cyan-400'
-                    : 'hover:bg-white/[0.02]'
-                }`}
+                className={`px-3 py-1.5 transition-colors ${rowBorderClass}`}
               >
                 {/* Rank Badge */}
                 <div className="flex items-center justify-center">

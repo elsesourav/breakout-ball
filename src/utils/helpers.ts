@@ -295,7 +295,8 @@ export function drawLevelPreviewOnCanvas(
   canvas: HTMLCanvasElement,
   blocks: BlockData[],
   width?: number,
-  height?: number
+  height?: number,
+  options?: { reservedBottom?: number }
 ) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -330,26 +331,43 @@ export function drawLevelPreviewOnCanvas(
   ctx.lineWidth = 1.5;
   ctx.strokeRect(3, 3, w - 6, h - 6);
 
-  // 3. Calculate block dimensions scaled to fit width cleanly
+  const validBlocks = blocks.filter((b) => b.h > 0);
+  if (validBlocks.length === 0) return;
+
+  // 3. Auto calculate bounding box and exact centering
+  const reservedBottom = options?.reservedBottom || 0;
+  const availH = Math.max(30, h - reservedBottom);
+
+  const minY = Math.min(...validBlocks.map((b) => b.y));
+  const maxY = Math.max(...validBlocks.map((b) => b.y));
+  const spanY = maxY - minY + 1;
+
   const marginX = 8;
   const playW = w - marginX * 2;
-  const cellW = playW / GRID_ROWS;
-  const cellH = cellW * 0.7; // Match game block ratio (128x90)
+  let cellW = playW / GRID_ROWS;
+  let cellH = cellW * 0.7; // Match game block ratio (128x90)
+
+  // Ensure tall patterns do not exceed available height with padding
+  const totalClusterH = spanY * cellH;
+  if (totalClusterH > availH - 16) {
+    const scale = (availH - 16) / totalClusterH;
+    cellW *= scale;
+    cellH *= scale;
+  }
+
   const padding = Math.max(1, cellW * 0.05);
 
-  // Vertically center blocks within preview canvas
-  const validBlocks = blocks.filter((b) => b.h > 0);
-  let startY = 10;
-  if (validBlocks.length > 0) {
-    const minY = Math.min(...validBlocks.map((b) => b.y));
-    const maxY = Math.max(...validBlocks.map((b) => b.y));
-    const spanH = (maxY - minY + 1) * cellH;
-    startY = Math.max(6, Math.round((h - spanH) / 2) - minY * cellH);
-  }
+  // Symmetrical Vertical Centering in the visible available preview area
+  const clusterH = spanY * cellH;
+  const startY = Math.round((availH - clusterH) / 2) - minY * cellH;
+
+  // Symmetrical Horizontal Centering
+  const gridW = GRID_ROWS * cellW;
+  const startX = Math.round((w - gridW) / 2);
 
   blocks.forEach((block) => {
     if (block.h <= 0) return;
-    const bx = marginX + block.x * cellW + padding;
+    const bx = startX + block.x * cellW + padding;
     const by = startY + block.y * cellH + padding;
     const bw = cellW - padding * 2;
     const bh = cellH - padding * 2;
