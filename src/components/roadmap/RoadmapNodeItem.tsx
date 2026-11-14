@@ -67,13 +67,14 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
 
     return (
       <div
-        ref={isCurrent ? ref : undefined}
-        className="absolute z-20 flex flex-col items-center"
+        ref={ref}
+        className="roadmap-scale-item absolute z-20 flex flex-col items-center"
+        data-base-transform="translate(-50%, -50%)"
         style={{
           left: `${(node.x / SVG_WIDTH) * 100}%`,
           top: `${node.y}px`,
-          transform: 'translate(-50%, -50%) translateZ(28px)',
-          transformStyle: 'preserve-3d',
+          transform: 'translate(-50%, -50%)',
+          willChange: 'transform, opacity',
         }}
       >
         {/* Floating Bouncing Energy Ball & High-Tech PLAY Beacon above Current Active Level */}
@@ -85,8 +86,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               position: 'absolute',
               top: '-56px',
               left: '50%',
-              transform: 'translateX(-50%) translateZ(20px) rotateX(-12deg)',
-              transformStyle: 'preserve-3d',
+              transform: 'translateX(-50%)',
             }}
           >
             {/* 3D Glowing Cyber Ball with Radiant Core */}

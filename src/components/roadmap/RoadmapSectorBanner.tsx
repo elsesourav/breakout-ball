@@ -20,13 +20,14 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
         return (
           <div
             key={`sector-banner-${node.id}`}
-            className="absolute z-10 flex flex-col items-center pointer-events-none select-none"
+            className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
+            data-base-transform="translateX(-50%)"
             style={{
               left: `${(node.x / SVG_WIDTH) * 100}%`,
               // Sector 1 entrance sits cleanly below Level 1; other sectors sit comfortably above their milestone
               top: isEntrance ? `${node.y + 75}px` : `${node.y - 110}px`,
-              transform: 'translateX(-50%) translateZ(36px) rotateX(-12deg)',
-              transformStyle: 'preserve-3d',
+              transform: 'translateX(-50%)',
+              willChange: 'transform, opacity',
             }}
           >
             <div
@@ -77,12 +78,13 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
       {/* Grand Apex Summit Reactor at Level 30 */}
       {summitNode && (
         <div
-          className="absolute z-10 flex flex-col items-center pointer-events-none select-none"
+          className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
+          data-base-transform="translateX(-50%)"
           style={{
             left: `${(summitNode.x / SVG_WIDTH) * 100}%`,
             top: `${summitNode.y - 95}px`,
-            transform: 'translateX(-50%) translateZ(45px) rotateX(-12deg)',
-            transformStyle: 'preserve-3d',
+            transform: 'translateX(-50%)',
+            willChange: 'transform, opacity',
           }}
         >
           {/* Golden Apex Ring */}

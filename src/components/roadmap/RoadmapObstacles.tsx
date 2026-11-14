@@ -27,12 +27,13 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
             <div
               key={b.id}
               onClick={() => onBlockerClick?.(b)}
-              className="absolute z-20 -translate-x-1/2 -translate-y-1/2 select-none cursor-pointer active:scale-95 transition-transform"
+              className="roadmap-scale-item absolute z-20 select-none cursor-pointer active:scale-95 transition-transform"
+              data-base-transform="translate(-50%, -50%)"
               style={{
                 left: `${(b.x / SVG_WIDTH) * 100}%`,
                 top: `${b.y}px`,
-                transform: 'translate(-50%, -50%) translateZ(22px) rotateX(-12deg)',
-                transformStyle: 'preserve-3d',
+                transform: 'translate(-50%, -50%)',
+                willChange: 'transform, opacity',
               }}
               title="Route Blocked: Complete previous level to destroy this barrier"
             >
@@ -153,12 +154,13 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
         return (
           <div
             key={b.id}
-            className="absolute z-10 select-none pointer-events-none opacity-70"
+            className="roadmap-scale-item absolute z-10 select-none pointer-events-none opacity-70"
+            data-base-transform="translate(-50%, -50%)"
             style={{
               left: `${(b.x / SVG_WIDTH) * 100}%`,
               top: `${b.y}px`,
-              transform: 'translate(-50%, -50%) translateZ(12px)',
-              transformStyle: 'preserve-3d',
+              transform: 'translate(-50%, -50%)',
+              willChange: 'transform, opacity',
             }}
           >
             {/* Dormant Mechanical Track Clamp Object */}
@@ -226,12 +228,13 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
           return (
             <div
               key={obs.id}
-              className="absolute z-10 flex flex-col items-center pointer-events-none select-none"
+              className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
+              data-base-transform="translate(-50%, -50%)"
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
-                transform: 'translateX(-50%) translateZ(30px) rotateX(-12deg)',
-                transformStyle: 'preserve-3d',
+                transform: 'translate(-50%, -50%)',
+                willChange: 'transform, opacity',
               }}
             >
               {/* Visual Laser Forcefield Arch stretched across the Roadmap */}
@@ -304,10 +307,13 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
           return (
             <div
               key={obs.id}
-              className="absolute z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              className="roadmap-scale-item absolute z-10 pointer-events-none"
+              data-base-transform="translate(-50%, -50%)"
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
+                transform: 'translate(-50%, -50%)',
+                willChange: 'transform, opacity',
               }}
             >
               {/* Indestructible Titanium Block */}
@@ -330,10 +336,13 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
           return (
             <div
               key={obs.id}
-              className="absolute z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center select-none"
+              className="roadmap-scale-item absolute z-10 pointer-events-none flex items-center justify-center select-none"
+              data-base-transform="translate(-50%, -50%)"
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
+                transform: 'translate(-50%, -50%)',
+                willChange: 'transform, opacity',
               }}
             >
               {/* Pure SVG Vector Plasma Orb */}
