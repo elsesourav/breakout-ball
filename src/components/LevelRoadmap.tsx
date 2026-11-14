@@ -5,7 +5,6 @@ import {
   SPACING,
   SVG_WIDTH,
   BOTTOM_OFFSET,
-  TOP_OFFSET,
   TOTAL_HEIGHT,
   SECTOR_CONFIG,
   RoadmapNode,
@@ -24,13 +23,13 @@ export const LevelRoadmap: React.FC = () => {
   const activeNodeRef = useRef<HTMLDivElement | null>(null);
   const hasInitialScrolled = useRef<boolean>(false);
 
-  // Compute energy conduit nodes along an arcade ricochet path
+  // Compute energy conduit nodes along an arcade ricochet path with generous 175px spacing
   const nodes: RoadmapNode[] = useMemo(() => {
     const list: RoadmapNode[] = [];
     for (let i = 1; i <= TOTAL_LEVELS; i++) {
       const y = TOTAL_HEIGHT - BOTTOM_OFFSET - (i - 1) * SPACING;
       const angle = (i - 1) * 1.05;
-      const x = 180 + Math.sin(angle) * 92;
+      const x = 190 + Math.sin(angle) * 95;
 
       let zone = 1;
       if (i > 24) zone = 5;
@@ -62,7 +61,7 @@ export const LevelRoadmap: React.FC = () => {
     return highest;
   }, [localProgress]);
 
-  // Ambient floating Breakout Bricks in background (theme aligned)
+  // Ambient floating Breakout Bricks in outer margins (generous room, theme aligned)
   const floatingBricks: FloatingBrick[] = useMemo(() => {
     const bricks: FloatingBrick[] = [];
     const brickColors = [
@@ -75,14 +74,13 @@ export const LevelRoadmap: React.FC = () => {
 
     for (let i = 0; i < 18; i++) {
       const palette = brickColors[i % brickColors.length];
-      const y = (TOTAL_HEIGHT / 18) * i + ((i * 37) % 50);
+      const y = (TOTAL_HEIGHT / 18) * i + ((i * 47) % 60);
       const isLeft = i % 2 === 0;
-      const w = 36 + ((i * 7) % 14);
-      const h = 16 + ((i * 3) % 6);
-      // Strictly clamp x inside canvas with >= 22px safe padding to prevent right-edge clipping
+      const w = 34 + ((i * 7) % 12);
+      const h = 15 + ((i * 3) % 6);
       const x = isLeft
-        ? 22 + ((i * 21) % 36)
-        : SVG_WIDTH - w - 22 - ((i * 27) % 36);
+        ? 20 + ((i * 15) % 25)
+        : SVG_WIDTH - w - 20 - ((i * 17) % 25);
 
       bricks.push({
         id: i,
@@ -99,100 +97,66 @@ export const LevelRoadmap: React.FC = () => {
     return bricks;
   }, []);
 
-  // Kinetic Obstacles placed along the energy path
+  // Ambient kinetic hazards positioned safely in outer curves away from the conduit track
   const obstacles: Obstacle[] = useMemo(() => {
     return [
       {
-        id: 'gate-sector-2',
-        type: 'forcefield',
-        x: 180,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 5.5 * SPACING,
-        label: 'GATE 01',
-        locked: currentUnlockedId < 7,
-      },
-      {
         id: 'titanium-1',
         type: 'titanium',
-        x: 105,
+        x: 65,
         y: TOTAL_HEIGHT - BOTTOM_OFFSET - 2.5 * SPACING,
       },
       {
         id: 'plasma-1',
         type: 'plasma',
-        x: 255,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 4.2 * SPACING,
-      },
-      {
-        id: 'gate-sector-3',
-        type: 'forcefield',
-        x: 180,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 11.5 * SPACING,
-        label: 'GATE 02',
-        locked: currentUnlockedId < 13,
+        x: 315,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 4.5 * SPACING,
       },
       {
         id: 'titanium-2',
         type: 'titanium',
-        x: 245,
+        x: 315,
         y: TOTAL_HEIGHT - BOTTOM_OFFSET - 8.5 * SPACING,
       },
       {
         id: 'plasma-2',
         type: 'plasma',
-        x: 110,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 10.3 * SPACING,
-      },
-      {
-        id: 'gate-sector-4',
-        type: 'forcefield',
-        x: 180,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING,
-        label: 'GATE 03',
-        locked: currentUnlockedId < 19,
+        x: 65,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 10.5 * SPACING,
       },
       {
         id: 'titanium-3',
         type: 'titanium',
-        x: 115,
+        x: 65,
         y: TOTAL_HEIGHT - BOTTOM_OFFSET - 14.5 * SPACING,
       },
       {
         id: 'plasma-3',
         type: 'plasma',
-        x: 245,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 16.2 * SPACING,
-      },
-      {
-        id: 'gate-sector-5',
-        type: 'forcefield',
-        x: 180,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING,
-        label: 'GATE 04',
-        locked: currentUnlockedId < 25,
+        x: 315,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 16.5 * SPACING,
       },
       {
         id: 'titanium-4',
         type: 'titanium',
-        x: 240,
+        x: 315,
         y: TOTAL_HEIGHT - BOTTOM_OFFSET - 20.5 * SPACING,
       },
       {
         id: 'plasma-4',
         type: 'plasma',
-        x: 115,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 26.5 * SPACING,
+        x: 65,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 22.5 * SPACING,
       },
     ];
-  }, [currentUnlockedId]);
+  }, []);
 
-  // Generate Kinetic Obstacles directly blocking the route between levels
+  // Compute route blockers on each path between consecutive levels
   const routeBlockers: RouteBlocker[] = useMemo(() => {
     const list: RouteBlocker[] = [];
-    for (let i = 1; i < TOTAL_LEVELS; i++) {
+    for (let i = 1; i < nodes.length; i++) {
       const curr = nodes[i - 1];
       const next = nodes[i];
-      if (!curr || !next) continue;
-
       const midX = Math.round((curr.x + next.x) / 2);
       const midY = Math.round((curr.y + next.y) / 2);
 
@@ -296,8 +260,8 @@ export const LevelRoadmap: React.FC = () => {
   // Handle route blocker tap
   const handleBlockerClick = (blocker: RouteBlocker) => {
     showAlert({
-      title: 'FIREWALL ENGAGED',
-      message: `The route to Level ${blocker.toLevel} is blocked! Complete Level ${blocker.fromLevel} to shatter this obstacle and unlock the path.`,
+      title: 'ROUTE BLOCKED',
+      message: `The route to Level ${blocker.toLevel} is blocked! Complete Level ${blocker.fromLevel} to destroy this obstacle and open the path.`,
       titleColor: '#ff0844',
       btn1Text: 'DEPLOY CORE',
       btn1Color: '#00f7ff',
@@ -308,8 +272,6 @@ export const LevelRoadmap: React.FC = () => {
     <div
       className="relative w-full h-full overflow-hidden select-none bg-[#03040c]"
       style={{
-        perspective: '850px',
-        perspectiveOrigin: '50% 90%',
         backgroundImage: `
           radial-gradient(ellipse 95% 20% at 50% 0%, rgba(255, 215, 0, 0.12) 0%, transparent 75%),
           radial-gradient(ellipse 90% 20% at 50% 30%, rgba(244, 63, 94, 0.1) 0%, transparent 75%),
@@ -318,33 +280,28 @@ export const LevelRoadmap: React.FC = () => {
         `,
       }}
     >
-      {/* 3D Horizon Atmosphere Gradient overlay */}
+      {/* Top Atmospheric Horizon Gradient overlay */}
       <div
-        className="absolute top-0 inset-x-0 h-32 pointer-events-none z-30"
+        className="absolute top-0 inset-x-0 h-20 pointer-events-none z-30"
         style={{
-          background: 'linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.88) 35%, rgba(3, 4, 12, 0.35) 75%, transparent 100%)',
+          background:
+            'linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.85) 40%, transparent 100%)',
         }}
       />
 
+      {/* Edge-to-Edge Native Scroll Container - Seamless Fit with Zero Uncovered Outside Gaps */}
       <div
         ref={scrollContainerRef}
-        className="relative w-full h-full overflow-y-auto overflow-x-hidden select-none bg-[#03040c]"
+        className="relative w-full h-full overflow-y-auto overflow-x-hidden select-none"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
           overscrollBehaviorY: 'contain',
           contain: 'content',
-          transform: 'rotateX(9deg)',
-          transformOrigin: '50% 100%',
-          transformStyle: 'preserve-3d',
-          willChange: 'transform, scroll-position',
-          width: '108%',
-          marginLeft: '-4%',
-          height: '136%',
-          marginTop: '-30%',
-          paddingBottom: '160px',
-          backgroundColor: '#03040c',
+          width: '100%',
+          height: '100%',
+          paddingBottom: '140px',
           backgroundImage: `
             radial-gradient(ellipse 95% 18% at 50% 1%, rgba(255, 215, 0, 0.16) 0%, transparent 75%),
             radial-gradient(ellipse 90% 18% at 50% 24%, rgba(244, 63, 94, 0.13) 0%, transparent 75%),
@@ -354,70 +311,68 @@ export const LevelRoadmap: React.FC = () => {
           `,
         }}
       >
-      <div
-        className="relative mx-auto overflow-x-hidden w-full max-w-[440px]"
-        style={{
-          height: `${TOTAL_HEIGHT}px`,
-          transform: 'translateZ(0)',
-          willChange: 'scroll-position',
-        }}
-      >
-        {/* Floating Breakout Bricks along roadmap */}
-        {floatingBricks.map((b) => (
-          <div
-            key={`brick-${b.id}`}
-            className="absolute rounded-md pointer-events-none transition-transform"
-            style={{
-              left: `${b.x}px`,
-              top: `${b.y}px`,
-              width: `${b.w}px`,
-              height: `${b.h}px`,
-              backgroundColor: b.color,
-              opacity: b.opacity,
-              boxShadow: `0 0 14px ${b.glow}, inset 0 1px 1px #fff`,
-              transform: `rotate(${b.rotation}deg)`,
-              border: '1px solid rgba(255,255,255,0.2)',
-            }}
-          />
-        ))}
-
-        {/* Laser Conduit SVG with Cleared Connected vs Blocked Severed Paths */}
-        <RoadmapConduitSvg
-          nodes={nodes}
-          pathData={conduitPathData}
-          activePathData={activePathData}
-          currentUnlockedId={currentUnlockedId}
-        />
-
-        {/* Route Blockers & Map Obstacles */}
-        <RoadmapObstacles
-          obstacles={obstacles}
-          routeBlockers={routeBlockers}
-          onBlockerClick={handleBlockerClick}
-        />
-
-        {/* Sector Gateway Banners */}
-        <RoadmapSectorBanner nodes={nodes} />
-
-        {/* Level Energy Cells */}
-        {nodes.map((node) => {
-          const progress = localProgress[String(node.id)];
-          const isComplete = progress?.completed;
-          const isCurrent = node.id === currentUnlockedId && !isComplete;
-
-          return (
-            <RoadmapNodeItem
-              key={`node-${node.id}`}
-              ref={isCurrent ? activeNodeRef : undefined}
-              node={node}
-              progress={progress}
-              isCurrent={isCurrent}
-              onLevelClick={handleLevelClick}
+        <div
+          className="relative mx-auto overflow-x-hidden w-full max-w-[440px]"
+          style={{
+            height: `${TOTAL_HEIGHT}px`,
+          }}
+        >
+          {/* Floating Breakout Bricks in generous margins */}
+          {floatingBricks.map((b) => (
+            <div
+              key={`brick-${b.id}`}
+              className="absolute rounded-md pointer-events-none transition-transform"
+              style={{
+                left: `${b.x}px`,
+                top: `${b.y}px`,
+                width: `${b.w}px`,
+                height: `${b.h}px`,
+                backgroundColor: b.color,
+                opacity: b.opacity,
+                boxShadow: `0 0 14px ${b.glow}, inset 0 1px 1px #fff`,
+                transform: `rotate(${b.rotation}deg)`,
+                border: '1px solid rgba(255,255,255,0.2)',
+              }}
             />
-          );
-        })}
+          ))}
+
+          {/* Laser Conduit SVG with Cleared Connected vs Blocked Severed Paths */}
+          <RoadmapConduitSvg
+            nodes={nodes}
+            pathData={conduitPathData}
+            activePathData={activePathData}
+            currentUnlockedId={currentUnlockedId}
+          />
+
+          {/* Route Blockers & Map Obstacles (Physical 3D Clamps & Ambient Hazards) */}
+          <RoadmapObstacles
+            obstacles={obstacles}
+            routeBlockers={routeBlockers}
+            onBlockerClick={handleBlockerClick}
+          />
+
+          {/* Sector Gateway Banners */}
+          <RoadmapSectorBanner nodes={nodes} />
+
+          {/* Level Energy Cells */}
+          {nodes.map((node) => {
+            const progress = localProgress[String(node.id)];
+            const isComplete = progress?.completed;
+            const isCurrent = node.id === currentUnlockedId && !isComplete;
+
+            return (
+              <RoadmapNodeItem
+                key={`node-${node.id}`}
+                ref={isCurrent ? activeNodeRef : undefined}
+                node={node}
+                progress={progress}
+                isCurrent={isCurrent}
+                onLevelClick={handleLevelClick}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
