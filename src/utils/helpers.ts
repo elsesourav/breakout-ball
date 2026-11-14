@@ -337,10 +337,20 @@ export function drawLevelPreviewOnCanvas(
   const cellH = cellW * 0.7; // Match game block ratio (128x90)
   const padding = Math.max(1, cellW * 0.05);
 
+  // Vertically center blocks within preview canvas
+  const validBlocks = blocks.filter((b) => b.h > 0);
+  let startY = 10;
+  if (validBlocks.length > 0) {
+    const minY = Math.min(...validBlocks.map((b) => b.y));
+    const maxY = Math.max(...validBlocks.map((b) => b.y));
+    const spanH = (maxY - minY + 1) * cellH;
+    startY = Math.max(6, Math.round((h - spanH) / 2) - minY * cellH);
+  }
+
   blocks.forEach((block) => {
     if (block.h <= 0) return;
     const bx = marginX + block.x * cellW + padding;
-    const by = 12 + block.y * cellH + padding;
+    const by = startY + block.y * cellH + padding;
     const bw = cellW - padding * 2;
     const bh = cellH - padding * 2;
     draw3DBlock(ctx, bx, by, bw, bh, block.h);
