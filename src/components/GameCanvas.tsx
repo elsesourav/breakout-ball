@@ -31,6 +31,7 @@ export const GameCanvas: React.FC = () => {
   const [combo, setCombo] = useState<number>(0);
   const [countdownText, setCountdownText] = useState<string | null>('3');
   const [summaryState, setSummaryState] = useState<ScoreState | null>(null);
+  const [liveScoreState, setLiveScoreState] = useState<ScoreState | null>(null);
 
   // Key tracking
   const keysPressed = useRef<{ ArrowLeft: boolean; ArrowRight: boolean; KeyA: boolean; KeyD: boolean }>({
@@ -90,10 +91,12 @@ export const GameCanvas: React.FC = () => {
     setCombo(0);
     setCountdownText('3');
     setSummaryState(null);
+    setLiveScoreState(null);
 
     const engine = new GameEngine(canvas, {
       onScoreUpdate: (st) => {
         if (isDisposed) return;
+        setLiveScoreState(st);
         setScore(st.score);
         setTimeUsed(st.timeUsed);
       },
@@ -278,6 +281,8 @@ export const GameCanvas: React.FC = () => {
         onNextLevel={handleNextLevel}
         hasNextLevel={hasNextLevel}
         levelNumber={levelNumber}
+        totalBreakable={liveScoreState?.totalBreakable ?? 0}
+        blocksDestroyed={liveScoreState?.blocksDestroyed ?? 0}
       />
       <canvas
         ref={canvasRef}

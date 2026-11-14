@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useGame } from '../context/GameContext';
 import { BlockData } from '../types/game';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GRID_ROWS, GRID_COLS, BLOCK_COLORS } from '../constants/game';
-import { generateLevelId, draw3DBlock } from '../utils/helpers';
+import { generateLevelId, draw3DBlock, calculateLevelHp } from '../utils/helpers';
 import { soundManager } from '../utils/audio';
 import { Play, Save, ArrowLeft, Undo2, Redo2, Lock, Globe, Eraser, Sparkles, Infinity, Atom, Zap } from 'lucide-react';
 
@@ -83,7 +83,8 @@ export const LevelDesigner: React.FC = () => {
     });
   });
 
-  const breakableCount = placedBlocks.filter((b) => (b.h >= 1 && b.h <= 5) || b.h === 8).length;
+  const stats = calculateLevelHp(placedBlocks);
+  const breakableCount = stats.breakableCount;
 
   const handleTestLevel = () => {
     if (breakableCount === 0) {
@@ -116,7 +117,7 @@ export const LevelDesigner: React.FC = () => {
     }
     showAlert({
       title: 'CONFIRM MATRIX SAVE',
-      message: `Save custom breakout level with ${placedBlocks.length} blocks as ${isPrivate ? 'PRIVATE' : 'PUBLIC'}?`,
+      message: `Save custom breakout level with ${stats.totalHp} HP (${placedBlocks.length} blocks total) as ${isPrivate ? 'PRIVATE' : 'PUBLIC'}?`,
       btn1Text: 'CANCEL',
       btn2Text: 'SAVE LEVEL',
       btn2Color: '#00f7ff',

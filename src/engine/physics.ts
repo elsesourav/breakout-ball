@@ -332,14 +332,29 @@ export class PhysicsWorld {
             const isBreakable = (block.health >= 1 && block.health <= 5) || block.health === 8;
             if (!this.isMegaBall || !isBreakable) {
               const dist = Math.sqrt(distSq);
-              let nx = dist > 0.0001 ? distX / dist : ball.vx > 0 ? -1 : 1;
-              let ny = dist > 0.0001 ? distY / dist : ball.vy > 0 ? -1 : 1;
+              const nx = dist > 0.0001 ? distX / dist : (ball.vx > 0 ? -1 : 1);
+              const ny = dist > 0.0001 ? distY / dist : (ball.vy > 0 ? -1 : 1);
               const penetration = ball.radius - dist;
               const dot = ball.vx * nx + ball.vy * ny;
-              ball.vx -= 2 * dot * nx;
-              ball.vy -= 2 * dot * ny;
-              ball.x += nx * (penetration + 0.5);
-              ball.y += ny * (penetration + 0.5);
+              if (dot < 0) {
+                ball.vx -= 2 * dot * nx;
+                ball.vy -= 2 * dot * ny;
+              }
+              if (penetration > 0) {
+                ball.x += nx * (penetration + 0.5);
+                ball.y += ny * (penetration + 0.5);
+              }
+
+              // Anti-horizontal trap: keep ball dynamic and engaging
+              const minVy = 0.22 * ball.speed;
+              if (Math.abs(ball.vy) < minVy) {
+                ball.vy = ball.vy >= 0 ? minVy : -minVy;
+                const spd = Math.hypot(ball.vx, ball.vy);
+                if (spd > 0.001) {
+                  ball.vx = (ball.vx / spd) * ball.speed;
+                  ball.vy = (ball.vy / spd) * ball.speed;
+                }
+              }
             }
 
             block.hitAnim = 1.0;

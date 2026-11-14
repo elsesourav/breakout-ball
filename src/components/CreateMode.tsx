@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { LevelData } from '../types/game';
-import { drawLevelPreviewOnCanvas } from '../utils/helpers';
+import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../utils/helpers';
 import { Plus, Settings2, Play, Eye, EyeOff, Layers, Sparkles } from 'lucide-react';
 
 export const CreateMode: React.FC = () => {
@@ -109,7 +109,7 @@ const StudioLevelCard: React.FC<{
     }
   }, [level]);
 
-  const brickCount = level.blocks.filter((b) => b.h > 0).length;
+  const stats = calculateLevelHp(level.blocks);
 
   return (
     <div
@@ -181,8 +181,8 @@ const StudioLevelCard: React.FC<{
             <Play className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
             <span>{level.playCount || 0}</span>
           </span>
-          <span className="text-cyan-400 font-mono font-semibold">
-            {brickCount} Bricks
+          <span className="text-cyan-400 font-tech font-bold text-[9px]">
+            {stats.totalHp} HP ({stats.breakableCount})
           </span>
         </div>
       </div>

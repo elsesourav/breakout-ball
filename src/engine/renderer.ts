@@ -7,10 +7,15 @@ export class GameRenderer {
   private width: number;
   private height: number;
   private animTick = 0;
+  private shakeIntensity = 0;
 
   constructor(width: number, height: number) {
     this.width = width;
     this.height = height;
+  }
+
+  public triggerShake(intensity: number) {
+    this.shakeIntensity = Math.min(22, this.shakeIntensity + intensity);
   }
 
   public setDimensions(width: number, height: number) {
@@ -34,6 +39,16 @@ export class GameRenderer {
 
     // 1. Clear & Cyber Radial Backdrop
     ctx.clearRect(0, 0, w, h);
+
+    // Screen Shake Camera Translation
+    ctx.save();
+    if (this.shakeIntensity > 0.1) {
+      const sx = (Math.random() - 0.5) * this.shakeIntensity;
+      const sy = (Math.random() - 0.5) * this.shakeIntensity;
+      ctx.translate(sx, sy);
+      this.shakeIntensity *= 0.88;
+      if (this.shakeIntensity < 0.1) this.shakeIntensity = 0;
+    }
 
     const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 80, w / 2, h / 2, h);
     bgGrad.addColorStop(0, '#0a0d2c');
@@ -206,6 +221,23 @@ export class GameRenderer {
         if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
         else ctx.rect(bx, by, bw, topFaceH);
         ctx.fill();
+
+        // Angled Caution Hazard Stripes
+        ctx.save();
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
+        else ctx.rect(bx, by, bw, topFaceH);
+        ctx.clip();
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.32)';
+        ctx.lineWidth = Math.max(2.5, bw * 0.08);
+        const step = Math.max(6, topFaceH * 0.55);
+        for (let sx = -topFaceH; sx < bw + topFaceH; sx += step) {
+          ctx.beginPath();
+          ctx.moveTo(bx + sx, by + topFaceH);
+          ctx.lineTo(bx + sx + topFaceH, by);
+          ctx.stroke();
+        }
+        ctx.restore();
       } else {
         // STANDARD 1-5 HP BLOCKS: 3D High-Gloss Cyber Crystal
         const faceGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
@@ -217,6 +249,34 @@ export class GameRenderer {
         if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
         else ctx.rect(bx, by, bw, topFaceH);
         ctx.fill();
+      }
+
+      // 3D Damage Fracture Cracks on Wounded Blocks
+      if (block.health < block.initialHealth && block.initialHealth > 1) {
+        const damageRatio = (block.initialHealth - block.health) / block.initialHealth;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(bx + bw * 0.22, by + 2);
+        ctx.lineTo(bx + bw * 0.38, by + topFaceH * 0.45);
+        ctx.lineTo(bx + bw * 0.55, by + topFaceH * 0.52);
+        ctx.lineTo(bx + bw * 0.76, by + topFaceH - 2);
+        ctx.stroke();
+
+        if (damageRatio > 0.4) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.beginPath();
+          ctx.moveTo(bx + bw * 0.38, by + topFaceH * 0.45);
+          ctx.lineTo(bx + bw * 0.16, by + topFaceH * 0.8);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(bx + bw * 0.55, by + topFaceH * 0.52);
+          ctx.lineTo(bx + bw * 0.84, by + topFaceH * 0.28);
+          ctx.stroke();
+        }
+        ctx.restore();
       }
 
       // 3D Top Bevel Specular Sheen (Curved highlight reflecting overhead lights)
@@ -405,5 +465,6 @@ export class GameRenderer {
 
       ctx.restore();
     }
+    ctx.restore();
   }
 }

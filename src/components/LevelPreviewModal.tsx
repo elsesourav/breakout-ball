@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
-import { drawLevelPreviewOnCanvas } from '../utils/helpers';
+import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../utils/helpers';
 import { CyberRankingTable, RankingEntry } from './leaderboard/CyberRankingTable';
 import {
   Play,
@@ -11,6 +11,8 @@ import {
   Boxes,
   RotateCcw,
   Sparkles,
+  Shield,
+  Zap,
 } from 'lucide-react';
 
 export const LevelPreviewModal: React.FC = () => {
@@ -89,7 +91,7 @@ export const LevelPreviewModal: React.FC = () => {
     return list;
   }, [rankingList, isCompleted, progress, user]);
 
-  const blockCount = selectedLevel.blocks.filter((b) => b.h > 0).length;
+  const stats = useMemo(() => calculateLevelHp(selectedLevel.blocks), [selectedLevel]);
   const isCampaign = !isNaN(Number(selectedLevel.id));
 
   return (
@@ -153,12 +155,28 @@ export const LevelPreviewModal: React.FC = () => {
               </span>
             </div>
 
-            {/* Block count & Best time */}
-            <div className="flex items-center gap-3 font-tech text-xs">
-              <div className="flex items-center gap-1 text-slate-300">
-                <Boxes className="w-3 h-3 text-purple-400" />
-                <span>{blockCount} Bricks</span>
+            {/* Target Stats: Accurate Total HP & Breakable Count */}
+            <div className="flex items-center gap-2.5 font-tech text-xs">
+              <div className="flex items-center gap-1" title="Total Level HP">
+                <Shield className="w-3 h-3 text-red-400" />
+                <span className="font-bold text-red-300">{stats.totalHp} HP</span>
               </div>
+              <div className="flex items-center gap-1 text-slate-300" title="Breakable Targets">
+                <Boxes className="w-3 h-3 text-purple-400" />
+                <span>{stats.breakableCount} Targets</span>
+              </div>
+              {stats.titaniumCount > 0 && (
+                <div className="flex items-center gap-0.5 text-slate-300 text-[11px]" title="Indestructible Titanium Blocks">
+                  <span className="text-slate-400 font-bold">∞</span>
+                  <span>{stats.titaniumCount}</span>
+                </div>
+              )}
+              {stats.portalCount > 0 && (
+                <div className="flex items-center gap-0.5 text-cyan-300 text-[11px]" title="Quantum Portals">
+                  <span>🌀</span>
+                  <span>{stats.portalCount}</span>
+                </div>
+              )}
               <div className="flex items-center gap-1 text-slate-300">
                 <Clock className="w-3 h-3 text-cyan-400" />
                 <span style={{ color: '#00f7ff', fontWeight: 700 }}>{bestTime}</span>

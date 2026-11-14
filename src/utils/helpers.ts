@@ -10,6 +10,92 @@ export function generateLevelId(): string {
   return result;
 }
 
+export interface LevelHpStats {
+  totalHp: number;
+  breakableCount: number;
+  indestructibleCount: number;
+  titaniumCount: number;
+  portalCount: number;
+  empCount: number;
+}
+
+/**
+ * Accurate HP and Targets calculation across the game:
+ * - Bricks 1-5: Add their face HP (1 to 5) to totalHp, count as breakable.
+ * - Titanium Wall (6): 0 HP (Indestructible obstacle).
+ * - Quantum Portal (7): 0 HP (Indestructible warp gateway).
+ * - EMP Reactor (8): 3 HP countdown hits to detonation, counts as breakable.
+ */
+export function calculateLevelHp(blocks: BlockData[]): LevelHpStats {
+  let totalHp = 0;
+  let breakableCount = 0;
+  let indestructibleCount = 0;
+  let titaniumCount = 0;
+  let portalCount = 0;
+  let empCount = 0;
+
+  for (const block of blocks) {
+    if (!block || block.h <= 0) continue;
+    if (block.h >= 1 && block.h <= 5) {
+      totalHp += block.h;
+      breakableCount++;
+    } else if (block.h === 6) {
+      indestructibleCount++;
+      titaniumCount++;
+    } else if (block.h === 7) {
+      indestructibleCount++;
+      portalCount++;
+    } else if (block.h === 8) {
+      totalHp += 3;
+      breakableCount++;
+      empCount++;
+    }
+  }
+
+  return {
+    totalHp,
+    breakableCount,
+    indestructibleCount,
+    titaniumCount,
+    portalCount,
+    empCount,
+  };
+}
+
+export function drawFractureCracks(
+  ctx: CanvasRenderingContext2D,
+  bx: number,
+  by: number,
+  bw: number,
+  bh: number,
+  damageRatio: number
+) {
+  if (damageRatio <= 0) return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(bx + bw * 0.22, by + 2);
+  ctx.lineTo(bx + bw * 0.38, by + bh * 0.45);
+  ctx.lineTo(bx + bw * 0.55, by + bh * 0.52);
+  ctx.lineTo(bx + bw * 0.76, by + bh - 2);
+  ctx.stroke();
+
+  if (damageRatio > 0.4) {
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.beginPath();
+    ctx.moveTo(bx + bw * 0.38, by + bh * 0.45);
+    ctx.lineTo(bx + bw * 0.16, by + bh * 0.8);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(bx + bw * 0.55, by + bh * 0.52);
+    ctx.lineTo(bx + bw * 0.84, by + bh * 0.28);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 export function draw3DBlock(
   ctx: CanvasRenderingContext2D,
   bx: number,
@@ -17,25 +103,27 @@ export function draw3DBlock(
   bw: number,
   bh: number,
   blockType: number,
-  alpha: number = 1.0
+  alpha: number = 1.0,
+  currentHealth?: number,
+  initialHealth?: number
 ) {
   if (blockType <= 0) return;
   const config = BLOCK_COLORS[blockType] || BLOCK_COLORS[1];
-  const depth = Math.max(2, Math.round(bh * 0.15));
+  const depth = Math.max(2, Math.round(bh * 0.16));
   const topFaceH = bh - depth;
   const r = Math.min(bw, topFaceH) * 0.22;
 
   ctx.save();
   if (alpha < 1.0) ctx.globalAlpha = alpha;
 
-  // 3D Drop Shadow on Floor
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  // 1. 3D Drop Shadow on Floor
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
   ctx.beginPath();
   if (ctx.roundRect) ctx.roundRect(bx + 1.5, by + depth + 1.5, bw, topFaceH, r);
   else ctx.rect(bx + 1.5, by + depth + 1.5, bw, topFaceH);
   ctx.fill();
 
-  // 3D Extruded Lower Base & Flanks (Thickness)
+  // 2. 3D Extruded Lower Base & Flanks (Thickness)
   const baseGrad = ctx.createLinearGradient(bx, by + topFaceH, bx, by + bh);
   baseGrad.addColorStop(0, '#0a0d18');
   baseGrad.addColorStop(1, '#020308');
@@ -45,11 +133,11 @@ export function draw3DBlock(
   else ctx.rect(bx, by + depth * 0.6, bw, topFaceH + depth * 0.4);
   ctx.fill();
 
-  // Main 3D Front Face
+  // 3. Main 3D Front Face
   if (blockType === 6) {
-    // 3D Heavy Titanium Ingot with Steel Screws
+    // 3D Heavy Titanium Ingot with Steel Screws & Brushed Finish
     const steelGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
-    steelGrad.addColorStop(0, '#e2e8f0');
+    steelGrad.addColorStop(0, '#f1f5f9');
     steelGrad.addColorStop(0.35, '#94a3b8');
     steelGrad.addColorStop(0.7, '#475569');
     steelGrad.addColorStop(1, '#1e293b');
@@ -59,9 +147,9 @@ export function draw3DBlock(
     else ctx.rect(bx, by, bw, topFaceH);
     ctx.fill();
 
-    // Corner rivets
-    const boltOffset = Math.max(3, bw * 0.15);
-    const boltR = Math.max(1, bw * 0.05);
+    // Corner rivets with specular sheen
+    const boltOffset = Math.max(3, bw * 0.14);
+    const boltR = Math.max(1.2, bw * 0.045);
     [
       [bx + boltOffset, by + boltOffset],
       [bx + bw - boltOffset, by + boltOffset],
@@ -72,12 +160,16 @@ export function draw3DBlock(
       ctx.beginPath();
       ctx.arc(cx, cy, boltR, 0, Math.PI * 2);
       ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(cx - 0.5, cy - 0.5, boltR * 0.4, 0, Math.PI * 2);
+      ctx.fill();
     });
   } else if (blockType === 7) {
     // 3D Quantum Portal
     const portalChassis = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
-    portalChassis.addColorStop(0, '#2e0854');
-    portalChassis.addColorStop(0.5, '#120224');
+    portalChassis.addColorStop(0, '#3b0764');
+    portalChassis.addColorStop(0.5, '#1e053a');
     portalChassis.addColorStop(1, '#05000a');
     ctx.fillStyle = portalChassis;
     ctx.beginPath();
@@ -88,17 +180,17 @@ export function draw3DBlock(
     // Swirling vortex center
     const pCenterX = bx + bw / 2;
     const pCenterY = by + topFaceH / 2;
-    const pRadius = Math.min(bw, topFaceH) * 0.4;
+    const pRadius = Math.min(bw, topFaceH) * 0.42;
     const vortexGrad = ctx.createRadialGradient(pCenterX, pCenterY, 1, pCenterX, pCenterY, pRadius);
     vortexGrad.addColorStop(0, '#00f7ff');
-    vortexGrad.addColorStop(0.5, '#7928ca');
-    vortexGrad.addColorStop(1, 'rgba(255, 0, 128, 0.2)');
+    vortexGrad.addColorStop(0.5, '#9333ea');
+    vortexGrad.addColorStop(1, 'rgba(236, 72, 153, 0.2)');
     ctx.fillStyle = vortexGrad;
     ctx.beginPath();
     ctx.arc(pCenterX, pCenterY, pRadius, 0, Math.PI * 2);
     ctx.fill();
   } else if (blockType === 8) {
-    // 3D Hazard EMP Reactor
+    // 3D Hazard EMP Reactor with Caution Stripes
     const empGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
     empGrad.addColorStop(0, '#ff7700');
     empGrad.addColorStop(0.5, '#ff3b00');
@@ -108,6 +200,23 @@ export function draw3DBlock(
     if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
     else ctx.rect(bx, by, bw, topFaceH);
     ctx.fill();
+
+    // Angled Hazard Stripes
+    ctx.save();
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
+    else ctx.rect(bx, by, bw, topFaceH);
+    ctx.clip();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.lineWidth = Math.max(2.5, bw * 0.08);
+    const step = Math.max(6, topFaceH * 0.5);
+    for (let sx = -topFaceH; sx < bw + topFaceH; sx += step) {
+      ctx.beginPath();
+      ctx.moveTo(bx + sx, by + topFaceH);
+      ctx.lineTo(bx + sx + topFaceH, by);
+      ctx.stroke();
+    }
+    ctx.restore();
   } else {
     // Standard 1-5 HP 3D Cyber Crystal
     const faceGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
@@ -121,10 +230,16 @@ export function draw3DBlock(
     ctx.fill();
   }
 
-  // 3D Top Specular Bevel Highlight
+  // 4. Fracture Cracks on Damaged Blocks
+  if (currentHealth !== undefined && initialHealth !== undefined && currentHealth < initialHealth) {
+    const damageRatio = (initialHealth - currentHealth) / initialHealth;
+    drawFractureCracks(ctx, bx, by, bw, topFaceH, damageRatio);
+  }
+
+  // 5. 3D Top Specular Bevel Highlight
   const sheenGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH * 0.45);
-  sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
-  sheenGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.15)');
+  sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+  sheenGrad.addColorStop(0.35, 'rgba(255, 255, 255, 0.18)');
   sheenGrad.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
   ctx.fillStyle = sheenGrad;
   ctx.beginPath();
@@ -132,7 +247,7 @@ export function draw3DBlock(
   else ctx.rect(bx + 1.5, by + 1, bw - 3, topFaceH * 0.4);
   ctx.fill();
 
-  // Outer Glowing Cyber Rim
+  // 6. Outer Glowing Cyber Rim
   ctx.strokeStyle = config.border;
   ctx.shadowColor = config.border;
   ctx.shadowBlur = 8;
@@ -142,7 +257,7 @@ export function draw3DBlock(
   else ctx.rect(bx, by, bw, topFaceH);
   ctx.stroke();
 
-  // 3D Embossed Label / Number
+  // 7. 3D Embossed Label / Number
   if (bw > 16) {
     const cx = bx + bw / 2;
     const cy = by + topFaceH / 2;

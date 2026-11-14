@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { LevelData } from '../types/game';
-import { drawLevelPreviewOnCanvas } from '../utils/helpers';
+import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../utils/helpers';
 import { levelSearchEngine } from '../services/search';
 import { Search, Flame, Globe, User, X, ChevronLeft, ChevronRight, Boxes } from 'lucide-react';
 
@@ -308,7 +308,7 @@ const ArenaLevelCard: React.FC<{ level: LevelData; onClick: () => void }> = ({ l
     }
   }, [level]);
 
-  const brickCount = level.blocks.filter((b) => b.h > 0).length;
+  const stats = useMemo(() => calculateLevelHp(level.blocks), [level]);
 
   return (
     <div
@@ -368,8 +368,8 @@ const ArenaLevelCard: React.FC<{ level: LevelData; onClick: () => void }> = ({ l
             <User className="w-2.5 h-2.5 text-cyan-400 flex-shrink-0" />
             <span className="truncate">@{level.creator}</span>
           </span>
-          <span className="text-[9px] font-tech text-cyan-300/80 font-semibold">
-            {brickCount} Bricks
+          <span className="text-[9px] font-tech text-cyan-300/90 font-bold">
+            {stats.totalHp} HP ({stats.breakableCount})
           </span>
           <span className="flex items-center gap-1 text-amber-300 font-tech font-bold flex-shrink-0">
             <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />

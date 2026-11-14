@@ -276,18 +276,22 @@ export class GameEngine {
       } else if (ev.type === 'portal_warp') {
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
         this.particles.addFloatingText('🌀 PORTAL WARP', ev.hitX, ev.hitY, '#00f7ff');
+        this.renderer.triggerShake(2.0);
       } else if (ev.type === 'emp_explode') {
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, '#ff9900', true);
         this.particles.addFloatingText('💥 EMP DETONATION!', ev.hitX, ev.hitY, '#ff3b00');
+        this.renderer.triggerShake(8.0);
         this.state.score += 500;
         this.callbacks.onScoreUpdate?.(this.state);
       } else if (ev.type === 'shield_bounce') {
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
         this.particles.addFloatingText('🛡️ FORCEFIELD SAVED', ev.hitX, ev.hitY, '#10b981');
+        this.renderer.triggerShake(3.0);
       } else if (ev.type === 'block_damage') {
         const block = this.tsPhysics.blocks[ev.blockIndex];
         const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#00f7ff' : '#00f7ff';
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, false);
+        this.renderer.triggerShake(1.5);
 
         this.state.combo = ev.combo;
         if (this.state.combo > this.state.maxCombo) {
@@ -302,6 +306,7 @@ export class GameEngine {
         const block = this.tsPhysics.blocks[ev.blockIndex];
         const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#ff0844' : '#ff0844';
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, true);
+        this.renderer.triggerShake(3.5);
 
         // Emergent Power Shard Drop Chance (32%)
         this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.32);
@@ -326,6 +331,7 @@ export class GameEngine {
           return;
         }
       } else if (ev.type === 'ball_lost') {
+        this.renderer.triggerShake(10.0);
         this.handleLifeLost();
         return;
       }

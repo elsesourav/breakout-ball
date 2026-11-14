@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, RotateCcw, ChevronRight, Trophy, Zap, Heart, Shield } from 'lucide-react';
+import { Home, RotateCcw, ChevronRight, Trophy, Zap, Heart, Shield, Boxes } from 'lucide-react';
 import { ScoreState } from '../engine/types';
 
 interface GameHUDProps {
@@ -14,7 +14,36 @@ interface GameHUDProps {
   onNextLevel?: () => void;
   hasNextLevel?: boolean;
   levelNumber?: number;
+  totalBreakable?: number;
+  blocksDestroyed?: number;
 }
+
+const countdownTheme: Record<string, { color: string; border: string; glow: string; sub: string }> = {
+  '3': {
+    color: '#00f7ff',
+    border: '#00f7ff',
+    glow: 'rgba(0, 247, 255, 0.85)',
+    sub: 'INITIALIZING CORE',
+  },
+  '2': {
+    color: '#ffb700',
+    border: '#ffb700',
+    glow: 'rgba(255, 183, 0, 0.85)',
+    sub: 'CALIBRATING PADDLE',
+  },
+  '1': {
+    color: '#ff0844',
+    border: '#ff0844',
+    glow: 'rgba(255, 8, 68, 0.85)',
+    sub: 'SYSTEM ENGAGED',
+  },
+  'GO!': {
+    color: '#00ff66',
+    border: '#00ff66',
+    glow: 'rgba(0, 255, 102, 0.95)',
+    sub: 'LAUNCH BALL!',
+  },
+};
 
 export const GameHUD: React.FC<GameHUDProps> = ({
   lives,
@@ -28,7 +57,11 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   onNextLevel,
   hasNextLevel = false,
   levelNumber = 1,
+  totalBreakable = 0,
+  blocksDestroyed = 0,
 }) => {
+  const remainingTargets = Math.max(0, totalBreakable - blocksDestroyed);
+
   return (
     <>
       {/* Top Cyber HUD Bar */}
@@ -36,14 +69,14 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         {/* Left: Exit to Menu Button */}
         <button
           onClick={onExit}
-          className="pointer-events-auto flex items-center justify-center w-10 h-10 rounded-xl bg-[#090d24]/80 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all shadow-[0_0_12px_rgba(0,247,255,0.25)] backdrop-blur-md"
+          className="pointer-events-auto flex items-center justify-center w-10 h-10 rounded-xl bg-[#090d24]/85 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all shadow-[0_0_12px_rgba(0,247,255,0.25)] backdrop-blur-md cursor-pointer"
           title="Exit to Level Select"
         >
           <Home className="w-5 h-5" />
         </button>
 
         {/* Center: Live Score Display */}
-        <div className="flex flex-col items-center justify-center px-4 py-1 rounded-xl bg-[#06091c]/80 border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.6)] backdrop-blur-md">
+        <div className="flex flex-col items-center justify-center px-4 py-1 rounded-xl bg-[#06091c]/85 border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.6)] backdrop-blur-md">
           <span className="font-tech text-[10px] tracking-widest text-slate-400 uppercase">
             LVL {levelNumber} SCORE
           </span>
@@ -70,22 +103,62 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         </div>
       </header>
 
-      {/* Floating Center Countdown */}
+      {/* Floating Center Countdown - High-Contrast Neon Overhaul */}
       {countdown && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
-          <div className="relative flex flex-col items-center justify-center">
-            {/* Glowing outer pulse ring */}
-            <div className="absolute w-36 h-36 rounded-full border-2 border-cyan-400/60 animate-ping" />
-            <div className="flex items-center justify-center w-28 h-28 rounded-full bg-[#06091e]/90 border-2 border-cyan-400 shadow-[0_0_35px_rgba(0,247,255,0.7)] backdrop-blur-md">
-              <span
-                key={countdown}
-                className="font-display font-black text-5xl text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-200 to-cyan-400 animate-bounce"
-                style={{ textShadow: '0 0 20px rgba(0,247,255,0.9)' }}
-              >
-                {countdown}
-              </span>
-            </div>
-          </div>
+        <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none bg-black/60 backdrop-blur-[3px] transition-all">
+          {(() => {
+            const cfg = countdownTheme[countdown] || countdownTheme['GO!'];
+            const isGo = countdown === 'GO!';
+            return (
+              <div className="relative flex flex-col items-center justify-center">
+                {/* Expanding shockwave pulse ring */}
+                <div
+                  key={`pulse-${countdown}`}
+                  className="absolute rounded-full animate-ping pointer-events-none"
+                  style={{
+                    width: isGo ? '220px' : '180px',
+                    height: isGo ? '220px' : '180px',
+                    border: `2px solid ${cfg.border}`,
+                    boxShadow: `0 0 35px ${cfg.glow}`,
+                  }}
+                />
+
+                {/* Outer Holographic Cyber Dial */}
+                <div
+                  className="relative flex flex-col items-center justify-center rounded-full backdrop-blur-md"
+                  style={{
+                    width: isGo ? '170px' : '140px',
+                    height: isGo ? '170px' : '140px',
+                    backgroundColor: 'rgba(5, 8, 26, 0.95)',
+                    border: `3px solid ${cfg.color}`,
+                    boxShadow: `0 0 45px ${cfg.glow}, inset 0 0 30px ${cfg.glow}`,
+                  }}
+                >
+                  <span
+                    key={countdown}
+                    className="font-display font-black leading-none select-none tracking-widest animate-bounce"
+                    style={{
+                      fontSize: isGo ? '46px' : '68px',
+                      color: '#ffffff',
+                      textShadow: `0 0 15px #ffffff, 0 0 30px ${cfg.color}, 0 0 60px ${cfg.color}`,
+                    }}
+                  >
+                    {countdown}
+                  </span>
+
+                  <span
+                    className="font-tech font-bold text-[9px] uppercase tracking-widest mt-1.5 select-none text-center px-2"
+                    style={{
+                      color: cfg.color,
+                      textShadow: `0 0 8px ${cfg.color}`,
+                    }}
+                  >
+                    {cfg.sub}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -109,6 +182,20 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             );
           })}
         </div>
+
+        {/* Center: Live Remaining Targets Counter */}
+        {totalBreakable > 0 && (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#06091c]/85 border border-cyan-500/30 shadow-[0_0_12px_rgba(0,247,255,0.2)] backdrop-blur-md">
+            <Boxes className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="font-tech text-xs text-slate-300 tracking-wider">TARGETS</span>
+            <span
+              className="font-tech font-bold text-xs text-cyan-300 tracking-wider"
+              style={{ textShadow: '0 0 8px rgba(0,247,255,0.6)' }}
+            >
+              {remainingTargets}
+            </span>
+          </div>
+        )}
 
         {/* Stopwatch Timer */}
         <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#06091c]/85 border border-white/10 shadow-lg backdrop-blur-md">
@@ -189,8 +276,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({
                   TOTAL SCORE
                 </span>
                 <span
-                  className="font-display font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-cyan-300"
-                  style={{ textShadow: '0 0 15px rgba(255,215,0,0.5)' }}
+                  className="font-display font-black text-2xl text-amber-300"
+                  style={{ textShadow: '0 0 15px rgba(255,215,0,0.6)' }}
                 >
                   {(summaryState.score ?? 0).toLocaleString()}
                 </span>
@@ -202,7 +289,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               {summaryState.status === 'win' && hasNextLevel && onNextLevel && (
                 <button
                   onClick={onNextLevel}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-tech font-bold text-sm tracking-wider shadow-[0_0_15px_rgba(0,247,255,0.4)] active:scale-98 transition-all hover:brightness-110"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-tech font-bold text-sm tracking-wider shadow-[0_0_15px_rgba(0,247,255,0.4)] active:scale-98 transition-all hover:brightness-110 cursor-pointer"
                 >
                   <span>NEXT MISSION</span>
                   <ChevronRight className="w-4 h-4" />
@@ -212,7 +299,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               {onRetry && (
                 <button
                   onClick={onRetry}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/20 text-white font-tech font-bold text-xs tracking-wider active:scale-98 transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] border border-white/20 text-white font-tech font-bold text-xs tracking-wider active:scale-98 transition-all cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4 text-cyan-400" />
                   <span>RETRY LEVEL</span>
@@ -221,7 +308,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
               <button
                 onClick={onExit}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-black/40 hover:bg-black/60 border border-white/10 text-slate-300 font-tech text-xs tracking-wider active:scale-98 transition-all"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-black/40 hover:bg-black/60 border border-white/10 text-slate-300 font-tech text-xs tracking-wider active:scale-98 transition-all cursor-pointer"
               >
                 <Home className="w-4 h-4 text-slate-400" />
                 <span>EXIT TO LEVEL MAP</span>
