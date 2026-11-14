@@ -267,8 +267,8 @@ export const LevelRoadmap: React.FC = () => {
     <div
       className="relative w-full h-full overflow-hidden select-none bg-[#03040c]"
       style={{
-        perspective: '750px',
-        perspectiveOrigin: '50% 88%',
+        perspective: '850px',
+        perspectiveOrigin: '50% 90%',
         backgroundImage: `
           radial-gradient(ellipse 95% 20% at 50% 0%, rgba(255, 215, 0, 0.12) 0%, transparent 75%),
           radial-gradient(ellipse 90% 20% at 50% 30%, rgba(244, 63, 94, 0.1) 0%, transparent 75%),
@@ -279,7 +279,7 @@ export const LevelRoadmap: React.FC = () => {
     >
       {/* 3D Horizon Atmosphere Gradient overlay */}
       <div
-        className="absolute top-0 inset-x-0 h-36 pointer-events-none z-30"
+        className="absolute top-0 inset-x-0 h-32 pointer-events-none z-30"
         style={{
           background: 'linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.88) 35%, rgba(3, 4, 12, 0.35) 75%, transparent 100%)',
         }}
@@ -294,15 +294,15 @@ export const LevelRoadmap: React.FC = () => {
           WebkitOverflowScrolling: 'touch',
           overscrollBehaviorY: 'contain',
           contain: 'content',
-          transform: 'rotateX(13deg)',
+          transform: 'rotateX(9deg)',
           transformOrigin: '50% 100%',
           transformStyle: 'preserve-3d',
           willChange: 'transform, scroll-position',
-          width: '112%',
-          marginLeft: '-6%',
-          height: '145%',
-          marginTop: '-38%',
-          paddingBottom: '100px',
+          width: '108%',
+          marginLeft: '-4%',
+          height: '136%',
+          marginTop: '-30%',
+          paddingBottom: '160px',
           backgroundColor: '#03040c',
           backgroundImage: `
             radial-gradient(ellipse 95% 18% at 50% 1%, rgba(255, 215, 0, 0.16) 0%, transparent 75%),

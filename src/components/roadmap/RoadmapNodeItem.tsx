@@ -44,7 +44,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         : isCurrent
         ? '#00f7ff'
         : sectorColor
-      : '#334155';
+      : '#475569';
 
     const orbShadow = isUnlocked
       ? isCurrent
@@ -52,10 +52,10 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         : isComplete
         ? '0 0 22px rgba(16, 185, 129, 0.55), inset 0 2px 5px rgba(255,255,255,0.45), inset 0 -4px 8px rgba(0,0,0,0.9)'
         : `0 0 16px ${sectorColor}55, inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -4px 8px rgba(0,0,0,0.9)`
-      : '0 4px 12px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -3px 6px rgba(0,0,0,0.95)';
+      : '0 4px 14px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.25), inset 0 -3px 6px rgba(0,0,0,0.95)';
 
-    // 3D Extruded Tactile Lettering for Level Numbers
-    const numberColor = isUnlocked ? '#ffffff' : '#94a3b8';
+    // High-Contrast 3D Tactile Lettering for Level Numbers
+    const numberColor = isUnlocked ? '#ffffff' : '#f1f5f9';
 
     const numberShadow = isUnlocked
       ? isComplete
@@ -63,7 +63,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         : isCurrent
         ? '0 1px 0 #cffafe, 0 2px 0 #00f7ff, 0 3px 0 #00b4d8, 0 4px 0 #0077b6, 0 5px 0 #03045e, 0 6px 8px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 247, 255, 0.95)'
         : `0 1px 0 rgba(255,255,255,0.8), 0 2px 0 ${sectorColor}, 0 3px 0 ${sectorColor}cc, 0 4px 0 rgba(0,0,0,0.8), 0 5px 6px rgba(0,0,0,0.9), 0 0 14px ${sectorColor}88`
-      : '0 1px 0 rgba(255,255,255,0.25), 0 2px 0 #475569, 0 3px 0 #334155, 0 4px 0 #1e293b, 0 5px 6px rgba(0,0,0,0.95)';
+      : '0 1px 0 #ffffff, 0 2px 0 #64748b, 0 3px 0 #334155, 0 4px 0 #0f172a, 0 5px 6px rgba(0,0,0,0.95), 0 0 8px rgba(255,255,255,0.2)';
 
     return (
       <div
@@ -148,7 +148,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               ? isCurrent
                 ? 'scale-105 ring-2 ring-cyan-400 ring-offset-2 ring-offset-[#03040c]'
                 : 'hover:scale-105 active:scale-95'
-              : 'hover:border-slate-400 active:scale-95 opacity-75 hover:opacity-100'
+              : 'hover:border-slate-300 active:scale-95 opacity-95 hover:opacity-100'
           }`}
         >
           {/* Top Curved Specular Sheen (Spherical 3D Glass Arc) */}

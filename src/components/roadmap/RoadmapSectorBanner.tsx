@@ -20,39 +20,39 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
         return (
           <div
             key={`sector-banner-${node.id}`}
-            className="absolute z-10 -translate-x-1/2 flex flex-col items-center pointer-events-none"
+            className="absolute z-10 -translate-x-1/2 flex flex-col items-center pointer-events-none select-none"
             style={{
               left: `${(node.x / SVG_WIDTH) * 100}%`,
               // Sector 1 entrance sits cleanly below Level 1; other sectors sit above their milestone
-              top: isEntrance ? `${node.y + 60}px` : `${node.y - 78}px`,
+              top: isEntrance ? `${node.y + 68}px` : `${node.y - 78}px`,
             }}
           >
             <div
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border shadow-lg select-none"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border shadow-lg select-none whitespace-nowrap"
               style={{
-                backgroundColor: 'rgba(8, 12, 32, 0.96)',
+                backgroundColor: 'rgba(8, 14, 36, 0.98)',
                 borderColor: sector.color,
-                boxShadow: `0 4px 0 rgba(0,0,0,0.8), 0 8px 18px rgba(0,0,0,0.85), 0 0 20px ${sector.accentGlow}, inset 0 1px 2px rgba(255,255,255,0.5)`,
-                transform: 'perspective(500px) rotateX(-12deg)',
+                boxShadow: `0 3px 0 rgba(0,0,0,0.9), 0 6px 18px rgba(0,0,0,0.85), 0 0 20px ${sector.accentGlow}, inset 0 1px 2px rgba(255,255,255,0.4)`,
+                transform: 'perspective(500px) rotateX(-6deg)',
               }}
             >
-              <Sparkles style={{ color: sector.color }} className="w-3.5 h-3.5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]" />
-              <div className="flex flex-col items-start leading-none">
+              <Sparkles style={{ color: sector.color }} className="w-3.5 h-3.5 flex-shrink-0 drop-shadow-[0_0_8px_currentColor]" />
+              <div className="flex flex-col items-start leading-none whitespace-nowrap">
                 <span
-                  className="font-display font-black text-xs tracking-wider"
+                  className="font-display font-black text-xs tracking-wider whitespace-nowrap"
                   style={{
                     color: '#ffffff',
-                    textShadow: `0 1px 0 rgba(255,255,255,0.8), 0 2px 0 ${sector.color}, 0 3px 0 ${sector.color}cc, 0 4px 0 rgba(0,0,0,0.8), 0 5px 6px rgba(0,0,0,0.95), 0 0 14px ${sector.accentGlow}`,
+                    textShadow: `0 1px 0 rgba(255,255,255,0.9), 0 2px 0 ${sector.color}, 0 3px 0 ${sector.color}cc, 0 4px 6px rgba(0,0,0,0.95), 0 0 16px ${sector.accentGlow}`,
                     letterSpacing: '0.08em',
                   }}
                 >
                   SECTOR {sector.number} // {sector.name}
                 </span>
                 <span
-                  className="font-tech text-[9px] font-bold tracking-wider mt-0.5"
+                  className="font-tech text-[10px] font-bold tracking-wider mt-1 whitespace-nowrap"
                   style={{
-                    color: sector.color,
-                    textShadow: '0 1px 0 rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)',
+                    color: '#e2e8f0',
+                    textShadow: `0 1px 2px rgba(0,0,0,0.95), 0 0 10px ${sector.accentGlow}`,
                   }}
                 >
                   {sector.subtitle}

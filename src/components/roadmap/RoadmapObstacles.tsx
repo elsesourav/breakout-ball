@@ -35,21 +35,26 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({ obstacles })
                 <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
               </div>
 
-              {/* Barrier Security Tag with 3D Extruded Depth */}
+              {/* Barrier Security Tag with 3D Extruded Depth and High Contrast */}
               <div
-                className="flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[9px] font-tech font-bold tracking-wider uppercase"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-tech font-bold tracking-wider uppercase whitespace-nowrap"
                 style={{
-                  backgroundColor: obs.locked ? 'rgba(26, 6, 16, 0.96)' : 'rgba(5, 24, 18, 0.96)',
+                  backgroundColor: obs.locked ? 'rgba(26, 6, 16, 0.98)' : 'rgba(5, 24, 18, 0.98)',
                   borderColor: obs.locked ? '#ff0844' : '#10b981',
-                  color: obs.locked ? '#ff4b72' : '#34d399',
+                  color: '#ffffff',
                   boxShadow: obs.locked
-                    ? '0 2px 0 rgba(0,0,0,0.8), 0 4px 12px rgba(255, 8, 68, 0.4), inset 0 1px 1px rgba(255,255,255,0.2)'
-                    : '0 2px 0 rgba(0,0,0,0.8), 0 4px 12px rgba(16, 185, 129, 0.4), inset 0 1px 1px rgba(255,255,255,0.2)',
-                  textShadow: '0 1px 0 rgba(0,0,0,0.9)',
+                    ? '0 2px 0 rgba(0,0,0,0.9), 0 4px 14px rgba(255, 8, 68, 0.5), inset 0 1px 1px rgba(255,255,255,0.4)'
+                    : '0 2px 0 rgba(0,0,0,0.9), 0 4px 14px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(255,255,255,0.4)',
+                  textShadow: obs.locked
+                    ? '0 1px 0 #000, 0 0 8px #ff0844'
+                    : '0 1px 0 #000, 0 0 8px #10b981',
                 }}
               >
-                <ShieldAlert className="w-3 h-3 flex-shrink-0" />
-                <span>{obs.label} // {obs.locked ? 'GATE ACTIVE' : 'PASSED'}</span>
+                <ShieldAlert
+                  style={{ color: obs.locked ? '#ff4b72' : '#34d399' }}
+                  className="w-3.5 h-3.5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]"
+                />
+                <span className="whitespace-nowrap">{obs.label} // {obs.locked ? 'GATE ACTIVE' : 'PASSED'}</span>
               </div>
             </div>
           );

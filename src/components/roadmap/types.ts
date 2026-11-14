@@ -38,8 +38,8 @@ export interface Obstacle {
 export const TOTAL_LEVELS = 30;
 export const SPACING = 115;
 export const SVG_WIDTH = 360;
-export const BOTTOM_OFFSET = 190;
-export const TOP_OFFSET = 150;
+export const BOTTOM_OFFSET = 260;
+export const TOP_OFFSET = 160;
 export const TOTAL_HEIGHT = (TOTAL_LEVELS - 1) * SPACING + BOTTOM_OFFSET + TOP_OFFSET;
 
 export const SECTOR_CONFIG: Record<number, SectorInfo> = {
