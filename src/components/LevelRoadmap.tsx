@@ -269,13 +269,19 @@ export const LevelRoadmap: React.FC = () => {
       style={{
         perspective: '750px',
         perspectiveOrigin: '50% 88%',
+        backgroundImage: `
+          radial-gradient(ellipse 95% 20% at 50% 0%, rgba(255, 215, 0, 0.12) 0%, transparent 75%),
+          radial-gradient(ellipse 90% 20% at 50% 30%, rgba(244, 63, 94, 0.1) 0%, transparent 75%),
+          radial-gradient(ellipse 90% 20% at 50% 65%, rgba(183, 115, 255, 0.1) 0%, transparent 75%),
+          radial-gradient(ellipse 95% 25% at 50% 100%, rgba(0, 247, 255, 0.14) 0%, transparent 75%)
+        `,
       }}
     >
       {/* 3D Horizon Atmosphere Gradient overlay */}
       <div
-        className="absolute top-0 inset-x-0 h-20 pointer-events-none z-30"
+        className="absolute top-0 inset-x-0 h-36 pointer-events-none z-30"
         style={{
-          background: 'linear-gradient(to bottom, rgba(3, 4, 12, 0.95) 0%, rgba(3, 4, 12, 0.5) 50%, transparent 100%)',
+          background: 'linear-gradient(to bottom, #03040c 0%, rgba(3, 4, 12, 0.88) 35%, rgba(3, 4, 12, 0.35) 75%, transparent 100%)',
         }}
       />
 
@@ -292,10 +298,11 @@ export const LevelRoadmap: React.FC = () => {
           transformOrigin: '50% 100%',
           transformStyle: 'preserve-3d',
           willChange: 'transform, scroll-position',
-          width: '106%',
-          marginLeft: '-3%',
-          height: '106%',
-          marginTop: '-3%',
+          width: '112%',
+          marginLeft: '-6%',
+          height: '142%',
+          marginTop: '-35%',
+          paddingBottom: '90px',
           backgroundColor: '#03040c',
           backgroundImage: `
             radial-gradient(ellipse 95% 18% at 50% 1%, rgba(255, 215, 0, 0.16) 0%, transparent 75%),
