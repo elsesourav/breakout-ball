@@ -54,16 +54,16 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         : `0 0 16px ${sectorColor}55, inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -4px 8px rgba(0,0,0,0.9)`
       : '0 4px 14px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.25), inset 0 -3px 6px rgba(0,0,0,0.95)';
 
-    // High-Contrast 3D Tactile Lettering for Level Numbers
-    const numberColor = isUnlocked ? '#ffffff' : '#f1f5f9';
+    // High-Contrast Clean Typography for Level Numbers
+    const numberColor = isUnlocked ? '#ffffff' : '#94a3b8';
 
     const numberShadow = isUnlocked
-      ? isComplete
-        ? '0 1px 0 #a7f3d0, 0 2px 0 #34d399, 0 3px 0 #059669, 0 4px 0 #064e3b, 0 5px 6px rgba(0, 0, 0, 0.9), 0 0 16px rgba(52, 211, 153, 0.85)'
-        : isCurrent
-        ? '0 1px 0 #cffafe, 0 2px 0 #00f7ff, 0 3px 0 #00b4d8, 0 4px 0 #0077b6, 0 5px 0 #03045e, 0 6px 8px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 247, 255, 0.95)'
-        : `0 1px 0 rgba(255,255,255,0.8), 0 2px 0 ${sectorColor}, 0 3px 0 ${sectorColor}cc, 0 4px 0 rgba(0,0,0,0.8), 0 5px 6px rgba(0,0,0,0.9), 0 0 14px ${sectorColor}88`
-      : '0 1px 0 #ffffff, 0 2px 0 #64748b, 0 3px 0 #334155, 0 4px 0 #0f172a, 0 5px 6px rgba(0,0,0,0.95), 0 0 8px rgba(255,255,255,0.2)';
+      ? isCurrent
+        ? '0 0 14px #00f7ff, 0 2px 4px rgba(0, 0, 0, 0.95)'
+        : isComplete
+        ? '0 0 12px #34d399, 0 2px 4px rgba(0, 0, 0, 0.95)'
+        : `0 0 10px ${sectorColor}, 0 2px 4px rgba(0, 0, 0, 0.95)`
+      : '0 2px 4px rgba(0, 0, 0, 0.95)';
 
     return (
       <div
@@ -109,7 +109,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               <span
                 style={{
                   color: '#ffffff',
-                  textShadow: '0 1px 0 #cffafe, 0 2px 0 #0077b6, 0 3px 0 #023e8a, 0 4px 5px rgba(0,0,0,0.8)',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                   letterSpacing: '0.12em',
                 }}
               >
@@ -342,7 +342,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               <span
                 className="font-display font-black text-[10px] tracking-widest text-white leading-none"
                 style={{
-                  textShadow: '0 1px 0 #00f7ff, 0 2px 0 #0077b6, 0 3px 4px rgba(0,0,0,0.9)',
+                  textShadow: '0 0 6px #00f7ff, 0 1px 2px rgba(0,0,0,0.9)',
                 }}
               >
                 READY

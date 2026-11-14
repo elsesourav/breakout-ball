@@ -1,5 +1,4 @@
 import React from 'react';
-import { ShieldAlert, Lock, Check, Zap } from 'lucide-react';
 import { Obstacle, RouteBlocker, SVG_WIDTH } from './types';
 
 interface RoadmapObstaclesProps {
@@ -15,109 +14,212 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
 }) => {
   return (
     <>
-      {/* 1. Kinetic Route Obstacles (Directly Blocking the Progression Conduit) */}
+      {/* 1. Kinetic Route Obstacle Objects (Physical 3D Blockers on the Conduit Path) */}
       {routeBlockers.map((b) => {
+        // When level is cleared, the blocker object is completely destroyed/removed!
         if (b.isCleared) {
-          // Cleared Route Blocker: Opened Bypass Conduit Node
-          return (
-            <div
-              key={b.id}
-              className="absolute z-10 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center select-none pointer-events-none"
-              style={{
-                left: `${(b.x / SVG_WIDTH) * 100}%`,
-                top: `${b.y}px`,
-              }}
-            >
-              <div
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[8px] font-tech font-bold tracking-widest uppercase"
-                style={{
-                  backgroundColor: 'rgba(3, 20, 14, 0.94)',
-                  borderColor: '#10b981',
-                  color: '#34d399',
-                  boxShadow: '0 0 10px rgba(16, 185, 129, 0.4), inset 0 0 4px rgba(16, 185, 129, 0.2)',
-                }}
-              >
-                <Check className="w-2.5 h-2.5 stroke-[3.5] text-emerald-400" />
-                <span>BYPASS ONLINE</span>
-              </div>
-            </div>
-          );
+          return null;
         }
 
         if (b.isActive) {
-          // Active Route Blocker: Crimson Laser Firewall Physically Severing the Path!
+          // ACTIVE BLOCKER: 3D High-Tech Energy Barrier Clamp Severing the Active Route
           return (
             <div
               key={b.id}
               onClick={() => onBlockerClick?.(b)}
-              className="absolute z-20 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center select-none cursor-pointer active:scale-95 transition-transform"
+              className="absolute z-20 -translate-x-1/2 -translate-y-1/2 select-none cursor-pointer active:scale-95 transition-transform"
               style={{
                 left: `${(b.x / SVG_WIDTH) * 100}%`,
                 top: `${b.y}px`,
-                transform: 'translate(-50%, -50%) perspective(500px) rotateX(-6deg)',
+                transform: 'translate(-50%, -50%)',
               }}
+              title="Route Blocked: Complete previous level to destroy this barrier"
             >
-              {/* Pulsing Laser Emitter Beam across the Conduit */}
-              <div
-                className="w-32 h-1.5 rounded-full mb-1 flex items-center justify-between px-1"
-                style={{
-                  backgroundColor: '#ff0844',
-                  boxShadow: '0 0 16px #ff0844, 0 0 24px rgba(255, 8, 68, 0.7)',
-                }}
+              {/* 3D Cyber Barrier Object across the Conduit Track */}
+              <svg
+                width="64"
+                height="32"
+                viewBox="0 0 64 32"
+                className="overflow-visible select-none drop-shadow-[0_0_12px_rgba(255,8,68,0.7)]"
               >
-                <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff] animate-ping" />
-                <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
-                <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff] animate-ping" />
-              </div>
+                <defs>
+                  {/* Metallic Clamp Gradient */}
+                  <linearGradient id={`clampGrad-${b.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#334155" />
+                    <stop offset="40%" stopColor="#1e293b" />
+                    <stop offset="100%" stopColor="#090d16" />
+                  </linearGradient>
 
-              {/* Glowing High-Tech Firewall Tag */}
-              <div
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full border text-[9px] font-tech font-bold tracking-wider uppercase whitespace-nowrap shadow-xl"
-                style={{
-                  backgroundColor: 'rgba(28, 4, 14, 0.98)',
-                  borderColor: '#ff0844',
-                  color: '#ffffff',
-                  boxShadow: '0 3px 0 rgba(0,0,0,0.9), 0 0 18px rgba(255, 8, 68, 0.6), inset 0 1px 1px #ffffff',
-                  textShadow: '0 1px 0 #000, 0 0 8px #ff0844',
-                }}
-              >
-                <ShieldAlert className="w-3.5 h-3.5 text-rose-400 animate-pulse flex-shrink-0" />
-                <span className="whitespace-nowrap font-black">
-                  FIREWALL ACTIVE // LVL {b.toLevel} BLOCKED
-                </span>
-              </div>
+                  {/* Active Laser Force Beam Gradient */}
+                  <linearGradient id={`laserBeam-${b.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ff0844" stopOpacity="0.3" />
+                    <stop offset="25%" stopColor="#ff0844" stopOpacity="1" />
+                    <stop offset="50%" stopColor="#ffffff" stopOpacity="1" />
+                    <stop offset="75%" stopColor="#ff0844" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#ff0844" stopOpacity="0.3" />
+                  </linearGradient>
+
+                  {/* Center Lock Core Glow */}
+                  <radialGradient id={`coreGlow-${b.id}`} cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#ff4b72" />
+                    <stop offset="60%" stopColor="#be123c" />
+                    <stop offset="100%" stopColor="#1c040d" />
+                  </radialGradient>
+                </defs>
+
+                {/* Transverse Heavy Security Rail Chassis */}
+                <rect
+                  x="8"
+                  y="12"
+                  width="48"
+                  height="8"
+                  rx="4"
+                  fill={`url(#clampGrad-${b.id})`}
+                  stroke="#ff0844"
+                  strokeWidth="1.5"
+                />
+
+                {/* Left Conduit Clamp Shoe */}
+                <rect
+                  x="4"
+                  y="6"
+                  width="10"
+                  height="20"
+                  rx="3"
+                  fill="#0b0f1d"
+                  stroke="#f43f5e"
+                  strokeWidth="1.5"
+                />
+                <circle cx="9" cy="11" r="1.5" fill="#f43f5e" />
+                <circle cx="9" cy="21" r="1.5" fill="#f43f5e" />
+
+                {/* Right Conduit Clamp Shoe */}
+                <rect
+                  x="50"
+                  y="6"
+                  width="10"
+                  height="20"
+                  rx="3"
+                  fill="#0b0f1d"
+                  stroke="#f43f5e"
+                  strokeWidth="1.5"
+                />
+                <circle cx="55" cy="11" r="1.5" fill="#f43f5e" />
+                <circle cx="55" cy="21" r="1.5" fill="#f43f5e" />
+
+                {/* High-Voltage Crimson Laser Barrier Line across Conduit */}
+                <line
+                  x1="12"
+                  y1="16"
+                  x2="52"
+                  y2="16"
+                  stroke={`url(#laserBeam-${b.id})`}
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="16"
+                  y1="16"
+                  x2="48"
+                  y2="16"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+
+                {/* Central 3D Cyber Lock Nucleus */}
+                <circle
+                  cx="32"
+                  cy="16"
+                  r="9"
+                  fill={`url(#coreGlow-${b.id})`}
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                  className="animate-pulse"
+                />
+                {/* Security Keyhole / Padlock Geometry */}
+                <path
+                  d="M 29.5 14.5 A 2.5 2.5 0 0 1 34.5 14.5 V 16 H 29.5 Z M 28.5 16 H 35.5 V 19 H 28.5 Z"
+                  fill="#ffffff"
+                />
+                <circle cx="32" cy="17.2" r="0.8" fill="#ff0844" />
+              </svg>
             </div>
           );
         }
 
-        // Future Route Blocker: Inactive Cyber Firewall Padlock on Severed Track
+        // FUTURE BLOCKER: Dark Inactive Mechanical Barricade Clamp (Zero Text)
         return (
           <div
             key={b.id}
-            className="absolute z-10 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center select-none pointer-events-none opacity-60"
+            className="absolute z-10 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none opacity-70"
             style={{
               left: `${(b.x / SVG_WIDTH) * 100}%`,
               top: `${b.y}px`,
             }}
           >
-            <div
-              className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[8px] font-tech font-bold tracking-wider uppercase"
-              style={{
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                borderColor: '#475569',
-                color: '#94a3b8',
-              }}
+            {/* Dormant Mechanical Track Clamp Object */}
+            <svg
+              width="44"
+              height="22"
+              viewBox="0 0 44 22"
+              className="overflow-visible select-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
             >
-              <Lock className="w-2.5 h-2.5 text-slate-400" />
-              <span>LOCK {b.fromLevel}</span>
-            </div>
+              {/* Transverse Crossbar */}
+              <rect
+                x="6"
+                y="8"
+                width="32"
+                height="6"
+                rx="3"
+                fill="#0f172a"
+                stroke="#334155"
+                strokeWidth="1.2"
+              />
+              {/* Left Clamp Foot */}
+              <rect
+                x="3"
+                y="4"
+                width="7"
+                height="14"
+                rx="2"
+                fill="#1e293b"
+                stroke="#475569"
+                strokeWidth="1"
+              />
+              {/* Right Clamp Foot */}
+              <rect
+                x="34"
+                y="4"
+                width="7"
+                height="14"
+                rx="2"
+                fill="#1e293b"
+                stroke="#475569"
+                strokeWidth="1"
+              />
+              {/* Center Mechanical Lock Core with Dim Crimson Diode */}
+              <circle
+                cx="22"
+                cy="11"
+                r="5.5"
+                fill="#0b0f1d"
+                stroke="#475569"
+                strokeWidth="1.2"
+              />
+              <circle cx="22" cy="11" r="2" fill="#be123c" opacity="0.8" />
+            </svg>
           </div>
         );
       })}
 
-      {/* 2. Major Sector Forcefield Gateways */}
+      {/* 2. Major Sector Forcefield Gateways (Pure Visual Laser Arch - No Red Text Pill) */}
       {obstacles.map((obs) => {
         if (obs.type === 'forcefield') {
+          const isLocked = obs.locked;
+          const laserColor = isLocked ? '#ff0844' : '#10b981';
+          const laserGlow = isLocked ? 'rgba(255, 8, 68, 0.7)' : 'rgba(16, 185, 129, 0.6)';
+
           return (
             <div
               key={obs.id}
@@ -125,43 +227,69 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
-                transform: 'perspective(500px) rotateX(-6deg)',
               }}
             >
-              {/* Laser Forcefield Barrier Line */}
-              <div
-                className="w-44 h-1.5 rounded-full mb-1 flex items-center justify-between px-1"
-                style={{
-                  backgroundColor: obs.locked ? '#ff0844' : '#10b981',
-                  boxShadow: obs.locked
-                    ? '0 0 16px #ff0844, 0 0 24px rgba(255, 8, 68, 0.5)'
-                    : '0 0 16px #10b981, 0 0 20px rgba(16, 185, 129, 0.45)',
-                }}
-              >
-                <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
-                <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
-              </div>
+              {/* Visual Laser Forcefield Arch stretched across the Roadmap */}
+              <div className="relative flex items-center justify-between w-64 h-8 px-1">
+                {/* Left Emitter Pylon */}
+                <div
+                  className="w-4 h-8 rounded-sm flex flex-col items-center justify-between py-1 border shadow-lg"
+                  style={{
+                    backgroundColor: '#0a0f24',
+                    borderColor: laserColor,
+                    boxShadow: `0 0 10px ${laserGlow}`,
+                  }}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor: laserColor,
+                      boxShadow: `0 0 6px ${laserColor}`,
+                    }}
+                  />
+                  <span className="w-2 h-0.5 bg-slate-500 rounded-full" />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: laserColor }}
+                  />
+                </div>
 
-              {/* Barrier Security Tag with 3D Extruded Depth and High Contrast */}
-              <div
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-tech font-bold tracking-wider uppercase whitespace-nowrap"
-                style={{
-                  backgroundColor: obs.locked ? 'rgba(26, 6, 16, 0.98)' : 'rgba(5, 24, 18, 0.98)',
-                  borderColor: obs.locked ? '#ff0844' : '#10b981',
-                  color: '#ffffff',
-                  boxShadow: obs.locked
-                    ? '0 2px 0 rgba(0,0,0,0.9), 0 4px 14px rgba(255, 8, 68, 0.5), inset 0 1px 1px rgba(255,255,255,0.4)'
-                    : '0 2px 0 rgba(0,0,0,0.9), 0 4px 14px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(255,255,255,0.4)',
-                  textShadow: obs.locked
-                    ? '0 1px 0 #000, 0 0 8px #ff0844'
-                    : '0 1px 0 #000, 0 0 8px #10b981',
-                }}
-              >
-                <ShieldAlert
-                  style={{ color: obs.locked ? '#ff4b72' : '#34d399' }}
-                  className="w-3.5 h-3.5 flex-shrink-0 drop-shadow-[0_0_6px_currentColor]"
-                />
-                <span className="whitespace-nowrap">{obs.label} // {obs.locked ? 'GATE ACTIVE' : 'PASSED'}</span>
+                {/* Laser Forcefield Beam Line */}
+                <div className="flex-1 relative mx-1 h-2 flex items-center">
+                  <div
+                    className="w-full h-1 rounded-full"
+                    style={{
+                      backgroundColor: laserColor,
+                      boxShadow: `0 0 14px ${laserColor}, 0 0 22px ${laserGlow}`,
+                    }}
+                  />
+                  <div
+                    className="absolute inset-x-4 h-[1.5px] bg-white rounded-full opacity-80"
+                  />
+                </div>
+
+                {/* Right Emitter Pylon */}
+                <div
+                  className="w-4 h-8 rounded-sm flex flex-col items-center justify-between py-1 border shadow-lg"
+                  style={{
+                    backgroundColor: '#0a0f24',
+                    borderColor: laserColor,
+                    boxShadow: `0 0 10px ${laserGlow}`,
+                  }}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor: laserColor,
+                      boxShadow: `0 0 6px ${laserColor}`,
+                    }}
+                  />
+                  <span className="w-2 h-0.5 bg-slate-500 rounded-full" />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: laserColor }}
+                  />
+                </div>
               </div>
             </div>
           );
@@ -201,10 +329,9 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
-                transform: 'perspective(500px) rotateX(-6deg)',
               }}
             >
-              {/* Pure SVG Vector Plasma Orb: 100% immune to CSS box artifacts */}
+              {/* Pure SVG Vector Plasma Orb */}
               <svg width="34" height="34" viewBox="0 0 34 34" className="overflow-visible select-none">
                 <defs>
                   <radialGradient id={`plasma-grad-${obs.id}`} cx="50%" cy="50%" r="50%">
