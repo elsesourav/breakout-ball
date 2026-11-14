@@ -112,7 +112,7 @@ export const LevelPreviewModal: React.FC = () => {
               className="font-display font-black text-xs tracking-wider"
               style={{ color: '#00f7ff' }}
             >
-              {isCampaign ? `CORE ${selectedLevel.id.padStart(2, '0')}` : selectedLevel.name}
+              {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
             </span>
             <span className="font-ui text-[9px] text-slate-400">
               By @{selectedLevel.creator}

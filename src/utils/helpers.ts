@@ -24,11 +24,11 @@ export function drawLevelPreviewOnCanvas(
   ctx.clearRect(0, 0, w, h);
 
   // 1. Arcade Cyber Backdrop with grid pattern
-  ctx.fillStyle = '#060818';
+  ctx.fillStyle = '#050716';
   ctx.fillRect(0, 0, w, h);
 
   // Subtle gridlines
-  ctx.strokeStyle = 'rgba(0, 247, 255, 0.05)';
+  ctx.strokeStyle = 'rgba(0, 247, 255, 0.04)';
   ctx.lineWidth = 1;
   const gridSize = Math.floor(w / 12);
   for (let x = 0; x < w; x += gridSize) {
@@ -45,16 +45,16 @@ export function drawLevelPreviewOnCanvas(
   }
 
   // 2. Playfield side rails / borders
-  ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(4, 4, w - 8, h - 8);
+  ctx.strokeStyle = 'rgba(0, 247, 255, 0.15)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(3, 3, w - 6, h - 6);
 
   // 3. Calculate block dimensions scaled to fit width cleanly
   const marginX = 8;
   const playW = w - marginX * 2;
   const cellW = playW / GRID_ROWS;
   const cellH = cellW * 0.7; // Match game block ratio (128x90)
-  const padding = Math.max(1, cellW * 0.06);
+  const padding = Math.max(1, cellW * 0.05);
 
   blocks.forEach((block) => {
     if (block.h <= 0) return;
@@ -64,41 +64,157 @@ export function drawLevelPreviewOnCanvas(
     const by = 12 + block.y * cellH + padding;
     const bw = cellW - padding * 2;
     const bh = cellH - padding * 2;
-    const r = Math.min(bw, bh) * 0.22;
+    const depth = Math.max(2, Math.round(bh * 0.15)); // 3D extrusion thickness
+    const topFaceH = bh - depth;
+    const r = Math.min(bw, topFaceH) * 0.22;
 
     ctx.save();
-    // Rounded block path
-    ctx.beginPath();
-    if (ctx.roundRect) {
-      ctx.roundRect(bx, by, bw, bh, r);
-    } else {
-      ctx.rect(bx, by, bw, bh);
-    }
 
-    // Gradient fill
-    const grad = ctx.createLinearGradient(bx, by, bx, by + bh);
-    grad.addColorStop(0, config.bg[0]);
-    grad.addColorStop(1, config.bg[1]);
-    ctx.fillStyle = grad;
+    // 3D Drop Shadow on Floor
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx + 1.5, by + depth + 1.5, bw, topFaceH, r);
+    else ctx.rect(bx + 1.5, by + depth + 1.5, bw, topFaceH);
     ctx.fill();
 
-    // Specular shine at top of brick
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-    ctx.fillRect(bx + r * 0.5, by + 1.5, bw - r, bh * 0.25);
+    // 3D Extruded Lower Base & Flanks (Thickness)
+    const baseGrad = ctx.createLinearGradient(bx, by + topFaceH, bx, by + bh);
+    baseGrad.addColorStop(0, '#0a0d18');
+    baseGrad.addColorStop(1, '#020308');
+    ctx.fillStyle = baseGrad;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by + depth * 0.6, bw, topFaceH + depth * 0.4, r);
+    else ctx.rect(bx, by + depth * 0.6, bw, topFaceH + depth * 0.4);
+    ctx.fill();
 
-    // Glowing border stroke
+    // Main 3D Front Face
+    if (block.h === 6) {
+      // 3D Heavy Titanium Ingot with Steel Screws
+      const steelGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
+      steelGrad.addColorStop(0, '#e2e8f0');
+      steelGrad.addColorStop(0.35, '#94a3b8');
+      steelGrad.addColorStop(0.7, '#475569');
+      steelGrad.addColorStop(1, '#1e293b');
+      ctx.fillStyle = steelGrad;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
+      else ctx.rect(bx, by, bw, topFaceH);
+      ctx.fill();
+
+      // Corner rivets
+      const boltOffset = Math.max(3, bw * 0.15);
+      const boltR = Math.max(1, cellW * 0.05);
+      [
+        [bx + boltOffset, by + boltOffset],
+        [bx + bw - boltOffset, by + boltOffset],
+        [bx + boltOffset, by + topFaceH - boltOffset],
+        [bx + bw - boltOffset, by + topFaceH - boltOffset],
+      ].forEach(([cx, cy]) => {
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(cx, cy, boltR, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    } else if (block.h === 7) {
+      // 3D Quantum Portal
+      const portalChassis = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
+      portalChassis.addColorStop(0, '#2e0854');
+      portalChassis.addColorStop(0.5, '#120224');
+      portalChassis.addColorStop(1, '#05000a');
+      ctx.fillStyle = portalChassis;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
+      else ctx.rect(bx, by, bw, topFaceH);
+      ctx.fill();
+
+      // Swirling vortex center
+      const pCenterX = bx + bw / 2;
+      const pCenterY = by + topFaceH / 2;
+      const pRadius = Math.min(bw, topFaceH) * 0.4;
+      const vortexGrad = ctx.createRadialGradient(pCenterX, pCenterY, 1, pCenterX, pCenterY, pRadius);
+      vortexGrad.addColorStop(0, '#00f7ff');
+      vortexGrad.addColorStop(0.5, '#7928ca');
+      vortexGrad.addColorStop(1, 'rgba(255, 0, 128, 0.2)');
+      ctx.fillStyle = vortexGrad;
+      ctx.beginPath();
+      ctx.arc(pCenterX, pCenterY, pRadius, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (block.h === 8) {
+      // 3D Hazard EMP Reactor
+      const empGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
+      empGrad.addColorStop(0, '#ff7700');
+      empGrad.addColorStop(0.5, '#ff3b00');
+      empGrad.addColorStop(1, '#4a0800');
+      ctx.fillStyle = empGrad;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
+      else ctx.rect(bx, by, bw, topFaceH);
+      ctx.fill();
+    } else {
+      // Standard 1-5 HP 3D Cyber Crystal
+      const faceGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH);
+      faceGrad.addColorStop(0, config.bg[0]);
+      faceGrad.addColorStop(0.6, config.bg[1]);
+      faceGrad.addColorStop(1, '#050c18');
+      ctx.fillStyle = faceGrad;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
+      else ctx.rect(bx, by, bw, topFaceH);
+      ctx.fill();
+    }
+
+    // 3D Top Specular Bevel Highlight
+    const sheenGrad = ctx.createLinearGradient(bx, by, bx, by + topFaceH * 0.45);
+    sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
+    sheenGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.15)');
+    sheenGrad.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+    ctx.fillStyle = sheenGrad;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx + 1.5, by + 1, bw - 3, topFaceH * 0.4, r * 0.6);
+    else ctx.rect(bx + 1.5, by + 1, bw - 3, topFaceH * 0.4);
+    ctx.fill();
+
+    // Outer Glowing Cyber Rim
     ctx.strokeStyle = config.border;
-    ctx.lineWidth = Math.max(1.5, cellW * 0.05);
+    ctx.shadowColor = config.border;
+    ctx.shadowBlur = 8;
+    ctx.lineWidth = Math.max(1.5, cellW * 0.04);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, topFaceH, r);
+    else ctx.rect(bx, by, bw, topFaceH);
     ctx.stroke();
 
-    // HP label or icon
+    // 3D Embossed Label / Number
     if (cellW > 16) {
-      ctx.fillStyle = config.text;
-      ctx.font = `900 ${Math.floor(cellH * 0.55)}px monospace`;
+      const cx = bx + bw / 2;
+      const cy = by + topFaceH / 2;
+      ctx.shadowBlur = 0;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(config.label, bx + bw / 2, by + bh / 2 + 1);
+
+      let label = config.label;
+      if (block.h === 6) label = '∞';
+      else if (block.h === 7) label = '🌀';
+      else if (block.h === 8) label = 'EMP';
+
+      ctx.font =
+        block.h === 7
+          ? `${Math.floor(topFaceH * 0.52)}px sans-serif`
+          : `900 ${Math.floor(topFaceH * 0.5)}px monospace`;
+
+      // 3D Drop shadow for stamped text
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+      ctx.fillText(label, cx, cy + 1.5);
+
+      // Top highlight for stamped text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.fillText(label, cx, cy - 0.8);
+
+      // Main Text
+      ctx.fillStyle = config.text;
+      ctx.fillText(label, cx, cy);
     }
+
     ctx.restore();
   });
 }

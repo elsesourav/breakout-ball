@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Play, Check, Sparkles } from 'lucide-react';
+import { Play, Check, Clock } from 'lucide-react';
 import { RoadmapNode, SVG_WIDTH } from './types';
 import { LocalLevelProgress } from '../../types/game';
 
@@ -22,11 +22,13 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         : node.zone === 2
         ? '#818cf8'
         : node.zone === 3
+        ? '#b773ff'
+        : node.zone === 4
         ? '#f43f5e'
         : '#ffd700';
 
-    // Format number to 2 digits for aesthetic cyber consistency (01, 02, ... 20)
-    const formattedNumber = node.id < 10 ? `0${node.id}` : String(node.id);
+    // Plain clean number: 1, 2, 3... 30 (no 01, 02)
+    const formattedNumber = String(node.id);
 
     return (
       <div
@@ -37,16 +39,16 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           top: `${node.y}px`,
         }}
       >
-        {/* Floating Bouncing Energy Ball & LAUNCH Beacon above Active Level */}
+        {/* Floating Bouncing Energy Ball & PLAY Beacon above Current Active Level */}
         {isCurrent && (
           <div
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-30"
             style={{ top: '-46px' }}
           >
-            {/* Bouncing Breakout Ball with motion glow */}
+            {/* 3D Glowing Cyber Ball */}
             <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-400 to-white shadow-[0_0_16px_#00f7ff] border border-white animate-ball-bounce mb-1" />
 
-            {/* High-tech LAUNCH Pill */}
+            {/* High-tech PLAY Pill */}
             <div
               style={{
                 backgroundColor: '#00f7ff',
@@ -56,26 +58,26 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               className="flex items-center gap-1 px-2.5 py-0.5 rounded-full font-display font-black text-[10px] tracking-wider whitespace-nowrap shadow-md"
             >
               <Play style={{ fill: '#000000', color: '#000000' }} className="w-3 h-3" />
-              <span>LAUNCH</span>
+              <span>PLAY</span>
             </div>
           </div>
         )}
 
-        {/* Level Reactor Node Capsule */}
+        {/* 3D Tactile Cyber Node Capsule */}
         <button
           type="button"
           onClick={() => onLevelClick(node.id)}
           aria-label={`Level ${node.id} ${isUnlocked ? (isComplete ? 'Completed' : 'Unlocked') : 'Locked'}`}
           style={{
-            width: '64px',
-            height: '64px',
+            width: '66px',
+            height: '66px',
             backgroundColor: isUnlocked
               ? isComplete
-                ? '#041822'
+                ? '#061a22'
                 : isCurrent
-                ? '#081433'
-                : '#080d28'
-              : '#060818',
+                ? '#091838'
+                : '#090e29'
+              : '#080a1c',
             borderColor: isUnlocked
               ? isComplete
                 ? '#10b981'
@@ -85,20 +87,23 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               : '#1e293b',
             boxShadow: isUnlocked
               ? isCurrent
-                ? '0 0 26px rgba(0, 247, 255, 0.75), inset 0 0 15px rgba(0, 247, 255, 0.35)'
+                ? '0 8px 24px rgba(0, 247, 255, 0.45), inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -3px 6px rgba(0,0,0,0.7)'
                 : isComplete
-                ? '0 0 18px rgba(16, 185, 129, 0.55), inset 0 0 10px rgba(16, 185, 129, 0.2)'
-                : `0 0 14px ${sectorColor}40`
-              : '0 4px 12px rgba(0,0,0,0.6)',
+                ? '0 6px 18px rgba(16, 185, 129, 0.4), inset 0 2px 3px rgba(255,255,255,0.35), inset 0 -3px 6px rgba(0,0,0,0.7)'
+                : `0 4px 14px ${sectorColor}35, inset 0 1px 3px rgba(255,255,255,0.2), inset 0 -3px 6px rgba(0,0,0,0.7)`
+              : '0 4px 10px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -2px 4px rgba(0,0,0,0.85)',
           }}
           className={`relative group rounded-2xl flex flex-col items-center justify-center transition-all duration-200 outline-none select-none cursor-pointer border-[2.5px] ${
             isUnlocked
               ? isCurrent
                 ? 'scale-105 ring-2 ring-cyan-400/50'
                 : 'hover:scale-105 active:scale-95'
-              : 'hover:border-slate-500 active:scale-95 opacity-80 hover:opacity-100'
+              : 'hover:border-slate-500 active:scale-95 opacity-75 hover:opacity-100'
           }`}
         >
+          {/* Top 3D Specular Sheen Stripe */}
+          <div className="absolute top-1 inset-x-2 h-4 rounded-t-xl bg-gradient-to-b from-white/25 via-white/5 to-transparent pointer-events-none" />
+
           {/* Top Decorative Neon Accent Strip */}
           <div
             className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-6 h-1.5 rounded-full pointer-events-none"
@@ -108,14 +113,14 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             }}
           />
 
-          {/* Corner Cyber Accents for tech look */}
+          {/* Corner Cyber Accents */}
           <div className="absolute top-1 left-1 w-1.5 h-1.5 border-t border-l border-white/20 pointer-events-none" />
           <div className="absolute top-1 right-1 w-1.5 h-1.5 border-t border-r border-white/20 pointer-events-none" />
           <div className="absolute bottom-1 left-1 w-1.5 h-1.5 border-b border-l border-white/20 pointer-events-none" />
           <div className="absolute bottom-1 right-1 w-1.5 h-1.5 border-b border-r border-white/20 pointer-events-none" />
 
           {/* BIG PROMINENT LEVEL NUMBER */}
-          <div className="flex flex-col items-center justify-center leading-none">
+          <div className="flex flex-col items-center justify-center leading-none mt-0.5">
             <span
               className="font-display font-black tracking-tight"
               style={{
@@ -139,20 +144,26 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               {formattedNumber}
             </span>
 
-            {/* Discrete Status Indicator at bottom of node */}
-            <div className="flex items-center gap-1 mt-0.5">
-              {isUnlocked ? (
-                isComplete ? (
-                  <span className="font-tech text-[8px] font-black text-emerald-400 tracking-wider">
-                    CLEARED
+            {/* Clean Status Pill: Best Time or Subtle Energy Dot (No tacky CLEARED/ONLINE text) */}
+            <div className="flex items-center gap-1 mt-1">
+              {isComplete ? (
+                progress?.bestTime ? (
+                  <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 font-tech text-[9px] font-bold text-emerald-300">
+                    <Clock className="w-2.5 h-2.5 text-emerald-400" />
+                    <span>{progress.bestTime.toFixed(1)}s</span>
                   </span>
                 ) : (
-                  <span className="font-tech text-[8px] font-black text-cyan-300 tracking-wider">
-                    ONLINE
-                  </span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
                 )
+              ) : isCurrent ? (
+                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-[9px] font-tech font-bold text-cyan-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff] animate-pulse" />
+                  <span>READY</span>
+                </div>
+              ) : isUnlocked ? (
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400/70" />
               ) : (
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-600/70" />
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-700/60" />
               )}
             </div>
           </div>

@@ -15,7 +15,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   // ==========================================
   {
     id: '1',
-    name: 'Core 01: Genesis',
+    name: 'Level 1: Genesis',
     creator: 'sourav',
     playCount: 1420,
     blocks: [
@@ -26,7 +26,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '2',
-    name: 'Core 02: Twin Pillars',
+    name: 'Level 2: Twin Pillars',
     creator: 'sourav',
     playCount: 980,
     blocks: [
@@ -39,7 +39,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '3',
-    name: 'Core 03: Diamond Core',
+    name: 'Level 3: Diamond Core',
     creator: 'sourav',
     playCount: 820,
     blocks: [
@@ -52,7 +52,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '4',
-    name: 'Core 04: Quantum Gateway',
+    name: 'Level 4: Quantum Gateway',
     creator: 'sourav',
     playCount: 740,
     blocks: [
@@ -65,7 +65,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '5',
-    name: 'Core 05: Checkered Maze',
+    name: 'Level 5: Checkered Maze',
     creator: 'sourav',
     playCount: 610,
     blocks: [
@@ -77,7 +77,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '6',
-    name: 'Core 06: Shielded Core',
+    name: 'Level 6: Shielded Core',
     creator: 'sourav',
     playCount: 520,
     blocks: [
@@ -93,7 +93,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   // ==========================================
   {
     id: '7',
-    name: 'Core 07: EMP Pulse',
+    name: 'Level 7: EMP Pulse',
     creator: 'sourav',
     playCount: 480,
     blocks: [
@@ -105,7 +105,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '8',
-    name: 'Core 08: Zigzag Conduit',
+    name: 'Level 8: Zigzag Conduit',
     creator: 'sourav',
     playCount: 440,
     blocks: [
@@ -119,7 +119,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '9',
-    name: 'Core 09: Double Helix',
+    name: 'Level 9: Double Helix',
     creator: 'sourav',
     playCount: 410,
     blocks: [
@@ -133,7 +133,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '10',
-    name: 'Core 10: Cluster Detonator',
+    name: 'Level 10: Cluster Detonator',
     creator: 'sourav',
     playCount: 390,
     blocks: [
@@ -145,7 +145,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '11',
-    name: 'Core 11: The Citadel Gate',
+    name: 'Level 11: The Citadel Gate',
     creator: 'sourav',
     playCount: 360,
     blocks: [
@@ -158,7 +158,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '12',
-    name: 'Core 12: Reactor Core Alpha',
+    name: 'Level 12: Reactor Core Alpha',
     creator: 'sourav',
     playCount: 340,
     blocks: [
@@ -176,7 +176,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   // ==========================================
   {
     id: '13',
-    name: 'Core 13: Stargate Nexus',
+    name: 'Level 13: Stargate Nexus',
     creator: 'sourav',
     playCount: 310,
     blocks: [
@@ -188,7 +188,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '14',
-    name: 'Core 14: Asteroid Shards',
+    name: 'Level 14: Asteroid Shards',
     creator: 'sourav',
     playCount: 290,
     blocks: [
@@ -201,7 +201,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '15',
-    name: 'Core 15: Crossfire Grid',
+    name: 'Level 15: Crossfire Grid',
     creator: 'sourav',
     playCount: 270,
     blocks: [
@@ -213,7 +213,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '16',
-    name: 'Core 16: Chronos Vault',
+    name: 'Level 16: Chronos Vault',
     creator: 'sourav',
     playCount: 250,
     blocks: [
@@ -227,7 +227,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '17',
-    name: 'Core 17: Binary Orbit',
+    name: 'Level 17: Binary Orbit',
     creator: 'sourav',
     playCount: 235,
     blocks: [
@@ -240,7 +240,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '18',
-    name: 'Core 18: Singularity Matrix',
+    name: 'Level 18: Singularity Matrix',
     creator: 'sourav',
     playCount: 220,
     blocks: [
@@ -258,7 +258,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   // ==========================================
   {
     id: '19',
-    name: 'Core 19: The Great Wall',
+    name: 'Level 19: The Great Wall',
     creator: 'sourav',
     playCount: 205,
     blocks: [
@@ -271,7 +271,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '20',
-    name: 'Core 20: Bastion Ramparts',
+    name: 'Level 20: Bastion Ramparts',
     creator: 'sourav',
     playCount: 190,
     blocks: [
@@ -284,7 +284,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '21',
-    name: 'Core 21: EMP Labyrinth',
+    name: 'Level 21: EMP Labyrinth',
     creator: 'sourav',
     playCount: 180,
     blocks: [
@@ -297,7 +297,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '22',
-    name: 'Core 22: Iron Curtain',
+    name: 'Level 22: Iron Curtain',
     creator: 'sourav',
     playCount: 170,
     blocks: [
@@ -310,7 +310,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '23',
-    name: 'Core 23: Laser Citadel',
+    name: 'Level 23: Laser Citadel',
     creator: 'sourav',
     playCount: 160,
     blocks: [
@@ -322,7 +322,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '24',
-    name: 'Core 24: Overdrive Nexus',
+    name: 'Level 24: Overdrive Nexus',
     creator: 'sourav',
     playCount: 150,
     blocks: [
@@ -338,7 +338,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   // ==========================================
   {
     id: '25',
-    name: 'Core 25: Genesis Overdrive',
+    name: 'Level 25: Genesis Overdrive',
     creator: 'sourav',
     playCount: 140,
     blocks: [
@@ -350,7 +350,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '26',
-    name: 'Core 26: Quantum Lattice',
+    name: 'Level 26: Quantum Lattice',
     creator: 'sourav',
     playCount: 130,
     blocks: [
@@ -363,7 +363,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '27',
-    name: 'Core 27: Chaos Lattice',
+    name: 'Level 27: Chaos Lattice',
     creator: 'sourav',
     playCount: 120,
     blocks: [
@@ -376,7 +376,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '28',
-    name: 'Core 28: Dreadnought Bastion',
+    name: 'Level 28: Dreadnought Bastion',
     creator: 'sourav',
     playCount: 110,
     blocks: [
@@ -389,7 +389,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '29',
-    name: 'Core 29: Event Horizon',
+    name: 'Level 29: Event Horizon',
     creator: 'sourav',
     playCount: 100,
     blocks: [
@@ -402,7 +402,7 @@ export const INITIAL_LOCAL_LEVELS: LevelData[] = [
   },
   {
     id: '30',
-    name: 'Core 30: Grand Apex Reactor',
+    name: 'Level 30: Grand Apex Reactor',
     creator: 'sourav',
     playCount: 95,
     blocks: [
