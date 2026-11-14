@@ -26,13 +26,16 @@ export const MobileBottomNav: React.FC = () => {
 
   return (
     <nav
-      className="w-full bg-[#080a18]/95 backdrop-blur-xl border-t border-white/10 z-40 flex-shrink-0 select-none shadow-[0_-8px_25px_rgba(0,0,0,0.7)]"
+      className="relative w-full bg-[#050716]/95 backdrop-blur-2xl border-t border-cyan-500/20 rounded-t-[20px] z-40 flex-shrink-0 select-none shadow-[0_-10px_30px_rgba(0,0,0,0.85)]"
       style={{
         paddingBottom: 'max(8px, env(safe-area-inset-bottom, 8px))',
       }}
       aria-label="Game Navigation"
     >
-      <div className="flex items-center justify-around px-2 py-1.5 max-w-md mx-auto">
+      {/* Top Floating Cyber Laser Horizon */}
+      <div className="absolute top-0 left-6 right-6 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent shadow-[0_0_12px_#00f7ff] pointer-events-none" />
+
+      <div className="flex items-center justify-around px-2 pt-2 pb-1 max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = activeTab === item.id;
           const isProfile = item.id === 'profile';
@@ -46,62 +49,67 @@ export const MobileBottomNav: React.FC = () => {
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Spring sliding active background pill */}
+              {/* Soft luminous ambient aura (NO harsh border box outline) */}
               {isActive && (
-                <motion.div
-                  layoutId="mobileBottomNavActivePill"
-                  className="absolute inset-0 bg-gradient-to-b from-cyan-500/20 via-purple-500/15 to-pink-500/15 border border-cyan-400/50 rounded-xl shadow-[0_0_15px_rgba(0,247,255,0.35)] pointer-events-none"
-                  transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-                />
+                <>
+                  <motion.div
+                    layoutId="mobileBottomNavActiveAura"
+                    className="absolute inset-0 bg-gradient-to-b from-cyan-500/18 via-indigo-500/10 to-transparent rounded-xl pointer-events-none shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]"
+                    transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                  />
+                  {/* Top glowing laser blade indicator */}
+                  <motion.div
+                    layoutId="bottomNavActiveBlade"
+                    className="absolute -top-2 left-4 right-4 h-[2px] bg-cyan-400 rounded-full shadow-[0_0_10px_#00f7ff] pointer-events-none"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                </>
               )}
 
               {/* Icon / Avatar with spring scale */}
               <motion.div
                 animate={{
                   scale: isActive ? 1.15 : 1,
-                  y: isActive ? -2 : 0,
+                  y: isActive ? -1 : 0,
                 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                 className="relative z-10 transition-colors duration-200"
                 style={{
-                  color: isActive ? '#00f7ff' : '#cbd5e1',
-                  filter: isActive ? 'drop-shadow(0 0 8px rgba(0,247,255,0.8))' : 'none',
+                  color: isActive ? '#00f7ff' : '#94a3b8',
+                  filter: isActive ? 'drop-shadow(0 0 10px rgba(0,247,255,0.85))' : 'none',
                 }}
               >
                 {isProfile && user.isLoggedIn ? (
                   <div className="relative">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-[11px] font-black text-black font-mono shadow-[0_0_6px_#00f7ff]">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-[11px] font-black text-black font-mono shadow-[0_0_8px_#00f7ff]">
                       {user.username.slice(0, 1).toUpperCase()}
                     </div>
                     <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-black shadow-[0_0_4px_#34d399]" />
                   </div>
                 ) : (
-                  <Icon active={isActive} className="w-5 h-5" style={{ color: isActive ? '#00f7ff' : '#cbd5e1' }} />
+                  <Icon active={isActive} className="w-5 h-5" style={{ color: isActive ? '#00f7ff' : '#94a3b8' }} />
                 )}
               </motion.div>
 
-              {/* Text Label */}
-              <span
-                className="relative z-10 text-[11px] tracking-tight mt-1 truncate max-w-[74px] transition-all duration-200"
-                style={{
-                  color: isActive ? '#00f7ff' : '#cbd5e1',
-                  fontFamily: 'var(--font-ui)',
-                  fontWeight: isActive ? 800 : 600,
-                  letterSpacing: '0.02em',
-                  textShadow: isActive ? '0 0 8px rgba(0,247,255,0.7)' : 'none',
-                }}
+              {/* Cyber Styled Badge Shape for Footer Label */}
+              <div
+                className={`relative z-10 px-2 py-0.5 rounded-full mt-1 transition-all duration-200 ${
+                  isActive
+                    ? 'bg-cyan-500/15 border border-cyan-400/40 shadow-[0_0_8px_rgba(0,247,255,0.3)]'
+                    : 'bg-transparent border border-transparent'
+                }`}
               >
-                {item.label}
-              </span>
-
-              {/* Glowing active indicator dot */}
-              {isActive && (
-                <motion.span
-                  layoutId="bottomNavDot"
-                  className="w-1 h-1 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff] mt-0.5"
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                />
-              )}
+                <span
+                  className="font-tech text-[10px] tracking-wider uppercase truncate max-w-[70px] block"
+                  style={{
+                    color: isActive ? '#00f7ff' : '#94a3b8',
+                    fontWeight: isActive ? 800 : 600,
+                    textShadow: isActive ? '0 0 8px rgba(0,247,255,0.8)' : 'none',
+                  }}
+                >
+                  {item.label}
+                </span>
+              </div>
             </button>
           );
         })}
