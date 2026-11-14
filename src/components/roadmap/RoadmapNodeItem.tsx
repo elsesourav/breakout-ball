@@ -15,7 +15,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
     const isUnlocked = progress !== undefined;
     const isComplete = progress?.completed;
 
-    // Theme color based on sector zone
+    // Sector Theme Color
     const sectorColor =
       node.zone === 1
         ? '#00f7ff'
@@ -27,25 +27,72 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         ? '#f43f5e'
         : '#ffd700';
 
-    // Plain clean number: 1, 2, 3... 30 (no 01, 02)
     const formattedNumber = String(node.id);
+
+    // 3D Spherical Radial Background & Border per status
+    const orbBg = isUnlocked
+      ? isComplete
+        ? 'radial-gradient(circle at 35% 28%, #0d3830 0%, #061e1a 55%, #020a08 100%)'
+        : isCurrent
+        ? 'radial-gradient(circle at 35% 28%, #0f305c 0%, #091a38 55%, #03081a 100%)'
+        : 'radial-gradient(circle at 35% 28%, #181d3d 0%, #090e29 55%, #040614 100%)'
+      : 'radial-gradient(circle at 35% 28%, #141926 0%, #090c16 60%, #020308 100%)';
+
+    const orbBorder = isUnlocked
+      ? isComplete
+        ? '#10b981'
+        : isCurrent
+        ? '#00f7ff'
+        : sectorColor
+      : '#1e293b';
+
+    const orbShadow = isUnlocked
+      ? isCurrent
+        ? '0 0 24px rgba(0, 247, 255, 0.6), inset 0 2px 5px rgba(255,255,255,0.45), inset 0 -4px 6px rgba(0,0,0,0.8)'
+        : isComplete
+        ? '0 0 18px rgba(16, 185, 129, 0.45), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 6px rgba(0,0,0,0.8)'
+        : `0 0 14px ${sectorColor}40, inset 0 2px 4px rgba(255,255,255,0.25), inset 0 -4px 6px rgba(0,0,0,0.8)`
+      : '0 4px 10px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -3px 5px rgba(0,0,0,0.9)';
+
+    const numberColor = isUnlocked
+      ? isComplete
+        ? '#34d399'
+        : isCurrent
+        ? '#00f7ff'
+        : '#ffffff'
+      : '#64748b';
+
+    const numberShadow = isUnlocked
+      ? isComplete
+        ? '0 0 12px rgba(52, 211, 153, 0.8), 0 2px 4px #000'
+        : isCurrent
+        ? '0 0 15px rgba(0, 247, 255, 0.9), 0 2px 4px #000'
+        : '0 0 8px rgba(255,255,255,0.4), 0 2px 4px #000'
+      : '0 2px 4px rgba(0,0,0,0.8)';
 
     return (
       <div
         ref={isCurrent ? ref : undefined}
-        className="absolute -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center"
+        className="absolute z-20 flex flex-col items-center"
         style={{
           left: `${(node.x / SVG_WIDTH) * 100}%`,
           top: `${node.y}px`,
-          contentVisibility: 'auto',
-          containIntrinsicSize: '70px 70px',
+          transform: 'translate(-50%, -50%)',
         }}
       >
         {/* Floating Bouncing Energy Ball & PLAY Beacon above Current Active Level */}
         {isCurrent && (
           <div
-            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-30"
-            style={{ top: '-46px' }}
+            className="pointer-events-none z-30"
+            style={{
+              position: 'absolute',
+              top: '-46px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
           >
             {/* 3D Glowing Cyber Ball */}
             <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-400 to-white shadow-[0_0_16px_#00f7ff] border border-white animate-ball-bounce mb-1" />
@@ -65,126 +112,124 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           </div>
         )}
 
-        {/* 3D Tactile Cyber Node Capsule */}
+        {/* 3D Tactile Cyber Core Orb (Circular, No Box, No Corner Brackets) */}
         <button
           type="button"
           onClick={() => onLevelClick(node.id)}
           aria-label={`Level ${node.id} ${isUnlocked ? (isComplete ? 'Completed' : 'Unlocked') : 'Locked'}`}
           style={{
-            width: '66px',
-            height: '66px',
-            backgroundColor: isUnlocked
-              ? isComplete
-                ? '#061a22'
-                : isCurrent
-                ? '#091838'
-                : '#090e29'
-              : '#080a1c',
-            borderColor: isUnlocked
-              ? isComplete
-                ? '#10b981'
-                : isCurrent
-                ? '#00f7ff'
-                : sectorColor
-              : '#1e293b',
-            boxShadow: isUnlocked
-              ? isCurrent
-                ? '0 8px 24px rgba(0, 247, 255, 0.45), inset 0 2px 4px rgba(255,255,255,0.45), inset 0 -3px 6px rgba(0,0,0,0.7)'
-                : isComplete
-                ? '0 6px 18px rgba(16, 185, 129, 0.4), inset 0 2px 3px rgba(255,255,255,0.35), inset 0 -3px 6px rgba(0,0,0,0.7)'
-                : `0 4px 14px ${sectorColor}35, inset 0 1px 3px rgba(255,255,255,0.2), inset 0 -3px 6px rgba(0,0,0,0.7)`
-              : '0 4px 10px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -2px 4px rgba(0,0,0,0.85)',
+            width: '64px',
+            height: '64px',
+            background: orbBg,
+            borderColor: orbBorder,
+            boxShadow: orbShadow,
+            WebkitTapHighlightColor: 'transparent',
+            outline: 'none',
           }}
-          className={`relative group rounded-2xl flex flex-col items-center justify-center transition-all duration-200 outline-none select-none cursor-pointer border-[2.5px] ${
+          className={`relative rounded-full flex items-center justify-center transition-all duration-200 select-none cursor-pointer border-[2.5px] ${
             isUnlocked
               ? isCurrent
-                ? 'scale-105 ring-2 ring-cyan-400/50'
+                ? 'scale-105 ring-2 ring-cyan-400/60'
                 : 'hover:scale-105 active:scale-95'
               : 'hover:border-slate-500 active:scale-95 opacity-75 hover:opacity-100'
           }`}
         >
-          {/* Top 3D Specular Sheen Stripe */}
-          <div className="absolute top-1 inset-x-2 h-4 rounded-t-xl bg-gradient-to-b from-white/25 via-white/5 to-transparent pointer-events-none" />
-
-          {/* Top Decorative Neon Accent Strip */}
+          {/* Top Curved Specular Sheen (Spherical 3D Glass Arc) */}
           <div
-            className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-6 h-1.5 rounded-full pointer-events-none"
             style={{
-              backgroundColor: isUnlocked ? (isComplete ? '#10b981' : sectorColor) : '#334155',
-              boxShadow: isUnlocked ? `0 0 10px ${isComplete ? '#10b981' : sectorColor}` : 'none',
+              position: 'absolute',
+              top: '6px',
+              left: '14px',
+              right: '14px',
+              height: '14px',
+              borderRadius: '9999px',
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)',
+              pointerEvents: 'none',
             }}
           />
 
-          {/* Corner Cyber Accents */}
-          <div className="absolute top-1 left-1 w-1.5 h-1.5 border-t border-l border-white/20 pointer-events-none" />
-          <div className="absolute top-1 right-1 w-1.5 h-1.5 border-t border-r border-white/20 pointer-events-none" />
-          <div className="absolute bottom-1 left-1 w-1.5 h-1.5 border-b border-l border-white/20 pointer-events-none" />
-          <div className="absolute bottom-1 right-1 w-1.5 h-1.5 border-b border-r border-white/20 pointer-events-none" />
+          {/* Clean Prominent Level Number (100% un-occluded in center) */}
+          <span
+            className="font-display font-black leading-none select-none"
+            style={{
+              fontSize: '26px',
+              color: numberColor,
+              textShadow: numberShadow,
+              position: 'relative',
+              zIndex: 2,
+            }}
+          >
+            {formattedNumber}
+          </span>
 
-          {/* BIG PROMINENT LEVEL NUMBER */}
-          <div className="flex flex-col items-center justify-center leading-none mt-0.5">
-            <span
-              className="font-display font-black tracking-tight"
-              style={{
-                fontSize: '26px',
-                color: isUnlocked
-                  ? isComplete
-                    ? '#34d399'
-                    : isCurrent
-                    ? '#00f7ff'
-                    : '#ffffff'
-                  : '#64748b',
-                textShadow: isUnlocked
-                  ? isComplete
-                    ? '0 0 12px rgba(52, 211, 153, 0.8), 0 2px 4px #000'
-                    : isCurrent
-                    ? '0 0 15px rgba(0, 247, 255, 0.9), 0 2px 4px #000'
-                    : '0 0 8px rgba(255,255,255,0.4), 0 2px 4px #000'
-                  : '0 2px 4px rgba(0,0,0,0.8)',
-              }}
-            >
-              {formattedNumber}
-            </span>
-
-            {/* Clean Status Pill: Best Time or Subtle Energy Dot (No tacky CLEARED/ONLINE text) */}
-            <div className="flex items-center gap-1 mt-1">
-              {isComplete ? (
-                progress?.bestTime ? (
-                  <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 font-tech text-[9px] font-bold text-emerald-300">
-                    <Clock className="w-2.5 h-2.5 text-emerald-400" />
-                    <span>{progress.bestTime.toFixed(1)}s</span>
-                  </span>
-                ) : (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
-                )
-              ) : isCurrent ? (
-                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-[9px] font-tech font-bold text-cyan-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff] animate-pulse" />
-                  <span>READY</span>
-                </div>
-              ) : isUnlocked ? (
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400/70" />
-              ) : (
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-700/60" />
-              )}
-            </div>
-          </div>
-
-          {/* Completed Checkmark Corner Badge */}
+          {/* Floating Completed Checkmark Badge on Orb Rim */}
           {isComplete && (
             <div
               style={{
+                position: 'absolute',
+                top: '-3px',
+                right: '-3px',
+                width: '20px',
+                height: '20px',
+                borderRadius: '9999px',
                 backgroundColor: '#10b981',
-                boxShadow: '0 0 8px #34d399',
+                boxShadow: '0 0 10px #34d399',
+                border: '1.5px solid #000000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+                zIndex: 10,
               }}
-              className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center"
             >
-              <Check style={{ color: '#000000' }} className="w-2.5 h-2.5 stroke-[3.5]" />
+              <Check style={{ color: '#000000' }} className="w-3 h-3 stroke-[3.5]" />
             </div>
           )}
 
-          {/* Inner Acrylic Border Bezel */}
-          <div className="absolute inset-0.5 rounded-[13px] border border-white/10 pointer-events-none" />
+          {/* Floating Status / Time Pill Anchored Cleanly BELOW Orb (Zero Collage / Overlap) */}
+          {isComplete && progress?.bestTime ? (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '-14px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: 'rgba(3, 6, 20, 0.96)',
+                border: '1px solid rgba(16, 185, 129, 0.55)',
+                boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)',
+                pointerEvents: 'none',
+                whiteSpace: 'nowrap',
+                zIndex: 10,
+              }}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full"
+            >
+              <Clock className="w-2.5 h-2.5 text-emerald-400" />
+              <span className="font-tech text-[9px] font-bold text-emerald-300 leading-none">
+                {progress.bestTime.toFixed(1)}s
+              </span>
+            </div>
+          ) : isCurrent ? (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '-14px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: 'rgba(3, 6, 20, 0.96)',
+                border: '1px solid rgba(0, 247, 255, 0.65)',
+                boxShadow: '0 0 12px rgba(0, 247, 255, 0.5)',
+                pointerEvents: 'none',
+                whiteSpace: 'nowrap',
+                zIndex: 10,
+              }}
+              className="flex items-center gap-1 px-2.5 py-0.5 rounded-full"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff] animate-pulse" />
+              <span className="font-tech text-[9px] font-bold text-cyan-300 leading-none">
+                READY
+              </span>
+            </div>
+          ) : null}
         </button>
       </div>
     );

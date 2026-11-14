@@ -40,7 +40,32 @@ export const RoadmapConduitSvg: React.FC<RoadmapConduitSvgProps> = ({
             <stop offset="65%" stopColor="#120c24" />
             <stop offset="100%" stopColor="#1a1408" />
           </linearGradient>
+
+          {/* Futuristic Sci-Fi Hexagonal Honeycomb Matrix */}
+          <pattern
+            id="cyberHexGrid"
+            width="36"
+            height="62.35"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 18 0 L 36 10.39 L 36 31.18 L 18 41.57 L 0 31.18 L 0 10.39 Z M 18 62.35 L 36 51.96 L 36 31.18 L 18 41.57 L 0 31.18 L 0 51.96 Z"
+              fill="none"
+              stroke="rgba(0, 247, 255, 0.05)"
+              strokeWidth="1"
+            />
+          </pattern>
         </defs>
+
+        {/* Hexagonal Cyber Honeycomb Matrix Base (Replaces Square Grid) */}
+        <rect
+          x="0"
+          y="0"
+          width={SVG_WIDTH}
+          height={TOTAL_HEIGHT}
+          fill="url(#cyberHexGrid)"
+          opacity="0.85"
+        />
 
         {/* Outer Soft Ambient Aura (Multi-pass opacity strokes replace CPU-heavy Gaussian Blur) */}
         <path

@@ -268,13 +268,14 @@ export const LevelRoadmap: React.FC = () => {
         WebkitOverflowScrolling: 'touch',
         overscrollBehaviorY: 'contain',
         contain: 'content',
+        backgroundColor: '#03040c',
         backgroundImage: `
-          radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%),
-          radial-gradient(ellipse 60% 40% at 50% 100%, rgba(0, 247, 255, 0.12) 0%, transparent 60%),
-          linear-gradient(to right, rgba(0, 247, 255, 0.03) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(0, 247, 255, 0.03) 1px, transparent 1px)
+          radial-gradient(ellipse 95% 18% at 50% 1%, rgba(255, 215, 0, 0.16) 0%, transparent 75%),
+          radial-gradient(ellipse 90% 18% at 50% 24%, rgba(244, 63, 94, 0.13) 0%, transparent 75%),
+          radial-gradient(ellipse 90% 18% at 50% 48%, rgba(183, 115, 255, 0.13) 0%, transparent 75%),
+          radial-gradient(ellipse 90% 18% at 50% 72%, rgba(99, 102, 241, 0.14) 0%, transparent 75%),
+          radial-gradient(ellipse 95% 20% at 50% 98%, rgba(0, 247, 255, 0.16) 0%, transparent 75%)
         `,
-        backgroundSize: '100% 100%, 100% 100%, 28px 28px, 28px 28px',
       }}
     >
       <div
