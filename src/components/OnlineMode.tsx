@@ -102,7 +102,7 @@ export const OnlineMode: React.FC = () => {
         {/* Cyber Search Terminal Input */}
         <div className="relative w-full mt-0.5">
           <div
-            className="flex items-center w-full h-11 px-4 rounded-xl transition-all duration-200"
+            className="flex gap-1 items-center w-full h-11 px-4 rounded-xl transition-all duration-200"
             style={{
               backgroundColor: 'rgba(8, 14, 38, 0.95)',
               border: isSearchFocused

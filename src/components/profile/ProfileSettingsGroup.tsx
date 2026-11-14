@@ -50,7 +50,7 @@ export const ProfileSettingsGroup: React.FC = () => {
             showGlow={true}
             showValue={true}
             formatValue={(v) => `${Math.round(v * 100)}%`}
-            className="w-full"
+            className="w-full font-tech"
             ariaLabel="Master Volume"
           />
         </div>
@@ -78,6 +78,7 @@ export const ProfileSettingsGroup: React.FC = () => {
             offLabel="OFF"
             showBezel={true}
             showGlow={true}
+            className="font-tech"
             ariaLabel="Vibration Toggle"
           />
         </div>
@@ -113,6 +114,7 @@ export const ProfileSettingsGroup: React.FC = () => {
             offLabel="OFF"
             showBezel={true}
             showGlow={true}
+            className="font-tech"
             ariaLabel="Gyroscope Toggle"
           />
         </div>
@@ -139,7 +141,7 @@ export const ProfileSettingsGroup: React.FC = () => {
             showGlow={true}
             showValue={true}
             formatValue={(v) => `${Math.round(v * 100)}%`}
-            className="w-full"
+            className="w-full font-tech"
             ariaLabel="Gyroscope Sensitivity"
           />
         </div>

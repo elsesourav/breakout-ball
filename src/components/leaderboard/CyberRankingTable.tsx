@@ -64,8 +64,8 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
         <span className="text-right pr-1 font-bold">TIME</span>
       </div>
 
-      {/* Ranking Rows */}
-      <div className="flex flex-col divide-y divide-white/5 max-h-56 overflow-y-auto">
+      {/* Ranking Rows - Fixed compact scrollable height showing ~4 rows */}
+      <div className="flex flex-col divide-y divide-white/5 max-h-[148px] overflow-y-auto overscroll-contain cyber-scroll pr-1">
         {entries.length === 0 ? (
           <div className="py-3 text-center text-xs font-ui text-slate-400">
             No rankings yet. Be the first to clear this level!
@@ -222,6 +222,14 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
           })
         )}
       </div>
+
+      {/* Scrollable Indicator Pill for Top 10 Leaderboard */}
+      {entries.length > 4 && (
+        <div className="py-1 px-3 bg-black/60 border-t border-white/5 flex items-center justify-between text-[9px] font-tech text-slate-400">
+          <span>TOP 10 PILOTS</span>
+          <span className="text-cyan-400/90 font-bold animate-pulse tracking-wider">SCROLL FOR MORE ▼</span>
+        </div>
+      )}
     </div>
   );
 };
