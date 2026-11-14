@@ -44,8 +44,18 @@ class StandardDatabaseService {
   }
 
   private seedDatabaseIfEmpty() {
-    if (!localStorage.getItem(this.localLevelsKey)) {
+    const localRaw = localStorage.getItem(this.localLevelsKey);
+    if (!localRaw) {
       localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+    } else {
+      try {
+        const parsed = JSON.parse(localRaw);
+        if (!Array.isArray(parsed) || parsed.length < INITIAL_LOCAL_LEVELS.length) {
+          localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+        }
+      } catch {
+        localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+      }
     }
     if (!localStorage.getItem(this.onlineLevelsKey)) {
       localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
@@ -233,19 +243,30 @@ class StandardDatabaseService {
   // LOCAL PROGRESS API
   // ==========================================
 
-  public async getProgress(): Promise<Record<string, LocalLevelProgress>> {
-    const raw = localStorage.getItem(this.progressKey);
-    if (raw) return JSON.parse(raw);
+  public async getProgress(username?: string): Promise<Record<string, LocalLevelProgress>> {
+    const userKey = username && username.toLowerCase() !== 'anonymous' ? `breakout_db_progress_${username.toLowerCase()}` : null;
+    const raw = (userKey ? localStorage.getItem(userKey) : null) || localStorage.getItem(this.progressKey);
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch {}
+    }
 
-    const initial = {
+    const initial: Record<string, LocalLevelProgress> = {
       '1': { levelNumber: 1, completed: false, rank: null, bestTime: null },
     };
     localStorage.setItem(this.progressKey, JSON.stringify(initial));
+    if (userKey) {
+      localStorage.setItem(userKey, JSON.stringify(initial));
+    }
     return initial;
   }
 
-  public async saveProgress(progress: Record<string, LocalLevelProgress>): Promise<void> {
+  public async saveProgress(progress: Record<string, LocalLevelProgress>, username?: string): Promise<void> {
     localStorage.setItem(this.progressKey, JSON.stringify(progress));
+    if (username && username.toLowerCase() !== 'anonymous') {
+      localStorage.setItem(`breakout_db_progress_${username.toLowerCase()}`, JSON.stringify(progress));
+    }
   }
 }
 

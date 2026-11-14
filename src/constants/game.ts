@@ -20,6 +20,8 @@ export const BLOCK_COLORS: Record<number, { bg: [string, string]; border: string
   4: { bg: ['#b773ff', '#7028e4'], border: '#af4eff', label: '4', text: '#fff' },
   5: { bg: ['#ff0844', '#ff7e9e'], border: '#ff20c4', label: '5', text: '#fff' },
   6: { bg: ['#b0b7c1', '#eaeaea'], border: '#ffffff', label: '∞', text: '#333' }, // Wall (unbreakable)
+  7: { bg: ['#7928ca', '#00f7ff'], border: '#00f7ff', label: '🌀', text: '#fff' }, // Quantum Portal
+  8: { bg: ['#ff3b00', '#ff8800'], border: '#ffaa00', label: 'EMP', text: '#fff' }, // Countdown Reactor
 };
 
 export const AUDIO_PATHS = {
@@ -48,83 +50,7 @@ export const DEFAULT_USER: UserProfile = {
   isLoggedIn: false,
 };
 
-// Generate attractive preset levels
-export const INITIAL_LOCAL_LEVELS: LevelData[] = [
-  {
-    id: '1',
-    name: 'Level 1: Genesis',
-    creator: 'sourav',
-    playCount: 1420,
-    blocks: [
-      { x: 1, y: 2, h: 1 }, { x: 2, y: 2, h: 1 }, { x: 3, y: 2, h: 1 }, { x: 4, y: 2, h: 1 }, { x: 5, y: 2, h: 1 }, { x: 6, y: 2, h: 1 }, { x: 7, y: 2, h: 1 },
-      { x: 2, y: 3, h: 2 }, { x: 3, y: 3, h: 2 }, { x: 4, y: 3, h: 2 }, { x: 5, y: 3, h: 2 }, { x: 6, y: 3, h: 2 },
-      { x: 3, y: 4, h: 3 }, { x: 4, y: 4, h: 3 }, { x: 5, y: 4, h: 3 },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Level 2: Twin Pillars',
-    creator: 'sourav',
-    playCount: 980,
-    blocks: [
-      { x: 1, y: 1, h: 2 }, { x: 1, y: 2, h: 2 }, { x: 1, y: 3, h: 2 }, { x: 1, y: 4, h: 2 },
-      { x: 7, y: 1, h: 2 }, { x: 7, y: 2, h: 2 }, { x: 7, y: 3, h: 2 }, { x: 7, y: 4, h: 2 },
-      { x: 3, y: 2, h: 1 }, { x: 4, y: 2, h: 3 }, { x: 5, y: 2, h: 1 },
-      { x: 3, y: 3, h: 4 }, { x: 4, y: 3, h: 5 }, { x: 5, y: 3, h: 4 },
-      { x: 4, y: 4, h: 6 }, // Wall in center
-    ],
-  },
-  {
-    id: '3',
-    name: 'Level 3: Diamond Core',
-    creator: 'sourav',
-    playCount: 820,
-    blocks: [
-      { x: 4, y: 1, h: 5 },
-      { x: 3, y: 2, h: 4 }, { x: 5, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 4, y: 3, h: 6 }, { x: 6, y: 3, h: 3 },
-      { x: 3, y: 4, h: 2 }, { x: 5, y: 4, h: 2 },
-      { x: 4, y: 5, h: 1 },
-    ],
-  },
-  {
-    id: '4',
-    name: 'Level 4: Rainbow Fortress',
-    creator: 'sourav',
-    playCount: 650,
-    blocks: [
-      { x: 0, y: 1, h: 5 }, { x: 1, y: 1, h: 5 }, { x: 2, y: 1, h: 5 }, { x: 3, y: 1, h: 5 }, { x: 4, y: 1, h: 5 }, { x: 5, y: 1, h: 5 }, { x: 6, y: 1, h: 5 }, { x: 7, y: 1, h: 5 }, { x: 8, y: 1, h: 5 },
-      { x: 1, y: 2, h: 4 }, { x: 2, y: 2, h: 4 }, { x: 3, y: 2, h: 4 }, { x: 4, y: 2, h: 4 }, { x: 5, y: 2, h: 4 }, { x: 6, y: 2, h: 4 }, { x: 7, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 3, y: 3, h: 3 }, { x: 4, y: 3, h: 3 }, { x: 5, y: 3, h: 3 }, { x: 6, y: 3, h: 3 },
-      { x: 3, y: 4, h: 2 }, { x: 4, y: 4, h: 2 }, { x: 5, y: 4, h: 2 },
-      { x: 4, y: 5, h: 1 },
-    ],
-  },
-  {
-    id: '5',
-    name: 'Level 5: Checkered Maze',
-    creator: 'sourav',
-    playCount: 512,
-    blocks: [
-      { x: 0, y: 1, h: 3 }, { x: 2, y: 1, h: 3 }, { x: 4, y: 1, h: 3 }, { x: 6, y: 1, h: 3 }, { x: 8, y: 1, h: 3 },
-      { x: 1, y: 2, h: 2 }, { x: 3, y: 2, h: 2 }, { x: 5, y: 2, h: 2 }, { x: 7, y: 2, h: 2 },
-      { x: 0, y: 3, h: 4 }, { x: 2, y: 3, h: 6 }, { x: 4, y: 3, h: 4 }, { x: 6, y: 3, h: 6 }, { x: 8, y: 3, h: 4 },
-      { x: 1, y: 4, h: 1 }, { x: 3, y: 4, h: 5 }, { x: 5, y: 4, h: 5 }, { x: 7, y: 4, h: 1 },
-    ],
-  },
-  {
-    id: '6',
-    name: 'Level 6: Shielded Core',
-    creator: 'sourav',
-    playCount: 420,
-    blocks: [
-      { x: 2, y: 1, h: 6 }, { x: 3, y: 1, h: 6 }, { x: 4, y: 1, h: 6 }, { x: 5, y: 1, h: 6 }, { x: 6, y: 1, h: 6 },
-      { x: 2, y: 2, h: 6 }, { x: 3, y: 2, h: 5 }, { x: 4, y: 2, h: 5 }, { x: 5, y: 2, h: 5 }, { x: 6, y: 2, h: 6 },
-      { x: 2, y: 3, h: 6 }, { x: 3, y: 3, h: 4 }, { x: 4, y: 3, h: 5 }, { x: 5, y: 3, h: 4 }, { x: 6, y: 3, h: 6 },
-      { x: 1, y: 4, h: 1 }, { x: 2, y: 4, h: 2 }, { x: 6, y: 4, h: 2 }, { x: 7, y: 4, h: 1 },
-    ],
-  },
-];
+export { INITIAL_LOCAL_LEVELS } from './levels';
 
 export const INITIAL_ONLINE_LEVELS: LevelData[] = [
   {

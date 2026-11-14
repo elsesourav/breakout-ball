@@ -38,6 +38,26 @@ export class AudioBridge {
         soundManager.playDamage();
         this.vibrate(350);
         break;
+
+      case 'portal_warp':
+        soundManager.playClick();
+        this.vibrate([25, 40, 25]);
+        break;
+
+      case 'emp_explode':
+        soundManager.playBlockHit();
+        this.vibrate(120);
+        break;
+
+      case 'powerup_collect':
+        soundManager.playClick();
+        this.vibrate(45);
+        break;
+
+      case 'shield_bounce':
+        soundManager.playSideHit();
+        this.vibrate(70);
+        break;
     }
   }
 

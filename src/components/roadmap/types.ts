@@ -35,8 +35,8 @@ export interface Obstacle {
   locked?: boolean;
 }
 
-export const TOTAL_LEVELS = 20;
-export const SPACING = 120;
+export const TOTAL_LEVELS = 30;
+export const SPACING = 115;
 export const SVG_WIDTH = 360;
 export const BOTTOM_OFFSET = 140;
 export const TOP_OFFSET = 150;
@@ -50,24 +50,31 @@ export const SECTOR_CONFIG: Record<number, SectorInfo> = {
     color: '#00f7ff',
     accentGlow: 'rgba(0, 247, 255, 0.45)',
   },
-  6: {
+  7: {
     number: '02',
     name: 'PULSE GRID',
     subtitle: 'SYNTHWAVE MULTI-STRIKE',
     color: '#818cf8',
     accentGlow: 'rgba(129, 140, 248, 0.45)',
   },
-  11: {
+  13: {
     number: '03',
     name: 'QUANTUM VOID',
-    subtitle: 'HARDENED SHIFTING SHARDS',
+    subtitle: 'PORTAL WORMHOLE NEXUS',
+    color: '#b773ff',
+    accentGlow: 'rgba(183, 115, 255, 0.45)',
+  },
+  19: {
+    number: '04',
+    name: 'CYBER BASTION',
+    subtitle: 'HEAVY ARMOR FORTRESS',
     color: '#f43f5e',
     accentGlow: 'rgba(244, 63, 94, 0.45)',
   },
-  16: {
-    number: '04',
-    name: 'HYPER CORE',
-    subtitle: 'APEX OVERDRIVE REACTOR',
+  25: {
+    number: '05',
+    name: 'HYPER CORE OVERDRIVE',
+    subtitle: 'MASTER APEX GAUNTLET',
     color: '#ffd700',
     accentGlow: 'rgba(255, 215, 0, 0.5)',
   },

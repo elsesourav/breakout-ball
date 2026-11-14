@@ -32,9 +32,10 @@ export const LevelRoadmap: React.FC = () => {
       const x = 180 + Math.sin(angle) * 92;
 
       let zone = 1;
-      if (i > 15) zone = 4;
-      else if (i > 10) zone = 3;
-      else if (i > 5) zone = 2;
+      if (i > 24) zone = 5;
+      else if (i > 18) zone = 4;
+      else if (i > 12) zone = 3;
+      else if (i > 6) zone = 2;
 
       const sector = SECTOR_CONFIG[i];
 
@@ -99,9 +100,9 @@ export const LevelRoadmap: React.FC = () => {
         id: 'gate-sector-2',
         type: 'forcefield',
         x: 180,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 4.5 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 5.5 * SPACING,
         label: 'GATE 01',
-        locked: currentUnlockedId < 6,
+        locked: currentUnlockedId < 7,
       },
       {
         id: 'titanium-1',
@@ -113,47 +114,67 @@ export const LevelRoadmap: React.FC = () => {
         id: 'plasma-1',
         type: 'plasma',
         x: 255,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.2 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 4.2 * SPACING,
       },
       {
         id: 'gate-sector-3',
         type: 'forcefield',
         x: 180,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 9.5 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 11.5 * SPACING,
         label: 'GATE 02',
-        locked: currentUnlockedId < 11,
+        locked: currentUnlockedId < 13,
       },
       {
         id: 'titanium-2',
         type: 'titanium',
         x: 245,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 8.5 * SPACING,
       },
       {
         id: 'plasma-2',
         type: 'plasma',
         x: 110,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 8.3 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 10.3 * SPACING,
       },
       {
         id: 'gate-sector-4',
         type: 'forcefield',
         x: 180,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 14.5 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING,
         label: 'GATE 03',
-        locked: currentUnlockedId < 16,
+        locked: currentUnlockedId < 19,
       },
       {
         id: 'titanium-3',
         type: 'titanium',
         x: 115,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 12.5 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 14.5 * SPACING,
       },
       {
         id: 'plasma-3',
         type: 'plasma',
         x: 245,
-        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.8 * SPACING,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 16.2 * SPACING,
+      },
+      {
+        id: 'gate-sector-5',
+        type: 'forcefield',
+        x: 180,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING,
+        label: 'GATE 04',
+        locked: currentUnlockedId < 25,
+      },
+      {
+        id: 'titanium-4',
+        type: 'titanium',
+        x: 240,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 20.5 * SPACING,
+      },
+      {
+        id: 'plasma-4',
+        type: 'plasma',
+        x: 115,
+        y: TOTAL_HEIGHT - BOTTOM_OFFSET - 26.5 * SPACING,
       },
     ];
   }, [currentUnlockedId]);

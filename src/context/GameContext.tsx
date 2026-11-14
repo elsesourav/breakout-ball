@@ -91,7 +91,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const [locals, onlines, userProgress] = await Promise.all([
         dbService.getLocalLevels(),
         dbService.getOnlineLevels(),
-        dbService.getProgress(),
+        dbService.getProgress(user.username),
       ]);
 
       setLocalLevels(locals);
@@ -251,7 +251,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           [nextLevelId]: nextUnlocked,
         };
 
-        dbService.saveProgress(updatedProgress);
+        dbService.saveProgress(updatedProgress, user.username);
         return updatedProgress;
       });
     }
