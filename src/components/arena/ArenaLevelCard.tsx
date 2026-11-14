@@ -20,7 +20,9 @@ export const ArenaLevelCard: React.FC<ArenaLevelCardProps> = ({ level, onClick }
       const displayH = canvas.clientHeight || 96;
       canvas.width = Math.round(displayW * dpr);
       canvas.height = Math.round(displayH * dpr);
-      drawLevelPreviewOnCanvas(canvas, level.blocks, canvas.width, canvas.height);
+      drawLevelPreviewOnCanvas(canvas, level.blocks, canvas.width, canvas.height, {
+        showGrid: false,
+      });
     }
   }, [level]);
 
@@ -56,16 +58,6 @@ export const ArenaLevelCard: React.FC<ArenaLevelCardProps> = ({ level, onClick }
           ref={canvasRef}
           className="w-full h-full block"
           style={{ width: '100%', height: '96px' }}
-        />
-
-        {/* Subtle Cyber Grid Lines inside preview */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-20"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(0, 247, 255, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 247, 255, 0.15) 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
         />
       </div>
 

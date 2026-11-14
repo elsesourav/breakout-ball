@@ -17,15 +17,18 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
         const sector = node.sector;
         const isEntrance = node.id === 1;
 
+        const bannerY = isEntrance ? node.y + 75 : node.y - 110;
+
         return (
           <div
             key={`sector-banner-${node.id}`}
             className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
             data-base-transform="translateX(-50%)"
+            data-y={bannerY}
             style={{
               left: `${(node.x / SVG_WIDTH) * 100}%`,
               // Sector 1 entrance sits cleanly below Level 1; other sectors sit comfortably above their milestone
-              top: isEntrance ? `${node.y + 75}px` : `${node.y - 110}px`,
+              top: `${bannerY}px`,
               transform: 'translateX(-50%)',
               willChange: 'transform, opacity',
             }}
@@ -80,6 +83,7 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
         <div
           className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
           data-base-transform="translateX(-50%)"
+          data-y={summitNode.y - 95}
           style={{
             left: `${(summitNode.x / SVG_WIDTH) * 100}%`,
             top: `${summitNode.y - 95}px`,

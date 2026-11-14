@@ -29,6 +29,7 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               onClick={() => onBlockerClick?.(b)}
               className="roadmap-scale-item absolute z-20 select-none cursor-pointer active:scale-95 transition-transform"
               data-base-transform="translate(-50%, -50%)"
+              data-y={b.y}
               style={{
                 left: `${(b.x / SVG_WIDTH) * 100}%`,
                 top: `${b.y}px`,
@@ -156,6 +157,7 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
             key={b.id}
             className="roadmap-scale-item absolute z-10 select-none pointer-events-none opacity-70"
             data-base-transform="translate(-50%, -50%)"
+            data-y={b.y}
             style={{
               left: `${(b.x / SVG_WIDTH) * 100}%`,
               top: `${b.y}px`,
@@ -230,6 +232,7 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               key={obs.id}
               className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
               data-base-transform="translate(-50%, -50%)"
+              data-y={obs.y}
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
@@ -309,6 +312,7 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               key={obs.id}
               className="roadmap-scale-item absolute z-10 pointer-events-none"
               data-base-transform="translate(-50%, -50%)"
+              data-y={obs.y}
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
@@ -338,6 +342,7 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({
               key={obs.id}
               className="roadmap-scale-item absolute z-10 pointer-events-none flex items-center justify-center select-none"
               data-base-transform="translate(-50%, -50%)"
+              data-y={obs.y}
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,

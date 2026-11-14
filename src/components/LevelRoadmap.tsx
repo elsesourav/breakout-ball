@@ -35,8 +35,9 @@ export const LevelRoadmap: React.FC = () => {
   const rafRef       = useRef<number>(0);
   const initScrolled = useRef(false);
 
-  // Cached list of all scalable map elements (.roadmap-scale-item)
+  // Cached list of all scalable map elements (.roadmap-scale-item) and conduit segments
   const scaleElementsRef = useRef<HTMLElement[]>([]);
+  const conduitSegmentsRef = useRef<SVGGElement[]>([]);
 
   // ── Node layout ─────────────────────────────────────────────────────────────
   const nodes: RoadmapNode[] = useMemo(() => {
@@ -147,6 +148,8 @@ export const LevelRoadmap: React.FC = () => {
     if (!scrollRef.current) return;
     const items = scrollRef.current.querySelectorAll<HTMLElement>('.roadmap-scale-item');
     scaleElementsRef.current = Array.from(items);
+    const segs = scrollRef.current.querySelectorAll<SVGGElement>('.roadmap-conduit-segment');
+    conduitSegmentsRef.current = Array.from(segs);
   }, []);
 
   useEffect(() => {
@@ -172,10 +175,10 @@ export const LevelRoadmap: React.FC = () => {
   }, [currentUnlockedId]);
 
   // ── rAF scroll-linked perspective scale ───────────────────────────────────────
-  // Reads each scalable element's viewport Y and applies dynamic scaling so
-  // objects close to the bottom render at actual/full size, and elements toward
-  // the top smoothly scale down — creating a true 3D road depth effect across all
-  // nodes, red obstacle clamps, dormant clamps, hazards, and sector banners.
+  // Projects both objects and conduit path segments with screen-space perspective:
+  // 1. Objects & paths near the bottom: full size (capped at SCALE_MAX) and full distance.
+  // 2. Objects & paths near the top: smoothly small (thinner stroke) and short (compressed distance),
+  //    recreating authentic 3D road perspective foreshortening as you scroll through the entire map.
   const tick = useCallback(() => {
     const container = scrollRef.current;
     if (container) {
@@ -183,33 +186,86 @@ export const LevelRoadmap: React.FC = () => {
         refreshScaleElements();
       }
 
+      const scrollTop = container.scrollTop;
       const viewH = container.clientHeight;
-      const contTop = container.getBoundingClientRect().top;
 
-      scaleElementsRef.current.forEach((el) => {
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const centerY = rect.top - contTop + rect.height * 0.5;
-        // ny: 0 = top of scroll view (far), 1 = bottom of scroll view (near)
-        const ny = Math.max(0, Math.min(1, centerY / viewH));
+      // Perspective projection function:
+      // Computes yShift (foreshortening compression) and scale for any coordinate on screen.
+      const projectY = (rawY: number) => {
+        const u = rawY / viewH;
+        if (u >= FOREGROUND_LIMIT_Y) {
+          return { yShift: 0, scale: SCALE_MAX, u };
+        }
+        const t = Math.max(0, Math.min(1, (FOREGROUND_LIMIT_Y - u) / FOREGROUND_LIMIT_Y));
+        // Foreshortening compression: pulls top elements down by up to 75px,
+        // making the vertical distance between top nodes significantly shorter
+        const yShift = t * t * 75;
 
-        // Strict limit for closer objects: growth caps at FOREGROUND_LIMIT_Y so
-        // elements closer to the screen stay comfortably within SCALE_MAX and never over-inflate.
+        const ny = Math.max(0, Math.min(1, u));
         const progress = Math.max(0, Math.min(1, ny / FOREGROUND_LIMIT_Y));
         const eased = Math.sin((progress * Math.PI) / 2);
         const scale = SCALE_MIN + eased * (SCALE_MAX - SCALE_MIN);
 
+        return { yShift, scale, u };
+      };
+
+      // 1. Transform all map objects (nodes, route blockers, dormant clamps, banners, hazards, bricks)
+      scaleElementsRef.current.forEach((el) => {
+        if (!el) return;
+        const dataY = parseFloat(el.getAttribute('data-y') || '');
+        const rawY = !isNaN(dataY) ? dataY - scrollTop : el.offsetTop - scrollTop;
+        const { yShift, scale, u } = projectY(rawY);
+
         const baseTransform = el.getAttribute('data-base-transform') || 'translate(-50%, -50%)';
-        el.style.transform = `${baseTransform} scale(${scale.toFixed(3)})`;
+        el.style.transform = `${baseTransform} translateY(${yShift.toFixed(1)}px) scale(${scale.toFixed(3)})`;
         el.style.transformOrigin = 'center center';
 
         // Only fade out elements when dissolving into the horizon haze at the very top
-        if (ny < FADE_ZONE) {
-          el.style.opacity = (ny / FADE_ZONE).toFixed(3);
+        if (u < FADE_ZONE) {
+          el.style.opacity = (Math.max(0, u) / FADE_ZONE).toFixed(3);
         } else {
           el.style.opacity = '';
         }
         el.style.willChange = 'transform, opacity';
+      });
+
+      // 2. Transform all conduit path segments: makes the top path small (thinner) and short (compressed)
+      conduitSegmentsRef.current.forEach((g) => {
+        if (!g) return;
+        const currY = parseFloat(g.getAttribute('data-curr-y') || '0');
+        const nextY = parseFloat(g.getAttribute('data-next-y') || '0');
+        const midY = (currY + nextY) * 0.5;
+
+        const rawCurrY = currY - scrollTop;
+        const rawNextY = nextY - scrollTop;
+        const rawMidY = midY - scrollTop;
+
+        const pCurr = projectY(rawCurrY);
+        const pNext = projectY(rawNextY);
+        const pMid = projectY(rawMidY);
+
+        // Vertical distance compression: raw vs projected
+        const dy = nextY - currY;
+        const projDy = (nextY + pNext.yShift) - (currY + pCurr.yShift);
+        const sy = dy !== 0 ? Math.max(0.35, Math.min(1.0, projDy / dy)) : 1.0;
+        const ty = pCurr.yShift;
+        const Yt = ty + currY * (1 - sy);
+
+        // Native SVG transform: scale strictly in Y with zero horizontal shift,
+        // guaranteeing 100% exact, gapless alignment with node centers!
+        g.setAttribute('transform', `translate(0, ${Yt.toFixed(2)}) scale(1, ${sy.toFixed(4)})`);
+        g.style.transform = '';
+
+        // Dynamic perspective stroke-factor: shrinks stroke thickness at the top (SMALL)
+        const strokeFactor = Math.max(0.35, Math.min(1.0, pMid.scale / SCALE_MAX));
+        g.style.setProperty('--stroke-factor', strokeFactor.toFixed(3));
+
+        if (pMid.u < FADE_ZONE) {
+          g.style.opacity = (Math.max(0, pMid.u) / FADE_ZONE).toFixed(3);
+        } else {
+          g.style.opacity = '';
+        }
+        g.style.willChange = 'transform, opacity';
       });
     }
     rafRef.current = requestAnimationFrame(tick);
@@ -299,6 +355,7 @@ export const LevelRoadmap: React.FC = () => {
               key={`brick-${b.id}`}
               className="roadmap-scale-item absolute rounded-md pointer-events-none"
               data-base-transform={`rotate(${b.rotation}deg)`}
+              data-y={b.y}
               style={{
                 left: `${b.x}px`,
                 top: `${b.y}px`,

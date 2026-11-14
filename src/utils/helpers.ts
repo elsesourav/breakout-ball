@@ -296,7 +296,7 @@ export function drawLevelPreviewOnCanvas(
   blocks: BlockData[],
   width?: number,
   height?: number,
-  options?: { reservedBottom?: number }
+  options?: { reservedBottom?: number; showGrid?: boolean }
 ) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -309,21 +309,23 @@ export function drawLevelPreviewOnCanvas(
   ctx.fillStyle = '#050716';
   ctx.fillRect(0, 0, w, h);
 
-  // Subtle gridlines
-  ctx.strokeStyle = 'rgba(0, 247, 255, 0.04)';
-  ctx.lineWidth = 1;
-  const gridSize = Math.floor(w / 12);
-  for (let x = 0; x < w; x += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, h);
-    ctx.stroke();
-  }
-  for (let y = 0; y < h; y += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
-    ctx.stroke();
+  if (options?.showGrid !== false) {
+    // Subtle gridlines
+    ctx.strokeStyle = 'rgba(0, 247, 255, 0.04)';
+    ctx.lineWidth = 1;
+    const gridSize = Math.floor(w / 12);
+    for (let x = 0; x < w; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+    for (let y = 0; y < h; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
   }
 
   // 2. Playfield side rails / borders

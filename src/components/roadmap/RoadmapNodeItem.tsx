@@ -70,6 +70,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         ref={ref}
         className="roadmap-scale-item absolute z-20 flex flex-col items-center"
         data-base-transform="translate(-50%, -50%)"
+        data-y={node.y}
         style={{
           left: `${(node.x / SVG_WIDTH) * 100}%`,
           top: `${node.y}px`,
@@ -77,60 +78,6 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           willChange: 'transform, opacity',
         }}
       >
-        {/* Floating Bouncing Energy Ball & High-Tech PLAY Beacon above Current Active Level */}
-        {isCurrent && (
-          <div
-            onClick={() => onLevelClick(node.id)}
-            className="z-30 cursor-pointer active:scale-95 transition-transform flex flex-col items-center select-none"
-            style={{
-              position: 'absolute',
-              top: '-56px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
-          >
-            {/* 3D Glowing Cyber Ball with Radiant Core */}
-            <div className="relative mb-1">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 via-white to-cyan-200 shadow-[0_0_18px_#00f7ff,0_0_8px_#ffffff] border-2 border-white animate-ball-bounce" />
-              <div className="absolute inset-0 rounded-full bg-cyan-400/30 blur-sm animate-pulse pointer-events-none" />
-            </div>
-
-            {/* High-tech Arcade PLAY Button with 3D Extruded Game Font */}
-            <div
-              style={{
-                background: 'linear-gradient(180deg, #00f7ff 0%, #00b4d8 60%, #0077b6 100%)',
-                color: '#ffffff',
-                border: '1.5px solid #ffffff',
-                boxShadow: '0 3px 0 #023e8a, 0 6px 14px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 247, 255, 0.8), inset 0 1px 2px #ffffff',
-                borderRadius: '9999px',
-                transform: 'perspective(400px) rotateX(-6deg)',
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-1 font-display font-black text-xs tracking-widest uppercase shadow-lg"
-            >
-              <Play className="w-3.5 h-3.5 fill-white text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />
-              <span
-                style={{
-                  color: '#ffffff',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.8)',
-                  letterSpacing: '0.12em',
-                }}
-              >
-                PLAY
-              </span>
-            </div>
-
-            {/* Glowing Pointer Notch */}
-            <div
-              className="w-2 h-2 rotate-45 -mt-1 shadow-sm"
-              style={{
-                backgroundColor: '#00d2eb',
-                borderRight: '1px solid #ffffff',
-                borderBottom: '1px solid #ffffff',
-              }}
-            />
-          </div>
-        )}
-
         {/* 3D Celestial Cyber Globe (High-tech Arcade Stage Node) */}
         <button
           type="button"
@@ -323,34 +270,39 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             </div>
           )}
 
-          {/* Ready Status Pill Anchored Cleanly BELOW Active Current Node */}
-          {isCurrent ? (
+          {/* High-Tech Arcade PLAY Button Anchored Below Current Active Level Index */}
+          {isCurrent && (
             <div
               style={{
                 position: 'absolute',
                 bottom: '-16px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                backgroundColor: 'rgba(3, 8, 20, 0.96)',
-                border: '1.5px solid rgba(0, 247, 255, 0.8)',
-                boxShadow: '0 0 14px rgba(0, 247, 255, 0.6), 0 2px 6px rgba(0,0,0,0.8)',
+                background: 'linear-gradient(180deg, #00f7ff 0%, #00b4d8 60%, #0077b6 100%)',
+                border: '1.5px solid #ffffff',
+                boxShadow: '0 2.5px 0 #023e8a, 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 18px rgba(0, 247, 255, 0.85), inset 0 1px 2px #ffffff',
+                borderRadius: '9999px',
                 pointerEvents: 'none',
                 whiteSpace: 'nowrap',
-                zIndex: 10,
+                zIndex: 20,
               }}
-              className="flex items-center gap-1.5 px-3 py-0.5 rounded-full"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-1 font-display font-black text-xs uppercase tracking-widest shadow-lg select-none"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f7ff] animate-pulse" />
+              <Play className="w-3.5 h-3.5 fill-white text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] shrink-0" />
               <span
-                className="font-display font-black text-[10px] tracking-widest text-white leading-none"
+                className="font-display font-black text-xs leading-none uppercase"
                 style={{
-                  textShadow: '0 0 6px #00f7ff, 0 1px 2px rgba(0,0,0,0.9)',
+                  fontFamily: 'var(--font-display), sans-serif',
+                  fontWeight: 900,
+                  color: '#ffffff',
+                  textShadow: '0 1px 3px rgba(0,0,0,0.8), 0 0 8px rgba(0,247,255,0.6)',
+                  letterSpacing: '0.12em',
                 }}
               >
-                READY
+                PLAY
               </span>
             </div>
-          ) : null}
+          )}
         </button>
       </div>
     );
