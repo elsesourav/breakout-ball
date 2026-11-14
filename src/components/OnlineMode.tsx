@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useGame } from '../context/GameContext';
-import { LevelData } from '../types/game';
-import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../utils/helpers';
 import { levelSearchEngine } from '../services/search';
-import { Search, Flame, Globe, User, X, ChevronLeft, ChevronRight, Boxes } from 'lucide-react';
+import { Search, Flame, Globe, X, Boxes } from 'lucide-react';
+import { ArenaLevelCard } from './arena/ArenaLevelCard';
+import { ArenaPagination } from './arena/ArenaPagination';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -13,6 +13,7 @@ export const OnlineMode: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterMode, setFilterMode] = useState<'all' | 'popular'>('all');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const filteredLevels = useMemo(() => {
     let list = levelSearchEngine.search(onlineLevels, searchTerm);
@@ -29,8 +30,14 @@ export const OnlineMode: React.FC = () => {
     return filteredLevels.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredLevels, currentPage]);
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div
+      ref={containerRef}
       className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 py-4 gap-3 pb-28 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
@@ -95,21 +102,16 @@ export const OnlineMode: React.FC = () => {
               }}
               spellCheck="false"
               autoComplete="off"
-              className="w-full text-xs font-tech tracking-wide text-white"
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#ffffff',
-                boxShadow: 'none',
-                outline: 'none',
-                padding: 0,
-              }}
+              className="bare-input flex-1 min-w-0 text-xs font-tech tracking-wide text-white placeholder:text-slate-400"
             />
             {searchTerm && (
               <button
                 type="button"
-                onClick={() => setSearchTerm('')}
-                className="p-1 rounded-md text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-1"
+                onClick={() => {
+                  setSearchTerm('');
+                  setCurrentPage(1);
+                }}
+                className="p-1 rounded-md text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-1.5"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
@@ -211,7 +213,10 @@ export const OnlineMode: React.FC = () => {
           </div>
           <button
             type="button"
-            onClick={() => setSearchTerm('')}
+            onClick={() => {
+              setSearchTerm('');
+              setCurrentPage(1);
+            }}
             style={{
               backgroundColor: 'rgba(0, 247, 255, 0.15)',
               border: '1.5px solid #00f7ff',
@@ -225,158 +230,14 @@ export const OnlineMode: React.FC = () => {
         </div>
       )}
 
-      {/* Pagination Bar */}
-      {totalPages > 1 && (
-        <div className="flex items-center gap-1.5 mt-2 font-tech text-xs">
-          <button
-            type="button"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              border: '1.5px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '8px',
-            }}
-            className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          {Array.from({ length: totalPages }).map((_, idx) => {
-            const pageNum = idx + 1;
-            const isActive = currentPage === pageNum;
-            return (
-              <button
-                key={pageNum}
-                type="button"
-                onClick={() => setCurrentPage(pageNum)}
-                style={
-                  isActive
-                    ? {
-                        backgroundColor: 'rgba(0, 247, 255, 0.25)',
-                        border: '1.5px solid #00f7ff',
-                        color: '#00f7ff',
-                        boxShadow: '0 0 12px rgba(0, 247, 255, 0.4)',
-                        borderRadius: '8px',
-                      }
-                    : {
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        border: '1.5px solid rgba(255, 255, 255, 0.12)',
-                        color: '#94a3b8',
-                        borderRadius: '8px',
-                      }
-                }
-                className="w-8 h-8 flex items-center justify-center font-bold transition-all cursor-pointer"
-              >
-                {pageNum}
-              </button>
-            );
-          })}
-
-          <button
-            type="button"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              border: '1.5px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '8px',
-            }}
-            className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ArenaLevelCard: React.FC<{ level: LevelData; onClick: () => void }> = ({ level, onClick }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const displayW = canvas.clientWidth || 150;
-      const displayH = canvas.clientHeight || 105;
-      canvas.width = Math.round(displayW * dpr);
-      canvas.height = Math.round(displayH * dpr);
-      drawLevelPreviewOnCanvas(canvas, level.blocks, canvas.width, canvas.height);
-    }
-  }, [level]);
-
-  const stats = useMemo(() => calculateLevelHp(level.blocks), [level]);
-
-  return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        backgroundColor: 'rgba(8, 13, 36, 0.94)',
-        border: isHovered
-          ? '1.5px solid #00f7ff'
-          : '1.5px solid rgba(0, 247, 255, 0.22)',
-        boxShadow: isHovered
-          ? '0 0 18px rgba(0, 247, 255, 0.35), inset 0 0 10px rgba(0, 247, 255, 0.08)'
-          : '0 4px 12px rgba(0, 0, 0, 0.4)',
-        borderRadius: '14px',
-      }}
-      className="relative flex flex-col overflow-hidden active:scale-[0.98] transition-all duration-200 cursor-pointer group"
-    >
-      {/* HiDPI Canvas Preview */}
-      <div className="w-full h-26 bg-[#040614] relative overflow-hidden border-b border-cyan-500/20">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full block"
-          style={{ width: '100%', height: '104px' }}
-        />
-        {/* Subtle Cyber Grid Lines inside preview */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-20"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(0, 247, 255, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 247, 255, 0.15) 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        />
-      </div>
-
-      {/* Details Bar */}
-      <div className="p-2.5 flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <span className="font-tech font-black text-xs text-white truncate group-hover:text-cyan-300 transition-colors">
-            {level.name || `Core #${level.id}`}
-          </span>
-          <span
-            style={{
-              backgroundColor: 'rgba(0, 247, 255, 0.1)',
-              border: '1px solid rgba(0, 247, 255, 0.3)',
-              color: '#00f7ff',
-            }}
-            className="font-tech text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0"
-          >
-            #{level.id}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between text-[10px] font-ui text-slate-400 border-t border-white/10 pt-1.5">
-          <span className="flex items-center gap-1 truncate text-slate-300 max-w-[80px]">
-            <User className="w-2.5 h-2.5 text-cyan-400 flex-shrink-0" />
-            <span className="truncate">@{level.creator}</span>
-          </span>
-          <span className="text-[9px] font-tech text-cyan-300/90 font-bold">
-            {stats.totalHp} HP ({stats.breakableCount})
-          </span>
-          <span className="flex items-center gap-1 text-amber-300 font-tech font-bold flex-shrink-0">
-            <Flame className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-            <span>{level.playCount || 0}</span>
-          </span>
-        </div>
-      </div>
+      {/* Responsive Cyber Pagination Bar */}
+      <ArenaPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={filteredLevels.length}
+        itemsPerPage={ITEMS_PER_PAGE}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

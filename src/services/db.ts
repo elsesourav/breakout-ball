@@ -57,7 +57,19 @@ class StandardDatabaseService {
         localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
       }
     }
-    if (!localStorage.getItem(this.onlineLevelsKey)) {
+    try {
+      const raw = localStorage.getItem(this.onlineLevelsKey);
+      if (!raw) {
+        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
+      } else {
+        const stored: LevelData[] = JSON.parse(raw);
+        const missing = INITIAL_ONLINE_LEVELS.filter((initLvl) => !stored.some((s) => s.id === initLvl.id));
+        if (missing.length > 0) {
+          const merged = [...stored, ...missing];
+          localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
+        }
+      }
+    } catch {
       localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
     }
     if (!localStorage.getItem(this.leaderboardsKey)) {
