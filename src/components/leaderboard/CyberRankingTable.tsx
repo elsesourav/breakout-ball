@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Medal, Award, User, Flame } from 'lucide-react';
+import { Trophy, Medal, Award, Flame } from 'lucide-react';
 
 export interface RankingEntry {
   rank: number;
@@ -21,32 +21,47 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
   currentUser,
 }) => {
   return (
-    <div className="w-full flex flex-col rounded-xl bg-[#070a1a]/95 border border-white/10 overflow-hidden shadow-lg backdrop-blur-md">
+    <div
+      style={{
+        backgroundColor: 'rgba(7, 10, 26, 0.95)',
+        border: '1.5px solid rgba(0, 247, 255, 0.25)',
+        borderRadius: '14px',
+      }}
+      className="w-full flex flex-col overflow-hidden shadow-lg backdrop-blur-md"
+    >
       {/* Table Header Bar */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-white/10 bg-white/[0.03]">
         <div className="flex items-center gap-1.5">
           <Trophy className="w-3.5 h-3.5 text-yellow-400" />
           <span
-            className="font-display font-bold text-xs tracking-wider text-cyan-300"
-            style={{ color: '#00f7ff' }}
+            className="font-display font-bold text-xs tracking-wider"
+            style={{ color: '#00f7ff', textShadow: '0 0 8px rgba(0, 247, 255, 0.35)' }}
           >
             {title}
           </span>
         </div>
         <span
-          className="font-tech text-[10px] tracking-wider uppercase"
+          className="font-tech text-[10px] tracking-wider uppercase font-semibold"
           style={{ color: '#94a3b8' }}
         >
           GLOBAL TOP PILOTS
         </span>
       </div>
 
-      {/* Column Labels */}
-      <div className="grid grid-cols-12 px-3 py-1.5 text-[10px] font-tech text-slate-400 border-b border-white/5 uppercase tracking-wider bg-black/30">
-        <span className="col-span-2 text-center">RANK</span>
-        <span className="col-span-5 text-left pl-1">PILOT</span>
-        <span className="col-span-3 text-right">SCORE</span>
-        <span className="col-span-2 text-right pr-1">TIME</span>
+      {/* Column Labels with Rigid CSS Grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '36px 1fr 60px 52px',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.45)',
+        }}
+        className="px-3 py-1.5 text-[10px] font-tech text-slate-400 border-b border-white/10 uppercase tracking-wider"
+      >
+        <span className="text-center font-bold">RANK</span>
+        <span className="text-left pl-1 font-bold">PILOT</span>
+        <span className="text-right font-bold">SCORE</span>
+        <span className="text-right pr-1 font-bold">TIME</span>
       </div>
 
       {/* Ranking Rows */}
@@ -97,19 +112,24 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
             return (
               <div
                 key={`rank-${entry.rank}-${entry.username}`}
-                className={`grid grid-cols-12 items-center px-3 py-1.5 transition-colors ${
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '36px 1fr 60px 52px',
+                  alignItems: 'center',
+                }}
+                className={`px-3 py-1.5 transition-colors ${
                   isUser
                     ? 'bg-cyan-950/40 border-l-2 border-cyan-400'
                     : 'hover:bg-white/[0.02]'
                 }`}
               >
                 {/* Rank Badge */}
-                <div className="col-span-2 flex items-center justify-center">
+                <div className="flex items-center justify-center">
                   {rankBadge}
                 </div>
 
                 {/* Pilot Username & Initials */}
-                <div className="col-span-5 flex items-center gap-1.5 min-w-0 pl-1">
+                <div className="flex items-center gap-1.5 min-w-0 pl-1 overflow-hidden">
                   <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-600 to-indigo-600 flex items-center justify-center text-[9px] font-bold font-tech text-white flex-shrink-0">
                     {entry.username.slice(0, 1).toUpperCase()}
                   </div>
@@ -122,14 +142,14 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                     @{entry.username}
                   </span>
                   {isUser && (
-                    <span className="text-[8px] font-tech font-bold px-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">
+                    <span className="text-[8px] font-tech font-bold px-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 flex-shrink-0">
                       YOU
                     </span>
                   )}
                 </div>
 
                 {/* Score */}
-                <div className="col-span-3 text-right">
+                <div className="text-right">
                   <span
                     className="font-tech font-bold text-xs"
                     style={{ color: '#00f7ff' }}
@@ -139,7 +159,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                 </div>
 
                 {/* Time */}
-                <div className="col-span-2 text-right pr-1">
+                <div className="text-right pr-1">
                   <span
                     className="font-tech font-semibold text-xs"
                     style={{ color: '#cbd5e1' }}

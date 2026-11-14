@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { LevelData } from '../types/game';
 import { drawLevelPreviewOnCanvas } from '../utils/helpers';
@@ -95,6 +95,7 @@ const StudioLevelCard: React.FC<{
   onSettings: (e: React.MouseEvent) => void;
 }> = ({ level, onSelect, onSettings }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -108,13 +109,27 @@ const StudioLevelCard: React.FC<{
     }
   }, [level]);
 
+  const brickCount = level.blocks.filter((b) => b.h > 0).length;
+
   return (
     <div
       onClick={onSelect}
-      className="relative flex flex-col rounded-xl overflow-hidden bg-[#090d24]/90 border border-white/15 hover:border-cyan-400/50 active:scale-[0.98] transition-all cursor-pointer shadow-md group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        backgroundColor: 'rgba(8, 13, 36, 0.94)',
+        border: isHovered
+          ? '1.5px solid #00f7ff'
+          : '1.5px solid rgba(0, 247, 255, 0.22)',
+        boxShadow: isHovered
+          ? '0 0 18px rgba(0, 247, 255, 0.35), inset 0 0 10px rgba(0, 247, 255, 0.08)'
+          : '0 4px 12px rgba(0, 0, 0, 0.4)',
+        borderRadius: '14px',
+      }}
+      className="relative flex flex-col overflow-hidden active:scale-[0.98] transition-all duration-200 cursor-pointer group"
     >
       {/* Visibility Badge */}
-      <div className="absolute top-1.5 right-1.5 z-10">
+      <div className="absolute top-2 right-2 z-10">
         <span
           className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-tech font-bold uppercase tracking-wider ${
             level.isPublic
@@ -128,16 +143,25 @@ const StudioLevelCard: React.FC<{
       </div>
 
       {/* HiDPI Canvas Preview */}
-      <div className="w-full h-26 bg-[#040612] relative overflow-hidden border-b border-white/10">
+      <div className="w-full h-26 bg-[#040614] relative overflow-hidden border-b border-cyan-500/20">
         <canvas
           ref={canvasRef}
           className="w-full h-full block"
           style={{ width: '100%', height: '104px' }}
         />
+        {/* Subtle Cyber Grid Lines inside preview */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-20"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(0, 247, 255, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 247, 255, 0.15) 1px, transparent 1px)',
+            backgroundSize: '16px 16px',
+          }}
+        />
       </div>
 
       {/* Details Bar */}
-      <div className="p-2 flex flex-col gap-1.5">
+      <div className="p-2.5 flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
           <span className="font-tech font-black text-xs text-cyan-300 truncate">
             {level.name || `Core #${level.id}`}
@@ -145,20 +169,20 @@ const StudioLevelCard: React.FC<{
           <button
             type="button"
             onClick={onSettings}
-            className="p-1 rounded-md bg-white/5 hover:bg-white/15 text-slate-300 hover:text-cyan-300 transition-colors"
+            className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
             title="Edit Level Settings"
           >
             <Settings2 className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div className="flex items-center justify-between text-[10px] font-tech text-slate-400 border-t border-white/5 pt-1">
+        <div className="flex items-center justify-between text-[10px] font-tech text-slate-400 border-t border-white/10 pt-1.5">
           <span className="flex items-center gap-1 text-slate-300">
             <Play className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
             <span>{level.playCount || 0}</span>
           </span>
-          <span className="text-cyan-400 font-mono">
-            {level.blocks.filter((b) => b.h > 0).length} Bricks
+          <span className="text-cyan-400 font-mono font-semibold">
+            {brickCount} Bricks
           </span>
         </div>
       </div>

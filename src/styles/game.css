@@ -30,6 +30,35 @@
 .text-pink-400 { color: #f472b6 !important; }
 .text-purple-400 { color: #c084fc !important; }
 
+/* Universal Cyber Input & Form Element Theming */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="search"],
+input[type="number"],
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]) {
+  background-color: #080d26 !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(0, 247, 255, 0.28) !important;
+  border-radius: 12px;
+  outline: none !important;
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):focus {
+  border-color: #00f7ff !important;
+  box-shadow: 0 0 16px rgba(0, 247, 255, 0.45), inset 0 0 8px rgba(0, 247, 255, 0.1) !important;
+}
+
+input::placeholder {
+  color: rgba(148, 163, 184, 0.65) !important;
+}
+
 :root {
   --window-width: 360px;
   --window-height: 640px;
