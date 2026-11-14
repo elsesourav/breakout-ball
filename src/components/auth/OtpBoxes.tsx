@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { soundManager } from '../../utils/audio';
 
 interface OtpBoxesProps {
   value: string;
@@ -8,7 +9,6 @@ interface OtpBoxesProps {
 
 export const OtpBoxes: React.FC<OtpBoxesProps> = ({ value, onChange, disabled }) => {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
-
   const digits = Array.from({ length: 6 }).map((_, i) => value[i] || '');
 
   const handleChange = (index: number, char: string) => {
@@ -23,6 +23,7 @@ export const OtpBoxes: React.FC<OtpBoxesProps> = ({ value, onChange, disabled })
         if (index + idx < 6) newDigits[index + idx] = d;
       });
       onChange(newDigits.join(''));
+      soundManager.playClick();
       const focusIndex = Math.min(5, index + pasted.length);
       inputsRef.current[focusIndex]?.focus();
       return;
@@ -30,6 +31,7 @@ export const OtpBoxes: React.FC<OtpBoxesProps> = ({ value, onChange, disabled })
 
     newDigits[index] = clean;
     onChange(newDigits.join(''));
+    if (clean) soundManager.playClick();
 
     if (clean && index < 5) {
       inputsRef.current[index + 1]?.focus();
@@ -47,31 +49,39 @@ export const OtpBoxes: React.FC<OtpBoxesProps> = ({ value, onChange, disabled })
     const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
     if (pasted) {
       onChange(pasted);
+      soundManager.playClick();
       const nextFocus = Math.min(5, pasted.length);
       inputsRef.current[nextFocus]?.focus();
     }
   };
 
   return (
-    <div className="flex gap-2 justify-center items-center my-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <input
-          key={i}
-          ref={(el) => {
-            inputsRef.current[i] = el;
-          }}
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={1}
-          value={digits[i] || ''}
-          disabled={disabled}
-          onChange={(e) => handleChange(i, e.target.value)}
-          onKeyDown={(e) => handleKeyDown(i, e)}
-          onPaste={handlePaste}
-          className="w-10 h-12 text-center text-lg font-bold font-mono text-cyan-300 bg-surface/80 border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-xl outline-none transition-all shadow-inner"
-        />
-      ))}
+    <div className="flex gap-1.5 justify-center items-center my-2.5">
+      {Array.from({ length: 6 }).map((_, i) => {
+        const isFilled = !!digits[i];
+        return (
+          <input
+            key={i}
+            ref={(el) => {
+              inputsRef.current[i] = el;
+            }}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={1}
+            value={digits[i] || ''}
+            disabled={disabled}
+            onChange={(e) => handleChange(i, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(i, e)}
+            onPaste={handlePaste}
+            className={`w-9 h-11 text-center font-display font-black text-base rounded-xl outline-none transition-all ${
+              isFilled
+                ? 'bg-[#0a1236] border-cyan-400 text-[#00f7ff] shadow-[0_0_10px_rgba(0,247,255,0.3)]'
+                : 'bg-[#060a1f] border-cyan-500/30 text-white placeholder:text-slate-600'
+            } border focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]`}
+          />
+        );
+      })}
     </div>
   );
 };

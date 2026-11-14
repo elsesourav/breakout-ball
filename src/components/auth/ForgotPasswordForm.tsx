@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { authService } from '../../services/auth';
 import { OtpBoxes } from './OtpBoxes';
-import { ArcadeButton } from '@elsesourav/react-ui';
+import { Mail, KeyRound, Eye, EyeOff, Loader2, AlertCircle, ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
+import { soundManager } from '../../utils/audio';
 
 interface ForgotPasswordFormProps {
   onBackToLogin: () => void;
@@ -26,13 +27,14 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
     e.preventDefault();
     setErrorMessage(null);
     setIsLoading(true);
+    soundManager.playClick();
 
     try {
       const res = await authService.requestPasswordOtp(identifier);
       if (res.success) {
         setStatusMessage(res.message);
         if (res.testOtp) {
-          setOtp(res.testOtp); // Auto-fill for developer convenience
+          setOtp(res.testOtp);
         }
         setStep(2);
       } else {
@@ -50,6 +52,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
     e.preventDefault();
     setErrorMessage(null);
     setIsLoading(true);
+    soundManager.playClick();
 
     try {
       const res = await authService.verifyOtpAndResetPassword(identifier, otp, newPassword);
@@ -68,13 +71,20 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
     }
   };
 
+  const inputStyle = {
+    backgroundColor: '#060a1f',
+    border: '1.5px solid rgba(0, 247, 255, 0.3)',
+    color: '#ffffff',
+  };
+
   return (
     <div className="w-full flex flex-col">
-      <div className="text-center mb-3">
-        <h2 className="text-xl font-bold font-sans text-cyan-300 tracking-wide">
-          Password Recovery
+      {/* Cyber Header */}
+      <div className="text-center mb-2.5">
+        <h2 className="font-display font-black text-base md:text-lg tracking-wider text-[#00f7ff] [text-shadow:0_0_12px_rgba(0,247,255,0.4)]">
+          PASSWORD RECOVERY
         </h2>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="font-ui text-xs text-slate-400 mt-0.5">
           {step === 1
             ? 'Enter your account email or @username'
             : 'Enter the 6-digit OTP code & new password'}
@@ -82,58 +92,79 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
       </div>
 
       {statusMessage && (
-        <div className="p-2 mb-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs text-center">
-          {statusMessage}
+        <div className="p-2 mb-2 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 font-tech text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{statusMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-2 mb-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs text-center">
-          {errorMessage}
+        <div className="p-2 mb-2 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-300 font-tech text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>{errorMessage}</span>
         </div>
       )}
 
       {step === 1 ? (
-        <form onSubmit={handleRequestOtp} className="flex flex-col gap-3">
+        <form onSubmit={handleRequestOtp} className="flex flex-col gap-2.5">
           <div className="flex flex-col gap-1 text-left">
-            <label className="text-[11px] font-semibold text-slate-300">
-              Account Identifier
+            <label className="font-tech text-[10px] font-bold tracking-wider text-cyan-300 uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff]" />
+              <span>Account Identifier</span>
             </label>
-            <input
-              type="text"
-              placeholder="user@example.com or @username"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              required
-              className="w-full px-3 py-2 text-xs rounded-xl bg-surface/70 border border-border focus:border-primary text-white outline-none transition-all"
-            />
+            <div className="relative flex items-center">
+              <Mail className="absolute left-3 w-3.5 h-3.5 text-cyan-400/70 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="user@example.com or @username"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                required
+                style={inputStyle}
+                className="w-full pl-8 pr-3 py-2 text-xs rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 placeholder:text-slate-500 outline-none transition-all font-tech tracking-wide shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"
+              />
+            </div>
           </div>
 
-          <ArcadeButton
-            variant="cyan"
-            size="md"
-            shape="rounded"
-            mask={true}
-            glow={true}
-            isLoading={isLoading}
-            onClick={(e) => handleRequestOtp(e as unknown as React.FormEvent)}
-            className="w-full mt-2 py-2 text-sm tracking-wider font-bold"
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              backgroundColor: '#00f7ff',
+              backgroundImage: 'linear-gradient(135deg, #00f7ff 0%, #0088ff 100%)',
+              color: '#000000',
+              border: '1.5px solid #a5f3fc',
+              boxShadow: '0 0 20px rgba(0, 247, 255, 0.45)',
+            }}
+            className="w-full mt-2 h-10 rounded-xl font-display font-black text-xs tracking-wider flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all disabled:opacity-50"
           >
-            Send Verification Code
-          </ArcadeButton>
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-black" />
+            ) : (
+              <>
+                <Send className="w-4 h-4 stroke-[2.5]" />
+                <span>SEND VERIFICATION CODE</span>
+              </>
+            )}
+          </button>
         </form>
       ) : (
-        <form onSubmit={handleResetPassword} className="flex flex-col gap-3">
+        <form onSubmit={handleResetPassword} className="flex flex-col gap-2.5">
           <div className="flex flex-col gap-1 text-center">
-            <label className="text-[11px] font-semibold text-slate-300">
-              6-Digit OTP Code
+            <label className="font-tech text-[10px] font-bold tracking-wider text-cyan-300 uppercase flex items-center justify-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff]" />
+              <span>6-Digit Security Code</span>
             </label>
             <OtpBoxes value={otp} onChange={setOtp} disabled={isLoading} />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className="text-[11px] font-semibold text-slate-300">New Password</label>
+            <label className="font-tech text-[10px] font-bold tracking-wider text-cyan-300 uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff]" />
+              <span>New Password</span>
+            </label>
             <div className="relative flex items-center">
+              <KeyRound className="absolute left-3 w-3.5 h-3.5 text-cyan-400/70 pointer-events-none" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Minimum 6 characters"
@@ -141,40 +172,49 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-3 py-2 pr-9 text-xs rounded-xl bg-surface/70 border border-border focus:border-primary text-white outline-none transition-all"
+                style={inputStyle}
+                className="w-full pl-8 pr-9 py-2 text-xs rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/40 placeholder:text-slate-500 outline-none transition-all font-tech tracking-wide shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2.5 text-slate-400 hover:text-white text-xs"
+                onClick={() => { soundManager.playClick(); setShowPassword(!showPassword); }}
+                className="absolute right-2.5 text-slate-400 hover:text-cyan-300 cursor-pointer p-1"
               >
-                {showPassword ? '👁️' : '🔒'}
+                {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
             </div>
           </div>
 
-          <ArcadeButton
-            variant="magenta"
-            size="md"
-            shape="rounded"
-            mask={true}
-            glow={true}
-            isLoading={isLoading}
-            onClick={(e) => handleResetPassword(e as unknown as React.FormEvent)}
-            className="w-full mt-2 py-2 text-sm tracking-wider font-bold"
+          <button
+            type="submit"
+            disabled={isLoading}
+            style={{
+              backgroundColor: '#ff0844',
+              backgroundImage: 'linear-gradient(135deg, #ff0844 0%, #ff20c4 100%)',
+              color: '#ffffff',
+              border: '1.5px solid #ffb2d9',
+              boxShadow: '0 0 20px rgba(255, 8, 68, 0.5)',
+            }}
+            className="w-full mt-2 h-10 rounded-xl font-display font-black text-xs tracking-wider flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition-all disabled:opacity-50"
           >
-            Update Password
-          </ArcadeButton>
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
+            ) : (
+              <span>UPDATE PASSWORD</span>
+            )}
+          </button>
         </form>
       )}
 
-      <div className="text-center mt-4 pt-3 border-t border-white/10 text-xs text-slate-400">
+      {/* Back to Sign In Link */}
+      <div className="text-center mt-3 pt-2.5 border-t border-cyan-500/20 text-xs text-slate-400 font-ui">
         <button
           type="button"
-          onClick={onBackToLogin}
-          className="text-cyan-400 font-semibold hover:underline"
+          onClick={() => { soundManager.playClick(); onBackToLogin(); }}
+          className="font-tech font-bold text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-1 mx-auto underline-offset-4 hover:underline tracking-wider uppercase cursor-pointer"
         >
-          ← Back to Sign In
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Sign In</span>
         </button>
       </div>
     </div>
