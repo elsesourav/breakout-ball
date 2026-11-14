@@ -23,8 +23,8 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
             className="absolute z-10 -translate-x-1/2 flex flex-col items-center pointer-events-none select-none"
             style={{
               left: `${(node.x / SVG_WIDTH) * 100}%`,
-              // Sector 1 entrance sits cleanly below Level 1; other sectors sit above their milestone
-              top: isEntrance ? `${node.y + 68}px` : `${node.y - 78}px`,
+              // Sector 1 entrance sits cleanly below Level 1; other sectors sit comfortably above their milestone
+              top: isEntrance ? `${node.y + 75}px` : `${node.y - 110}px`,
             }}
           >
             <div
