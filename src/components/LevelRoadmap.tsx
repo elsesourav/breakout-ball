@@ -196,6 +196,20 @@ export const LevelRoadmap: React.FC = () => {
     return d;
   }, [nodes]);
 
+  // Construct active laser pulse path only covering unlocked progression
+  const activePathData = useMemo(() => {
+    const activeNodes = nodes.filter((n) => n.id <= currentUnlockedId);
+    if (activeNodes.length <= 1) return '';
+    let d = `M ${activeNodes[0].x} ${activeNodes[0].y}`;
+    for (let i = 0; i < activeNodes.length - 1; i++) {
+      const curr = activeNodes[i];
+      const next = activeNodes[i + 1];
+      const dy = (next.y - curr.y) * 0.5;
+      d += ` C ${curr.x} ${curr.y + dy}, ${next.x} ${next.y - dy}, ${next.x} ${next.y}`;
+    }
+    return d;
+  }, [nodes, currentUnlockedId]);
+
   // On first load, scroll smoothly to the active unlocked level
   useEffect(() => {
     if (hasInitialScrolled.current) return;
@@ -251,6 +265,9 @@ export const LevelRoadmap: React.FC = () => {
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehaviorY: 'contain',
+        contain: 'content',
         backgroundImage: `
           radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%),
           radial-gradient(ellipse 60% 40% at 50% 100%, rgba(0, 247, 255, 0.12) 0%, transparent 60%),
@@ -265,6 +282,8 @@ export const LevelRoadmap: React.FC = () => {
         style={{
           width: `${SVG_WIDTH}px`,
           height: `${TOTAL_HEIGHT}px`,
+          transform: 'translateZ(0)',
+          willChange: 'scroll-position',
         }}
       >
         {/* Floating Breakout Bricks along roadmap */}
@@ -282,12 +301,18 @@ export const LevelRoadmap: React.FC = () => {
               boxShadow: `0 0 14px ${b.glow}, inset 0 1px 1px #fff`,
               transform: `rotate(${b.rotation}deg)`,
               border: '1px solid rgba(255,255,255,0.2)',
+              contentVisibility: 'auto',
+              containIntrinsicSize: `${b.w}px ${b.h}px`,
             }}
           />
         ))}
 
         {/* Laser Conduit SVG */}
-        <RoadmapConduitSvg nodes={nodes} pathData={conduitPathData} />
+        <RoadmapConduitSvg
+          nodes={nodes}
+          pathData={conduitPathData}
+          activePathData={activePathData}
+        />
 
         {/* Map Obstacles */}
         <RoadmapObstacles obstacles={obstacles} />

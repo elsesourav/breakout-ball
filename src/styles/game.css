@@ -166,16 +166,16 @@ main {
 @keyframes bounceBallFloat {
   0%, 100% {
     transform: translateY(0px) scale(1);
-    filter: drop-shadow(0 0 12px #00f7ff);
   }
   50% {
-    transform: translateY(-8px) scale(1.08);
-    filter: drop-shadow(0 0 20px #00f7ff);
+    transform: translateY(-8px) scale(1.06);
   }
 }
 
 .animate-ball-bounce {
   animation: bounceBallFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px #00f7ff);
+  will-change: transform;
 }
 
 @keyframes energyPulseFlow {
@@ -189,6 +189,7 @@ main {
 
 .animate-energy-flow {
   animation: energyPulseFlow 2.5s linear infinite;
+  will-change: stroke-dashoffset;
 }
 
 .mobile-nav-header {
@@ -270,9 +271,7 @@ main {
   flex: 1;
   min-height: 0;
   width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 /* =======================================================

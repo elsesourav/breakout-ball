@@ -37,6 +37,8 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         style={{
           left: `${(node.x / SVG_WIDTH) * 100}%`,
           top: `${node.y}px`,
+          contentVisibility: 'auto',
+          containIntrinsicSize: '70px 70px',
         }}
       >
         {/* Floating Bouncing Energy Ball & PLAY Beacon above Current Active Level */}
