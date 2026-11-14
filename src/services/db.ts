@@ -79,8 +79,19 @@ class StandardDatabaseService {
     } catch {
       localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
     }
-    if (!localStorage.getItem(this.leaderboardsKey)) {
+    const storedLeaderboardsRaw = localStorage.getItem(this.leaderboardsKey);
+    if (!storedLeaderboardsRaw) {
       localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
+    } else {
+      try {
+        const stored = JSON.parse(storedLeaderboardsRaw);
+        // Ensure leaderboards provide up to 10 entries
+        if (!stored['1'] || stored['1'].length < 10) {
+          localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
+        }
+      } catch {
+        localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
+      }
     }
   }
 

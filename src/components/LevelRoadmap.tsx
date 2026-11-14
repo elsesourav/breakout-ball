@@ -265,24 +265,47 @@ export const LevelRoadmap: React.FC = () => {
 
   return (
     <div
-      ref={scrollContainerRef}
-      className="relative w-full h-full overflow-y-auto overflow-x-hidden select-none bg-[#03040c]"
+      className="relative w-full h-full overflow-hidden select-none bg-[#03040c]"
       style={{
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehaviorY: 'contain',
-        contain: 'content',
-        backgroundColor: '#03040c',
-        backgroundImage: `
-          radial-gradient(ellipse 95% 18% at 50% 1%, rgba(255, 215, 0, 0.16) 0%, transparent 75%),
-          radial-gradient(ellipse 90% 18% at 50% 24%, rgba(244, 63, 94, 0.13) 0%, transparent 75%),
-          radial-gradient(ellipse 90% 18% at 50% 48%, rgba(183, 115, 255, 0.13) 0%, transparent 75%),
-          radial-gradient(ellipse 90% 18% at 50% 72%, rgba(99, 102, 241, 0.14) 0%, transparent 75%),
-          radial-gradient(ellipse 95% 20% at 50% 98%, rgba(0, 247, 255, 0.16) 0%, transparent 75%)
-        `,
+        perspective: '750px',
+        perspectiveOrigin: '50% 88%',
       }}
     >
+      {/* 3D Horizon Atmosphere Gradient overlay */}
+      <div
+        className="absolute top-0 inset-x-0 h-20 pointer-events-none z-30"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(3, 4, 12, 0.95) 0%, rgba(3, 4, 12, 0.5) 50%, transparent 100%)',
+        }}
+      />
+
+      <div
+        ref={scrollContainerRef}
+        className="relative w-full h-full overflow-y-auto overflow-x-hidden select-none bg-[#03040c]"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehaviorY: 'contain',
+          contain: 'content',
+          transform: 'rotateX(13deg)',
+          transformOrigin: '50% 100%',
+          transformStyle: 'preserve-3d',
+          willChange: 'transform, scroll-position',
+          width: '106%',
+          marginLeft: '-3%',
+          height: '106%',
+          marginTop: '-3%',
+          backgroundColor: '#03040c',
+          backgroundImage: `
+            radial-gradient(ellipse 95% 18% at 50% 1%, rgba(255, 215, 0, 0.16) 0%, transparent 75%),
+            radial-gradient(ellipse 90% 18% at 50% 24%, rgba(244, 63, 94, 0.13) 0%, transparent 75%),
+            radial-gradient(ellipse 90% 18% at 50% 48%, rgba(183, 115, 255, 0.13) 0%, transparent 75%),
+            radial-gradient(ellipse 90% 18% at 50% 72%, rgba(99, 102, 241, 0.14) 0%, transparent 75%),
+            radial-gradient(ellipse 95% 20% at 50% 98%, rgba(0, 247, 255, 0.16) 0%, transparent 75%)
+          `,
+        }}
+      >
       <div
         className="relative mx-auto overflow-x-hidden"
         style={{
@@ -343,5 +366,6 @@ export const LevelRoadmap: React.FC = () => {
         })}
       </div>
     </div>
-  );
+  </div>
+);
 };

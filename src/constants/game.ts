@@ -60,6 +60,11 @@ export const MOCK_LEADERBOARDS: Record<string, LeaderboardEntry[]> = {
     { rank: 3, username: 'arcade_queen', time: 18.1 },
     { rank: 4, username: 'breakout_pro', time: 21.0 },
     { rank: 5, username: 'pixel_guy', time: 24.8 },
+    { rank: 6, username: 'cyber_ninja', time: 27.3 },
+    { rank: 7, username: 'neon_striker', time: 30.5 },
+    { rank: 8, username: 'quantum_ace', time: 33.2 },
+    { rank: 9, username: 'hyper_dash', time: 36.8 },
+    { rank: 10, username: 'retro_pilot', time: 41.5 },
   ],
   default: [
     { rank: 1, username: 'sourav', time: 22.4 },
@@ -67,5 +72,10 @@ export const MOCK_LEADERBOARDS: Record<string, LeaderboardEntry[]> = {
     { rank: 3, username: 'brick_breaker', time: 29.8 },
     { rank: 4, username: 'ball_wizard', time: 34.2 },
     { rank: 5, username: 'retro_hero', time: 39.0 },
+    { rank: 6, username: 'laser_master', time: 43.6 },
+    { rank: 7, username: 'core_shifter', time: 47.1 },
+    { rank: 8, username: 'plasma_striker', time: 52.4 },
+    { rank: 9, username: 'synth_runner', time: 58.0 },
+    { rank: 10, username: 'nova_cadet', time: 64.2 },
   ],
 };

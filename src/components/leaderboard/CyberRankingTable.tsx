@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Medal, Award, Flame } from 'lucide-react';
+import { Trophy, Flame } from 'lucide-react';
 
 export interface RankingEntry {
   rank: number;
@@ -65,13 +65,13 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
       </div>
 
       {/* Ranking Rows */}
-      <div className="flex flex-col divide-y divide-white/5 max-h-36 overflow-y-auto">
+      <div className="flex flex-col divide-y divide-white/5 max-h-56 overflow-y-auto">
         {entries.length === 0 ? (
           <div className="py-3 text-center text-xs font-ui text-slate-400">
             No rankings yet. Be the first to clear this level!
           </div>
         ) : (
-          entries.slice(0, 4).map((entry) => {
+          entries.slice(0, 10).map((entry) => {
             const isUser =
               entry.isCurrentUser ||
               (currentUser && currentUser !== 'anonymous' && entry.username === currentUser);
@@ -80,7 +80,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
             const isRank2 = entry.rank === 2;
             const isRank3 = entry.rank === 3;
 
-            // Custom Animated Rank Badge for Top 3 vs 4+
+            // Custom Animated Flame Rank Badge for Top 3 (Uniform Flame Icon with Rank Colors)
             let rankBadge = (
               <span className="font-tech font-bold text-xs text-slate-400">
                 #{entry.rank}
@@ -113,10 +113,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                   className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
                   title="Rank 2 - Elite"
                 >
-                  <Medal
-                    className="w-3.5 h-3.5 text-cyan-300 drop-shadow-[0_0_6px_#00f7ff] animate-bounce"
-                    style={{ animationDuration: '2.5s' }}
-                  />
+                  <Flame className="w-3.5 h-3.5 text-cyan-300 fill-cyan-400 animate-pulse drop-shadow-[0_0_8px_#00f7ff]" />
                   <span className="font-display font-black text-xs text-cyan-200">2</span>
                 </div>
               );
@@ -124,18 +121,15 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
               rankBadge = (
                 <div
                   style={{
-                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.12) 100%)',
-                    border: '1.5px solid #f59e0b',
-                    boxShadow: '0 0 10px rgba(245, 158, 11, 0.4), inset 0 0 6px rgba(245, 158, 11, 0.15)',
+                    background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%)',
+                    border: '1.5px solid #f97316',
+                    boxShadow: '0 0 10px rgba(249, 115, 22, 0.45), inset 0 0 6px rgba(249, 115, 22, 0.2)',
                   }}
                   className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full mx-auto"
                   title="Rank 3 - Ace"
                 >
-                  <Award
-                    className="w-3.5 h-3.5 text-amber-400 drop-shadow-[0_0_6px_#f59e0b] animate-pulse"
-                    style={{ animationDuration: '2s' }}
-                  />
-                  <span className="font-display font-black text-xs text-amber-300">3</span>
+                  <Flame className="w-3.5 h-3.5 text-orange-400 fill-orange-500 animate-pulse drop-shadow-[0_0_8px_#f97316]" />
+                  <span className="font-display font-black text-xs text-orange-200">3</span>
                 </div>
               );
             }
