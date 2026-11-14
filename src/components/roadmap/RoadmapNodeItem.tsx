@@ -32,11 +32,11 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
     // 3D Spherical Radial Background & Border per status
     const orbBg = isUnlocked
       ? isComplete
-        ? 'radial-gradient(circle at 35% 28%, #0d3830 0%, #061e1a 55%, #020a08 100%)'
+        ? 'radial-gradient(circle at 35% 25%, #0f4538 0%, #06231c 55%, #020d0a 100%)'
         : isCurrent
-        ? 'radial-gradient(circle at 35% 28%, #0f305c 0%, #091a38 55%, #03081a 100%)'
-        : 'radial-gradient(circle at 35% 28%, #181d3d 0%, #090e29 55%, #040614 100%)'
-      : 'radial-gradient(circle at 35% 28%, #141926 0%, #090c16 60%, #020308 100%)';
+        ? 'radial-gradient(circle at 35% 25%, #144272 0%, #0a2544 55%, #030d1a 100%)'
+        : 'radial-gradient(circle at 35% 25%, #202752 0%, #0d1436 55%, #04081c 100%)'
+      : 'radial-gradient(circle at 35% 25%, #182030 0%, #0b101c 60%, #03050a 100%)';
 
     const orbBorder = isUnlocked
       ? isComplete
@@ -44,15 +44,15 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         : isCurrent
         ? '#00f7ff'
         : sectorColor
-      : '#1e293b';
+      : '#334155';
 
     const orbShadow = isUnlocked
       ? isCurrent
-        ? '0 0 24px rgba(0, 247, 255, 0.6), inset 0 2px 5px rgba(255,255,255,0.45), inset 0 -4px 6px rgba(0,0,0,0.8)'
+        ? '0 0 28px rgba(0, 247, 255, 0.75), 0 0 12px rgba(0, 247, 255, 0.9), inset 0 2px 6px rgba(255,255,255,0.55), inset 0 -4px 8px rgba(0,0,0,0.9)'
         : isComplete
-        ? '0 0 18px rgba(16, 185, 129, 0.45), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 6px rgba(0,0,0,0.8)'
-        : `0 0 14px ${sectorColor}40, inset 0 2px 4px rgba(255,255,255,0.25), inset 0 -4px 6px rgba(0,0,0,0.8)`
-      : '0 4px 10px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -3px 5px rgba(0,0,0,0.9)';
+        ? '0 0 22px rgba(16, 185, 129, 0.55), inset 0 2px 5px rgba(255,255,255,0.45), inset 0 -4px 8px rgba(0,0,0,0.9)'
+        : `0 0 16px ${sectorColor}55, inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -4px 8px rgba(0,0,0,0.9)`
+      : '0 4px 12px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.08), inset 0 -3px 6px rgba(0,0,0,0.95)';
 
     const numberColor = isUnlocked
       ? isComplete
@@ -64,11 +64,11 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
 
     const numberShadow = isUnlocked
       ? isComplete
-        ? '0 0 12px rgba(52, 211, 153, 0.8), 0 2px 4px #000'
+        ? '0 0 16px rgba(52, 211, 153, 0.95), 0 0 6px #34d399, 0 2px 4px #000'
         : isCurrent
-        ? '0 0 15px rgba(0, 247, 255, 0.9), 0 2px 4px #000'
-        : '0 0 8px rgba(255,255,255,0.4), 0 2px 4px #000'
-      : '0 2px 4px rgba(0,0,0,0.8)';
+        ? '0 0 18px rgba(0, 247, 255, 0.95), 0 0 8px #00f7ff, 0 2px 4px #000'
+        : '0 0 10px rgba(255,255,255,0.4), 0 2px 4px #000'
+      : '0 2px 4px rgba(0,0,0,0.9)';
 
     return (
       <div
@@ -80,46 +80,59 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           transform: 'translate(-50%, -50%)',
         }}
       >
-        {/* Floating Bouncing Energy Ball & PLAY Beacon above Current Active Level */}
+        {/* Floating Bouncing Energy Ball & High-Tech PLAY Beacon above Current Active Level */}
         {isCurrent && (
           <div
-            className="pointer-events-none z-30"
+            onClick={() => onLevelClick(node.id)}
+            className="z-30 cursor-pointer active:scale-95 transition-transform flex flex-col items-center select-none"
             style={{
               position: 'absolute',
-              top: '-46px',
+              top: '-56px',
               left: '50%',
               transform: 'translateX(-50%)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
             }}
           >
-            {/* 3D Glowing Cyber Ball */}
-            <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-cyan-400 to-white shadow-[0_0_16px_#00f7ff] border border-white animate-ball-bounce mb-1" />
+            {/* 3D Glowing Cyber Ball with Radiant Core */}
+            <div className="relative mb-1">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 via-white to-cyan-200 shadow-[0_0_18px_#00f7ff,0_0_8px_#ffffff] border-2 border-white animate-ball-bounce" />
+              <div className="absolute inset-0 rounded-full bg-cyan-400/30 blur-sm animate-pulse pointer-events-none" />
+            </div>
 
-            {/* High-tech PLAY Pill */}
+            {/* High-tech Arcade PLAY Button with Game Font */}
             <div
               style={{
-                backgroundColor: '#00f7ff',
-                color: '#000000',
-                boxShadow: '0 0 16px rgba(0, 247, 255, 0.9)',
+                background: 'linear-gradient(135deg, #00f7ff 0%, #00d2eb 50%, #0096c7 100%)',
+                color: '#030816',
+                border: '1.5px solid #ffffff',
+                boxShadow: '0 0 20px rgba(0, 247, 255, 0.9), 0 4px 12px rgba(0, 0, 0, 0.7), inset 0 1px 2px #ffffff',
+                borderRadius: '9999px',
               }}
-              className="flex items-center gap-1 px-2.5 py-0.5 rounded-full font-display font-black text-[10px] tracking-wider whitespace-nowrap shadow-md"
+              className="flex items-center gap-1.5 px-3.5 py-1 font-display font-black text-xs tracking-widest uppercase shadow-lg"
             >
-              <Play style={{ fill: '#000000', color: '#000000' }} className="w-3 h-3" />
-              <span>PLAY</span>
+              <Play className="w-3.5 h-3.5 fill-[#030816] text-[#030816]" />
+              <span style={{ textShadow: '0 1px 1px rgba(255,255,255,0.4)' }}>PLAY</span>
             </div>
+
+            {/* Glowing Pointer Notch */}
+            <div
+              className="w-2 h-2 rotate-45 -mt-1 shadow-sm"
+              style={{
+                backgroundColor: '#00d2eb',
+                borderRight: '1px solid #ffffff',
+                borderBottom: '1px solid #ffffff',
+              }}
+            />
           </div>
         )}
 
-        {/* 3D Tactile Cyber Core Orb (Circular, No Box, No Corner Brackets) */}
+        {/* 3D Tactile Cyber Core Orb (High-tech Arcade Stage Node) */}
         <button
           type="button"
           onClick={() => onLevelClick(node.id)}
           aria-label={`Level ${node.id} ${isUnlocked ? (isComplete ? 'Completed' : 'Unlocked') : 'Locked'}`}
           style={{
-            width: '64px',
-            height: '64px',
+            width: '68px',
+            height: '68px',
             background: orbBg,
             borderColor: orbBorder,
             boxShadow: orbShadow,
@@ -129,9 +142,9 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           className={`relative rounded-full flex items-center justify-center transition-all duration-200 select-none cursor-pointer border-[2.5px] ${
             isUnlocked
               ? isCurrent
-                ? 'scale-105 ring-2 ring-cyan-400/60'
+                ? 'scale-105 ring-2 ring-cyan-400 ring-offset-2 ring-offset-[#03040c]'
                 : 'hover:scale-105 active:scale-95'
-              : 'hover:border-slate-500 active:scale-95 opacity-75 hover:opacity-100'
+              : 'hover:border-slate-400 active:scale-95 opacity-75 hover:opacity-100'
           }`}
         >
           {/* Top Curved Specular Sheen (Spherical 3D Glass Arc) */}
@@ -141,18 +154,18 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               top: '6px',
               left: '14px',
               right: '14px',
-              height: '14px',
+              height: '16px',
               borderRadius: '9999px',
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.08) 60%, transparent 100%)',
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 60%, transparent 100%)',
               pointerEvents: 'none',
             }}
           />
 
-          {/* Clean Prominent Level Number (100% un-occluded in center) */}
+          {/* Level Number with Authentic Arcade Game Font */}
           <span
             className="font-display font-black leading-none select-none"
             style={{
-              fontSize: '26px',
+              fontSize: '28px',
               color: numberColor,
               textShadow: numberShadow,
               position: 'relative',
@@ -169,12 +182,12 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
                 position: 'absolute',
                 top: '-3px',
                 right: '-3px',
-                width: '20px',
-                height: '20px',
+                width: '22px',
+                height: '22px',
                 borderRadius: '9999px',
-                backgroundColor: '#10b981',
-                boxShadow: '0 0 10px #34d399',
-                border: '1.5px solid #000000',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                boxShadow: '0 0 12px #34d399, 0 2px 6px rgba(0,0,0,0.7)',
+                border: '1.5px solid #ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -182,29 +195,29 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
                 zIndex: 10,
               }}
             >
-              <Check style={{ color: '#000000' }} className="w-3 h-3 stroke-[3.5]" />
+              <Check style={{ color: '#ffffff' }} className="w-3.5 h-3.5 stroke-[3.5]" />
             </div>
           )}
 
-          {/* Floating Status / Time Pill Anchored Cleanly BELOW Orb (Zero Collage / Overlap) */}
+          {/* Status / Time Pill Anchored Cleanly BELOW Orb with Game Font */}
           {isComplete && progress?.bestTime ? (
             <div
               style={{
                 position: 'absolute',
-                bottom: '-14px',
+                bottom: '-16px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                backgroundColor: 'rgba(3, 6, 20, 0.96)',
-                border: '1px solid rgba(16, 185, 129, 0.55)',
-                boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)',
+                backgroundColor: 'rgba(3, 8, 20, 0.96)',
+                border: '1.5px solid rgba(16, 185, 129, 0.7)',
+                boxShadow: '0 0 12px rgba(16, 185, 129, 0.5), 0 2px 6px rgba(0,0,0,0.8)',
                 pointerEvents: 'none',
                 whiteSpace: 'nowrap',
                 zIndex: 10,
               }}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-full"
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full"
             >
               <Clock className="w-2.5 h-2.5 text-emerald-400" />
-              <span className="font-tech text-[9px] font-bold text-emerald-300 leading-none">
+              <span className="font-tech font-bold text-[10px] text-emerald-300 leading-none">
                 {progress.bestTime.toFixed(1)}s
               </span>
             </div>
@@ -212,20 +225,20 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             <div
               style={{
                 position: 'absolute',
-                bottom: '-14px',
+                bottom: '-16px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                backgroundColor: 'rgba(3, 6, 20, 0.96)',
-                border: '1px solid rgba(0, 247, 255, 0.65)',
-                boxShadow: '0 0 12px rgba(0, 247, 255, 0.5)',
+                backgroundColor: 'rgba(3, 8, 20, 0.96)',
+                border: '1.5px solid rgba(0, 247, 255, 0.8)',
+                boxShadow: '0 0 14px rgba(0, 247, 255, 0.6), 0 2px 6px rgba(0,0,0,0.8)',
                 pointerEvents: 'none',
                 whiteSpace: 'nowrap',
                 zIndex: 10,
               }}
-              className="flex items-center gap-1 px-2.5 py-0.5 rounded-full"
+              className="flex items-center gap-1.5 px-3 py-0.5 rounded-full"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f7ff] animate-pulse" />
-              <span className="font-tech text-[9px] font-bold text-cyan-300 leading-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f7ff] animate-pulse" />
+              <span className="font-tech font-bold text-[10px] tracking-widest text-cyan-300 leading-none">
                 READY
               </span>
             </div>

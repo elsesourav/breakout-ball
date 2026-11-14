@@ -25,8 +25,6 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               left: `${(node.x / SVG_WIDTH) * 100}%`,
               // Sector 1 entrance sits cleanly below Level 1; other sectors sit above their milestone
               top: isEntrance ? `${node.y + 60}px` : `${node.y - 78}px`,
-              contentVisibility: 'auto',
-              containIntrinsicSize: '240px 60px',
             }}
           >
             <div
@@ -67,8 +65,6 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
           style={{
             left: `${(summitNode.x / SVG_WIDTH) * 100}%`,
             top: `${summitNode.y - 100}px`,
-            contentVisibility: 'auto',
-            containIntrinsicSize: '160px 80px',
           }}
         >
           {/* Golden Apex Ring */}

@@ -76,14 +76,19 @@ export const LevelRoadmap: React.FC = () => {
       const palette = brickColors[i % brickColors.length];
       const y = (TOTAL_HEIGHT / 18) * i + ((i * 37) % 50);
       const isLeft = i % 2 === 0;
-      const x = isLeft ? 35 + ((i * 23) % 45) : 325 - ((i * 29) % 45);
+      const w = 36 + ((i * 7) % 14);
+      const h = 16 + ((i * 3) % 6);
+      // Strictly clamp x inside canvas with >= 22px safe padding to prevent right-edge clipping
+      const x = isLeft
+        ? 22 + ((i * 21) % 36)
+        : SVG_WIDTH - w - 22 - ((i * 27) % 36);
 
       bricks.push({
         id: i,
         x,
         y,
-        w: 38 + ((i * 7) % 18),
-        h: 18 + ((i * 3) % 8),
+        w,
+        h,
         color: palette.color,
         glow: palette.glow,
         rotation: ((i * 17) % 30) - 15,
@@ -279,7 +284,7 @@ export const LevelRoadmap: React.FC = () => {
       }}
     >
       <div
-        className="relative mx-auto"
+        className="relative mx-auto overflow-x-hidden"
         style={{
           width: `${SVG_WIDTH}px`,
           height: `${TOTAL_HEIGHT}px`,
@@ -291,7 +296,7 @@ export const LevelRoadmap: React.FC = () => {
         {floatingBricks.map((b) => (
           <div
             key={`brick-${b.id}`}
-            className="absolute rounded pointer-events-none transition-transform"
+            className="absolute rounded-md pointer-events-none transition-transform"
             style={{
               left: `${b.x}px`,
               top: `${b.y}px`,
@@ -302,8 +307,6 @@ export const LevelRoadmap: React.FC = () => {
               boxShadow: `0 0 14px ${b.glow}, inset 0 1px 1px #fff`,
               transform: `rotate(${b.rotation}deg)`,
               border: '1px solid rgba(255,255,255,0.2)',
-              contentVisibility: 'auto',
-              containIntrinsicSize: `${b.w}px ${b.h}px`,
             }}
           />
         ))}

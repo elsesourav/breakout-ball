@@ -18,13 +18,11 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({ obstacles })
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
-                contentVisibility: 'auto',
-                containIntrinsicSize: '200px 50px',
               }}
             >
               {/* Laser Forcefield Barrier Line */}
               <div
-                className="w-48 h-1.5 rounded-full mb-1 flex items-center justify-between px-1"
+                className="w-44 h-1.5 rounded-full mb-1 flex items-center justify-between px-1"
                 style={{
                   backgroundColor: obs.locked ? '#ff0844' : '#10b981',
                   boxShadow: obs.locked
@@ -63,8 +61,6 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({ obstacles })
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
-                contentVisibility: 'auto',
-                containIntrinsicSize: '40px 20px',
               }}
             >
               {/* Indestructible Titanium Block */}
@@ -87,24 +83,22 @@ export const RoadmapObstacles: React.FC<RoadmapObstaclesProps> = ({ obstacles })
           return (
             <div
               key={obs.id}
-              className="absolute z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              className="absolute z-10 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center overflow-visible"
               style={{
                 left: `${(obs.x / SVG_WIDTH) * 100}%`,
                 top: `${obs.y}px`,
-                contentVisibility: 'auto',
-                containIntrinsicSize: '24px 24px',
               }}
             >
-              {/* Plasma Hazard Deflector Orb */}
+              {/* Plasma Hazard Deflector Orb - smooth circular aura without square box clipping */}
               <div
-                className="w-6 h-6 rounded-full flex items-center justify-center border"
+                className="w-7 h-7 rounded-full flex items-center justify-center relative overflow-visible"
                 style={{
-                  backgroundColor: 'rgba(244, 63, 94, 0.25)',
-                  borderColor: '#f43f5e',
-                  boxShadow: '0 0 12px rgba(244, 63, 94, 0.5)',
+                  background: 'radial-gradient(circle, rgba(244, 63, 94, 0.35) 0%, rgba(225, 29, 72, 0.15) 70%, transparent 100%)',
+                  border: '1.5px solid #f43f5e',
+                  boxShadow: '0 0 16px rgba(244, 63, 94, 0.7), inset 0 0 8px rgba(244, 63, 94, 0.4)',
                 }}
               >
-                <Flame className="w-3.5 h-3.5 text-rose-400" />
+                <Flame className="w-3.5 h-3.5 text-rose-300 drop-shadow-[0_0_6px_#f43f5e]" />
               </div>
             </div>
           );
