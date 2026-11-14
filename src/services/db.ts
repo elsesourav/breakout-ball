@@ -1,38 +1,34 @@
 /**
- * Standard Database Service (Replaces legacy Firebase Realtime Database)
+ * Cloud Database Service (Cloud Firestore Native)
  *
- * Implements a relational/REST standard database pattern for:
- * - Levels (Local, Online, User Created)
- * - Leaderboards & Scores
- * - User Progress & Telemetry
+ * Connects directly to Google Cloud Firestore (Project: breakout-ball)
+ * replacing the legacy Firebase Realtime Database.
  *
- * Fully decoupled from Firebase with offline persistence and REST-ready contracts.
+ * Implements:
+ * - Community & Custom Levels (Firestore 'online_levels' & 'user_levels')
+ * - Global Level Leaderboards (Firestore 'leaderboards')
+ * - User Progress & Cloud Sync (Firestore 'users')
+ * - High-speed Local Cache & Offline Resilience
  */
 
-import { LevelData, LeaderboardEntry, LocalLevelProgress, BlockData } from '../types/game';
+import { LevelData, LeaderboardEntry, LocalLevelProgress } from '../types/game';
 import { INITIAL_LOCAL_LEVELS, INITIAL_ONLINE_LEVELS, MOCK_LEADERBOARDS } from '../constants/game';
+import { firestoreDb } from './firebase';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+  increment,
+  query,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
 
-export interface DatabaseLevelRow {
-  id: string;
-  name: string;
-  creator: string;
-  play_count: number;
-  is_public: boolean;
-  blocks_json: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface DatabaseScoreRow {
-  id: string;
-  level_id: string;
-  username: string;
-  time: number;
-  rank?: number;
-  created_at: string;
-}
-
-class StandardDatabaseService {
+class CloudDatabaseService {
   private localLevelsKey = 'breakout_db_local_levels';
   private onlineLevelsKey = 'breakout_db_online_levels';
   private userLevelsKey = 'breakout_db_user_levels';
@@ -40,58 +36,42 @@ class StandardDatabaseService {
   private progressKey = 'breakout_db_progress';
 
   constructor() {
-    this.seedDatabaseIfEmpty();
+    this.seedLocalCache();
+    this.syncInitialLevelsToCloud().catch(() => {});
   }
 
-  private seedDatabaseIfEmpty() {
-    const localRaw = localStorage.getItem(this.localLevelsKey);
-    if (!localRaw) {
+  private seedLocalCache() {
+    if (!localStorage.getItem(this.localLevelsKey)) {
       localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
-    } else {
-      try {
-        const parsed = JSON.parse(localRaw);
-        if (!Array.isArray(parsed) || parsed.length < INITIAL_LOCAL_LEVELS.length) {
-          localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
-        }
-      } catch {
-        localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
-      }
     }
-    try {
-      const raw = localStorage.getItem(this.onlineLevelsKey);
-      if (!raw) {
-        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
-      } else {
-        const stored: LevelData[] = JSON.parse(raw);
-        // Strictly filter out numeric arcade levels from stored online levels
-        const cleanStored = Array.isArray(stored) ? stored.filter((lvl) => isNaN(Number(lvl.id))) : [];
-        // Preserve curated INITIAL_ONLINE_LEVELS order (featuring @elsesourav stages first)
-        const initialIds = new Set(INITIAL_ONLINE_LEVELS.map((l) => l.id));
-        const customUserLevels = cleanStored.filter((lvl) => !initialIds.has(lvl.id));
-        const merged = [...INITIAL_ONLINE_LEVELS, ...customUserLevels];
-        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
-      }
-    } catch {
+    if (!localStorage.getItem(this.onlineLevelsKey)) {
       localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
     }
-    const storedLeaderboardsRaw = localStorage.getItem(this.leaderboardsKey);
-    if (!storedLeaderboardsRaw) {
+    if (!localStorage.getItem(this.leaderboardsKey)) {
       localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
-    } else {
-      try {
-        const stored = JSON.parse(storedLeaderboardsRaw);
-        // Ensure leaderboards provide up to 10 entries
-        if (!stored['1'] || stored['1'].length < 10) {
-          localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
-        }
-      } catch {
-        localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
-      }
     }
+  }
+
+  /**
+   * One-time background sync of curated initial stages to Cloud Firestore
+   */
+  private async syncInitialLevelsToCloud(): Promise<void> {
+    try {
+      const snap = await getDocs(query(collection(firestoreDb, 'online_levels'), limit(1)));
+      if (snap.empty) {
+        // Seed curated stages into Firestore so all players immediately see them
+        for (const lvl of INITIAL_ONLINE_LEVELS) {
+          await setDoc(doc(firestoreDb, 'online_levels', lvl.id), {
+            ...lvl,
+            createdAt: new Date().toISOString(),
+          }, { merge: true });
+        }
+      }
+    } catch {}
   }
 
   // ==========================================
-  // LEVELS API
+  // LEVELS API (CLOUD FIRESTORE)
   // ==========================================
 
   public async getLocalLevels(): Promise<LevelData[]> {
@@ -100,58 +80,103 @@ class StandardDatabaseService {
   }
 
   public async getOnlineLevels(searchTerm?: string): Promise<LevelData[]> {
+    // 1. Fetch live levels from Cloud Firestore
+    try {
+      const q = query(collection(firestoreDb, 'online_levels'), orderBy('playCount', 'desc'), limit(50));
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        const cloudLevels: LevelData[] = snap.docs.map((d) => d.data() as LevelData);
+        // Exclude numeric arcade levels
+        const cleanCloud = cloudLevels.filter((l) => isNaN(Number(l.id)));
+        const cloudIds = new Set(cleanCloud.map((l) => l.id));
+
+        // Merge with initial curated stages
+        const missingCurated = INITIAL_ONLINE_LEVELS.filter((l) => !cloudIds.has(l.id));
+        const merged = [...cleanCloud, ...missingCurated];
+
+        // Update local cache for offline play
+        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
+
+        return this.filterLevelsByTerm(merged, searchTerm);
+      }
+    } catch {}
+
+    // 2. Offline / Cache fallback
     const raw = localStorage.getItem(this.onlineLevelsKey);
     const rawLevels: LevelData[] = raw ? JSON.parse(raw) : INITIAL_ONLINE_LEVELS;
-    // Strictly exclude numeric arcade levels from online results
-    const levels = rawLevels.filter((l) => isNaN(Number(l.id)));
+    const cleanLevels = rawLevels.filter((l) => isNaN(Number(l.id)));
+    return this.filterLevelsByTerm(cleanLevels, searchTerm);
+  }
 
-    if (!searchTerm || !searchTerm.trim()) {
-      return levels;
-    }
-
-    const term = searchTerm.trim().toUpperCase();
+  private filterLevelsByTerm(levels: LevelData[], term?: string): LevelData[] {
+    if (!term || !term.trim()) return levels;
+    const upper = term.trim().toUpperCase();
     return levels.filter(
-      (l) => l.id.toUpperCase().includes(term) || (l.name && l.name.toUpperCase().includes(term))
+      (l) => l.id.toUpperCase().includes(upper) || (l.name && l.name.toUpperCase().includes(upper))
     );
   }
 
   public async getUserCreatedLevels(username: string): Promise<LevelData[]> {
+    try {
+      const snap = await getDocs(collection(firestoreDb, 'user_levels'));
+      if (!snap.empty) {
+        const cloudLevels = snap.docs
+          .map((d) => d.data() as LevelData)
+          .filter((l) => l.creator.toLowerCase() === username.toLowerCase());
+        if (cloudLevels.length > 0) return cloudLevels;
+      }
+    } catch {}
+
     const raw = localStorage.getItem(this.userLevelsKey);
     const levels: LevelData[] = raw ? JSON.parse(raw) : [];
     return levels.filter((l) => l.creator.toLowerCase() === username.toLowerCase());
   }
 
   public async getLevelById(id: string): Promise<LevelData | null> {
+    // 1. Check local stages
     const local = await this.getLocalLevels();
     const foundLocal = local.find((l) => l.id === id);
     if (foundLocal) return foundLocal;
 
-    const online = await this.getOnlineLevels();
-    const foundOnline = online.find((l) => l.id === id);
-    if (foundOnline) return foundOnline;
+    // 2. Check Firestore
+    try {
+      const snap = await getDoc(doc(firestoreDb, 'online_levels', id));
+      if (snap.exists()) {
+        return snap.data() as LevelData;
+      }
+    } catch {}
 
-    const rawUser = localStorage.getItem(this.userLevelsKey);
-    const userLevels: LevelData[] = rawUser ? JSON.parse(rawUser) : [];
-    return userLevels.find((l) => l.id === id) || null;
+    // 3. Check local cache
+    const online = await this.getOnlineLevels();
+    return online.find((l) => l.id === id) || null;
   }
 
   public async saveLevel(level: LevelData): Promise<boolean> {
     try {
+      // 1. Save to Cloud Firestore
+      if (level.isPublic) {
+        await setDoc(doc(firestoreDb, 'online_levels', level.id), {
+          ...level,
+          updatedAt: new Date().toISOString(),
+        }, { merge: true });
+      }
+
+      await setDoc(doc(firestoreDb, 'user_levels', `${level.creator}_${level.id}`), {
+        ...level,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+
+      // 2. Sync Local Cache
       const rawUser = localStorage.getItem(this.userLevelsKey);
       const userLevels: LevelData[] = rawUser ? JSON.parse(rawUser) : [];
-
-      const existingIndex = userLevels.findIndex((l) => l.id === level.id);
-      if (existingIndex >= 0) {
-        userLevels[existingIndex] = { ...level };
-      } else {
-        userLevels.unshift(level);
-      }
+      const existingIdx = userLevels.findIndex((l) => l.id === level.id);
+      if (existingIdx >= 0) userLevels[existingIdx] = { ...level };
+      else userLevels.unshift(level);
       localStorage.setItem(this.userLevelsKey, JSON.stringify(userLevels));
 
-      // Sync with online levels repository if public
       const rawOnline = localStorage.getItem(this.onlineLevelsKey);
       let onlineLevels: LevelData[] = rawOnline ? JSON.parse(rawOnline) : [];
-
       if (level.isPublic) {
         const oIdx = onlineLevels.findIndex((l) => l.id === level.id);
         if (oIdx >= 0) onlineLevels[oIdx] = { ...level };
@@ -168,29 +193,26 @@ class StandardDatabaseService {
   }
 
   public async updateLevelPrivacy(id: string, isPublic: boolean): Promise<boolean> {
-    const rawUser = localStorage.getItem(this.userLevelsKey);
-    const userLevels: LevelData[] = rawUser ? JSON.parse(rawUser) : [];
-    const target = userLevels.find((l) => l.id === id);
-    if (!target) return false;
-
-    target.isPublic = isPublic;
-    return this.saveLevel(target);
+    const level = await this.getLevelById(id);
+    if (!level) return false;
+    level.isPublic = isPublic;
+    return this.saveLevel(level);
   }
 
   public async deleteLevel(id: string): Promise<boolean> {
     try {
+      await deleteDoc(doc(firestoreDb, 'online_levels', id)).catch(() => {});
+
       const rawUser = localStorage.getItem(this.userLevelsKey);
       if (rawUser) {
         const userLevels: LevelData[] = JSON.parse(rawUser);
-        const filtered = userLevels.filter((l) => l.id !== id);
-        localStorage.setItem(this.userLevelsKey, JSON.stringify(filtered));
+        localStorage.setItem(this.userLevelsKey, JSON.stringify(userLevels.filter((l) => l.id !== id)));
       }
 
       const rawOnline = localStorage.getItem(this.onlineLevelsKey);
       if (rawOnline) {
         const onlineLevels: LevelData[] = JSON.parse(rawOnline);
-        const filtered = onlineLevels.filter((l) => l.id !== id);
-        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(filtered));
+        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(onlineLevels.filter((l) => l.id !== id)));
       }
 
       return true;
@@ -200,6 +222,12 @@ class StandardDatabaseService {
   }
 
   public async incrementPlayCount(levelId: string): Promise<void> {
+    try {
+      await updateDoc(doc(firestoreDb, 'online_levels', levelId), {
+        playCount: increment(1),
+      });
+    } catch {}
+
     const rawOnline = localStorage.getItem(this.onlineLevelsKey);
     if (rawOnline) {
       const onlineLevels: LevelData[] = JSON.parse(rawOnline);
@@ -212,16 +240,25 @@ class StandardDatabaseService {
   }
 
   // ==========================================
-  // LEADERBOARD & SCORES API
+  // LEADERBOARD & RANKINGS API (CLOUD FIRESTORE)
   // ==========================================
 
   public async getLeaderboard(levelId: string): Promise<LeaderboardEntry[]> {
-    const raw = localStorage.getItem(this.leaderboardsKey);
-    const allLeaderboards: Record<string, LeaderboardEntry[]> = raw
-      ? JSON.parse(raw)
-      : MOCK_LEADERBOARDS;
+    // 1. Read live leaderboard document from Cloud Firestore
+    try {
+      const snap = await getDoc(doc(firestoreDb, 'leaderboards', String(levelId)));
+      if (snap.exists()) {
+        const data = snap.data();
+        if (Array.isArray(data?.entries) && data.entries.length > 0) {
+          return data.entries;
+        }
+      }
+    } catch {}
 
-    return allLeaderboards[levelId] || allLeaderboards.default || [];
+    // 2. Local fallback
+    const raw = localStorage.getItem(this.leaderboardsKey);
+    const all: Record<string, LeaderboardEntry[]> = raw ? JSON.parse(raw) : MOCK_LEADERBOARDS;
+    return all[levelId] || all.default || [];
   }
 
   public async submitScore(
@@ -229,14 +266,7 @@ class StandardDatabaseService {
     username: string,
     time: number
   ): Promise<{ rank: number; isNewBest: boolean; updatedLeaderboard: LeaderboardEntry[] }> {
-    const raw = localStorage.getItem(this.leaderboardsKey);
-    const allLeaderboards: Record<string, LeaderboardEntry[]> = raw
-      ? JSON.parse(raw)
-      : MOCK_LEADERBOARDS;
-
-    const existingList: LeaderboardEntry[] = allLeaderboards[levelId] || [
-      ...(allLeaderboards.default || []),
-    ];
+    const existingList: LeaderboardEntry[] = await this.getLeaderboard(levelId);
 
     const currentEntry = existingList.find((e) => e.username.toLowerCase() === username.toLowerCase());
     const isNewBest = !currentEntry || time < currentEntry.time;
@@ -250,15 +280,29 @@ class StandardDatabaseService {
       time: bestScoreTime,
     });
 
-    // Sort ascending by completion time
     filtered.sort((a, b) => a.time - b.time);
     filtered.forEach((item, idx) => {
       item.rank = idx + 1;
     });
 
     const finalLeaderboard = filtered.slice(0, 10);
-    allLeaderboards[levelId] = finalLeaderboard;
-    localStorage.setItem(this.leaderboardsKey, JSON.stringify(allLeaderboards));
+
+    // Save to Cloud Firestore
+    try {
+      await setDoc(doc(firestoreDb, 'leaderboards', String(levelId)), {
+        levelId: String(levelId),
+        entries: finalLeaderboard,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+    } catch {}
+
+    // Sync Local Cache
+    try {
+      const raw = localStorage.getItem(this.leaderboardsKey);
+      const all = raw ? JSON.parse(raw) : MOCK_LEADERBOARDS;
+      all[levelId] = finalLeaderboard;
+      localStorage.setItem(this.leaderboardsKey, JSON.stringify(all));
+    } catch {}
 
     const userEntry = finalLeaderboard.find((e) => e.username.toLowerCase() === username.toLowerCase());
     const rank = userEntry ? userEntry.rank : finalLeaderboard.length + 1;
@@ -267,12 +311,30 @@ class StandardDatabaseService {
   }
 
   // ==========================================
-  // LOCAL PROGRESS API
+  // USER CLOUD PROGRESS API (CLOUD FIRESTORE)
   // ==========================================
 
   public async getProgress(username?: string): Promise<Record<string, LocalLevelProgress>> {
-    const userKey = username && username.toLowerCase() !== 'anonymous' ? `breakout_db_progress_${username.toLowerCase()}` : null;
-    const raw = (userKey ? localStorage.getItem(userKey) : null) || localStorage.getItem(this.progressKey);
+    const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
+
+    // 1. Fetch user progress from Cloud Firestore if authenticated
+    if (userKey) {
+      try {
+        const snap = await getDoc(doc(firestoreDb, 'users', userKey));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data?.levelsRecord && Object.keys(data.levelsRecord).length > 0) {
+            localStorage.setItem(`breakout_db_progress_${userKey}`, JSON.stringify(data.levelsRecord));
+            return data.levelsRecord;
+          }
+        }
+      } catch {}
+    }
+
+    // 2. Local fallback
+    const raw = (userKey ? localStorage.getItem(`breakout_db_progress_${userKey}`) : null) ||
+      localStorage.getItem(this.progressKey);
+
     if (raw) {
       try {
         return JSON.parse(raw);
@@ -283,18 +345,25 @@ class StandardDatabaseService {
       '1': { levelNumber: 1, completed: false, rank: null, bestTime: null },
     };
     localStorage.setItem(this.progressKey, JSON.stringify(initial));
-    if (userKey) {
-      localStorage.setItem(userKey, JSON.stringify(initial));
-    }
     return initial;
   }
 
   public async saveProgress(progress: Record<string, LocalLevelProgress>, username?: string): Promise<void> {
     localStorage.setItem(this.progressKey, JSON.stringify(progress));
-    if (username && username.toLowerCase() !== 'anonymous') {
-      localStorage.setItem(`breakout_db_progress_${username.toLowerCase()}`, JSON.stringify(progress));
+
+    const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
+    if (userKey) {
+      localStorage.setItem(`breakout_db_progress_${userKey}`, JSON.stringify(progress));
+
+      // Sync progress to Cloud Firestore
+      try {
+        await setDoc(doc(firestoreDb, 'users', userKey), {
+          levelsRecord: progress,
+          updatedAt: new Date().toISOString(),
+        }, { merge: true });
+      } catch {}
     }
   }
 }
 
-export const dbService = new StandardDatabaseService();
+export const dbService = new CloudDatabaseService();

@@ -102,125 +102,139 @@ export const OnlineMode: React.FC = () => {
         <p className="text-xs text-slate-400 font-ui leading-normal">
           Challenge community-crafted breakout stages and climb global rankings.
         </p>
+      </div>
 
-        {/* Cyber Search Terminal Input */}
-        <div className="relative w-full mt-0.5">
-          <div
-            className="flex items-center gap-3 w-full h-11 px-4 rounded-xl transition-all duration-200"
-            style={{
-              backgroundColor: 'rgba(8, 14, 38, 0.95)',
-              border: isSearchFocused
-                ? '1.5px solid #00f7ff'
-                : '1.5px solid rgba(0, 247, 255, 0.35)',
-              boxShadow: isSearchFocused
-                ? '0 0 16px rgba(0, 247, 255, 0.4), inset 0 0 6px rgba(0, 247, 255, 0.15)'
-                : '0 2px 10px rgba(0, 0, 0, 0.5)',
-            }}
-          >
-            <Search
-              className="w-4 h-4 flex-shrink-0 transition-colors duration-200"
-              style={{ color: isSearchFocused ? '#00f7ff' : '#22d3ee' }}
-            />
-            <div className="relative flex-1 flex items-center h-full min-w-0">
-              <input
-                type="text"
-                value={searchTerm}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                spellCheck="false"
-                autoComplete="off"
-                className="bare-input w-full h-full text-xs py-2 font-tech tracking-wide text-white bg-transparent relative z-10"
+      {/* Sticky Search & Filter Controls */}
+      <div
+        className="sticky top-0 z-30 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 flex flex-col items-center pt-2 pb-2.5 -mt-2"
+        style={{
+          backgroundColor: 'rgba(6, 7, 20, 0.95)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(0, 247, 255, 0.12)',
+          boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.75)',
+        }}
+      >
+        <div className="w-full max-w-sm flex flex-col gap-2.5">
+          {/* Cyber Search Terminal Input */}
+          <div className="relative w-full">
+            <div
+              className="flex items-center gap-3 w-full h-11 px-4 rounded-xl transition-all duration-200"
+              style={{
+                backgroundColor: 'rgba(8, 14, 38, 0.95)',
+                border: isSearchFocused
+                  ? '1.5px solid #00f7ff'
+                  : '1.5px solid rgba(0, 247, 255, 0.35)',
+                boxShadow: isSearchFocused
+                  ? '0 0 16px rgba(0, 247, 255, 0.4), inset 0 0 6px rgba(0, 247, 255, 0.15)'
+                  : '0 2px 10px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              <Search
+                className="w-4 h-4 flex-shrink-0 transition-colors duration-200"
+                style={{ color: isSearchFocused ? '#00f7ff' : '#22d3ee' }}
               />
-              {!searchTerm && (
-                <div className="absolute inset-0 flex items-center pointer-events-none select-none text-xs font-tech text-slate-400 overflow-hidden">
-                  <span className="flex-shrink-0 text-slate-400">Search by&nbsp;</span>
-                  <div className="relative h-5 overflow-hidden flex items-center">
-                    <span
-                      key={searchTargetIdx}
-                      className="search-ticker-item text-slate-400 font-tech tracking-wide"
-                    >
-                      {SEARCH_TARGETS[searchTargetIdx]}
-                    </span>
+              <div className="relative flex-1 flex items-center h-full min-w-0">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  spellCheck="false"
+                  autoComplete="off"
+                  className="bare-input w-full h-full text-xs py-2 font-tech tracking-wide text-white bg-transparent relative z-10"
+                />
+                {!searchTerm && (
+                  <div className="absolute inset-0 flex items-center pointer-events-none select-none text-xs font-tech text-slate-400 overflow-hidden">
+                    <span className="flex-shrink-0 text-slate-400">Search by&nbsp;</span>
+                    <div className="relative h-5 overflow-hidden flex items-center">
+                      <span
+                        key={searchTargetIdx}
+                        className="search-ticker-item text-slate-400 font-tech tracking-wide"
+                      >
+                        {SEARCH_TARGETS[searchTargetIdx]}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
+              </div>
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setCurrentPage(1);
+                  }}
+                  className="p-1.5 rounded-lg text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-2 relative z-20"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               )}
             </div>
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchTerm('');
-                  setCurrentPage(1);
-                }}
-                className="p-1.5 rounded-lg text-cyan-400 hover:text-white hover:bg-cyan-500/20 transition-all cursor-pointer flex-shrink-0 ml-2 relative z-20"
-                title="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
-        </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2 mt-0.5">
-          <button
-            type="button"
-            onClick={() => {
-              setFilterMode('all');
-              setCurrentPage(1);
-            }}
-            style={
-              filterMode === 'all'
-                ? {
-                    backgroundColor: 'rgba(0, 247, 255, 0.18)',
-                    border: '1.5px solid #00f7ff',
-                    color: '#00f7ff',
-                    boxShadow: '0 0 12px rgba(0, 247, 255, 0.35)',
-                    borderRadius: '10px',
-                  }
-                : {
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    border: '1.5px solid rgba(255, 255, 255, 0.12)',
-                    color: '#94a3b8',
-                    borderRadius: '10px',
-                  }
-            }
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
-          >
-            <Boxes className="w-3.5 h-3.5" />
-            <span>ALL STAGES</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setFilterMode('popular');
-              setCurrentPage(1);
-            }}
-            style={
-              filterMode === 'popular'
-                ? {
-                    backgroundColor: 'rgba(255, 170, 0, 0.18)',
-                    border: '1.5px solid #ffa500',
-                    color: '#ffd700',
-                    boxShadow: '0 0 12px rgba(255, 170, 0, 0.35)',
-                    borderRadius: '10px',
-                  }
-                : {
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    border: '1.5px solid rgba(255, 255, 255, 0.12)',
-                    color: '#94a3b8',
-                    borderRadius: '10px',
-                  }
-            }
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
-          >
-            <Flame className="w-3.5 h-3.5 fill-current" />
-            <span>TOP PLAYED</span>
-          </button>
+          {/* Filter Pills */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setFilterMode('all');
+                setCurrentPage(1);
+              }}
+              style={
+                filterMode === 'all'
+                  ? {
+                      backgroundColor: 'rgba(0, 247, 255, 0.18)',
+                      border: '1.5px solid #00f7ff',
+                      color: '#00f7ff',
+                      boxShadow: '0 0 12px rgba(0, 247, 255, 0.35)',
+                      borderRadius: '10px',
+                    }
+                  : {
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1.5px solid rgba(255, 255, 255, 0.12)',
+                      color: '#94a3b8',
+                      borderRadius: '10px',
+                    }
+              }
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
+            >
+              <Boxes className="w-3.5 h-3.5" />
+              <span>ALL STAGES</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFilterMode('popular');
+                setCurrentPage(1);
+              }}
+              style={
+                filterMode === 'popular'
+                  ? {
+                      backgroundColor: 'rgba(255, 170, 0, 0.18)',
+                      border: '1.5px solid #ffa500',
+                      color: '#ffd700',
+                      boxShadow: '0 0 12px rgba(255, 170, 0, 0.35)',
+                      borderRadius: '10px',
+                    }
+                  : {
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1.5px solid rgba(255, 255, 255, 0.12)',
+                      color: '#94a3b8',
+                      borderRadius: '10px',
+                    }
+              }
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
+            >
+              <Flame className="w-3.5 h-3.5 fill-current" />
+              <span>TOP PLAYED</span>
+            </button>
+          </div>
         </div>
       </div>
 

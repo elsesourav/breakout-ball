@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@elsesourav/react-ui": "file:../es-react-components",
+    "@supabase/supabase-js": "^2.119.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
+    "firebase": "^13.3.0",
     "lucide-react": "^1.16.0",
     "motion": "^14.13.0",
     "react": "^19.3.1",
