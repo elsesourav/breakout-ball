@@ -37,9 +37,9 @@ export const OverallScoreLeaderboard: React.FC = () => {
     async function loadData() {
       try {
         if (activeTab === 'alltime') {
-          const res = await backendApi.getGlobalLeaderboard(50);
+          const res = await backendApi.getGlobalLeaderboard(12);
           if (isMounted && res && res.length > 0) {
-            const mapped: ScoreLeaderboardEntry[] = res.map((e, idx) => ({
+            const mapped: ScoreLeaderboardEntry[] = res.slice(0, 12).map((e, idx) => ({
               rank: e.rank || idx + 1,
               username: e.username,
               score: e.totalScore || e.score || 0,
@@ -54,7 +54,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
           const firestoreData = await getOverallLeaderboard();
           if (isMounted && firestoreData && firestoreData.length > 0) {
-            const mapped: ScoreLeaderboardEntry[] = firestoreData.map((e: any, idx: number) => ({
+            const mapped: ScoreLeaderboardEntry[] = firestoreData.slice(0, 12).map((e: any, idx: number) => ({
               rank: e.rank || idx + 1,
               username: e.username,
               score: e.totalScore || e.score || 0,
@@ -67,9 +67,9 @@ export const OverallScoreLeaderboard: React.FC = () => {
             return;
           }
         } else {
-          const res = await backendApi.getWeeklyLeaderboard(50);
+          const res = await backendApi.getWeeklyLeaderboard(12);
           if (isMounted && res && res.length > 0) {
-            const mapped: ScoreLeaderboardEntry[] = res.map((e, idx) => ({
+            const mapped: ScoreLeaderboardEntry[] = res.slice(0, 12).map((e, idx) => ({
               rank: e.rank || idx + 1,
               username: e.username,
               score: e.totalScore || e.score || 0,
@@ -299,8 +299,15 @@ export const OverallScoreLeaderboard: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-2" data-inner-scroll="true">
-          {rankedList.slice(0, 50).map((entry) => {
+        <div
+          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-1.5 min-h-0"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehaviorY: 'contain',
+          }}
+          data-inner-scroll="true"
+        >
+          {rankedList.slice(0, 12).map((entry) => {
             const isUser = entry.isCurrentUser;
             const isRank1 = entry.rank === 1;
             const isRank2 = entry.rank === 2;

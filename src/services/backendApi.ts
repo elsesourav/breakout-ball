@@ -71,7 +71,9 @@ class BackendApiService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_BACKEND_URL) || 'http://localhost:4000';
+    const isCustomDomain = typeof window !== 'undefined' && window.location.hostname.includes('elsesourav.com');
+    const defaultHost = isCustomDomain ? 'https://api-breakout.elsesourav.com' : 'http://localhost:4000';
+    this.baseUrl = ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_BACKEND_URL) || defaultHost;
   }
 
   public getBaseUrl(): string {
