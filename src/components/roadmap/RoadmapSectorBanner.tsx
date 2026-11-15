@@ -17,24 +17,24 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
         const sector = node.sector;
         const isEntrance = node.id === 1;
 
-        const bannerY = isEntrance ? node.y + 75 : node.y - 110;
+        const bannerY = isEntrance ? node.y + 75 : node.y - 88;
 
         return (
           <div
             key={`sector-banner-${node.id}`}
-            className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
+            className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none w-full max-w-[88vw] sm:max-w-xs px-2"
             data-base-transform="translateX(-50%)"
             data-y={bannerY}
             style={{
-              left: `${(node.x / SVG_WIDTH) * 100}%`,
-              // Sector 1 entrance sits cleanly below Level 1; other sectors sit comfortably above their milestone
+              left: '50%',
+              // Sector 1 entrance sits cleanly below Level 1; other sectors sit comfortably at the midpoint between milestone levels
               top: `${bannerY}px`,
               transform: 'translateX(-50%)',
               willChange: 'transform, opacity',
             }}
           >
             <div
-              className="flex flex-col items-center px-4 py-2 rounded-xl border select-none whitespace-nowrap shadow-xl"
+              className="flex flex-col items-center px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl border select-none shadow-xl max-w-full text-center"
               style={{
                 backgroundColor: 'rgba(6, 10, 26, 0.96)',
                 borderColor: sector.color,
@@ -42,9 +42,9 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               }}
             >
               {/* Clean Crisp Sector Heading without Magic/Sparkle Icon */}
-              <div className="flex items-center gap-1.5 leading-none whitespace-nowrap">
+              <div className="flex items-center justify-center gap-1.5 leading-none whitespace-nowrap">
                 <span
-                  className="font-display font-black text-xs tracking-wider whitespace-nowrap text-white"
+                  className="font-display font-black text-[11px] sm:text-xs tracking-wider whitespace-nowrap text-white"
                   style={{
                     letterSpacing: '0.08em',
                   }}
@@ -53,12 +53,12 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
                 </span>
                 <span
                   style={{ color: sector.color }}
-                  className="font-display font-black text-xs"
+                  className="font-display font-black text-[11px] sm:text-xs"
                 >
                   //
                 </span>
                 <span
-                  className="font-display font-black text-xs tracking-wider whitespace-nowrap"
+                  className="font-display font-black text-[11px] sm:text-xs tracking-wider whitespace-nowrap"
                   style={{
                     color: sector.color,
                     letterSpacing: '0.08em',
@@ -70,7 +70,7 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               </div>
 
               {/* Subtitle in Clean Slate Contrast */}
-              <span className="font-tech text-[10px] font-bold tracking-wider mt-1 whitespace-nowrap text-slate-300">
+              <span className="font-tech text-[9.5px] sm:text-[10px] font-bold tracking-wider mt-0.5 sm:mt-1 whitespace-nowrap text-slate-300 text-center">
                 {sector.subtitle}
               </span>
             </div>

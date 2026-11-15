@@ -57,12 +57,22 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
   const effectiveStars = gameMode === 'arcade' ? starsEarned : hearts;
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: isWin ? 0.8 : 0.25, ease: 'easeOut' }}
+      className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+    >
       <motion.div
-        initial={{ scale: 0.85, opacity: 0, y: 15 }}
+        initial={isWin ? { scale: 0.86, opacity: 0, y: 32 } : { scale: 0.88, opacity: 0, y: 15 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 320 }}
+        transition={
+          isWin
+            ? { duration: 0.9, ease: [0.16, 1, 0.3, 1] }
+            : { type: 'spring', damping: 24, stiffness: 320 }
+        }
         style={{
           backgroundColor: 'rgba(8, 12, 34, 0.96)',
           border: isWin
@@ -538,6 +548,6 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
           </div>
         )}
       </motion.div>
-    </div>
+    </motion.div>
   );
 };

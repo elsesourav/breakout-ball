@@ -467,6 +467,7 @@ export class GameEngine {
     this.state.score += timeBonus + lifeBonus;
 
     this.particles.spawnVictoryConfetti(CANVAS_WIDTH, CANVAS_HEIGHT);
+    this.particles.addFloatingText('LEVEL CLEARED!', CANVAS_WIDTH / 2, CANVAS_HEIGHT * 0.42, '#00f7ff');
     this.callbacks.onLevelWin?.(this.state);
   }
 

@@ -131,19 +131,42 @@ export const GameCanvas: React.FC = () => {
   const [maxCoresForLevel, setMaxCoresForLevel] = useState<number>(0);
   const [remainingCoresForLevel, setRemainingCoresForLevel] = useState<number>(0);
 
+  // Win presentation timers to gracefully reveal summary window over 2-3 seconds
+  const winTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const confettiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearWinTimers = useCallback(() => {
+    if (winTimeoutRef.current) {
+      clearTimeout(winTimeoutRef.current);
+      winTimeoutRef.current = null;
+    }
+    if (confettiTimeoutRef.current) {
+      clearTimeout(confettiTimeoutRef.current);
+      confettiTimeoutRef.current = null;
+    }
+  }, []);
+
   // Handle Level Victory
   const handleLevelWin = useCallback(
     async (finalScore: ScoreState) => {
       if (!selectedLevel) return;
 
-      // Confetti burst
+      // First celebratory confetti burst
       confetti({
-        particleCount: 140,
+        particleCount: 130,
         spread: 80,
         origin: { y: 0.55 },
       });
 
-      setSummaryState(finalScore);
+      // Second confetti burst to sustain celebration during canvas victory
+      if (confettiTimeoutRef.current) clearTimeout(confettiTimeoutRef.current);
+      confettiTimeoutRef.current = setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.4 },
+        });
+      }, 750);
 
       try {
         const result = await recordLevelCompletion(
@@ -161,6 +184,12 @@ export const GameCanvas: React.FC = () => {
       } catch (err) {
         console.error('Error saving score:', err);
       }
+
+      // Delay showing the winning window by ~1.9s so the player can celebrate on canvas first
+      if (winTimeoutRef.current) clearTimeout(winTimeoutRef.current);
+      winTimeoutRef.current = setTimeout(() => {
+        setSummaryState(finalScore);
+      }, 1900);
     },
     [selectedLevel, recordLevelCompletion]
   );
@@ -279,6 +308,7 @@ export const GameCanvas: React.FC = () => {
 
     return () => {
       isDisposed = true;
+      clearWinTimers();
       if (t1) clearTimeout(t1);
       if (t2) clearTimeout(t2);
       if (t3) clearTimeout(t3);
@@ -369,6 +399,7 @@ export const GameCanvas: React.FC = () => {
   // Replay Current Level
   const handleRetry = () => {
     if (!selectedLevel) return;
+    clearWinTimers();
     soundManager.playClick();
     setSummaryState(null);
     setAttemptId((prev) => prev + 1);
@@ -382,6 +413,7 @@ export const GameCanvas: React.FC = () => {
   const gameMode: 'arcade' | 'arena' = isArcade ? 'arcade' : 'arena';
 
   const handleExit = () => {
+    clearWinTimers();
     soundManager.stopBgMusic();
     if (isArcade) {
       setActiveTab('local');
@@ -393,6 +425,7 @@ export const GameCanvas: React.FC = () => {
 
   // Advance to Next Mission
   const handleNextLevel = () => {
+    clearWinTimers();
     if (hasNextLevel && localLevels[currentLevelIndex + 1]) {
       setSummaryState(null);
       startPlayLevel(localLevels[currentLevelIndex + 1]);
