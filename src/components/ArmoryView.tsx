@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '../context/GameContext';
-import { Flame, ShoppingBag, Gauge, Palette } from 'lucide-react';
 import { currencyService } from '../services/currency';
 import { UpgradeState } from '../constants/upgrades';
-import { BallTab } from './armory/BallTab';
-import { PowerTab } from './armory/PowerTab';
+import { UpgradeTab } from './armory/UpgradeTab';
 import { ShopTab } from './armory/ShopTab';
-import { BallSkinSelector } from './profile/BallSkinSelector';
 import { CyberSectionHeader } from './CyberSectionHeader';
 import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
 import { CoreIcon } from './CoreIcon';
+import { UpgradeTabIcon, ShopTabIcon } from './armory/InGameIcons';
 
-type ArmoryTab = 'hangar' | 'kinetics' | 'augments' | 'shop';
+type ArmorySection = 'upgrade' | 'shop';
 
 export const ArmoryView: React.FC = () => {
   const { user } = useGame();
-  const [activeTab, setActiveTab] = useState<ArmoryTab>('hangar');
+  const [activeSection, setActiveSection] = useState<ArmorySection>('upgrade');
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [upgrades, setUpgrades] = useState<UpgradeState>(() => currencyService.getUpgrades());
@@ -35,7 +33,7 @@ export const ArmoryView: React.FC = () => {
     });
   }, [user.username]);
 
-  // Smooth, gradual count-up counter animation over 1.8s
+  // Smooth, gradual count-up counter animation over 2.0s
   const startCountUp = useCallback((target: number) => {
     if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
 
@@ -98,11 +96,21 @@ export const ArmoryView: React.FC = () => {
     [startCountUp]
   );
 
-  const TABS: { id: ArmoryTab; label: string; icon: React.ElementType }[] = [
-    { id: 'hangar', label: 'HANGAR', icon: Palette },
-    { id: 'kinetics', label: 'KINETICS', icon: Gauge },
-    { id: 'augments', label: 'AUGMENTS', icon: Flame },
-    { id: 'shop', label: 'SHOP', icon: ShoppingBag },
+  const SECTIONS: {
+    id: ArmorySection;
+    label: string;
+    renderIcon: (active: boolean) => React.ReactNode;
+  }[] = [
+    {
+      id: 'upgrade',
+      label: 'UPGRADES',
+      renderIcon: () => <UpgradeTabIcon size={16} />,
+    },
+    {
+      id: 'shop',
+      label: 'CORE SHOP',
+      renderIcon: () => <ShopTabIcon size={16} />,
+    },
   ];
 
   return (
@@ -160,70 +168,65 @@ export const ArmoryView: React.FC = () => {
         />
       </div>
 
-      {/* 2. Fluid Animated Tab Switcher */}
+      {/* 2. Top-Level Main Switcher: UPGRADE vs SHOP */}
       <div className="w-full max-w-sm px-3.5 mt-2.5 mb-3">
-        <div className="flex items-center gap-1 p-1 rounded-2xl bg-[#080d26]/90 border border-cyan-500/20 shadow-lg relative">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const Icon = tab.icon;
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#080d26]/90 border border-cyan-500/20 shadow-lg relative">
+          {SECTIONS.map((sec) => {
+            const isActive = activeSection === sec.id;
 
             return (
               <button
-                key={tab.id}
+                key={sec.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative flex-1 py-1.5 flex items-center justify-center gap-1 rounded-xl font-tech font-bold text-[11px] transition-colors cursor-pointer z-10 ${
+                onClick={() => setActiveSection(sec.id)}
+                className={`relative flex-1 py-2 flex items-center justify-center gap-2 rounded-xl font-tech font-bold text-xs transition-colors cursor-pointer z-10 ${
                   isActive ? 'text-black' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 {isActive && (
                   <motion.div
-                    layoutId="armory-active-tab-indicator"
+                    layoutId="armory-main-section-indicator"
                     transition={{ type: 'spring', bounce: 0.18, duration: 0.45 }}
                     style={{
                       background:
-                        tab.id === 'shop'
+                        sec.id === 'shop'
                           ? 'linear-gradient(135deg, #ffd700 0%, #f59e0b 100%)'
-                          : tab.id === 'augments'
-                          ? 'linear-gradient(135deg, #b773ff 0%, #7c3aed 100%)'
                           : 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
                       boxShadow:
-                        tab.id === 'shop'
-                          ? '0 0 14px rgba(255, 215, 0, 0.4)'
-                          : tab.id === 'augments'
-                          ? '0 0 14px rgba(183, 115, 255, 0.4)'
-                          : '0 0 14px rgba(0, 247, 255, 0.45)',
+                        sec.id === 'shop'
+                          ? '0 0 16px rgba(255, 215, 0, 0.45)'
+                          : '0 0 16px rgba(0, 247, 255, 0.45)',
                     }}
                     className="absolute inset-0 rounded-xl -z-10"
                   />
                 )}
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'stroke-[2.5]' : ''}`} />
-                <span className="tracking-wider">{tab.label}</span>
+                {sec.renderIcon(isActive)}
+                <span className="tracking-wider">{sec.label}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 3. Tab Contents with Smooth Animated Transitions */}
+      {/* 3. Section Content with Smooth Animated Transitions */}
       <div className="w-full max-w-sm px-3.5">
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeTab}
+            key={activeSection}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.22, ease: 'easeOut' }}
             className="w-full"
           >
-            {activeTab === 'hangar' && <BallSkinSelector />}
-            {activeTab === 'kinetics' && (
-              <BallTab upgrades={upgrades} cores={cores} onUpgrade={handleUpgrade} />
+            {activeSection === 'upgrade' && (
+              <UpgradeTab
+                upgrades={upgrades}
+                cores={cores}
+                onUpgrade={handleUpgrade}
+              />
             )}
-            {activeTab === 'augments' && (
-              <PowerTab upgrades={upgrades} cores={cores} onUpgrade={handleUpgrade} />
-            )}
-            {activeTab === 'shop' && (
+            {activeSection === 'shop' && (
               <ShopTab
                 cores={cores}
                 username={user.username}

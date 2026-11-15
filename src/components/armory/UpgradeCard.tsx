@@ -10,6 +10,7 @@ interface UpgradeCardProps {
   cores: number;
   cost: number;
   onUpgrade: (id: string) => void;
+  icon?: React.ReactNode;
 }
 
 export const UpgradeCard: React.FC<UpgradeCardProps> = ({
@@ -18,6 +19,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
   cores,
   cost,
   onUpgrade,
+  icon,
 }) => {
   const isMax = level >= upgrade.maxLevel;
   const canAfford = !isMax && cores >= cost;
@@ -40,16 +42,16 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
     >
       {/* Top Row: Symbol Icon + Name + Stat Badge */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div
             style={{
               backgroundColor: `${upgrade.accentColor}18`,
               border: `1.2px solid ${upgrade.accentColor}60`,
               boxShadow: `0 0 10px ${upgrade.glowColor}`,
             }}
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-tech font-black text-xs text-white"
+            className="w-9 h-9 rounded-xl flex items-center justify-center font-tech font-black text-xs text-white shrink-0 overflow-hidden"
           >
-            {upgrade.symbol}
+            {icon ? icon : upgrade.symbol}
           </div>
 
           <div className="flex flex-col">
