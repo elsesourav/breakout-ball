@@ -11,7 +11,16 @@ interface PaddleTabProps {
 }
 
 export const PaddleTab: React.FC<PaddleTabProps> = ({ upgrades, cores, onUpgrade }) => {
-  const [selectedUpgrade, setSelectedUpgrade] = useState<UpgradeDef | null>(null);
+  const [selectedUpgrade, setSelectedUpgrade] = useState<UpgradeDef | null>(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      const prevId = sp.get('preview');
+      if (prevId) {
+        return PADDLE_UPGRADES.find((u) => u.id === prevId) || null;
+      }
+    }
+    return null;
+  });
 
   return (
     <div className="w-full flex flex-col gap-3">

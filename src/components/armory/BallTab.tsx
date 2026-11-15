@@ -14,7 +14,16 @@ interface BallTabProps {
 export const BallTab: React.FC<BallTabProps> = ({ upgrades, cores, onUpgrade }) => {
   const { settings } = useGame();
   const currentSkin = settings.ballSkin || 'cyan';
-  const [selectedUpgrade, setSelectedUpgrade] = useState<UpgradeDef | null>(null);
+  const [selectedUpgrade, setSelectedUpgrade] = useState<UpgradeDef | null>(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      const prevId = sp.get('preview');
+      if (prevId) {
+        return BALL_UPGRADES.find((u) => u.id === prevId) || null;
+      }
+    }
+    return null;
+  });
 
   return (
     <div className="w-full flex flex-col gap-3">
