@@ -9,19 +9,11 @@ import { BackendAdminModal } from '../admin/BackendAdminModal';
 import { authService, isUserAdmin } from '../../services/auth';
 
 const getPackVariant = (id: string): 'gold' | 'emerald' | 'blue' | 'pink' | 'rose' | 'cyan' => {
-  switch (id) {
-    case 'starter':
-      return 'emerald'; // 500: Green
-    case 'power':
-      return 'gold'; // 1000: Yellow
-    case 'mega':
-      return 'blue'; // 2500: Blue
-    case 'ultra':
-      return 'pink'; // 5000: Pink
-    case 'titan':
-    default:
-      return 'rose'; // 10000: Reddish
-  }
+  if (id === 'starter') return 'emerald';
+  if (id === 'power') return 'gold';
+  if (id === 'mega') return 'blue';
+  if (id === 'ultra') return 'pink';
+  return 'rose';
 };
 
 interface PackMeta {
@@ -39,59 +31,39 @@ interface PackMeta {
 
 const PACK_META: Record<string, PackMeta> = {
   starter: {
-    // 500: Green
     btnGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)',
     btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 14px rgba(16, 185, 129, 0.45)',
-    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(16, 185, 129, 0.12)',
-    cardBorder: '1.2px solid rgba(16, 185, 129, 0.4)',
-    iconBg: 'rgba(16, 185, 129, 0.15)',
-    iconBorder: '1.2px solid rgba(16, 185, 129, 0.5)',
-    iconGlow: '0 0 10px rgba(16, 185, 129, 0.25)',
+    btnShadow: '0 0 14px rgba(16, 185, 129, 0.45)', cardGlow: '0 4px 18px rgba(0,0,0,0.6), 0 0 10px rgba(16,185,129,0.12)',
+    cardBorder: '1.2px solid rgba(16, 185, 129, 0.4)', iconBg: 'rgba(16, 185, 129, 0.15)',
+    iconBorder: '1.2px solid rgba(16, 185, 129, 0.5)', iconGlow: '0 0 10px rgba(16, 185, 129, 0.25)',
   },
   power: {
-    // 1000: Deep Yellow
     btnGradient: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #d97706 100%)',
     btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 18px rgba(245, 158, 11, 0.55)',
-    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(245, 158, 11, 0.18)',
-    cardBorder: '1.3px solid rgba(245, 158, 11, 0.45)',
-    iconBg: 'rgba(245, 158, 11, 0.16)',
-    iconBorder: '1.2px solid rgba(245, 158, 11, 0.55)',
-    iconGlow: '0 0 14px rgba(245, 158, 11, 0.35)',
+    btnShadow: '0 0 18px rgba(245, 158, 11, 0.55)', cardGlow: '0 4px 18px rgba(0,0,0,0.6), 0 0 14px rgba(245,158,11,0.18)',
+    cardBorder: '1.3px solid rgba(245, 158, 11, 0.45)', iconBg: 'rgba(245, 158, 11, 0.16)',
+    iconBorder: '1.2px solid rgba(245, 158, 11, 0.55)', iconGlow: '0 0 14px rgba(245, 158, 11, 0.35)',
   },
   mega: {
-    // 2500: Blue
     btnGradient: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%)',
     btnTextColor: 'text-white font-black drop-shadow-sm',
-    btnShadow: '0 0 16px rgba(59, 130, 246, 0.55)',
-    cardGlow: '0 4px 20px rgba(0, 0, 0, 0.65), 0 0 16px rgba(59, 130, 246, 0.2)',
-    cardBorder: '1.3px solid rgba(59, 130, 246, 0.45)',
-    iconBg: 'rgba(59, 130, 246, 0.16)',
-    iconBorder: '1.2px solid rgba(59, 130, 246, 0.55)',
-    iconGlow: '0 0 14px rgba(59, 130, 246, 0.35)',
+    btnShadow: '0 0 16px rgba(59, 130, 246, 0.55)', cardGlow: '0 4px 20px rgba(0,0,0,0.65), 0 0 16px rgba(59,130,246,0.2)',
+    cardBorder: '1.3px solid rgba(59, 130, 246, 0.45)', iconBg: 'rgba(59, 130, 246, 0.16)',
+    iconBorder: '1.2px solid rgba(59, 130, 246, 0.55)', iconGlow: '0 0 14px rgba(59, 130, 246, 0.35)',
   },
   ultra: {
-    // 5000: Pink
     btnGradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #db2777 100%)',
     btnTextColor: 'text-white font-black drop-shadow-sm',
-    btnShadow: '0 0 18px rgba(236, 72, 153, 0.55)',
-    cardGlow: '0 4px 22px rgba(0, 0, 0, 0.7), 0 0 20px rgba(236, 72, 153, 0.22)',
-    cardBorder: '1.3px solid rgba(236, 72, 153, 0.45)',
-    iconBg: 'rgba(236, 72, 153, 0.16)',
-    iconBorder: '1.2px solid rgba(236, 72, 153, 0.55)',
-    iconGlow: '0 0 14px rgba(236, 72, 153, 0.35)',
+    btnShadow: '0 0 18px rgba(236, 72, 153, 0.55)', cardGlow: '0 4px 22px rgba(0,0,0,0.7), 0 0 20px rgba(236,72,153,0.22)',
+    cardBorder: '1.3px solid rgba(236, 72, 153, 0.45)', iconBg: 'rgba(236, 72, 153, 0.16)',
+    iconBorder: '1.2px solid rgba(236, 72, 153, 0.55)', iconGlow: '0 0 14px rgba(236, 72, 153, 0.35)',
   },
   titan: {
-    // 10000: Reddish (clean & normal, no heavy glow)
     btnGradient: 'linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%)',
     btnTextColor: 'text-white font-black drop-shadow-sm',
-    btnShadow: '0 0 18px rgba(239, 68, 68, 0.55)',
-    cardGlow: '0 4px 22px rgba(0, 0, 0, 0.7), 0 0 16px rgba(239, 68, 68, 0.18)',
-    cardBorder: '1.3px solid rgba(239, 68, 68, 0.45)',
-    iconBg: 'rgba(239, 68, 68, 0.16)',
-    iconBorder: '1.2px solid rgba(239, 68, 68, 0.55)',
-    iconGlow: '0 0 14px rgba(239, 68, 68, 0.35)',
+    btnShadow: '0 0 18px rgba(239, 68, 68, 0.55)', cardGlow: '0 4px 22px rgba(0,0,0,0.7), 0 0 16px rgba(239,68,68,0.18)',
+    cardBorder: '1.3px solid rgba(239, 68, 68, 0.45)', iconBg: 'rgba(239, 68, 68, 0.16)',
+    iconBorder: '1.2px solid rgba(239, 68, 68, 0.55)', iconGlow: '0 0 14px rgba(239, 68, 68, 0.35)',
   },
 };
 
@@ -115,6 +87,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMsg, setStatusMsg] = useState('');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [adminTab, setAdminTab] = useState<'logs' | 'coupons' | 'metrics'>('coupons');
   const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() =>
     currencyService.getDailyCollectStatus()
   );
@@ -201,15 +174,26 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           SHOP COUPON VAULT
         </span>
         {isUserAdmin(authService.getCurrentUser()) && (
-          <button
-            type="button"
-            onClick={() => setIsAdminOpen(true)}
-            className="flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)] transition-all"
-            title="Open Backend Operations Terminal"
-          >
-            <Database className="w-2.5 h-2.5 text-cyan-400" />
-            <span>OPS TERMINAL</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => { setAdminTab('coupons'); setIsAdminOpen(true); }}
+              className="flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 hover:bg-amber-500/30 cursor-pointer shadow-[0_0_8px_rgba(245,158,11,0.25)] transition-all"
+              title="Manage & Remove Coupons"
+            >
+              <Ticket className="w-2.5 h-2.5 text-amber-300" />
+              <span>COUPON ADMIN</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAdminTab('logs'); setIsAdminOpen(true); }}
+              className="flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)] transition-all"
+              title="Open Operations Logs"
+            >
+              <Database className="w-2.5 h-2.5 text-cyan-400" />
+              <span>OPS</span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -474,13 +458,28 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
                   <span className="tracking-widest">CLAIM IN SHOP</span>
                 )}
               </button>
+
+              {isUserAdmin(authService.getCurrentUser()) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPack(null);
+                    setAdminTab('coupons');
+                    setIsAdminOpen(true);
+                  }}
+                  className="w-full py-1.5 px-2 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500/25 font-mono text-[10px] flex items-center justify-center gap-1.5 transition-all cursor-pointer mt-0.5"
+                >
+                  <Ticket className="w-3 h-3 text-amber-300" />
+                  <span>ADMIN: MANAGE ALL COUPONS</span>
+                </button>
+              )}
             </form>
           </div>
         </div>
       )}
 
       {/* Backend Control & Operations Modal */}
-      <BackendAdminModal isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
+      <BackendAdminModal isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} initialTab={adminTab} />
     </div>
   );
 };

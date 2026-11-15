@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { X, Activity, Ticket, Database, CheckCircle, AlertCircle, RefreshCw, Trash2, Power, ShieldAlert } from 'lucide-react';
+import { X, Activity, Ticket, Database, CheckCircle, AlertCircle, RefreshCw, Trash2, Power, ShieldAlert, Copy, Search } from 'lucide-react';
 import { backendApi, BackendHealthResponse, BackendActivityLog, AdminCoupon } from '../../services/backendApi';
 import { authService, isUserAdmin } from '../../services/auth';
 
 interface BackendAdminModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialTab?: 'logs' | 'coupons' | 'metrics';
 }
 
-export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'logs' | 'coupons' | 'metrics'>('logs');
+export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, onClose, initialTab = 'coupons' }) => {
+  const [activeTab, setActiveTab] = useState<'logs' | 'coupons' | 'metrics'>(initialTab);
   const [health, setHealth] = useState<BackendHealthResponse | null>(null);
   const [logs, setLogs] = useState<BackendActivityLog[]>([]);
   const [coupons, setCoupons] = useState<AdminCoupon[]>([]);
   const [dashboard, setDashboard] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [couponFilter, setCouponFilter] = useState('');
 
   // New coupon form state
   const [newCode, setNewCode] = useState('');
@@ -29,17 +31,10 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
   const fetchAll = async () => {
     const user = authService.getCurrentUser();
     if (!isUserAdmin(user)) return;
-    if (!backendApi.hasAdminToken() && user.token) {
-      await backendApi.adminLogin(user.token);
-    }
+    if (!backendApi.hasAdminToken() && user.token) await backendApi.adminLogin(user.token);
     setIsLoading(true);
     try {
-      const [h, l, c, d] = await Promise.all([
-        backendApi.checkHealth(),
-        backendApi.getAdminLogs(60),
-        backendApi.getAdminCoupons(),
-        backendApi.getAdminDashboard(),
-      ]);
+      const [h, l, c, d] = await Promise.all([backendApi.checkHealth(), backendApi.getAdminLogs(60), backendApi.getAdminCoupons(), backendApi.getAdminDashboard()]);
       setHealth(h);
       if (Array.isArray(l)) setLogs(l);
       if (Array.isArray(c)) setCoupons(c);
@@ -53,11 +48,12 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
 
   useEffect(() => {
     if (isOpen) {
+      if (initialTab) setActiveTab(initialTab);
       fetchAll();
       const interval = setInterval(fetchAll, 12000);
       return () => clearInterval(interval);
     }
-  }, [isOpen]);
+  }, [isOpen, initialTab]);
 
   const handleCreateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,19 +77,19 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
     }
   };
 
-  const handleToggleCoupon = async (code: string) => {
-    const res = await backendApi.toggleCoupon(code);
+  const handleToggleCoupon = async (code: string, currentActive: boolean) => {
+    const res = await backendApi.toggleCoupon(code, !currentActive);
     if (res.success) {
-      setStatusMsg({ text: `Coupon ${code} updated`, type: 'success' });
+      setStatusMsg({ text: `Coupon ${code} set to ${!currentActive ? 'ACTIVE' : 'OFF'}`, type: 'success' });
       fetchAll();
     }
   };
 
   const handleDeleteCoupon = async (code: string) => {
-    if (!window.confirm(`Delete coupon ${code}?`)) return;
+    if (!window.confirm(`Permanently remove coupon ${code}?`)) return;
     const res = await backendApi.deleteCoupon(code);
     if (res.success) {
-      setStatusMsg({ text: `Coupon ${code} deleted`, type: 'success' });
+      setStatusMsg({ text: `Coupon ${code} removed successfully`, type: 'success' });
       fetchAll();
     }
   };
@@ -105,18 +101,9 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div className="w-full max-w-md rounded-2xl bg-[#080c24] border-2 border-red-500/50 p-6 flex flex-col items-center gap-3 text-center text-white font-tech shadow-[0_0_35px_rgba(239,68,68,0.3)]">
           <ShieldAlert className="w-10 h-10 text-red-400" />
-          <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider font-display">
-            ACCESS RESTRICTED // ADMIN ONLY
-          </h3>
-          <p className="text-xs text-slate-300">
-            This terminal requires authorization with your elsesourav.com administrator account. Please log in with your ElseSourav account to access backend controls.
-          </p>
-          <button
-            onClick={onClose}
-            className="mt-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all cursor-pointer"
-          >
-            DISMISS
-          </button>
+          <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider font-display">ACCESS RESTRICTED // ADMIN ONLY</h3>
+          <p className="text-xs text-slate-300">This terminal requires authorization with your elsesourav.com administrator account.</p>
+          <button onClick={onClose} className="mt-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all cursor-pointer">DISMISS</button>
         </div>
       </div>
     );
@@ -301,43 +288,24 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
                 <div>
                   <label className="text-[10px] text-slate-400 block mb-0.5">PER-USER REDEMPTION RULE</label>
                   <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setPerUserRule('1')}
-                      className={`flex-1 py-1 px-1.5 rounded text-[10px] font-bold transition-all ${
-                        perUserRule === '1'
-                          ? 'bg-cyan-500 text-black shadow-[0_0_8px_rgba(0,247,255,0.4)]'
-                          : 'bg-black/60 border border-cyan-500/30 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      1-Time (Default)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPerUserRule('multi')}
-                      className={`flex-1 py-1 px-1.5 rounded text-[10px] font-bold transition-all ${
-                        perUserRule === 'multi'
-                          ? 'bg-cyan-500 text-black shadow-[0_0_8px_rgba(0,247,255,0.4)]'
-                          : 'bg-black/60 border border-cyan-500/30 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      Multiple
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPerUserRule('unlimited')}
-                      className={`flex-1 py-1 px-1.5 rounded text-[10px] font-bold transition-all ${
-                        perUserRule === 'unlimited'
-                          ? 'bg-cyan-500 text-black shadow-[0_0_8px_rgba(0,247,255,0.4)]'
-                          : 'bg-black/60 border border-cyan-500/30 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      Unlimited
-                    </button>
+                    {(['1', 'multi', 'unlimited'] as const).map((rule) => (
+                      <button
+                        key={rule}
+                        type="button"
+                        onClick={() => setPerUserRule(rule)}
+                        className={`flex-1 py-1 px-1 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                          perUserRule === rule
+                            ? 'bg-cyan-500 text-black shadow-[0_0_8px_rgba(0,247,255,0.4)]'
+                            : 'bg-black/60 border border-cyan-500/30 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {rule === '1' ? '1-Time' : rule === 'multi' ? 'Multi' : 'Unlimited'}
+                      </button>
+                    ))}
                   </div>
                   {perUserRule === 'multi' && (
                     <div className="mt-1 flex items-center gap-1.5">
-                      <span className="text-[9px] text-slate-400">Max uses per user:</span>
+                      <span className="text-[9px] text-slate-400">Max uses/user:</span>
                       <input
                         type="number"
                         min="2"
@@ -393,18 +361,52 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
 
             {/* Existing Coupons Table */}
             <div className="space-y-1.5">
-              <h4 className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Active Promo Codes</h4>
-              <div className="space-y-1.5">
-                {coupons.map((c) => {
+              <div className="flex items-center justify-between">
+                <h4 className="text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Manage Active Coupons</span>
+                  <span className="px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[9px]">
+                    {coupons.length}
+                  </span>
+                </h4>
+                {coupons.length > 3 && (
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Filter codes..."
+                      value={couponFilter}
+                      onChange={(e) => setCouponFilter(e.target.value)}
+                      className="px-2 py-0.5 pl-5 bg-black/60 border border-cyan-500/30 rounded text-[10px] text-white outline-none w-28 focus:w-36 transition-all"
+                    />
+                    <Search className="w-2.5 h-2.5 text-slate-400 absolute left-1.5 top-1.5" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-1.5 max-h-60 overflow-y-auto pr-0.5">
+                {coupons.filter(c => c.code.toLowerCase().includes(couponFilter.toLowerCase()) || String(c.pack_cores).includes(couponFilter)).map((c) => {
                   const isUnlimited = Boolean(c.is_unlimited || c.max_uses <= 0);
                   const perUser = c.per_user_limit !== undefined && c.per_user_limit !== null ? Number(c.per_user_limit) : 1;
                   return (
                     <div
                       key={c.code}
-                      className="p-2.5 rounded-lg bg-black/40 border border-cyan-500/20 flex items-center justify-between gap-3 text-xs"
+                      className={`p-2.5 rounded-lg border flex items-center justify-between gap-3 text-xs transition-all ${
+                        c.is_active ? 'bg-black/50 border-cyan-500/25' : 'bg-black/30 border-slate-700/40 opacity-70'
+                      }`}
                     >
-                      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                        <span className="font-mono font-bold text-amber-300 text-sm tracking-wide">{c.code}</span>
+                      <div className="flex items-center gap-2 sm:gap-3 flex-wrap min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-amber-300 text-sm tracking-wide">{c.code}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(c.code);
+                              setStatusMsg({ text: `Copied ${c.code} to clipboard`, type: 'success' });
+                            }}
+                            className="text-slate-400 hover:text-cyan-300 p-0.5 cursor-pointer"
+                            title="Copy Code"
+                          >
+                            <Copy className="w-3 h-3" />
+                          </button>
+                        </div>
                         <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">
                           +{c.reward_cores} Cores (Pack {c.pack_cores})
                         </span>
@@ -420,26 +422,31 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
                           {perUser === 1 ? '1x / User' : perUser === 0 ? '∞ / User' : `${perUser}x / User`}
                         </span>
                         <span className="text-[10px] text-slate-400 font-mono">
-                          Used: {c.used_count} / {isUnlimited ? '∞ Unlimited' : c.max_uses}
+                          Used: {c.used_count} / {isUnlimited ? '∞' : c.max_uses}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
                         <button
-                          onClick={() => handleToggleCoupon(c.code)}
-                          className={`p-1 rounded text-[10px] font-bold flex items-center gap-1 ${
-                            c.is_active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700 text-slate-400'
+                          type="button"
+                          onClick={() => handleToggleCoupon(c.code, Boolean(c.is_active))}
+                          className={`py-1 px-2 rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all ${
+                            c.is_active
+                              ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30'
+                              : 'bg-slate-800 border border-slate-700 text-slate-400 hover:text-white'
                           }`}
-                          title={c.is_active ? 'Disable Coupon' : 'Enable Coupon'}
+                          title={c.is_active ? 'Click to Disable' : 'Click to Enable'}
                         >
                           <Power className="w-3 h-3" />
-                          {c.is_active ? 'ACTIVE' : 'OFF'}
+                          <span>{c.is_active ? 'ACTIVE' : 'OFF'}</span>
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDeleteCoupon(c.code)}
-                          className="p-1 rounded bg-rose-500/20 text-rose-300 hover:bg-rose-500/30"
-                          title="Delete Coupon"
+                          className="py-1 px-2 rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30 cursor-pointer flex items-center gap-1 text-[10px] font-bold transition-all"
+                          title="Remove Coupon Permanently"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-3 h-3" />
+                          <span>REMOVE</span>
                         </button>
                       </div>
                     </div>
@@ -470,11 +477,11 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
               ))}
             </div>
 
-            <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-xs space-y-1 font-mono text-slate-300">
+            <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-slate-300 leading-relaxed">
               <div className="text-cyan-400 font-bold mb-1">// SYSTEM ARCHITECTURE</div>
-              <div>• Storage Engine: SQLite (Native WAL mode, zero external compilation)</div>
-              <div>• Cloud Synchronization: Dual-Write (Local SQLite + Cloud Firestore)</div>
-              <div>• Host: Local port 4000 (Ready for VM3 Azure deployment via PM2)</div>
+              <p>• Storage Engine: SQLite (Native WAL mode, zero external compilation)</p>
+              <p>• Cloud Synchronization: Dual-Write (Local SQLite + Cloud Firestore)</p>
+              <p>• Production Host: VM3 Azure / PM2 Daemon (api.elsesourav.com:4000)</p>
             </div>
           </div>
         )}
