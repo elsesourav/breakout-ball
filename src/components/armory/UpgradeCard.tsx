@@ -13,6 +13,82 @@ interface UpgradeCardProps {
   icon?: React.ReactNode;
 }
 
+function getStatBreakdown(upgrade: UpgradeDef, level: number): {
+  statName: string;
+  current: string;
+  delta: string | null;
+} {
+  switch (upgrade.id) {
+    case 'ball_speed':
+      return {
+        statName: 'Velocity',
+        current: `+${level * 8}%`,
+        delta: '+8%',
+      };
+    case 'ball_size':
+      return {
+        statName: 'Radius',
+        current: `+${level * 5}%`,
+        delta: '+5%',
+      };
+    case 'ball_impact':
+      return {
+        statName: 'Damage',
+        current: `+${level * 12}%`,
+        delta: '+12%',
+      };
+    case 'paddle_width':
+      return {
+        statName: 'Width',
+        current: `+${level * 8}%`,
+        delta: '+8%',
+      };
+    case 'paddle_speed':
+      return {
+        statName: 'Speed',
+        current: `+${level * 10}%`,
+        delta: '+10%',
+      };
+    case 'plasma_power':
+    case 'expand_power':
+      return {
+        statName: 'Duration',
+        current: `${(6 + level * 1.14).toFixed(1)}s`,
+        delta: '+1.1s',
+      };
+    case 'mega_power':
+      return {
+        statName: 'Duration',
+        current: `${(5 + level * 1.0).toFixed(1)}s`,
+        delta: '+1.0s',
+      };
+    case 'slowmo_power':
+      return {
+        statName: 'Duration',
+        current: `${(4 + level * 0.86).toFixed(1)}s`,
+        delta: '+0.9s',
+      };
+    case 'multi_power':
+      return {
+        statName: 'Balls',
+        current: `${level + 1}`,
+        delta: '+1',
+      };
+    case 'shield_power':
+      return {
+        statName: 'Shield',
+        current: `${level}`,
+        delta: '+1',
+      };
+    default:
+      return {
+        statName: 'Level',
+        current: upgrade.statLabel(level),
+        delta: null,
+      };
+  }
+}
+
 export const UpgradeCard: React.FC<UpgradeCardProps> = ({
   upgrade,
   level,
@@ -23,6 +99,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
 }) => {
   const isMax = level >= upgrade.maxLevel;
   const canAfford = !isMax && cores >= cost;
+  const statBreakdown = getStatBreakdown(upgrade, level);
 
   const handleUpgradeClick = () => {
     if (!canAfford) return;
@@ -40,7 +117,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
       }}
       className="p-3 flex flex-col gap-2 relative overflow-hidden transition-all duration-200"
     >
-      {/* Top Row: Symbol Icon + Name + Stat Badge */}
+      {/* Top Row: Symbol Icon + Name + Stat Breakdown (+ green boost) */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div
@@ -58,12 +135,22 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
             <h4 className="font-display font-black text-xs text-white tracking-wide leading-tight">
               {upgrade.name}
             </h4>
-            <span
-              style={{ color: upgrade.accentColor }}
-              className="font-tech text-[10px] font-bold"
-            >
-              {upgrade.statLabel(level)}
-            </span>
+            <div className="flex items-center gap-1 mt-0.5">
+              <span className="font-tech text-[10px] text-slate-400 font-semibold uppercase">
+                {statBreakdown.statName}:
+              </span>
+              <span
+                style={{ color: upgrade.accentColor }}
+                className="font-tech text-[10px] font-bold"
+              >
+                {statBreakdown.current}
+              </span>
+              {!isMax && statBreakdown.delta && (
+                <span className="font-tech text-[10px] text-emerald-400 font-extrabold ml-0.5">
+                  +{statBreakdown.delta.replace(/^\+/, '')}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -112,41 +199,69 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
         })}
       </div>
 
-      {/* Action Footer: Next Stat & Upgrade Button (No horizontal divider line) */}
+      {/* Action Footer: Left = Cost, Right = Upgrade Action Button */}
       <div className="flex items-center justify-between pt-1 mt-0.5">
+        {/* Left Side: Upgrade Cost with CoreIcon */}
         <div className="flex items-center gap-1.5">
-          <span className="font-tech text-[9px] text-slate-400 uppercase tracking-wider">
-            {isMax ? 'PEAK' : 'NEXT:'}
-          </span>
-          <span className="font-tech text-[10px] text-emerald-400 font-bold">
-            {isMax ? 'MAX OVERDRIVE' : upgrade.nextLabel(level)}
-          </span>
+          {!isMax ? (
+            <div className="flex items-center gap-1.5">
+              <span className="font-tech text-[9px] text-slate-400 uppercase tracking-wider font-semibold">
+                COST:
+              </span>
+              <div
+                style={{
+                  backgroundColor: canAfford ? 'rgba(0, 247, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                  border: `1px solid ${canAfford ? 'rgba(0, 247, 255, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`,
+                }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-md shadow-inner"
+              >
+                <CoreIcon size={12} glow={canAfford} variant="cyan" />
+                <span
+                  className={`font-tech font-extrabold text-xs ${
+                    canAfford ? 'text-cyan-200' : 'text-slate-400'
+                  }`}
+                >
+                  {cost.toLocaleString()}
+                </span>
+                <span className="font-tech text-[8.5px] text-cyan-400 font-semibold uppercase tracking-wider">
+                  CORES
+                </span>
+              </div>
+            </div>
+          ) : (
+            <span className="text-emerald-400 font-tech font-bold text-xs flex items-center gap-1">
+              <Award className="w-3.5 h-3.5" />
+              MAXED OUT
+            </span>
+          )}
         </div>
 
+        {/* Right Side: Upgrade Action Button */}
         {!isMax ? (
           <button
             type="button"
             disabled={!canAfford}
             onClick={handleUpgradeClick}
             style={{
-              backgroundColor: canAfford ? upgrade.accentColor : 'rgba(10, 15, 36, 0.7)',
-              border: `1.2px solid ${canAfford ? upgrade.accentColor : 'rgba(0, 247, 255, 0.15)'}`,
+              background: canAfford
+                ? `linear-gradient(135deg, ${upgrade.accentColor} 0%, #0284c7 100%)`
+                : 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%)',
+              border: canAfford
+                ? `1.5px solid ${upgrade.accentColor}`
+                : '1.2px solid rgba(255, 255, 255, 0.1)',
               color: canAfford ? '#000000' : '#64748b',
-              boxShadow: canAfford ? `0 0 10px ${upgrade.glowColor}` : 'none',
+              boxShadow: canAfford
+                ? `0 0 14px ${upgrade.glowColor}, inset 0 1px 0 rgba(255, 255, 255, 0.35)`
+                : 'none',
             }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg font-tech font-bold text-xs transition-all cursor-pointer active:scale-95 disabled:cursor-not-allowed"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl font-tech font-black text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ChevronUp className="w-3.5 h-3.5 stroke-[3]" />
             <span>UPGRADE</span>
-            <span className="text-[10px] opacity-90 font-mono inline-flex items-center gap-0.5">
-              ({cost}
-              <CoreIcon size={10} glow={false} variant="cyan" />)
-            </span>
           </button>
         ) : (
-          <span className="text-emerald-400 font-tech font-bold text-xs flex items-center gap-1">
-            <Award className="w-3.5 h-3.5" />
-            MAXED
+          <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/35 text-emerald-400 font-tech font-bold text-[10px] tracking-wider uppercase">
+            PEAK
           </span>
         )}
       </div>

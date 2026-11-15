@@ -2,7 +2,7 @@ import React from 'react';
 
 // ─── 1. Top Navigation Icons ─────────────────────────────────────
 
-/** Custom Cyber Wrench / Kinetic Circuit Icon for UPGRADE Section */
+/** Custom Cyber Kinetic Upgrade / Ascension Chevron Icon for UPGRADE Section */
 export const UpgradeTabIcon: React.FC<{ className?: string; size?: number }> = ({
   className = '',
   size = 18,
@@ -15,14 +15,25 @@ export const UpgradeTabIcon: React.FC<{ className?: string; size?: number }> = (
     xmlns="http://www.w3.org/2000/svg"
     className={`inline-block select-none ${className}`}
   >
+    {/* Upper Tech Level-Up Chevron */}
     <path
-      d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+      d="M4.5 10.5L12 4L19.5 10.5"
       stroke="currentColor"
-      strokeWidth="2.2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" />
+    {/* Lower Tier Boost Chevron */}
+    <path
+      d="M4.5 17.5L12 11L19.5 17.5"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeOpacity="0.75"
+    />
+    {/* Kinetic Apex Core Crystal */}
+    <circle cx="12" cy="7.5" r="1.5" fill="currentColor" />
   </svg>
 );
 
