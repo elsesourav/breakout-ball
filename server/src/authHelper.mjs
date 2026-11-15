@@ -26,10 +26,11 @@ const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY || 'breakout_master_admin_
 export const activeAdminSessions = new Map();
 
 export function generateAdminToken(username, email) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.createHmac('sha256', ADMIN_SECRET_KEY).update(`${username}:${email}:${salt}:${Date.now()}`).digest('hex');
-  const token = `adm_${hash}`;
-  const expiresAt = Date.now() + 7 * 24 * 3600 * 1000; // 7 days valid
+  const expiresAt = Date.now() + 7 * 24 * 3600 * 1000;
+  const payload = JSON.stringify({ u: username, e: email, exp: expiresAt });
+  const b64 = Buffer.from(payload).toString('base64url');
+  const sig = crypto.createHmac('sha256', ADMIN_SECRET_KEY).update(b64).digest('hex');
+  const token = `adm_${b64}.${sig}`;
   activeAdminSessions.set(token, { username, email, expiresAt });
   return { token, expiresAt };
 }
@@ -98,6 +99,24 @@ export async function requireAdminAuth(req, res, next) {
   if (session && Date.now() <= session.expiresAt) {
     req.adminUser = session.username;
     return next();
+  }
+
+  // 1b. Check HMAC-signed admin session token (stateless across cluster workers)
+  if (token.startsWith('adm_')) {
+    const parts = token.slice(4).split('.');
+    if (parts.length === 2) {
+      const [b64, sig] = parts;
+      const expectedSig = crypto.createHmac('sha256', ADMIN_SECRET_KEY).update(b64).digest('hex');
+      if (sig === expectedSig) {
+        try {
+          const data = JSON.parse(Buffer.from(b64, 'base64url').toString('utf8'));
+          if (data.exp > Date.now()) {
+            req.adminUser = data.u;
+            return next();
+          }
+        } catch {}
+      }
+    }
   }
 
   // 2. Check if token is a direct Supabase JWT from ElseSourav Auth
