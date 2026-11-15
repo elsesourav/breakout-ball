@@ -12,22 +12,25 @@ export const CyberSectionHeader: React.FC<CyberSectionHeaderProps> = ({
   rightSlot,
 }) => {
   return (
-    <div className="w-full max-w-sm px-3.5 pt-4 pb-2 flex items-center justify-between select-none">
-      {/* Kicker Tag (smaller text) & Main Subtext (increased text size) */}
-      <div className="flex flex-col">
+    <div className="w-full max-w-sm px-3.5 pt-3.5 pb-2 flex items-center justify-between select-none">
+      {/* Category Kicker & Single-line Subtext */}
+      <div className="flex flex-col max-w-[210px] overflow-hidden">
         <span
-          className="font-tech text-[10px] font-bold tracking-widest text-cyan-400 uppercase leading-none mb-1"
-          style={{ textShadow: '0 0 8px rgba(0, 247, 255, 0.4)' }}
+          className="font-display font-black text-xs tracking-wider text-cyan-300 leading-none mb-1 truncate"
+          style={{
+            color: '#00f7ff',
+            textShadow: '0 0 10px rgba(0, 247, 255, 0.4)',
+          }}
         >
           {title}
         </span>
-        <h2 className="font-display font-black text-xs tracking-wider text-slate-100 uppercase leading-tight">
+        <span className="font-tech text-[9.5px] text-slate-400 font-medium tracking-widest uppercase leading-none truncate">
           {subtitle}
-        </h2>
+        </span>
       </div>
 
       {/* Right Slot (e.g. Cores Badge) */}
-      {rightSlot && <div className="flex items-center">{rightSlot}</div>}
+      {rightSlot && <div className="flex items-center flex-shrink-0">{rightSlot}</div>}
     </div>
   );
 };

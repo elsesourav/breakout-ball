@@ -11,7 +11,7 @@ import { BallSkinSelector } from './profile/BallSkinSelector';
 import { CyberSectionHeader } from './CyberSectionHeader';
 import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
 
-type ArmoryTab = 'hangar' | 'kinetics' | 'augments' | 'vault';
+type ArmoryTab = 'hangar' | 'kinetics' | 'augments' | 'shop';
 
 export const ArmoryView: React.FC = () => {
   const { user } = useGame();
@@ -20,6 +20,7 @@ export const ArmoryView: React.FC = () => {
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [upgrades, setUpgrades] = useState<UpgradeState>(() => currencyService.getUpgrades());
   const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
+  const [claimAmount, setClaimAmount] = useState<number>(500);
   const [isPulsing, setIsPulsing] = useState<boolean>(false);
   const countUpRef = useRef<number | null>(null);
 
@@ -33,7 +34,7 @@ export const ArmoryView: React.FC = () => {
     });
   }, [user.username]);
 
-  // Smooth count-up counter animation when cores increase
+  // Smooth, gradual count-up counter animation over 1.8s
   const startCountUp = useCallback((target: number) => {
     if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
 
@@ -44,13 +45,14 @@ export const ArmoryView: React.FC = () => {
       return;
     }
 
-    const duration = 1200; // ms
+    const duration = 1800; // ms
     const startTime = performance.now();
 
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      // Smooth ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 2.5);
       const current = Math.round(startVal + diff * eased);
       setDisplayCores(current);
 
@@ -79,16 +81,18 @@ export const ArmoryView: React.FC = () => {
 
   const handleClaimSuccess = useCallback(
     (coresGranted: number) => {
+      setClaimAmount(coresGranted);
       setIsFlyingCores(true);
       const newBalance = currencyService.getBalance();
       setCores(newBalance);
       setUpgrades(currencyService.getUpgrades());
 
+      // Delayed gradual count-up as crystals travel up
       setTimeout(() => {
         setIsPulsing(true);
         startCountUp(newBalance);
-        setTimeout(() => setIsPulsing(false), 800);
-      }, 500);
+        setTimeout(() => setIsPulsing(false), 2000);
+      }, 450);
     },
     [startCountUp]
   );
@@ -97,7 +101,7 @@ export const ArmoryView: React.FC = () => {
     { id: 'hangar', label: 'HANGAR', icon: Palette },
     { id: 'kinetics', label: 'KINETICS', icon: Gauge },
     { id: 'augments', label: 'AUGMENTS', icon: Flame },
-    { id: 'vault', label: 'VAULT', icon: ShoppingBag },
+    { id: 'shop', label: 'SHOP', icon: ShoppingBag },
   ];
 
   return (
@@ -111,41 +115,44 @@ export const ArmoryView: React.FC = () => {
       {/* Flying Cores Animation from Center Claim to Top Badge */}
       <FlyingCoresAnimation
         active={isFlyingCores}
+        amount={claimAmount}
         onComplete={() => setIsFlyingCores(false)}
       />
 
-      {/* 1. Top Cyber Section Header with Cores Badge on the Right */}
-      <CyberSectionHeader
-        title="CYBER ARMORY"
-        subtitle="KINETIC UPGRADES & WORKSHOP"
-        rightSlot={
-          <div
-            style={{
-              background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
-              border: isPulsing
-                ? '1.5px solid #00f7ff'
-                : '1.2px solid rgba(0, 247, 255, 0.45)',
-              boxShadow: isPulsing
-                ? '0 0 22px rgba(0, 247, 255, 0.8), inset 0 0 10px rgba(0, 247, 255, 0.4)'
-                : '0 0 12px rgba(0, 247, 255, 0.25)',
-              transform: isPulsing ? 'scale(1.12)' : 'scale(1)',
-              transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            }}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-default"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-            <span className="font-tech font-bold text-xs text-cyan-200">
-              {displayCores.toLocaleString()}
-            </span>
-            <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
-              CORES
-            </span>
-          </div>
-        }
-      />
+      {/* 1. Sticky Top Cyber Section Header - ALWAYS VISIBLE AT THE TOP */}
+      <div className="sticky top-0 z-[60] w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md border-b border-cyan-500/15 shadow-lg">
+        <CyberSectionHeader
+          title="CYBER ARMORY"
+          subtitle="KINETIC UPGRADES & WORKSHOP"
+          rightSlot={
+            <div
+              style={{
+                background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
+                border: isPulsing
+                  ? '1.5px solid #00f7ff'
+                  : '1.2px solid rgba(0, 247, 255, 0.45)',
+                boxShadow: isPulsing
+                  ? '0 0 25px rgba(0, 247, 255, 0.85), inset 0 0 10px rgba(0, 247, 255, 0.4)'
+                  : '0 0 12px rgba(0, 247, 255, 0.25)',
+                transform: isPulsing ? 'scale(1.16)' : 'scale(1)',
+                transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              }}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-default"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+              <span className="font-tech font-bold text-xs text-cyan-200">
+                {displayCores.toLocaleString()}
+              </span>
+              <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
+                CORES
+              </span>
+            </div>
+          }
+        />
+      </div>
 
-      {/* 2. Fluid Animated Tab Switcher with Modern Cyberpunk Terminology */}
-      <div className="w-full max-w-sm px-3.5 mt-1 mb-3">
+      {/* 2. Fluid Animated Tab Switcher */}
+      <div className="w-full max-w-sm px-3.5 mt-2.5 mb-3">
         <div className="flex items-center gap-1 p-1 rounded-2xl bg-[#080d26]/90 border border-cyan-500/20 shadow-lg relative">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -166,13 +173,13 @@ export const ArmoryView: React.FC = () => {
                     transition={{ type: 'spring', bounce: 0.18, duration: 0.45 }}
                     style={{
                       background:
-                        tab.id === 'vault'
+                        tab.id === 'shop'
                           ? 'linear-gradient(135deg, #ffd700 0%, #f59e0b 100%)'
                           : tab.id === 'augments'
                           ? 'linear-gradient(135deg, #b773ff 0%, #7c3aed 100%)'
                           : 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
                       boxShadow:
-                        tab.id === 'vault'
+                        tab.id === 'shop'
                           ? '0 0 14px rgba(255, 215, 0, 0.4)'
                           : tab.id === 'augments'
                           ? '0 0 14px rgba(183, 115, 255, 0.4)'
@@ -207,7 +214,7 @@ export const ArmoryView: React.FC = () => {
             {activeTab === 'augments' && (
               <PowerTab upgrades={upgrades} cores={cores} onUpgrade={handleUpgrade} />
             )}
-            {activeTab === 'vault' && (
+            {activeTab === 'shop' && (
               <ShopTab
                 cores={cores}
                 username={user.username}

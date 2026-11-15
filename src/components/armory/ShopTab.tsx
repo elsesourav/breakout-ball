@@ -55,7 +55,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
       onClaimSuccess(res.coresGranted);
       setTimeout(() => {
         handleCloseModal();
-      }, 1600);
+      }, 2400);
     } else {
       soundManager.play('damage');
       setStatus('error');
