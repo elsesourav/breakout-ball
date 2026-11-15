@@ -126,7 +126,11 @@ export const AchievementsList: React.FC = () => {
 
       {/* 2. Independently Scrollable Achievements Cards List */}
       <div
-        className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 no-scrollbar"
+        className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 no-scrollbar min-h-0"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
+        }}
         data-inner-scroll="true"
       >
         {displayedList.map((ach) => {

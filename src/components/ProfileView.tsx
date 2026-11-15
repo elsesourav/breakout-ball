@@ -31,6 +31,7 @@ export const ProfileView: React.FC = () => {
     setAuthMode,
     localProgress,
     userCreatedLevels,
+    logoutUser,
   } = useGame();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(() => {
@@ -126,7 +127,7 @@ export const ProfileView: React.FC = () => {
     };
   }, [isSettingsOpen, activeSection]);
 
-  // Desktop Mouse Wheel Coordinator: smooth transition between hero collapse and internal card scroll
+  // Universal Wheel & Touch Coordinator: seamless scrolling on desktop and mobile
   useEffect(() => {
     if (isSettingsOpen) return;
 
@@ -135,6 +136,7 @@ export const ProfileView: React.FC = () => {
 
     const getInner = () => outer.querySelector<HTMLElement>('[data-inner-scroll="true"]');
 
+    // 1. Wheel Coordinator (Mouse Wheel & Trackpad)
     const handleWheel = (e: WheelEvent) => {
       const deltaY = e.deltaY;
       if (!deltaY) return;
@@ -143,33 +145,80 @@ export const ProfileView: React.FC = () => {
       const maxOuter = maxOuterRef.current;
 
       if (deltaY > 0) {
-        // Scrolling DOWN (page moves up)
+        // Scrolling DOWN (moving content UP)
         if (outer.scrollTop < maxOuter - 0.5) {
-          // Body scrolls first until sticky header hits the top!
           e.preventDefault();
           outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
         } else if (inner) {
-          // Body is locked at sticky top, now scroll table inside!
-          e.preventDefault();
-          inner.scrollTop += deltaY;
+          const maxInner = inner.scrollHeight - inner.clientHeight;
+          if (inner.scrollTop < maxInner - 0.5) {
+            e.preventDefault();
+            inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
+          }
         }
       } else if (deltaY < 0) {
-        // Scrolling UP (page moves down)
+        // Scrolling UP (moving content DOWN)
         if (inner && inner.scrollTop > 0.5) {
-          // Table inside must finish scrolling first!
           e.preventDefault();
           inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
         } else if (outer.scrollTop > 0) {
-          // Table is at row 1, now page scrolls up revealing hero card!
           e.preventDefault();
           outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
         }
       }
     };
 
+    // 2. Touch Coordinator (Mobile Phone & Tablet Touch Swiping)
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        touchStartY = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY - currentY; // positive = dragging content up / scrolling down
+      touchStartY = currentY;
+
+      if (Math.abs(deltaY) < 0.5) return;
+
+      const inner = getInner();
+      const maxOuter = maxOuterRef.current;
+
+      if (deltaY > 0) {
+        // Dragging content UP
+        if (outer.scrollTop < maxOuter - 0.5) {
+          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
+          if (e.cancelable) e.preventDefault();
+        } else if (inner) {
+          const maxInner = inner.scrollHeight - inner.clientHeight;
+          if (inner.scrollTop < maxInner - 0.5) {
+            inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
+            if (e.cancelable) e.preventDefault();
+          }
+        }
+      } else if (deltaY < 0) {
+        // Dragging content DOWN
+        if (inner && inner.scrollTop > 0.5) {
+          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
+          if (e.cancelable) e.preventDefault();
+        } else if (outer.scrollTop > 0) {
+          outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
+          if (e.cancelable) e.preventDefault();
+        }
+      }
+    };
+
     outer.addEventListener('wheel', handleWheel, { passive: false });
+    outer.addEventListener('touchstart', handleTouchStart, { passive: true });
+    outer.addEventListener('touchmove', handleTouchMove, { passive: false });
+
     return () => {
       outer.removeEventListener('wheel', handleWheel);
+      outer.removeEventListener('touchstart', handleTouchStart);
+      outer.removeEventListener('touchmove', handleTouchMove);
     };
   }, [isSettingsOpen]);
 
@@ -194,16 +243,10 @@ export const ProfileView: React.FC = () => {
     setIsAuthModalOpen(true);
   };
 
-  const handleSignOut = () => {
-    soundManager.play('click');
-    updateUser({
-      fullName: 'Anonymous',
-      username: 'anonymous',
-      email: '',
-      avatarUrl: undefined,
-      provider: undefined,
-      isLoggedIn: false,
-    });
+  const handleSignOut = async () => {
+    await logoutUser();
+    setIsSettingsOpen(false);
+    setUnlockedBadgesCount(0);
   };
 
   const handleSectionSwitch = (section: 'badges' | 'leaderboard') => {
@@ -231,7 +274,7 @@ export const ProfileView: React.FC = () => {
     <div
       ref={outerContainerRef}
       onScroll={handleOuterScroll}
-      className="w-full h-full relative overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 pt-0 pb-0 select-none cyber-grid-bg no-scrollbar"
+      className="w-full h-full relative overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 pt-0 pb-6 cyber-grid-bg no-scrollbar"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',

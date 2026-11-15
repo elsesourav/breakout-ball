@@ -1702,4 +1702,19 @@ button[role="switch"] span,
   }
 }
 
+/* White button bright ambient glow animation */
+.btn-white-glow {
+  animation: pulse-white-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse-white-glow {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.8), 0 0 28px rgba(255, 255, 255, 0.5), inset 0 0 6px rgba(255, 255, 255, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(255, 255, 255, 1), 0 0 46px rgba(255, 255, 255, 0.75), inset 0 0 10px rgba(255, 255, 255, 1);
+  }
+}
+
+
 

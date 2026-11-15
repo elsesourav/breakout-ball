@@ -114,6 +114,17 @@ app.post('/api/levels/complete', (req, res) => {
   }
 });
 
+app.get('/api/levels/user/:username', (req, res) => {
+  try {
+    const { username } = req.params;
+    const completions = completionRepository.getUserCompletions(username);
+    const user = userRepository.get(username);
+    res.json({ success: true, username, completions, user: user || null });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. LEADERBOARDS (REAL DATA FROM DATABASE)
 // ─────────────────────────────────────────────────────────────────────────────

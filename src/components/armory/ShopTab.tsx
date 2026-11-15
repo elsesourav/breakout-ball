@@ -275,17 +275,17 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
             </span>
           </div>
 
-          {/* Action Button: Clean White Button with "CLAIM" text and smooth continuous shine */}
+          {/* Action Button: Glowing White Button with "CLAIM" text and smooth continuous shine */}
           {dailyStatus.canCollect ? (
             <button
               type="button"
               onClick={(e) => handleClaimDaily(e)}
               disabled={isClaimingDaily}
               style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%)',
-                boxShadow: '0 2px 10px rgba(255, 255, 255, 0.25), 0 0 10px rgba(0, 247, 255, 0.2)',
+                background: 'linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #f1f5f9 100%)',
+                border: '1.5px solid #ffffff',
               }}
-              className="w-full py-2 px-2 rounded-xl font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:brightness-105 flex items-center justify-center gap-1.5 shadow-md relative overflow-hidden btn-shine-sweep select-none"
+              className="w-full py-2 px-2 rounded-xl font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:brightness-105 flex items-center justify-center gap-1.5 shadow-md relative overflow-hidden btn-shine-sweep btn-white-glow select-none"
             >
               <Ticket className="w-3.5 h-3.5 stroke-[2.8] text-[#090d1f] relative z-10" />
               <span className="tracking-widest font-black text-[#090d1f] relative z-10">CLAIM</span>

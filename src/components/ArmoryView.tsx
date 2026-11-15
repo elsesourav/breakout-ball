@@ -225,7 +225,7 @@ export const ArmoryView: React.FC = () => {
   return (
     <div
       ref={scrollContainerRef}
-      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pb-28 select-none cyber-grid-bg"
+      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pb-16 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',
@@ -331,14 +331,8 @@ export const ArmoryView: React.FC = () => {
                       layoutId="armory-main-section-indicator"
                       transition={{ type: 'spring', bounce: 0.18, duration: 0.45 }}
                       style={{
-                        background:
-                          sec.id === 'shop'
-                            ? 'linear-gradient(135deg, #ffd700 0%, #f59e0b 100%)'
-                            : 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
-                        boxShadow:
-                          sec.id === 'shop'
-                            ? '0 0 16px rgba(255, 215, 0, 0.45)'
-                            : '0 0 16px rgba(0, 247, 255, 0.45)',
+                        background: 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
+                        boxShadow: '0 0 16px rgba(0, 247, 255, 0.45)',
                       }}
                       className="absolute inset-0 rounded-xl -z-10"
                     />
@@ -402,7 +396,7 @@ export const ArmoryView: React.FC = () => {
       </div>
 
       {/* ── 3. CONTENT AREA (Scrolls under sticky switchers) ──────────────────── */}
-      <div className="w-full max-w-sm px-4 sm:px-5 pb-8 pt-2">
+      <div className="w-full max-w-sm px-4 sm:px-5 pb-3 pt-2">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}

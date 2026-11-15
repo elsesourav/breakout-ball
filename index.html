@@ -51,23 +51,26 @@
   </head>
   <body>
     <div id="root">
-      <div style="position:fixed;inset:0;background:#050714;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;user-select:none;z-index:99999;">
-        <div style="position:relative;margin-bottom:20px;display:flex;align-items:center;justify-content:center;">
-          <img src="/logo.png" alt="Breakout Ball" style="width:96px;height:96px;border-radius:24px;border:2px solid rgba(0,247,255,0.7);box-shadow:0 0 35px rgba(245,158,11,0.45),0 0 65px rgba(0,247,255,0.35);object-fit:cover;" />
+      <div style="position:fixed;inset:0;background:#030408;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;user-select:none;z-index:99999;">
+        <div style="width:80px;height:80px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);box-shadow:0 10px 30px rgba(0,0,0,0.8);margin-bottom:20px;">
+          <img src="/logo.png" alt="Breakout Ball" style="width:100%;height:100%;object-fit:cover;" />
         </div>
-        <div style="font-size:24px;font-weight:900;letter-spacing:0.15em;background:linear-gradient(90deg,#00f7ff,#38bdf8,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+        <div style="font-size:20px;font-weight:900;letter-spacing:0.12em;color:#ffffff;margin-bottom:4px;">
           BREAKOUT BALL
         </div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.3em;color:rgba(0,247,255,0.8);margin-top:8px;margin-bottom:24px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.25em;color:rgba(0,247,255,0.7);margin-bottom:28px;">
           CYBERPUNK NEON ARCADE
         </div>
-        <div style="width:240px;height:6px;background:rgba(0,0,0,0.6);border:1px solid rgba(0,247,255,0.3);border-radius:9999px;overflow:hidden;position:relative;">
-          <div style="height:100%;width:35%;background:linear-gradient(90deg,#00f7ff,#38bdf8,#fbbf24);border-radius:9999px;box-shadow:0 0 12px #00f7ff;animation:pulseBar 1.2s ease-in-out infinite alternate;"></div>
+        <div style="width:192px;height:4px;background:rgba(255,255,255,0.08);border-radius:9999px;overflow:hidden;position:relative;">
+          <div style="height:100%;width:35%;background:linear-gradient(90deg,#00f7ff,#0284c7);border-radius:9999px;box-shadow:0 0 10px rgba(0,247,255,0.5);animation:simpleBar 1.2s ease-in-out infinite alternate;"></div>
+        </div>
+        <div style="font-family:monospace;font-size:12px;color:#94a3b8;margin-top:10px;letter-spacing:0.05em;">
+          Loading...
         </div>
         <style>
-          @keyframes pulseBar {
-            0% { width: 15%; opacity: 0.7; }
-            100% { width: 85%; opacity: 1; }
+          @keyframes simpleBar {
+            0% { width: 15%; }
+            100% { width: 85%; }
           }
         </style>
       </div>

@@ -106,17 +106,44 @@ class AchievementManager {
         const arr: string[] = JSON.parse(raw);
         this.unlockedIds = new Set(arr);
         this.viewedIds = new Set(arr);
-        return;
-      }
-      if (userKey === 'demo_pilot') {
+      } else if (userKey === 'demo_pilot') {
         const demoBadges = ['first_blood', 'speed_demon', 'campaign_10', 'combo_master', 'level_architect'];
         this.unlockedIds = new Set(demoBadges);
         this.viewedIds = new Set(demoBadges);
         localStorage.setItem(key, JSON.stringify(demoBadges));
-        return;
+      } else {
+        this.unlockedIds = new Set();
+        this.viewedIds = new Set();
       }
+    } catch {
+      this.load();
+    }
+
+    // Recover unlocked trophies directly from SQLite database for authenticated player
+    if (userKey && userKey !== 'demo_pilot') {
+      backendApi.getUserTrophies(userKey).then((trophies) => {
+        if (trophies && trophies.length > 0) {
+          trophies.forEach((t) => {
+            if (t.trophy_id) {
+              this.unlockedIds.add(t.trophy_id);
+              this.viewedIds.add(t.trophy_id);
+            }
+          });
+          try {
+            localStorage.setItem(key, JSON.stringify(Array.from(this.unlockedIds)));
+          } catch {}
+        }
+      }).catch(() => {});
+    }
+  }
+
+  public reset(): void {
+    this.unlockedIds = new Set();
+    this.viewedIds = new Set();
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(VIEWED_STORAGE_KEY);
     } catch {}
-    this.load();
   }
 
   /**

@@ -360,6 +360,25 @@ class CurrencyService {
     this.syncToCloud(username).catch(() => {});
     return { success: true, amount: DAILY_COLLECT_AMOUNT, newBalance: this.balance };
   }
+
+  public reset(): void {
+    this.balance = 0;
+    this.upgrades = { ...DEFAULT_UPGRADE_STATE };
+    this.claimedLevels = new Set();
+    this.levelStars = {};
+    this.levelClaimedCores = {};
+    this.arenaStats = { ...DEFAULT_ARENA_STATS };
+    this.loaded = false;
+    try {
+      localStorage.removeItem(CURRENCY_KEY);
+      localStorage.removeItem(UPGRADES_KEY);
+      localStorage.removeItem(CLAIMED_LEVELS_KEY);
+      localStorage.removeItem(LEVEL_STARS_KEY);
+      localStorage.removeItem(LEVEL_CLAIMED_CORES_KEY);
+      localStorage.removeItem(ARENA_STATS_KEY);
+      localStorage.removeItem(DAILY_COLLECT_KEY);
+    } catch { /* ignore */ }
+  }
 }
 
 // ─── Daily Reward Constants & Types ─────────────────────────────

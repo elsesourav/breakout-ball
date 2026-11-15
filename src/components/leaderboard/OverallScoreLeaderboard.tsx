@@ -336,67 +336,34 @@ export const OverallScoreLeaderboard: React.FC = () => {
           className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-1 min-h-0"
           style={{
             WebkitOverflowScrolling: 'touch',
-            overscrollBehaviorY: 'contain',
             touchAction: 'pan-y',
           }}
           data-inner-scroll="true"
         >
-          {rankedList.slice(0, 12).map((entry) => {
+          {rankedList.slice(0, 50).map((entry) => {
             const isUser = entry.isCurrentUser;
             const isRank1 = entry.rank === 1;
             const isRank2 = entry.rank === 2;
             const isRank3 = entry.rank === 3;
 
-            let rankBadge = (
+            const rankBadge = isRank1 ? (
+              <div style={{ background: 'radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(245, 158, 11, 0.1) 100%)', border: '1.5px solid #ffd700', boxShadow: '0 0 12px rgba(255, 215, 0, 0.55)' }} className="flex items-center justify-center gap-0.5 px-1 py-0.5 rounded-full mx-auto" title="Rank 1 - Gold Apex">
+                <Flame className="w-2.5 h-2.5 text-amber-300 fill-amber-400 drop-shadow-[0_0_6px_#ffd700]" />
+                <span className="font-display font-black text-[11px] text-yellow-200">1</span>
+              </div>
+            ) : isRank2 ? (
+              <div style={{ background: 'radial-gradient(circle, rgba(203, 213, 225, 0.3) 0%, rgba(148, 163, 184, 0.1) 100%)', border: '1.5px solid #cbd5e1', boxShadow: '0 0 10px rgba(203, 213, 225, 0.45)' }} className="flex items-center justify-center gap-0.5 px-1 py-0.5 rounded-full mx-auto" title="Rank 2 - Silver Titan">
+                <span className="font-display font-black text-[11px] text-slate-200">2</span>
+              </div>
+            ) : isRank3 ? (
+              <div style={{ background: 'radial-gradient(circle, rgba(217, 119, 6, 0.3) 0%, rgba(180, 83, 9, 0.1) 100%)', border: '1.5px solid #f59e0b', boxShadow: '0 0 10px rgba(245, 158, 11, 0.45)' }} className="flex items-center justify-center gap-0.5 px-1 py-0.5 rounded-full mx-auto" title="Rank 3 - Bronze Vanguard">
+                <span className="font-display font-black text-[11px] text-amber-300">3</span>
+              </div>
+            ) : (
               <span className={`font-tech font-bold text-xs ${isUser ? 'text-cyan-300 font-black' : 'text-slate-400'}`}>
                 #{entry.rank}
               </span>
             );
-
-            if (isRank1) {
-              rankBadge = (
-                <div
-                  style={{
-                    background: 'radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(245, 158, 11, 0.1) 100%)',
-                    border: '1.5px solid #ffd700',
-                    boxShadow: '0 0 12px rgba(255, 215, 0, 0.55)',
-                  }}
-                  className="flex items-center justify-center gap-0.5 px-1 py-0.5 rounded-full mx-auto"
-                  title="Rank 1 - Gold Apex"
-                >
-                  <Flame className="w-2.5 h-2.5 text-amber-300 fill-amber-400 drop-shadow-[0_0_6px_#ffd700]" />
-                  <span className="font-display font-black text-[11px] text-yellow-200">1</span>
-                </div>
-              );
-            } else if (isRank2) {
-              rankBadge = (
-                <div
-                  style={{
-                    background: 'radial-gradient(circle, rgba(203, 213, 225, 0.3) 0%, rgba(148, 163, 184, 0.1) 100%)',
-                    border: '1.5px solid #cbd5e1',
-                    boxShadow: '0 0 10px rgba(203, 213, 225, 0.45)',
-                  }}
-                  className="flex items-center justify-center gap-0.5 px-1 py-0.5 rounded-full mx-auto"
-                  title="Rank 2 - Silver Titan"
-                >
-                  <span className="font-display font-black text-[11px] text-slate-200">2</span>
-                </div>
-              );
-            } else if (isRank3) {
-              rankBadge = (
-                <div
-                  style={{
-                    background: 'radial-gradient(circle, rgba(217, 119, 6, 0.3) 0%, rgba(180, 83, 9, 0.1) 100%)',
-                    border: '1.5px solid #f59e0b',
-                    boxShadow: '0 0 10px rgba(245, 158, 11, 0.45)',
-                  }}
-                  className="flex items-center justify-center gap-0.5 px-1 py-0.5 rounded-full mx-auto"
-                  title="Rank 3 - Bronze Vanguard"
-                >
-                  <span className="font-display font-black text-[11px] text-amber-300">3</span>
-                </div>
-              );
-            }
 
             return (
               <div

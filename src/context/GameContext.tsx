@@ -60,6 +60,7 @@ interface GameContextType {
   deleteUserLevel: (id: string) => Promise<void>;
   updateLevelPrivacy: (id: string, isPublic: boolean) => Promise<void>;
   isInitialLoading: boolean;
+  logoutUser: () => Promise<void>;
   recordLevelCompletion: (
     levelId: string,
     time: number,
@@ -273,9 +274,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [activeTab]
   );
 
-  const updateSettings = (newSettings: Partial<GameSettings>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
-  };
+  const updateSettings = (newSettings: Partial<GameSettings>) => setSettings((prev) => ({ ...prev, ...newSettings }));
+  const showAlert = (config: AlertConfig) => setAlertConfig(config);
+  const hideAlert = () => setAlertConfig(null);
+  const openDesigner = () => { soundManager.playClick(); setScreenState('designer'); };
+  const openModifier = (lvl: LevelData) => { soundManager.playClick(); setEditingLevel(lvl); };
+  const closeModifier = () => { soundManager.playClick(); setEditingLevel(null); };
 
   const updateUser = (newUser: Partial<UserProfile>) => {
     setUser((prev) => {
@@ -293,28 +297,31 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const showAlert = (config: AlertConfig) => {
-    setAlertConfig(config);
-  };
-
-  const hideAlert = () => {
-    setAlertConfig(null);
-  };
+  const logoutUser = useCallback(async () => {
+    soundManager.playClick();
+    const prevUser = user.username;
+    await authService.logout();
+    currencyService.reset();
+    achievementManager.reset();
+    dbService.clearLocalProgress(prevUser);
+    setLocalProgress({ '1': { levelNumber: 1, completed: false, rank: null, bestTime: null } });
+    setUserCreatedLevels([]);
+    setSelectedLevel(localLevels[0] || null);
+    setUser({
+      fullName: 'Anonymous',
+      username: 'anonymous',
+      email: '',
+      avatarUrl: undefined,
+      provider: undefined,
+      isLoggedIn: false,
+    });
+  }, [user.username, localLevels]);
 
   const isLevelSelfMadeOrTest = useCallback(
     (level: LevelData | null): boolean => {
       if (!level) return false;
-      if (level.id === 'TEST' || level.id.startsWith('test_') || level.id.startsWith('test-')) {
-        return true;
-      }
-      if (
-        level.creator &&
-        user?.username &&
-        level.creator.trim().toLowerCase() === user.username.trim().toLowerCase()
-      ) {
-        return true;
-      }
-      return false;
+      if (level.id === 'TEST' || level.id.startsWith('test_') || level.id.startsWith('test-')) return true;
+      return !!(level.creator && user?.username && level.creator.trim().toLowerCase() === user.username.trim().toLowerCase());
     },
     [user?.username]
   );
@@ -325,18 +332,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSelectedLevel(level);
       setScreenState('playing');
       soundManager.startBgMusic();
-
       const isRestricted = isLevelSelfMadeOrTest(level);
       achievementManager.setRestrictedContext(isRestricted);
-
-      // Only increment play count and unlock arena_challenger for official or other players' stages
       if (!isRestricted) {
         dbService.incrementPlayCount(level.id);
-        if (level.isPublic || isNaN(parseInt(level.id, 10))) {
-          achievementManager.unlock('arena_challenger');
-        }
+        if (level.isPublic || isNaN(parseInt(level.id, 10))) achievementManager.unlock('arena_challenger');
       }
-
       pushAppRoute(getRoutePath(activeTab, 'playing', level.id));
     },
     [activeTab, isLevelSelfMadeOrTest]
@@ -354,56 +355,30 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [activeTab]
   );
 
-  const openDesigner = () => {
-    soundManager.playClick();
-    setScreenState('designer');
-  };
-
-  const openModifier = (level: LevelData) => {
-    soundManager.playClick();
-    setEditingLevel(level);
-  };
-
-  const closeModifier = () => {
-    soundManager.playClick();
-    setEditingLevel(null);
+  const syncUserAndOnlineLevels = async (uname: string) => {
+    const [userLvls, onlines] = await Promise.all([dbService.getUserCreatedLevels(uname), dbService.getOnlineLevels()]);
+    setUserCreatedLevels(userLvls);
+    setOnlineLevels(onlines);
   };
 
   const saveUserLevel = async (newLevel: LevelData): Promise<boolean> => {
     const success = await dbService.saveLevel(newLevel);
     if (success) {
       achievementManager.unlock('level_architect');
-      const [userLevels, onlines] = await Promise.all([
-        dbService.getUserCreatedLevels(user.username),
-        dbService.getOnlineLevels(),
-      ]);
-      setUserCreatedLevels(userLevels);
-      setOnlineLevels(onlines);
+      await syncUserAndOnlineLevels(user.username);
     }
     return success;
   };
 
   const deleteUserLevel = async (id: string): Promise<void> => {
     await dbService.deleteLevel(id);
-    const [userLevels, onlines] = await Promise.all([
-      dbService.getUserCreatedLevels(user.username),
-      dbService.getOnlineLevels(),
-    ]);
-    setUserCreatedLevels(userLevels);
-    setOnlineLevels(onlines);
-    if (editingLevel?.id === id) {
-      setEditingLevel(null);
-    }
+    await syncUserAndOnlineLevels(user.username);
+    if (editingLevel?.id === id) setEditingLevel(null);
   };
 
   const updateLevelPrivacy = async (id: string, isPublic: boolean): Promise<void> => {
     await dbService.updateLevelPrivacy(id, isPublic);
-    const [userLevels, onlines] = await Promise.all([
-      dbService.getUserCreatedLevels(user.username),
-      dbService.getOnlineLevels(),
-    ]);
-    setUserCreatedLevels(userLevels);
-    setOnlineLevels(onlines);
+    await syncUserAndOnlineLevels(user.username);
   };
 
   const recordLevelCompletion = useCallback(
@@ -499,6 +474,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteUserLevel,
         updateLevelPrivacy,
         isInitialLoading,
+        logoutUser,
         recordLevelCompletion,
       }}
     >

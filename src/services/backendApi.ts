@@ -134,6 +134,47 @@ class BackendApiService {
     }
   }
 
+  /** Recover user level completions directly from SQLite database */
+  public async getUserCompletions(username: string): Promise<Array<{
+    level_id: string;
+    time_used: number;
+    lives_remaining: number;
+    score: number;
+    stars: number;
+    completed_at: string;
+  }> | null> {
+    try {
+      const res = await fetch(`${this.baseUrl}/api/levels/user/${encodeURIComponent(username)}`, {
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.completions || [];
+    } catch {
+      return null;
+    }
+  }
+
+  /** Recover user trophies directly from SQLite database */
+  public async getUserTrophies(username: string): Promise<Array<{
+    trophy_id: string;
+    title: string;
+    description: string;
+    category: string;
+    unlocked_at: string;
+  }> | null> {
+    try {
+      const res = await fetch(`${this.baseUrl}/api/trophies/user/${encodeURIComponent(username)}`, {
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.trophies || [];
+    } catch {
+      return null;
+    }
+  }
+
   /** Get Real Level Leaderboard (from database records of 50 players) */
   public async getLevelLeaderboard(levelId: string | number, limit = 20): Promise<BackendLeaderboardEntry[] | null> {
     try {
