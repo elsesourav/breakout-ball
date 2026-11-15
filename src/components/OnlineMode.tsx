@@ -5,6 +5,7 @@ import { Search, Flame, Globe, X, Boxes, Plus } from 'lucide-react';
 import { ArenaLevelCard } from './arena/ArenaLevelCard';
 import { ArenaPagination } from './arena/ArenaPagination';
 import { DailyFeaturedBanner } from './arena/DailyFeaturedBanner';
+import { CyberSectionHeader } from './CyberSectionHeader';
 
 const ITEMS_PER_PAGE = 25;
 
@@ -65,44 +66,22 @@ export const OnlineMode: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pt-3.5 pb-28 select-none cyber-grid-bg"
+      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pt-0 pb-28 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',
       }}
     >
       {/* Arena Header Bar */}
-      <div className="w-full max-w-sm px-3.5 flex flex-col gap-2.5 mb-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img
-              src="/logo.png"
-              alt="Breakout Ball"
-              className="w-4 h-4 rounded-full object-cover shadow-[0_0_8px_#ff4500]"
-            />
-            <span
-              className="font-display font-black text-xs tracking-wider"
-              style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.4)' }}
-            >
-              GLOBAL ARENA
-            </span>
-          </div>
-          <span
-            style={{
-              backgroundColor: 'rgba(0, 247, 255, 0.12)',
-              border: '1px solid rgba(0, 247, 255, 0.4)',
-              color: '#00f7ff',
-            }}
-            className="font-tech text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-[0_0_8px_rgba(0,247,255,0.2)]"
-          >
+      <CyberSectionHeader
+        title="GLOBAL ARENA"
+        subtitle="COMMUNITY STAGES & GLOBAL RANKINGS"
+        rightSlot={
+          <span className="font-tech text-[10px] font-bold text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded-full border border-cyan-500/30">
             {filteredLevels.length} STAGES
           </span>
-        </div>
-
-        <p className="text-xs text-slate-400 font-ui leading-normal">
-          Challenge community-crafted breakout stages and climb global rankings.
-        </p>
-      </div>
+        }
+      />
 
       {/* Sticky Full-Width High-Blur Search & Filter Controls */}
       <div

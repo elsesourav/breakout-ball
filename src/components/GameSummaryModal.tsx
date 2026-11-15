@@ -58,11 +58,11 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
             ? '1.5px solid rgba(0, 247, 255, 0.38)'
             : '1.5px solid rgba(239, 68, 68, 0.38)',
           boxShadow: isWin
-            ? '0 0 50px rgba(0, 247, 255, 0.22), 0 25px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12)'
-            : '0 0 50px rgba(239, 68, 68, 0.22), 0 25px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-          borderRadius: '24px',
+            ? '0 0 50px rgba(0, 247, 255, 0.22), 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.12)'
+            : '0 0 50px rgba(239, 68, 68, 0.22), 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+          borderRadius: '28px',
         }}
-        className="w-full max-w-sm flex flex-col p-5 relative overflow-hidden backdrop-blur-xl"
+        className="w-full max-w-[380px] flex flex-col px-6 py-6 relative overflow-hidden backdrop-blur-2xl"
       >
         {/* Top Glow Strip */}
         <div
@@ -75,11 +75,11 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
         />
 
         {/* Header Banner */}
-        <div className="flex flex-col items-center text-center pb-2">
+        <div className="flex flex-col items-center text-center pb-3 mb-1">
           {isWin ? (
             <>
               {/* 3 Stars */}
-              <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="flex items-center justify-center gap-2.5 mb-2.5">
                 {[1, 2, 3].map((starIdx) => {
                   const isEarned = starIdx <= stars;
                   const isCenter = starIdx === 2;
@@ -107,17 +107,17 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
 
               <div
                 style={{
-                  width: '58px',
-                  height: '58px',
-                  borderRadius: '18px',
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '20px',
                   background:
                     'radial-gradient(circle, rgba(0, 247, 255, 0.25) 0%, rgba(16, 185, 129, 0.35) 100%)',
                   border: '1.5px solid #00f7ff',
                   boxShadow: '0 0 25px rgba(0, 247, 255, 0.45)',
                 }}
-                className="flex items-center justify-center text-emerald-300 mb-2 relative"
+                className="flex items-center justify-center text-emerald-300 mb-3 relative"
               >
-                <Trophy className="w-8 h-8" />
+                <Trophy className="w-9 h-9" />
                 <div className="absolute -inset-1 rounded-2xl bg-emerald-400/10 animate-pulse pointer-events-none" />
               </div>
 
@@ -131,11 +131,11 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                 LEVEL CLEARED!
               </h2>
 
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-tech font-bold uppercase tracking-widest bg-cyan-950/80 border border-cyan-400/40 text-cyan-300">
+              <div className="flex items-center gap-2 mt-2">
+                <span className="px-3 py-1 rounded-full text-[10px] font-tech font-bold uppercase tracking-widest bg-cyan-950/80 border border-cyan-400/40 text-cyan-300">
                   STAGE {levelNumber} CONQUERED
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-tech font-bold uppercase tracking-widest bg-emerald-950/80 border border-emerald-400/40 text-emerald-300">
+                <span className="px-3 py-1 rounded-full text-[10px] font-tech font-bold uppercase tracking-widest bg-emerald-950/80 border border-emerald-400/40 text-emerald-300">
                   {stars === 3 ? '★ APEX CLEAR' : 'ACCOMPLISHED'}
                 </span>
               </div>
@@ -144,17 +144,17 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
             <>
               <div
                 style={{
-                  width: '58px',
-                  height: '58px',
-                  borderRadius: '18px',
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '20px',
                   background:
                     'radial-gradient(circle, rgba(239, 68, 68, 0.28) 0%, rgba(127, 29, 29, 0.45) 100%)',
                   border: '1.5px solid #f87171',
                   boxShadow: '0 0 25px rgba(239, 68, 68, 0.45)',
                 }}
-                className="flex items-center justify-center text-red-400 mb-2 relative"
+                className="flex items-center justify-center text-red-400 mb-3 relative"
               >
-                <ShieldAlert className="w-8 h-8" />
+                <ShieldAlert className="w-9 h-9" />
                 <div className="absolute -inset-1 rounded-2xl bg-red-400/10 animate-pulse pointer-events-none" />
               </div>
 
@@ -168,8 +168,8 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                 GAME OVER
               </h2>
 
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-tech font-bold uppercase tracking-widest bg-red-950/80 border border-red-500/40 text-red-400">
+              <div className="flex items-center gap-2 mt-2">
+                <span className="px-3 py-1 rounded-full text-[10px] font-tech font-bold uppercase tracking-widest bg-red-950/80 border border-red-500/40 text-red-400">
                   SYSTEM COMPROMISED
                 </span>
               </div>
@@ -178,19 +178,19 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
         </div>
 
         {/* Performance Metrics (3-Card Grid) */}
-        <div className="grid grid-cols-3 gap-2 my-2">
+        <div className="grid grid-cols-3 gap-2.5 my-3">
           {/* Targets */}
           <div
             style={{
               backgroundColor: 'rgba(6, 10, 28, 0.8)',
               border: '1px solid rgba(0, 247, 255, 0.2)',
-              borderRadius: '12px',
+              borderRadius: '14px',
             }}
-            className="p-2 flex flex-col items-center text-center gap-1"
+            className="py-3 px-2 flex flex-col items-center text-center gap-1.5"
           >
             <div className="flex items-center gap-1 text-cyan-400">
               <Boxes className="w-3.5 h-3.5" />
-              <span className="font-tech text-[9px] uppercase tracking-wider text-slate-400">
+              <span className="font-tech text-[10px] uppercase tracking-wider text-slate-400 font-bold">
                 TARGETS
               </span>
             </div>
@@ -208,13 +208,13 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
             style={{
               backgroundColor: 'rgba(6, 10, 28, 0.8)',
               border: '1px solid rgba(0, 247, 255, 0.2)',
-              borderRadius: '12px',
+              borderRadius: '14px',
             }}
-            className="p-2 flex flex-col items-center text-center gap-1"
+            className="py-3 px-2 flex flex-col items-center text-center gap-1.5"
           >
             <div className="flex items-center gap-1 text-cyan-400">
               <Timer className="w-3.5 h-3.5" />
-              <span className="font-tech text-[9px] uppercase tracking-wider text-slate-400">
+              <span className="font-tech text-[10px] uppercase tracking-wider text-slate-400 font-bold">
                 TIME
               </span>
             </div>
@@ -228,13 +228,13 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
             style={{
               backgroundColor: 'rgba(6, 10, 28, 0.8)',
               border: '1px solid rgba(0, 247, 255, 0.2)',
-              borderRadius: '12px',
+              borderRadius: '14px',
             }}
-            className="p-2 flex flex-col items-center text-center gap-1"
+            className="py-3 px-2 flex flex-col items-center text-center gap-1.5"
           >
             <div className="flex items-center gap-1 text-amber-400">
               <Flame className="w-3.5 h-3.5" />
-              <span className="font-tech text-[9px] uppercase tracking-wider text-slate-400">
+              <span className="font-tech text-[10px] uppercase tracking-wider text-slate-400 font-bold">
                 STREAK
               </span>
             </div>
@@ -254,7 +254,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
               boxShadow: '0 0 15px rgba(0, 247, 255, 0.2)',
               borderRadius: '12px',
             }}
-            className="p-2.5 flex items-center justify-between mb-2"
+            className="px-4 py-3 flex items-center justify-between mb-3"
           >
             <div className="flex items-center gap-1.5">
               <Zap className="w-4 h-4 text-cyan-300" />
@@ -284,15 +284,15 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
               'linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.2) 100%)',
             border: '1px solid rgba(251, 191, 36, 0.35)',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-            borderRadius: '14px',
+            borderRadius: '16px',
           }}
-          className="p-2.5 flex items-center justify-between mb-3"
+          className="px-4.5 py-3.5 flex items-center justify-between mb-4"
         >
-          <span className="font-tech font-bold text-[10px] text-amber-200/80 uppercase tracking-widest">
+          <span className="font-tech font-bold text-[11px] text-amber-200/80 uppercase tracking-widest">
             TOTAL SCORE
           </span>
           <span
-            className="font-display font-black text-xl tracking-wider text-amber-300"
+            className="font-display font-black text-2xl tracking-wider text-amber-300"
             style={{
               textShadow: '0 0 16px rgba(251, 191, 36, 0.8)',
             }}
@@ -303,7 +303,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
 
         {/* Action Buttons */}
         {isWin ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {hasNextLevel && onNextLevel ? (
               <button
                 type="button"
@@ -315,7 +315,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                   borderRadius: '12px',
                   color: '#ffffff',
                 }}
-                className="w-full h-11 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer group"
+                className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer group"
               >
                 <span>NEXT MISSION</span>
                 <ChevronRight className="w-4 h-4 stroke-[3] group-hover:translate-x-1 transition-transform" />
@@ -342,7 +342,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {onRetry && (
                 <button
                   type="button"
@@ -353,7 +353,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                     borderRadius: '12px',
                     color: '#ffffff',
                   }}
-                  className="h-10 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-cyan-500/15 transition-all cursor-pointer"
+                  className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-cyan-500/15 transition-all cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
                   <span>RETRY</span>
@@ -369,7 +369,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                   borderRadius: '12px',
                   color: '#cbd5e1',
                 }}
-                className="h-10 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 transition-all cursor-pointer"
+                className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 transition-all cursor-pointer"
               >
                 <Home className="w-3.5 h-3.5 text-slate-400" />
                 <span>LEVEL MAP</span>
@@ -377,7 +377,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {onRetry && (
               <button
                 type="button"
@@ -389,7 +389,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                   borderRadius: '12px',
                   color: '#ffffff',
                 }}
-                className="w-full h-11 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer"
+                className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4 stroke-[2.5]" />
                 <span>TRY AGAIN</span>
@@ -405,7 +405,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                 borderRadius: '12px',
                 color: '#94a3b8',
               }}
-              className="w-full h-10 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 transition-all cursor-pointer"
+              className="w-full h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 transition-all cursor-pointer"
             >
               <Home className="w-3.5 h-3.5 text-slate-400" />
               <span>EXIT TO LEVEL MAP</span>

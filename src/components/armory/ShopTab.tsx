@@ -7,10 +7,17 @@ import { soundManager } from '../../utils/audio';
 interface ShopTabProps {
   cores: number;
   username?: string;
-  onCoresUpdated: () => void;
+  onClaimSuccess: (coresGranted: number) => void;
 }
 
-export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) => {
+const DEMO_CODES: Record<string, string> = {
+  starter: 'START500',
+  power: 'NEON1000',
+  mega: 'CYBER2500',
+  ultra: 'SUPER5000',
+};
+
+export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) => {
   const [selectedPack, setSelectedPack] = useState<ShopPack | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -33,21 +40,22 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) =>
 
   const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!couponCode.trim()) return;
+    if (!couponCode.trim() || !selectedPack) return;
 
     setStatus('loading');
     soundManager.play('click');
 
-    const res = await couponService.redeemCoupon(couponCode, username);
+    // Enforce tier match: 500 coupon only works on 500 pack
+    const res = await couponService.redeemCoupon(couponCode, username, selectedPack.cores);
 
     if (res.success) {
       soundManager.play('win');
       setStatus('success');
       setStatusMsg(res.message);
-      onCoresUpdated();
+      onClaimSuccess(res.coresGranted);
       setTimeout(() => {
         handleCloseModal();
-      }, 1800);
+      }, 1600);
     } else {
       soundManager.play('damage');
       setStatus('error');
@@ -69,17 +77,17 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) =>
           <div
             key={pack.id}
             style={{
-              backgroundColor: 'rgba(8, 14, 38, 0.95)',
-              border: `1.5px solid ${pack.borderColor}`,
-              boxShadow: `0 4px 16px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.06)`,
-              borderRadius: '14px',
+              backgroundColor: 'rgba(8, 13, 38, 0.94)',
+              border: `1.2px solid ${pack.borderColor}`,
+              boxShadow: `0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px ${pack.accentColor}15`,
+              borderRadius: '16px',
             }}
-            className="p-3 flex flex-col items-center justify-between text-center gap-2 relative overflow-hidden"
+            className="p-3.5 flex flex-col items-center justify-between text-center gap-2 relative overflow-hidden transition-all duration-200"
           >
             <div
               style={{
-                backgroundColor: `${pack.accentColor}15`,
-                border: `1px solid ${pack.accentColor}50`,
+                backgroundColor: `${pack.accentColor}18`,
+                border: `1.2px solid ${pack.accentColor}50`,
                 boxShadow: `0 0 12px ${pack.accentColor}30`,
               }}
               className="w-10 h-10 rounded-xl flex items-center justify-center mt-1"
@@ -113,10 +121,10 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) =>
       </div>
 
       {/* Info Card */}
-      <div className="p-3 rounded-xl bg-black/40 border border-white/5 flex items-center gap-2.5 mt-1">
+      <div className="p-3 rounded-xl bg-[#080d26]/80 border border-cyan-500/20 flex items-center gap-2.5 mt-1">
         <Ticket className="w-5 h-5 text-amber-400 shrink-0" />
         <p className="text-[11px] text-slate-400 font-ui leading-tight">
-          Enter official promo coupons or community challenge codes to unlock Cores. Available promo: <span className="text-amber-300 font-mono">START500</span>
+          Enter official promo coupons or challenge codes to claim Cores. Each coupon is tier-locked to its corresponding pack amount.
         </p>
       </div>
 
@@ -125,10 +133,10 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) =>
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
           <div
             style={{
-              backgroundColor: '#0a0f2c',
+              backgroundColor: '#080d26',
               border: `1.5px solid ${selectedPack.accentColor}`,
-              boxShadow: `0 0 30px ${selectedPack.accentColor}40`,
-              borderRadius: '16px',
+              boxShadow: `0 0 35px ${selectedPack.accentColor}40`,
+              borderRadius: '20px',
             }}
             className="w-full max-w-xs p-4 flex flex-col gap-3 relative"
           >
@@ -136,7 +144,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) =>
             <button
               type="button"
               onClick={handleCloseModal}
-              className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors"
+              className="absolute top-3.5 right-3.5 text-slate-400 hover:text-white transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -146,9 +154,9 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) =>
               <div
                 style={{
                   backgroundColor: `${selectedPack.accentColor}20`,
-                  border: `1px solid ${selectedPack.accentColor}`,
+                  border: `1.2px solid ${selectedPack.accentColor}`,
                 }}
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                className="w-9 h-9 rounded-xl flex items-center justify-center"
               >
                 <Zap style={{ color: selectedPack.accentColor }} className="w-5 h-5 fill-current" />
               </div>
@@ -165,16 +173,21 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) =>
             {/* Form */}
             <form onSubmit={handleRedeem} className="flex flex-col gap-2.5">
               <div className="flex flex-col gap-1">
-                <label className="font-tech text-[10px] text-slate-400 uppercase tracking-wider">
-                  ENTER COUPON CODE:
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="font-tech text-[10px] text-slate-400 uppercase tracking-wider">
+                    COUPON CODE:
+                  </label>
+                  <span className="font-mono text-[9px] text-amber-300">
+                    Try: {DEMO_CODES[selectedPack.id]}
+                  </span>
+                </div>
                 <input
                   type="text"
                   autoFocus
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  placeholder="e.g. START500"
-                  className="w-full px-3 py-2 rounded-lg bg-black/60 border border-white/20 text-white font-mono text-xs uppercase tracking-widest focus:outline-none focus:border-amber-400 transition-colors"
+                  placeholder={`e.g. ${DEMO_CODES[selectedPack.id]}`}
+                  className="w-full px-3 py-2 rounded-lg bg-black/70 border border-cyan-500/30 text-white font-mono text-xs uppercase tracking-widest focus:outline-none focus:border-amber-400 transition-colors"
                 />
               </div>
 

@@ -30,10 +30,10 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
   return (
     <div
       style={{
-        backgroundColor: 'rgba(7, 12, 34, 0.92)',
-        border: `1.5px solid ${upgrade.accentColor}35`,
-        boxShadow: `0 4px 18px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.08)`,
-        borderRadius: '14px',
+        backgroundColor: 'rgba(8, 13, 38, 0.94)',
+        border: `1.2px solid ${upgrade.accentColor}45`,
+        boxShadow: `0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px ${upgrade.accentColor}12`,
+        borderRadius: '16px',
       }}
       className="p-3 flex flex-col gap-2 relative overflow-hidden transition-all duration-200"
     >
@@ -67,8 +67,8 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
         {/* Level Rank Badge */}
         <span
           style={{
-            backgroundColor: isMax ? 'rgba(16, 185, 129, 0.2)' : `${upgrade.accentColor}15`,
-            border: `1px solid ${isMax ? '#10b981' : upgrade.accentColor}`,
+            backgroundColor: isMax ? 'rgba(16, 185, 129, 0.2)' : `${upgrade.accentColor}18`,
+            border: `1px solid ${isMax ? '#10b981' : upgrade.accentColor}60`,
             color: isMax ? '#10b981' : upgrade.accentColor,
           }}
           className="font-tech text-[10px] font-bold px-2 py-0.5 rounded-full"
@@ -78,7 +78,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
       </div>
 
       {/* Segmented Dash Progress Bar with clean gaps */}
-      <div className="flex items-center gap-1 w-full h-2 rounded bg-black/50 p-0.5 border border-white/5">
+      <div className="flex items-center gap-1 w-full h-2 rounded-sm bg-black/60 p-0.5 border border-cyan-500/15">
         {Array.from({ length: upgrade.maxLevel }).map((_, i) => {
           const isFilled = i < level;
           const isMilestone = (i + 1) % 5 === 0;
@@ -91,7 +91,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
                   ? isMilestone
                     ? '#fbbf24'
                     : upgrade.accentColor
-                  : 'rgba(255, 255, 255, 0.08)',
+                  : 'rgba(255, 255, 255, 0.05)',
                 boxShadow: isFilled
                   ? `0 0 6px ${isMilestone ? 'rgba(251,191,36,0.8)' : upgrade.glowColor}`
                   : 'none',
@@ -103,7 +103,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
       </div>
 
       {/* Action Footer: Next Stat & Upgrade Button */}
-      <div className="flex items-center justify-between pt-1 border-t border-white/10 mt-0.5">
+      <div className="flex items-center justify-between pt-1 border-t border-cyan-500/15 mt-0.5">
         <div className="flex items-center gap-1.5">
           <span className="font-tech text-[9px] text-slate-400 uppercase tracking-wider">
             {isMax ? 'PEAK' : 'NEXT:'}
@@ -119,8 +119,8 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
             disabled={!canAfford}
             onClick={handleUpgradeClick}
             style={{
-              backgroundColor: canAfford ? upgrade.accentColor : 'rgba(255, 255, 255, 0.06)',
-              border: `1.5px solid ${canAfford ? upgrade.accentColor : 'rgba(255, 255, 255, 0.15)'}`,
+              backgroundColor: canAfford ? upgrade.accentColor : 'rgba(10, 15, 36, 0.7)',
+              border: `1.2px solid ${canAfford ? upgrade.accentColor : 'rgba(0, 247, 255, 0.15)'}`,
               color: canAfford ? '#000000' : '#64748b',
               boxShadow: canAfford ? `0 0 10px ${upgrade.glowColor}` : 'none',
             }}

@@ -2,8 +2,7 @@
  * Coupon Service
  *
  * Handles validation and redemption of promo/coupon codes for Cores currency.
- * Integrates directly with Cloud Firestore 'redemption_codes' and 'coupons'
- * with atomic transactions and offline fallback for built-in test codes.
+ * Enforces tier matching (e.g. 500 coupon only works on 500 pack).
  */
 
 import { doc, getDoc, runTransaction } from 'firebase/firestore';
@@ -16,12 +15,12 @@ export interface CouponRedeemResult {
   message: string;
 }
 
-// Built-in offline fallback demo codes so game is immediately playable offline
-const BUILTIN_PROMO_CODES: Record<string, { cores: number; maxUses: number }> = {
-  START500: { cores: 500, maxUses: 1 },
-  NEON1000: { cores: 1000, maxUses: 1 },
-  CYBER2500: { cores: 2500, maxUses: 1 },
-  SUPER5000: { cores: 5000, maxUses: 1 },
+// Built-in offline fallback demo codes mapped to specific pack tiers
+const BUILTIN_PROMO_CODES: Record<string, { cores: number; maxUses: number; packName: string }> = {
+  START500: { cores: 500, maxUses: 1, packName: '500 Starter Pack' },
+  NEON1000: { cores: 1000, maxUses: 1, packName: '1,000 Power Bundle' },
+  CYBER2500: { cores: 2500, maxUses: 1, packName: '2,500 Mega Vault' },
+  SUPER5000: { cores: 5000, maxUses: 1, packName: '5,000 Ultra Core' },
 };
 
 const USER_REDEMPTIONS_KEY = 'breakout_user_redemptions';
@@ -45,9 +44,13 @@ class CouponService {
   }
 
   /**
-   * Redeem a coupon code for the given user.
+   * Redeem a coupon code for the given user, requiring match with expected pack cores.
    */
-  public async redeemCoupon(rawCode: string, username?: string): Promise<CouponRedeemResult> {
+  public async redeemCoupon(
+    rawCode: string,
+    username?: string,
+    expectedCores?: number
+  ): Promise<CouponRedeemResult> {
     const code = rawCode.trim().toUpperCase();
     if (!code) {
       return { success: false, coresGranted: 0, message: 'Please enter a coupon code' };
@@ -58,7 +61,7 @@ class CouponService {
       return { success: false, coresGranted: 0, message: 'Coupon already redeemed on this device' };
     }
 
-    // 1. First check Cloud Firestore for live coupon code
+    // 1. Check Cloud Firestore for live coupon code
     try {
       const codeRef = doc(firestoreDb, 'redemption_codes', code);
       const codeSnap = await getDoc(codeRef);
@@ -68,6 +71,24 @@ class CouponService {
 
         if (codeData.isRedeemed) {
           return { success: false, coresGranted: 0, message: 'Code has already been claimed' };
+        }
+
+        let prospectiveCores = codeData.cores || 500;
+        if (codeData.couponId) {
+          const couponRef = doc(firestoreDb, 'coupons', codeData.couponId);
+          const couponSnap = await getDoc(couponRef);
+          if (couponSnap.exists() && couponSnap.data().rewardCores) {
+            prospectiveCores = couponSnap.data().rewardCores;
+          }
+        }
+
+        // Tier check: Must match the pack the user is currently claiming
+        if (expectedCores && prospectiveCores !== expectedCores) {
+          return {
+            success: false,
+            coresGranted: 0,
+            message: `This code is valid for ${prospectiveCores.toLocaleString()} Cores, not this pack.`,
+          };
         }
 
         // Run transaction to claim code
@@ -81,12 +102,10 @@ class CouponService {
           let cores = freshSnap.data().cores || 500;
 
           if (couponId) {
-            const couponRef = doc(firestoreDb, 'coupons', couponId);
-            const couponSnap = await tx.get(couponRef);
-            if (couponSnap.exists()) {
-              const cData = couponSnap.data();
-              if (cData.isActive === false) throw new Error('Promotion has ended');
-              if (cData.rewardCores) cores = cData.rewardCores;
+            const cSnap = await tx.get(doc(firestoreDb, 'coupons', couponId));
+            if (cSnap.exists()) {
+              if (cSnap.data().isActive === false) throw new Error('Promotion has ended');
+              if (cSnap.data().rewardCores) cores = cSnap.data().rewardCores;
             }
           }
 
@@ -111,12 +130,20 @@ class CouponService {
       if (err?.message?.includes('already used') || err?.message?.includes('ended')) {
         return { success: false, coresGranted: 0, message: err.message };
       }
-      // Firestore offline or collection empty -> fall through to built-in promo codes
     }
 
     // 2. Offline / Built-in promo code fallback
     const builtIn = BUILTIN_PROMO_CODES[code];
     if (builtIn) {
+      // Tier match check
+      if (expectedCores && builtIn.cores !== expectedCores) {
+        return {
+          success: false,
+          coresGranted: 0,
+          message: `Code '${code}' is only valid for the ${builtIn.packName}.`,
+        };
+      }
+
       currencyService.addCores(builtIn.cores, username);
       this.markCodeRedeemed(code);
       return {
@@ -129,7 +156,7 @@ class CouponService {
     return {
       success: false,
       coresGranted: 0,
-      message: 'Invalid coupon code. Please check and try again.',
+      message: 'Invalid coupon code for this pack.',
     };
   }
 }
