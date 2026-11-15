@@ -1,6 +1,7 @@
-import React from 'react';
-import { ArrowLeft, Settings, UserCheck, Mail, ShieldCheck, LogOut, Cloud, LogIn, UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Settings, UserCheck, Mail, ShieldCheck, LogOut, Cloud, LogIn, UserPlus, Database } from 'lucide-react';
 import { ProfileSettingsGroup } from './ProfileSettingsGroup';
+import { BackendAdminModal } from '../admin/BackendAdminModal';
 import { soundManager } from '../../utils/audio';
 
 interface ProfileSettingsViewProps {
@@ -27,6 +28,8 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
   onSignIn,
   onCreateAccount,
 }) => {
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
   return (
     <div className="w-full max-w-sm flex flex-col gap-3.5 animate-in fade-in slide-in-from-right-4 duration-200">
       {/* Header Bar with Back Button */}
@@ -134,8 +137,40 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
         </div>
       )}
 
+      {/* Backend Control & Coupon Management Card */}
+      <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2 shadow-lg backdrop-blur-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-cyan-400 text-xs font-display font-bold uppercase tracking-wider">
+            <Database className="w-3.5 h-3.5" />
+            <span>Backend Ops Terminal</span>
+          </div>
+          <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            ONLINE
+          </span>
+        </div>
+
+        <p className="text-xs font-ui leading-snug text-slate-300">
+          Manage cyber promo coupons (create, toggle, delete), inspect live player activity logs, and monitor database metrics.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            soundManager.play('click');
+            setIsAdminOpen(true);
+          }}
+          className="w-full py-2 px-3 rounded-lg bg-cyan-950/60 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-tech font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_10px_rgba(0,247,255,0.2)] mt-1"
+        >
+          <Database className="w-3.5 h-3.5" />
+          <span>OPEN OPS TERMINAL</span>
+        </button>
+      </div>
+
       {/* Sound, Haptics, Simulation Hardware & Data Storage Settings */}
       <ProfileSettingsGroup />
+
+      {/* Backend Control / Coupon Management Modal */}
+      <BackendAdminModal isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
     </div>
   );
 };
