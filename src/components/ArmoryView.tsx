@@ -128,9 +128,9 @@ export const ArmoryView: React.FC = () => {
         onComplete={() => setIsFlyingCores(false)}
       />
 
-      {/* 1. Sticky Top Cyber Section Header - ALWAYS VISIBLE AT THE TOP */}
+      {/* 1. Top Cyber Section Header */}
       <div
-        className="sticky top-0 z-[60] w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg pt-1.5 sm:pt-2"
+        className="w-full flex justify-center bg-[#06081c] shadow-lg pt-1.5 sm:pt-2 flex-shrink-0"
         style={{
           borderBottom: '1px solid rgba(0, 247, 255, 0.22)',
           boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',

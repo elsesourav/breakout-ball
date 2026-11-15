@@ -21,69 +21,69 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
   switch (upgrade.id) {
     case 'ball_speed':
       return {
-        statName: 'Velocity',
-        current: `+${level * 8}%`,
-        delta: '+8%',
+        statName: 'VELOCITY',
+        current: `${level * 8}%`,
+        delta: '8%',
       };
     case 'ball_size':
       return {
-        statName: 'Radius',
-        current: `+${level * 5}%`,
-        delta: '+5%',
+        statName: 'RADIUS',
+        current: `${level * 5}%`,
+        delta: '5%',
       };
     case 'ball_impact':
       return {
-        statName: 'Damage',
-        current: `+${level * 12}%`,
-        delta: '+12%',
+        statName: 'DAMAGE',
+        current: `${level * 12}%`,
+        delta: '12%',
       };
     case 'paddle_width':
       return {
-        statName: 'Width',
-        current: `+${level * 8}%`,
-        delta: '+8%',
+        statName: 'WIDTH',
+        current: `${level * 8}%`,
+        delta: '8%',
       };
     case 'paddle_speed':
       return {
-        statName: 'Speed',
-        current: `+${level * 10}%`,
-        delta: '+10%',
+        statName: 'SPEED',
+        current: `${level * 10}%`,
+        delta: '10%',
       };
     case 'plasma_power':
     case 'expand_power':
       return {
-        statName: 'Duration',
+        statName: 'DURATION',
         current: `${(6 + level * 1.14).toFixed(1)}s`,
-        delta: '+1.1s',
+        delta: '1.1s',
       };
     case 'mega_power':
       return {
-        statName: 'Duration',
+        statName: 'DURATION',
         current: `${(5 + level * 1.0).toFixed(1)}s`,
-        delta: '+1.0s',
+        delta: '1.0s',
       };
     case 'slowmo_power':
       return {
-        statName: 'Duration',
+        statName: 'DURATION',
         current: `${(4 + level * 0.86).toFixed(1)}s`,
-        delta: '+0.9s',
+        delta: '0.9s',
       };
     case 'multi_power':
       return {
-        statName: 'Balls',
+        statName: 'BALLS',
         current: `${level + 1}`,
-        delta: '+1',
+        delta: '1',
       };
     case 'shield_power':
       return {
-        statName: 'Shield',
-        current: `${level}`,
-        delta: '+1',
+        statName: 'SHIELD',
+        current: `${level} Charge${level > 1 ? 's' : ''}`,
+        delta: '1 Charge',
       };
     default:
       return {
-        statName: 'Level',
-        current: upgrade.statLabel(level),
+        statName: 'LEVEL',
+        current: `${level}`,
         delta: null,
       };
   }
@@ -135,21 +135,35 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
             <h4 className="font-display font-black text-xs text-white tracking-wide leading-tight">
               {upgrade.name}
             </h4>
-            <div className="flex items-center gap-1 mt-0.5">
+            <div className="flex items-center gap-1.5 mt-0.5">
               <span className="font-tech text-[10px] text-slate-400 font-semibold uppercase">
                 {statBreakdown.statName}:
               </span>
-              <span
-                style={{ color: upgrade.accentColor }}
-                className="font-tech text-[10px] font-bold"
-              >
+              <span className="font-tech text-[11px] font-bold text-slate-100">
                 {statBreakdown.current}
               </span>
-              {!isMax && statBreakdown.delta && (
-                <span className="font-tech text-[10px] text-emerald-400 font-extrabold ml-0.5">
-                  +{statBreakdown.delta.replace(/^\+/, '')}
+              {!isMax && statBreakdown.delta ? (
+                <span
+                  style={{
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(52, 211, 153, 0.45)',
+                    boxShadow: '0 0 6px rgba(16, 185, 129, 0.2)',
+                  }}
+                  className="font-tech text-[10px] font-bold text-emerald-300 px-1.5 py-0.5 rounded-md inline-flex items-center tracking-wide"
+                >
+                  [+ {statBreakdown.delta}]
                 </span>
-              )}
+              ) : isMax ? (
+                <span
+                  style={{
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(52, 211, 153, 0.45)',
+                  }}
+                  className="font-tech text-[10px] font-bold text-emerald-300 px-1.5 py-0.5 rounded-md inline-flex items-center tracking-wider"
+                >
+                  [MAX]
+                </span>
+              ) : null}
             </div>
           </div>
         </div>
@@ -201,32 +215,25 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
 
       {/* Action Footer: Left = Cost, Right = Upgrade Action Button */}
       <div className="flex items-center justify-between pt-1 mt-0.5">
-        {/* Left Side: Upgrade Cost with CoreIcon */}
-        <div className="flex items-center gap-1.5">
+        {/* Left Side: Upgrade Cost Badge (No redundant COST: / CORES text) */}
+        <div className="flex items-center">
           {!isMax ? (
-            <div className="flex items-center gap-1.5">
-              <span className="font-tech text-[9px] text-slate-400 uppercase tracking-wider font-semibold">
-                COST:
-              </span>
-              <div
-                style={{
-                  backgroundColor: canAfford ? 'rgba(0, 247, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                  border: `1px solid ${canAfford ? 'rgba(0, 247, 255, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`,
-                }}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-md shadow-inner"
+            <div
+              style={{
+                backgroundColor: canAfford ? 'rgba(0, 247, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                border: `1px solid ${canAfford ? 'rgba(0, 247, 255, 0.35)' : 'rgba(255, 255, 255, 0.08)'}`,
+                boxShadow: canAfford ? '0 0 8px rgba(0, 247, 255, 0.15)' : 'none',
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg shadow-inner"
+            >
+              <CoreIcon size={13} glow={canAfford} variant="cyan" />
+              <span
+                className={`font-tech font-extrabold text-xs ${
+                  canAfford ? 'text-cyan-200' : 'text-slate-400'
+                }`}
               >
-                <CoreIcon size={12} glow={canAfford} variant="cyan" />
-                <span
-                  className={`font-tech font-extrabold text-xs ${
-                    canAfford ? 'text-cyan-200' : 'text-slate-400'
-                  }`}
-                >
-                  {cost.toLocaleString()}
-                </span>
-                <span className="font-tech text-[8.5px] text-cyan-400 font-semibold uppercase tracking-wider">
-                  CORES
-                </span>
-              </div>
+                {cost.toLocaleString()}
+              </span>
             </div>
           ) : (
             <span className="text-emerald-400 font-tech font-bold text-xs flex items-center gap-1">
