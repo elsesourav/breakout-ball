@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { useGame } from '../../context/GameContext';
 import { ActiveTab } from '../../types/game';
-import { soundManager } from '../../utils/audio';
 import { NavArcadeIcon, NavArenaIcon, NavArmoryIcon, NavProfileIcon } from './NavIcons';
 
 export const MobileBottomNav: React.FC = () => {
@@ -10,7 +9,6 @@ export const MobileBottomNav: React.FC = () => {
 
   const handleTabChange = (tab: ActiveTab) => {
     if (tab === activeTab) return;
-    soundManager.play('click');
     if (settings.vibrate && typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate(15);
     }

@@ -1,8 +1,9 @@
 export interface BlockData {
   x: number; // column index (0 to 8)
   y: number; // row index (0 to 10)
-  h: number; // 1 to 5: breakable with health, 6: unbreakable wall
+  h: number; // 1 to 5: breakable with health, 6: unbreakable wall, 7: quantum portal, 8: emp detonator
   currentHp?: number; // active game health
+  portalPairId?: number; // 1 to 4 for paired Quantum Portals (A=1, B=2, C=3, D=4)
 }
 
 export interface LevelData {
@@ -20,6 +21,9 @@ export interface LocalLevelProgress {
   completed: boolean;
   rank: number | null;
   bestTime: number | null;
+  stars?: number;        // Best stars achieved (1, 2, or 3 based on hearts completed)
+  claimedCores?: number; // Total cores claimed so far for this level
+  maxCores?: number;     // Maximum core pool for this level
 }
 
 export interface LeaderboardEntry {
@@ -61,7 +65,7 @@ export interface GameSettings {
 
 export type ActiveTab = 'local' | 'online' | 'armory' | 'create' | 'profile';
 
-export type GameScreen = 'menu' | 'preview' | 'playing' | 'designer' | 'design-lab';
+export type GameScreen = 'menu' | 'preview' | 'playing' | 'designer';
 
 export interface AlertConfig {
   title: string;

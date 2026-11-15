@@ -9,6 +9,7 @@ import {
   renderPaddleWidthPreview,
   renderPaddleSpeedPreview,
 } from './renderPaddlePreviews';
+import { renderPowerDurationPreview } from './renderPowerPreviews';
 
 interface UpgradePreviewCanvasProps {
   upgrade: UpgradeDef;
@@ -28,6 +29,11 @@ export const UpgradePreviewCanvas: React.FC<UpgradePreviewCanvasProps> = ({
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    if (canvas.parentElement) {
+      canvas.width = canvas.parentElement.clientWidth || 340;
+      canvas.height = canvas.parentElement.clientHeight || 176;
+    }
 
     let animId: number;
     let tick = 0;
@@ -65,24 +71,28 @@ export const UpgradePreviewCanvas: React.FC<UpgradePreviewCanvasProps> = ({
       ctx.restore();
 
       // 3. Delegate to Specific Upgrade Drawer
-      switch (upgrade.id) {
-        case 'ball_size':
-          renderBallSizePreview(ctx, w, h, currentLevel, isMax, tick);
-          break;
-        case 'ball_speed':
-          renderBallSpeedPreview(ctx, w, h, currentLevel, isMax, tick);
-          break;
-        case 'ball_impact':
-          renderBallImpactPreview(ctx, w, h, currentLevel, isMax, tick);
-          break;
-        case 'paddle_width':
-          renderPaddleWidthPreview(ctx, w, h, currentLevel, isMax, tick);
-          break;
-        case 'paddle_speed':
-          renderPaddleSpeedPreview(ctx, w, h, currentLevel, isMax, tick);
-          break;
-        default:
-          break;
+      if (upgrade.category === 'power') {
+        renderPowerDurationPreview(ctx, w, h, upgrade, currentLevel, isMax, tick);
+      } else {
+        switch (upgrade.id) {
+          case 'ball_size':
+            renderBallSizePreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
+          case 'ball_speed':
+            renderBallSpeedPreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
+          case 'ball_impact':
+            renderBallImpactPreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
+          case 'paddle_width':
+            renderPaddleWidthPreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
+          case 'paddle_speed':
+            renderPaddleSpeedPreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
+          default:
+            break;
+        }
       }
 
       animId = requestAnimationFrame(render);

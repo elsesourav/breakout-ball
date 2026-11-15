@@ -35,7 +35,7 @@ export class WasmPhysicsBridge {
       this.eventsBufPtr = malloc(1024);
 
       this.isReady = true;
-      console.log('⚡ WebAssembly Breakout Physics Module initialized successfully.');
+      console.log('WebAssembly Breakout Physics Module initialized successfully.');
       return true;
     } catch (err) {
       console.warn('WASM instantiation failed, using TypeScript physics engine fallback:', err);

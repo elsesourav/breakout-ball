@@ -1,5 +1,5 @@
 import { PaddleState } from '../types';
-import { PaddleTier, TopWeaponVariant, getPaddleTierFromUpgrades } from '../../constants/visualPresets';
+import { PaddleTier, getPaddleTierFromUpgrades } from '../../constants/visualPresets';
 
 export interface PaddleRenderOptions {
   animTick?: number;
@@ -8,7 +8,7 @@ export interface PaddleRenderOptions {
   tier?: PaddleTier;
   widthLevel?: number;
   speedLevel?: number;
-  weaponVariant?: TopWeaponVariant;
+  weaponVariant?: number;
 }
 
 /**
@@ -59,21 +59,36 @@ export function drawMechTitanPaddle(
 
   ctx.save();
 
-  // 1. Under-Chassis Ion Thruster Exhaust Plumes (Tier 2: Dual Thrusters, Tier 3: Quad Thrusters)
-  if (tier >= 2) {
-    const thrusterPositions =
-      tier === 3
-        ? [paddle.x - pw * 0.4, paddle.x - pw * 0.22, paddle.x + pw * 0.22, paddle.x + pw * 0.4]
-        : [paddle.x - pw * 0.32, paddle.x + pw * 0.32];
+  // Speed-based Thruster Fire Effect (Independent of Width)
+  const speedLevel = options.speedLevel !== undefined ? options.speedLevel : 1;
 
-    const thrusterW = tier === 3 ? 12 : 14;
-    const flameH = (tier === 3 ? 16 : 12) + Math.sin(animTick * 14) * 4;
+  // 1. Under-Chassis Ion Thruster Exhaust Plumes (Driven Strictly by Speed Level)
+  if (speedLevel >= 2) {
+    const isQuad = speedLevel >= 7;
+    const thrusterPositions = isQuad
+      ? [paddle.x - pw * 0.38, paddle.x - pw * 0.20, paddle.x + pw * 0.20, paddle.x + pw * 0.38]
+      : [paddle.x - pw * 0.30, paddle.x + pw * 0.30];
+
+    const thrusterW = isQuad ? 10 : 12;
+    const flameH = (isQuad ? 14 : 8) + (speedLevel - 1) * 2.0 + Math.sin(animTick * 14) * 3;
 
     thrusterPositions.forEach((tx) => {
       const flameGrad = ctx.createLinearGradient(tx, py + ph - 2, tx, py + ph + flameH);
       flameGrad.addColorStop(0, '#ffffff');
-      flameGrad.addColorStop(0.25, tier === 3 ? '#ff9900' : '#00f7ff');
-      flameGrad.addColorStop(0.7, tier === 3 ? '#ff3300' : '#0055ff');
+
+      if (speedLevel >= 7) {
+        // Quad Hyper Overdrive: Blazing Orange-Gold Core to Crimson Flame
+        flameGrad.addColorStop(0.25, '#ffd700');
+        flameGrad.addColorStop(0.65, '#ff4500');
+      } else if (speedLevel >= 4) {
+        // Boosted Plasma: Cyan to Electric Blue
+        flameGrad.addColorStop(0.25, '#00f7ff');
+        flameGrad.addColorStop(0.70, '#2563eb');
+      } else {
+        // Base Ion: Soft Cyan-Blue
+        flameGrad.addColorStop(0.35, '#38bdf8');
+        flameGrad.addColorStop(0.85, '#1d4ed8');
+      }
       flameGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       ctx.fillStyle = flameGrad;
@@ -84,11 +99,11 @@ export function drawMechTitanPaddle(
       ctx.closePath();
       ctx.fill();
 
-      // Exhaust spark particle
-      if (Math.sin(animTick * 18 + tx) > 0.4) {
-        ctx.fillStyle = '#ffffff';
+      // Exhaust spark particles
+      if (Math.sin(animTick * 18 + tx) > 0.35) {
+        ctx.fillStyle = speedLevel >= 7 ? '#ffd700' : '#ffffff';
         ctx.beginPath();
-        ctx.arc(tx + Math.sin(animTick * 10) * 3, py + ph + flameH + 4, 1.5, 0, Math.PI * 2);
+        ctx.arc(tx + Math.sin(animTick * 10) * 3, py + ph + flameH + 3, 1.4, 0, Math.PI * 2);
         ctx.fill();
       }
     });

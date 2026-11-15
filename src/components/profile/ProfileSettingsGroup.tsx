@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
 import { CustomCyberSlider } from '../common/CustomCyberSlider';
 import { CustomCyberSwitch } from '../common/CustomCyberSwitch';
-import { Volume2, Vibrate, Compass, Sliders, Trash2, AlertTriangle, Zap } from 'lucide-react';
+import { Volume2, Vibrate, Compass, Sliders, Trash2, AlertTriangle } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 export const ProfileSettingsGroup: React.FC = () => {
-  const { settings, updateSettings, setScreen } = useGame();
+  const { settings, updateSettings } = useGame();
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [resetInputText, setResetInputText] = useState('');
   const [isResetting, setIsResetting] = useState(false);
@@ -169,33 +169,6 @@ export const ProfileSettingsGroup: React.FC = () => {
             className="w-full font-tech"
             ariaLabel="Gyroscope Sensitivity"
           />
-        </div>
-      </div>
-
-      {/* Visual Design Lab & Asset Customizer */}
-      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-cyan-500/25 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-2 pb-2 border-b border-cyan-500/15 text-cyan-400 text-xs font-display font-black tracking-wider uppercase">
-          <Zap className="w-4 h-4 text-cyan-400" />
-          <span>Asset Forge & 3D Lab</span>
-        </div>
-
-        <div className="flex items-center justify-between pt-0.5">
-          <div className="flex flex-col">
-            <span className="font-settings-title text-xs font-bold text-white tracking-wider">
-              VISUAL DESIGN LAB
-            </span>
-            <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
-              Customize 3D ball cores, paddles & blocks
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setScreen('design-lab')}
-            className="px-3 py-1.5 rounded-xl border border-cyan-500/40 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 font-tech font-bold text-xs transition-all active:scale-95 cursor-pointer shadow-[0_0_10px_rgba(0,247,255,0.2)]"
-          >
-            OPEN LAB →
-          </button>
         </div>
       </div>
 

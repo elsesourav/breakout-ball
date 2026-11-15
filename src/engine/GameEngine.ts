@@ -35,6 +35,7 @@ export class GameEngine {
   private animFrameId: number | null = null;
   private lastTime: number = 0;
   private accumulator: number = 0;
+  private isPaused: boolean = false;
 
   // Fixed 60Hz physics timestep (0.016667s) guarantees identical speed on all devices (60Hz, 120Hz, 144Hz, 240Hz, mobile, tablet)
   private readonly FIXED_STEP: number = 1 / 60;
@@ -131,7 +132,7 @@ export class GameEngine {
     this.state.status = 'playing';
 
     const ballSpeedLvl = currencyService.getUpgradeLevel('ball_speed');
-    const currentSpeed = BALL_SPEED * (1 + (ballSpeedLvl - 1) * 0.08);
+    const currentSpeed = BALL_SPEED * (1 + (ballSpeedLvl - 1) * 0.035);
 
     const angle = (Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1) + (Math.random() * 0.2 - 0.1);
     const vx = Math.sin(angle) * currentSpeed;
@@ -172,6 +173,13 @@ export class GameEngine {
       let dt = (now - this.lastTime) / 1000;
       this.lastTime = now;
 
+      if (this.isPaused) {
+        this.accumulator = 0;
+        this.render();
+        this.animFrameId = requestAnimationFrame(loop);
+        return;
+      }
+
       if (dt > this.MAX_FRAME_DELTA) {
         dt = this.MAX_FRAME_DELTA;
       }
@@ -189,11 +197,33 @@ export class GameEngine {
     this.animFrameId = requestAnimationFrame(loop);
   }
 
+  public pause() {
+    this.isPaused = true;
+  }
+
+  public resume() {
+    this.isPaused = false;
+    this.lastTime = performance.now();
+    this.accumulator = 0;
+  }
+
+  public getIsPaused(): boolean {
+    return this.isPaused;
+  }
+
   public stopLoop() {
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
       this.animFrameId = null;
     }
+  }
+
+  private recordScore(combo: number, pts: number) {
+    this.state.combo = combo;
+    if (this.state.combo > this.state.maxCombo) this.state.maxCombo = this.state.combo;
+    this.state.score += pts;
+    this.callbacks.onComboChange?.(this.state.combo);
+    this.callbacks.onScoreUpdate?.(this.state);
   }
 
   private fixedTick(dt: number) {
@@ -235,6 +265,7 @@ export class GameEngine {
     this.tsPhysics.paddle.width = isExpand ? basePadW * expandMultiplier : basePadW;
     this.tsPhysics.isMegaBall = this.powerUps.buffs.megaBall > 0;
     this.tsPhysics.hasShield = this.powerUps.buffs.hasShield;
+    this.tsPhysics.ballImpactLevel = currencyService.getUpgradeLevel('ball_impact');
 
     // 2. Physics Simulation Step
     const events = this.tsPhysics.step(6);
@@ -256,7 +287,7 @@ export class GameEngine {
         this.tsPhysics.hasShield = true;
       }
       this.particles.addFloatingText(
-        `⚡ ${powerType.toUpperCase()}`,
+        `${powerType.toUpperCase()}`,
         this.tsPhysics.paddle.x,
         this.tsPhysics.paddle.y - 35,
         '#00f7ff'
@@ -286,6 +317,9 @@ export class GameEngine {
     }
 
     // 4. Process Collision & Combat Events
+    const ballImpactLvl = currencyService.getUpgradeLevel('ball_impact');
+    const impactShakeMult = 1 + (ballImpactLvl - 1) * 0.15;
+
     for (const ev of events) {
       this.audio.triggerEvent(ev.type, ev.combo);
       this.callbacks.onEventAudio?.(ev.type, ev.combo);
@@ -302,8 +336,12 @@ export class GameEngine {
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, '#ff9900', true);
         this.particles.addFloatingText('💥 EMP DETONATION!', ev.hitX, ev.hitY, '#ff3b00');
         this.renderer.triggerShake(8.0);
-        this.state.score += 500;
-        this.callbacks.onScoreUpdate?.(this.state);
+        this.state.blocksDestroyed++;
+        this.recordScore(ev.combo, 500);
+        if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
+          this.handleWin();
+          return;
+        }
       } else if (ev.type === 'shield_bounce') {
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
         this.particles.addFloatingText('🛡️ FORCEFIELD SAVED', ev.hitX, ev.hitY, '#10b981');
@@ -312,41 +350,29 @@ export class GameEngine {
         const block = this.tsPhysics.blocks[ev.blockIndex];
         const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#00f7ff' : '#00f7ff';
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, false);
-        this.renderer.triggerShake(1.5);
-
-        this.state.combo = ev.combo;
-        if (this.state.combo > this.state.maxCombo) {
-          this.state.maxCombo = this.state.combo;
-        }
+        this.renderer.triggerShake(1.5 * impactShakeMult);
         const pts = 50 * (1 + Math.floor(ev.combo / 3));
-        this.state.score += pts;
         this.particles.addFloatingText(`+${pts}`, ev.hitX, ev.hitY, color);
-        this.callbacks.onComboChange?.(this.state.combo);
-        this.callbacks.onScoreUpdate?.(this.state);
+        this.recordScore(ev.combo, pts);
+      } else if (ev.type === 'crit_damage') {
+        const block = this.tsPhysics.blocks[ev.blockIndex];
+        const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#fbbf24' : '#fbbf24';
+        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, true);
+        this.renderer.triggerShake(3.5 * impactShakeMult);
+        const pts = 100 * (1 + Math.floor(ev.combo / 2));
+        this.particles.addFloatingText(`💥 CRIT +${pts}`, ev.hitX, ev.hitY, '#fbbf24');
+        this.recordScore(ev.combo, pts);
       } else if (ev.type === 'block_destroy') {
         const block = this.tsPhysics.blocks[ev.blockIndex];
         const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#ff0844' : '#ff0844';
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, true);
-        this.renderer.triggerShake(3.5);
-
-        // Emergent Power Shard Drop Chance (32%)
+        this.renderer.triggerShake(3.5 * impactShakeMult);
         this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.32);
-
         this.state.blocksDestroyed++;
-        this.state.combo = ev.combo;
-        if (this.state.combo > this.state.maxCombo) {
-          this.state.maxCombo = this.state.combo;
-        }
-
         const pts = 100 * (1 + ev.combo);
-        this.state.score += pts;
         const comboText = ev.combo > 1 ? `+${pts} (${ev.combo}x)` : `+${pts}`;
         this.particles.addFloatingText(comboText, ev.hitX, ev.hitY, ev.combo > 2 ? '#eeff01' : color);
-
-        this.callbacks.onComboChange?.(this.state.combo);
-        this.callbacks.onScoreUpdate?.(this.state);
-
-        // Check Victory
+        this.recordScore(ev.combo, pts);
         if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
           this.handleWin();
           return;
@@ -356,6 +382,22 @@ export class GameEngine {
         this.handleLifeLost();
         return;
       }
+    }
+
+    // Synchronize destroyed breakables and remaining targets with ground-truth block state
+    let deadCount = 0;
+    let remCount = 0;
+    for (const b of this.tsPhysics.blocks) {
+      if ((b.initialHealth >= 1 && b.initialHealth <= 5) || b.initialHealth === 8) {
+        if (b.isDead) deadCount++;
+        else remCount++;
+      }
+    }
+    this.state.blocksDestroyed = Math.max(this.state.blocksDestroyed, deadCount);
+    this.tsPhysics.remainingBreakable = remCount;
+    if (remCount <= 0 && this.state.status === 'playing') {
+      this.handleWin();
+      return;
     }
 
     // 5. Update Ball Motion Trails
@@ -406,8 +448,10 @@ export class GameEngine {
       if (this.state.lives > 0 && this.state.status === 'paused') {
         this.state.status = 'playing';
         const angle = (Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1);
-        const vx = Math.sin(angle) * BALL_SPEED;
-        const vy = -Math.cos(angle) * BALL_SPEED;
+        const ballSpeedLvl = currencyService.getUpgradeLevel('ball_speed');
+        const currentSpeed = BALL_SPEED * (1 + (ballSpeedLvl - 1) * 0.035);
+        const vx = Math.sin(angle) * currentSpeed;
+        const vy = -Math.cos(angle) * currentSpeed;
         this.tsPhysics.resetBall(paddleX, resetY, vx, vy);
       }
     }, 700);
@@ -415,6 +459,7 @@ export class GameEngine {
 
   private handleWin() {
     this.state.status = 'win';
+    this.state.blocksDestroyed = this.state.totalBreakable;
     this.audio.playWin();
 
     const timeBonus = Math.max(0, Math.floor(1000 - this.state.timeUsed * 25));

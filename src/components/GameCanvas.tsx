@@ -12,12 +12,59 @@ import { GameHUD } from './GameHUD';
 import { ParticleBackdrop } from './ParticleBackdrop';
 import { GameEngine } from '../engine/GameEngine';
 import { ScoreState } from '../engine/types';
+import { isTodayDailyMission, isDailyMissionCompleted } from '../services/dailyApex';
+import { cyberToast } from './common/CyberToast';
+
+interface CanvasDisplaySize {
+  width: number;
+  height: number;
+  topPadding: number;
+  bottomPadding: number;
+}
+
+function computeGameCanvasSize(containerW: number, containerH: number): CanvasDisplaySize {
+  const GAME_ASPECT = CANVAS_WIDTH / CANVAS_HEIGHT; // 9:16 = 0.5625
+
+  // Top padding reserves space for the HUD buttons (~48px) so blocks never collide with them
+  const topPadding = Math.max(54, Math.min(68, Math.round(containerH * 0.075)));
+  const bottomPadding = Math.max(18, Math.min(28, Math.round(containerH * 0.035)));
+  const horizontalMargin = containerW < 360 ? 6 : 14;
+
+  const maxAvailableH = Math.max(160, containerH - topPadding - bottomPadding);
+  const maxAvailableW = Math.max(120, containerW - horizontalMargin * 2);
+
+  // Maximum display height requested by user: ~600px ceiling with matching width
+  const MAX_DISPLAY_HEIGHT = 600;
+  const MAX_DISPLAY_WIDTH = Math.round(MAX_DISPLAY_HEIGHT * GAME_ASPECT); // 338
+
+  const boundH = Math.min(maxAvailableH, MAX_DISPLAY_HEIGHT);
+  const boundW = Math.min(maxAvailableW, MAX_DISPLAY_WIDTH);
+
+  // Strictly preserve 9:16 aspect ratio across all devices:
+  // "If height is greater and width doesn't match -> make width small and height small.
+  //  If width is big but height is small -> make height small and width small."
+  let width = boundW;
+  let height = Math.round(width / GAME_ASPECT);
+
+  if (height > boundH) {
+    height = boundH;
+    width = Math.round(height * GAME_ASPECT);
+  }
+
+  // Force even integers for sharp display
+  width = Math.round(width / 2) * 2;
+  height = Math.round(height / 2) * 2;
+
+  return { width, height, topPadding, bottomPadding };
+}
 
 export const GameCanvas: React.FC = () => {
   const {
     selectedLevel,
     localLevels,
+    onlineLevels,
     setScreen,
+    setActiveTab,
     settings,
     recordLevelCompletion,
     startPlayLevel,
@@ -25,6 +72,30 @@ export const GameCanvas: React.FC = () => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [displaySize, setDisplaySize] = useState<CanvasDisplaySize>(() => {
+    const w = typeof window !== 'undefined' ? window.innerWidth : 360;
+    const h = typeof window !== 'undefined' ? window.innerHeight : 640;
+    return computeGameCanvasSize(w, h);
+  });
+
+  useEffect(() => {
+    const updateSize = () => {
+      const el = containerRef.current;
+      const w = el ? el.clientWidth : window.innerWidth;
+      const h = el ? el.clientHeight : window.innerHeight;
+      setDisplaySize(computeGameCanvasSize(w, h));
+    };
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    window.addEventListener('orientationchange', updateSize);
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      window.removeEventListener('orientationchange', updateSize);
+    };
+  }, []);
 
   // Reactive UI state
   const [lives, setLives] = useState<number>(3);
@@ -54,6 +125,11 @@ export const GameCanvas: React.FC = () => {
 
   const [coresEarned, setCoresEarned] = useState<number>(0);
   const [isFirstClear, setIsFirstClear] = useState<boolean>(false);
+  const [starsEarned, setStarsEarned] = useState<number>(3);
+  const [previousStars, setPreviousStars] = useState<number>(0);
+  const [totalClaimedForLevel, setTotalClaimedForLevel] = useState<number>(0);
+  const [maxCoresForLevel, setMaxCoresForLevel] = useState<number>(0);
+  const [remainingCoresForLevel, setRemainingCoresForLevel] = useState<number>(0);
 
   // Handle Level Victory
   const handleLevelWin = useCallback(
@@ -70,9 +146,18 @@ export const GameCanvas: React.FC = () => {
       setSummaryState(finalScore);
 
       try {
-        const result = await recordLevelCompletion(selectedLevel.id, finalScore.timeUsed);
+        const result = await recordLevelCompletion(
+          selectedLevel.id,
+          finalScore.timeUsed,
+          finalScore.lives
+        );
         setCoresEarned(result?.coresEarned ?? 0);
         setIsFirstClear(result?.isFirstClear ?? false);
+        setStarsEarned(result?.starsEarned ?? Math.min(3, Math.max(1, finalScore.lives)));
+        setPreviousStars(result?.previousStars ?? 0);
+        setTotalClaimedForLevel(result?.totalClaimedForLevel ?? 0);
+        setMaxCoresForLevel(result?.maxCoresForLevel ?? 0);
+        setRemainingCoresForLevel(result?.remainingCoresForLevel ?? 0);
       } catch (err) {
         console.error('Error saving score:', err);
       }
@@ -103,6 +188,15 @@ export const GameCanvas: React.FC = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !selectedLevel) return;
+
+    // Guard: Prevent playing today's Daily Apex Mission if already claimed
+    if (isTodayDailyMission(selectedLevel.id, onlineLevels) && isDailyMissionCompleted()) {
+      soundManager.playLockTap();
+      cyberToast.info('Daily Apex Mission already completed for today!');
+      setScreen('menu');
+      setActiveTab('online');
+      return;
+    }
 
     let isDisposed = false;
 
@@ -280,20 +374,40 @@ export const GameCanvas: React.FC = () => {
     setAttemptId((prev) => prev + 1);
   };
 
+  const isDaily = selectedLevel ? isTodayDailyMission(selectedLevel.id, onlineLevels) : false;
+
+  const isArcade = Boolean(
+    selectedLevel && localLevels.some((l) => l.id === selectedLevel.id)
+  );
+  const gameMode: 'arcade' | 'arena' = isArcade ? 'arcade' : 'arena';
+
+  const handleExit = () => {
+    soundManager.stopBgMusic();
+    if (isArcade) {
+      setActiveTab('local');
+    } else {
+      setActiveTab('online');
+    }
+    setScreen('menu');
+  };
+
   // Advance to Next Mission
   const handleNextLevel = () => {
     if (hasNextLevel && localLevels[currentLevelIndex + 1]) {
       setSummaryState(null);
       startPlayLevel(localLevels[currentLevelIndex + 1]);
     } else {
-      setScreen('menu');
+      handleExit();
     }
   };
 
   return (
     <div
-      className="relative w-full h-full flex flex-col items-center justify-center bg-black overflow-hidden select-none"
+      ref={containerRef}
+      className="relative w-full h-full flex flex-col items-center justify-between bg-[#060714] overflow-hidden select-none"
       style={{ width: '100%', height: '100%' }}
+      onMouseMove={handlePointerMove}
+      onTouchMove={handlePointerMove}
     >
       <ParticleBackdrop />
       <GameHUD
@@ -302,12 +416,11 @@ export const GameCanvas: React.FC = () => {
         countdown={countdownText}
         score={score}
         combo={combo}
-        onExit={() => {
-          soundManager.stopBgMusic();
-          setScreen('menu');
-        }}
+        onExit={handleExit}
+        onPause={() => engineRef.current?.pause()}
+        onResume={() => engineRef.current?.resume()}
         summaryState={summaryState}
-        onRetry={handleRetry}
+        onRetry={isDaily && summaryState?.status === 'win' ? undefined : handleRetry}
         onNextLevel={handleNextLevel}
         hasNextLevel={hasNextLevel}
         levelNumber={levelNumber}
@@ -315,17 +428,38 @@ export const GameCanvas: React.FC = () => {
         blocksDestroyed={liveScoreState?.blocksDestroyed ?? 0}
         coresEarned={coresEarned}
         isFirstClear={isFirstClear}
+        starsEarned={starsEarned}
+        previousStars={previousStars}
+        totalClaimedForLevel={totalClaimedForLevel}
+        maxCoresForLevel={maxCoresForLevel}
+        remainingCoresForLevel={remainingCoresForLevel}
         totalCores={currencyService.getBalance()}
+        isDailyMission={isDaily}
+        gameMode={gameMode}
       />
-      <canvas
-        ref={canvasRef}
-        id="mainCanvas"
-        className="w-full h-full object-contain active cursor-crosshair touch-none"
-        width={CANVAS_WIDTH}
-        height={CANVAS_HEIGHT}
-        onMouseMove={handlePointerMove}
-        onTouchMove={handlePointerMove}
-      />
+      <div
+        className="relative flex-1 w-full flex flex-col items-center justify-center pointer-events-auto"
+        style={{
+          paddingTop: `${displaySize.topPadding}px`,
+          paddingBottom: `${displaySize.bottomPadding}px`,
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          id="mainCanvas"
+          className="block active cursor-crosshair touch-none rounded-xl border border-cyan-500/30 shadow-[0_0_24px_rgba(0,247,255,0.2)]"
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          style={{
+            width: `${displaySize.width}px`,
+            height: `${displaySize.height}px`,
+          }}
+          onMouseDown={handlePointerMove}
+          onMouseMove={handlePointerMove}
+          onTouchStart={handlePointerMove}
+          onTouchMove={handlePointerMove}
+        />
+      </div>
     </div>
   );
 };

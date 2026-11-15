@@ -23,6 +23,7 @@ export class PhysicsWorld {
   public events: CollisionEvent[] = [];
   public hasShield: boolean = false;
   public isMegaBall: boolean = false;
+  public ballImpactLevel: number = 1;
 
   private defaultBall: BallState;
 
@@ -54,6 +55,8 @@ export class PhysicsWorld {
       baseSpeed: config.ballSpeed,
       isActive: false,
       warpCooldown: 0,
+      paddleCooldown: 0,
+      lastHitBlockCooldown: 0,
       trail: [],
     };
     this.balls = [{ ...this.defaultBall }];
@@ -88,6 +91,7 @@ export class PhysicsWorld {
         isDead,
         hitAnim: 0,
         counter: b.h === 8 ? 3 : undefined,
+        portalPairId: b.portalPairId,
       };
 
       if (b.h === 7) {
@@ -97,12 +101,40 @@ export class PhysicsWorld {
       this.blocks.push(blockState);
     });
 
-    // Pair portal blocks in order (portal A <-> portal B)
-    for (let p = 0; p < portalIndices.length - 1; p += 2) {
-      const idxA = portalIndices[p];
-      const idxB = portalIndices[p + 1];
+    // Robust Portal Pairing: Match portals by portalPairId, with fallback sequential/ring pairing
+    const pairMap = new Map<number, number[]>();
+    portalIndices.forEach((idx, i) => {
+      const pid = this.blocks[idx].portalPairId ?? Math.floor(i / 2) + 1;
+      if (!pairMap.has(pid)) pairMap.set(pid, []);
+      pairMap.get(pid)!.push(idx);
+    });
+
+    const orphanIndices: number[] = [];
+    pairMap.forEach((indices) => {
+      if (indices.length >= 2) {
+        for (let p = 0; p < indices.length; p++) {
+          const nextIdx = indices[(p + 1) % indices.length];
+          this.blocks[indices[p]].portalPairIndex = nextIdx;
+        }
+      } else if (indices.length === 1) {
+        orphanIndices.push(indices[0]);
+      }
+    });
+
+    // Pair up any leftover orphan portals across different groups
+    for (let o = 0; o < orphanIndices.length - 1; o += 2) {
+      const idxA = orphanIndices[o];
+      const idxB = orphanIndices[o + 1];
       this.blocks[idxA].portalPairIndex = idxB;
       this.blocks[idxB].portalPairIndex = idxA;
+    }
+
+    // If an odd single portal remains completely alone in the entire level:
+    // It remains a portal (health = 7) and acts as an indestructible quantum reflector!
+    // It NEVER transforms into a Titanium block or changes appearance.
+    if (orphanIndices.length % 2 === 1) {
+      const loneIdx = orphanIndices[orphanIndices.length - 1];
+      this.blocks[loneIdx].portalPairIndex = undefined;
     }
   }
 
@@ -117,6 +149,8 @@ export class PhysicsWorld {
       baseSpeed: this.config.ballSpeed,
       isActive: Math.abs(vx) > 0.01 || Math.abs(vy) > 0.01,
       warpCooldown: 0,
+      paddleCooldown: 0,
+      lastHitBlockCooldown: 0,
       isMega: this.isMegaBall,
       trail: [],
     };
@@ -136,32 +170,22 @@ export class PhysicsWorld {
       const angle = Math.atan2(b.vy, b.vx);
       const spd = b.speed || this.config.ballSpeed;
 
-      newBalls.push({
-        x: b.x,
-        y: b.y,
-        vx: Math.cos(angle + spread) * spd,
-        vy: Math.sin(angle + spread) * spd,
-        radius: b.radius,
-        speed: spd,
-        baseSpeed: b.baseSpeed,
-        isActive: true,
-        isMega: b.isMega,
-        warpCooldown: 0,
-        trail: [],
-      });
-
-      newBalls.push({
-        x: b.x,
-        y: b.y,
-        vx: Math.cos(angle - spread) * spd,
-        vy: Math.sin(angle - spread) * spd,
-        radius: b.radius,
-        speed: spd,
-        baseSpeed: b.baseSpeed,
-        isActive: true,
-        isMega: b.isMega,
-        warpCooldown: 0,
-        trail: [],
+      [spread, -spread].forEach((offset) => {
+        newBalls.push({
+          x: b.x,
+          y: b.y,
+          vx: Math.cos(angle + offset) * spd,
+          vy: Math.sin(angle + offset) * spd,
+          radius: b.radius,
+          speed: spd,
+          baseSpeed: b.baseSpeed,
+          isActive: true,
+          isMega: b.isMega,
+          warpCooldown: 0,
+          paddleCooldown: 0,
+          lastHitBlockCooldown: 0,
+          trail: [],
+        });
       });
     }
 
@@ -202,16 +226,29 @@ export class PhysicsWorld {
         ball.warpCooldown--;
       }
 
+      if (ball.paddleCooldown && ball.paddleCooldown > 0) {
+        ball.paddleCooldown--;
+      }
+
+      if (ball.lastHitBlockCooldown && ball.lastHitBlockCooldown > 0) {
+        ball.lastHitBlockCooldown--;
+        if (ball.lastHitBlockCooldown <= 0) {
+          ball.lastHitBlockIndex = undefined;
+        }
+      }
+
       ball.radius = this.isMegaBall ? this.config.ballRadius * 1.45 : this.config.ballRadius;
       ball.isMega = this.isMegaBall;
 
       const subDt = 1 / substeps;
-      const subVx = ball.vx * subDt;
-      const subVy = ball.vy * subDt;
+      // Track blocks damaged by this ball during this tick to strictly prevent multiple damage hits from one impact
+      const damagedBlocksThisTick = new Set<number>();
 
       for (let step = 0; step < substeps; step++) {
-        ball.x += subVx;
-        ball.y += subVy;
+        const prevBallY = ball.y;
+        // Always move by current velocity so any bounce in a previous substep immediately moves the ball away
+        ball.x += ball.vx * subDt;
+        ball.y += ball.vy * subDt;
 
         // 1. Boundary Wall Collisions
         if (ball.x - ball.radius <= 0) {
@@ -248,7 +285,7 @@ export class PhysicsWorld {
           }
         }
 
-        // 2. Paddle Curvature & Bounce
+        // 2. High-Precision Paddle Collision & Dynamic Angular Deflection
         const padLeft = this.paddle.x - halfPadW;
         const padRight = this.paddle.x + halfPadW;
         const padTop = this.paddle.y;
@@ -258,17 +295,24 @@ export class PhysicsWorld {
         const closestPadY = Math.max(padTop, Math.min(ball.y, padBottom));
         const padDistSq = (ball.x - closestPadX) ** 2 + (ball.y - closestPadY) ** 2;
 
-        if (padDistSq <= ball.radius ** 2 && ball.vy > 0) {
+        // Continuous swept check: Did the ball pass through the top paddle line this substep?
+        const crossedPaddleTop = prevBallY <= padTop + ball.radius && ball.y + ball.radius >= padTop;
+        const withinPaddleWidth = ball.x >= padLeft - ball.radius && ball.x <= padRight + ball.radius;
+        const isNearPaddle = padDistSq <= ball.radius ** 2 || (crossedPaddleTop && withinPaddleWidth && ball.vy > 0);
+        const isNotOnCooldown = !ball.paddleCooldown || ball.paddleCooldown <= 0;
+        const isMovingTowardsPaddle = ball.vy > 0 || ball.y <= padTop + this.paddle.height * 0.5;
+
+        if (isNearPaddle && isNotOnCooldown && isMovingTowardsPaddle) {
           const hitOffset = Math.max(-1, Math.min(1, (ball.x - this.paddle.x) / halfPadW));
           const maxAngle = (Math.PI / 180) * 62;
           const bounceAngle = hitOffset * maxAngle;
-          const spin = this.paddle.vx * 0.25;
-          const currentSpeed = ball.speed;
+          const spin = this.paddle.vx * 0.28;
+          const currentSpeed = ball.speed || this.config.ballSpeed;
 
           let newVx = currentSpeed * Math.sin(bounceAngle) + spin;
           let newVy = -currentSpeed * Math.cos(bounceAngle);
           const minVy = -currentSpeed * 0.35;
-          if (newVy > minVy) newVy = minVy;
+          if (newVy > minVy) newVy = minVy; // Ensure strong upward launch trajectory
 
           const newLen = Math.hypot(newVx, newVy);
           if (newLen > 0.001) {
@@ -279,11 +323,11 @@ export class PhysicsWorld {
             ball.vy = -currentSpeed;
           }
 
+          // Position cleanly above paddle surface to prevent penetration
           ball.y = padTop - ball.radius - 1;
+          ball.paddleCooldown = 8;
+          ball.lastHitBlockIndex = undefined;
           this.combo = 0;
-
-          // Tick down any active EMP counter reactors on paddle bounce!
-          this.decrementEmpReactors();
 
           this.events.push({
             type: 'paddle',
@@ -300,6 +344,10 @@ export class PhysicsWorld {
           const block = this.blocks[b];
           if (block.isDead) continue;
 
+          // Strictly guarantee: each block can only take damage once per physics frame from a ball
+          if (damagedBlocksThisTick.has(b)) continue;
+          if (ball.lastHitBlockIndex === b && (ball.lastHitBlockCooldown ?? 0) > 0) continue;
+
           const closestX = Math.max(block.x, Math.min(ball.x, block.x + block.w));
           const closestY = Math.max(block.y, Math.min(ball.y, block.y + block.h));
           const distX = ball.x - closestX;
@@ -312,29 +360,66 @@ export class PhysicsWorld {
 
             // SPECIAL A: Quantum Portal Warp (Type 7)
             if (block.health === 7 && (!ball.warpCooldown || ball.warpCooldown <= 0)) {
-              if (block.portalPairIndex !== undefined && this.blocks[block.portalPairIndex]) {
+              if (
+                block.portalPairIndex !== undefined &&
+                this.blocks[block.portalPairIndex] &&
+                this.blocks[block.portalPairIndex].health === 7 &&
+                !this.blocks[block.portalPairIndex].isDead
+              ) {
                 const targetPortal = this.blocks[block.portalPairIndex];
-                ball.x = targetPortal.x + targetPortal.w / 2;
-                ball.y = targetPortal.y + (ball.vy > 0 ? targetPortal.h + ball.radius + 4 : -ball.radius - 4);
-                ball.warpCooldown = 18;
-                this.events.push({
-                  type: 'portal_warp',
-                  blockIndex: b,
-                  hitX: hitCenterX,
-                  hitY: hitCenterY,
-                  combo: this.combo,
-                });
-                break;
+                if (typeof targetPortal.x === 'number' && typeof targetPortal.y === 'number') {
+                  const exitDown = targetPortal.y < this.config.blockHeight * 2 || ball.vy > 0;
+                  ball.x = Math.max(
+                    ball.radius + 4,
+                    Math.min(this.config.width - ball.radius - 4, targetPortal.x + targetPortal.w / 2)
+                  );
+                  ball.y = exitDown 
+                    ? targetPortal.y + targetPortal.h + ball.radius + 4 
+                    : targetPortal.y - ball.radius - 4;
+                  ball.vy = exitDown ? Math.abs(ball.vy) : -Math.abs(ball.vy);
+                  ball.warpCooldown = 22;
+                  this.events.push({
+                    type: 'portal_warp',
+                    blockIndex: b,
+                    hitX: hitCenterX,
+                    hitY: hitCenterY,
+                    combo: this.combo,
+                  });
+                  break;
+                }
               }
             }
 
-            // Normal reflection (Mega Ball pierces breakables without reflecting!)
+            // Normal reflection & physically accurate collision normal
+            let nx = 0;
+            let ny = 0;
+            let penetration = 0;
+            const dist = Math.sqrt(distSq);
+
+            if (dist > 0.0001) {
+              nx = distX / dist;
+              ny = distY / dist;
+              penetration = ball.radius - dist;
+            } else {
+              // Deep overlap: resolve along shallowest axis
+              const dLeft = Math.abs(ball.x - block.x);
+              const dRight = Math.abs(block.x + block.w - ball.x);
+              const dTop = Math.abs(ball.y - block.y);
+              const dBottom = Math.abs(block.y + block.h - ball.y);
+              const minD = Math.min(dLeft, dRight, dTop, dBottom);
+              if (minD === dTop) {
+                nx = 0; ny = -1; penetration = ball.radius + dTop;
+              } else if (minD === dBottom) {
+                nx = 0; ny = 1; penetration = ball.radius + dBottom;
+              } else if (minD === dLeft) {
+                nx = -1; ny = 0; penetration = ball.radius + dLeft;
+              } else {
+                nx = 1; ny = 0; penetration = ball.radius + dRight;
+              }
+            }
+
             const isBreakable = (block.health >= 1 && block.health <= 5) || block.health === 8;
             if (!this.isMegaBall || !isBreakable) {
-              const dist = Math.sqrt(distSq);
-              const nx = dist > 0.0001 ? distX / dist : (ball.vx > 0 ? -1 : 1);
-              const ny = dist > 0.0001 ? distY / dist : (ball.vy > 0 ? -1 : 1);
-              const penetration = ball.radius - dist;
               const dot = ball.vx * nx + ball.vy * ny;
               if (dot < 0) {
                 ball.vx -= 2 * dot * nx;
@@ -346,17 +431,27 @@ export class PhysicsWorld {
               }
 
               // Anti-horizontal trap: keep ball dynamic and engaging
-              const minVy = 0.22 * ball.speed;
+              const currentSpeed = ball.speed || this.config.ballSpeed;
+              const spd = Math.hypot(ball.vx, ball.vy);
+              if (spd > 0.001) {
+                ball.vx = (ball.vx / spd) * currentSpeed;
+                ball.vy = (ball.vy / spd) * currentSpeed;
+              }
+              const minVy = 0.22 * currentSpeed;
               if (Math.abs(ball.vy) < minVy) {
                 ball.vy = ball.vy >= 0 ? minVy : -minVy;
-                const spd = Math.hypot(ball.vx, ball.vy);
-                if (spd > 0.001) {
-                  ball.vx = (ball.vx / spd) * ball.speed;
-                  ball.vy = (ball.vy / spd) * ball.speed;
+                const newSpd = Math.hypot(ball.vx, ball.vy);
+                if (newSpd > 0.001) {
+                  ball.vx = (ball.vx / newSpd) * currentSpeed;
+                  ball.vy = (ball.vy / newSpd) * currentSpeed;
                 }
               }
             }
 
+            // Mark block damaged this tick and activate hit cooldown
+            damagedBlocksThisTick.add(b);
+            ball.lastHitBlockIndex = b;
+            ball.lastHitBlockCooldown = 4;
             block.hitAnim = 1.0;
 
             // SPECIAL B: Countdown EMP Reactor (Type 8)
@@ -366,12 +461,13 @@ export class PhysicsWorld {
             }
 
             // Standard Breakable Blocks (1 - 5)
+            // Strictly 1 damage per hit for standard ball (Mega Ball pierces and breaks block)
             if (block.health >= 1 && block.health <= 5) {
-              if (this.isMegaBall) {
-                block.health = 0;
-              } else {
-                block.health--;
-              }
+              const damage = this.isMegaBall ? block.health : 1;
+              block.health = Math.max(0, block.health - damage);
+
+              const critChance = (this.ballImpactLevel - 1) * 0.12;
+              const isCrit = !this.isMegaBall && critChance > 0 && Math.random() < critChance;
 
               this.combo++;
               if (block.health <= 0) {
@@ -379,6 +475,15 @@ export class PhysicsWorld {
                 this.remainingBreakable = Math.max(0, this.remainingBreakable - 1);
                 this.events.push({
                   type: 'block_destroy',
+                  blockIndex: b,
+                  hitX: hitCenterX,
+                  hitY: hitCenterY,
+                  combo: this.combo,
+                });
+              } else if (isCrit) {
+                // Critical impact: grants bonus score & celebratory effects without stripping extra HP
+                this.events.push({
+                  type: 'crit_damage',
                   blockIndex: b,
                   hitX: hitCenterX,
                   hitY: hitCenterY,
@@ -460,24 +565,31 @@ export class PhysicsWorld {
 
     for (let ob = 0; ob < this.blocks.length; ob++) {
       const other = this.blocks[ob];
-      if (other.isDead || other.health === 6) continue;
+      if (other.isDead || other.health === 6 || other.health === 7) continue;
       const ox = other.x + other.w / 2;
       const oy = other.y + other.h / 2;
       const dSq = (ox - hitCenterX) ** 2 + (oy - hitCenterY) ** 2;
 
       if (dSq <= blastSq) {
-        other.health = Math.max(0, other.health - 2);
-        other.hitAnim = 1.0;
-        if (other.health <= 0) {
-          other.isDead = true;
-          this.remainingBreakable = Math.max(0, this.remainingBreakable - 1);
-          this.events.push({
-            type: 'block_destroy',
-            blockIndex: ob,
-            hitX: ox,
-            hitY: oy,
-            combo: ++this.combo,
-          });
+        if (other.health === 8) {
+          // Chain reaction detonation
+          this.detonateEmpReactor(ob);
+          continue;
+        }
+        if (other.health >= 1 && other.health <= 5) {
+          other.health = Math.max(0, other.health - 2);
+          other.hitAnim = 1.0;
+          if (other.health <= 0) {
+            other.isDead = true;
+            this.remainingBreakable = Math.max(0, this.remainingBreakable - 1);
+            this.events.push({
+              type: 'block_destroy',
+              blockIndex: ob,
+              hitX: ox,
+              hitY: oy,
+              combo: ++this.combo,
+            });
+          }
         }
       }
     }

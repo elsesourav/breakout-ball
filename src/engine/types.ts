@@ -10,6 +10,9 @@ export interface BallState {
   baseSpeed: number;
   isActive: boolean;
   warpCooldown?: number;
+  paddleCooldown?: number;
+  lastHitBlockIndex?: number;
+  lastHitBlockCooldown?: number;
   isMega?: boolean;
   trail: { x: number; y: number; alpha: number; size: number }[];
 }
@@ -36,13 +39,15 @@ export interface BlockEngineState {
   isDead: boolean;
   hitAnim: number; // 0 to 1 for flash effect
   counter?: number; // for type 8 EMP counter
-  portalPairIndex?: number; // for type 7 Quantum Portal
+  portalPairIndex?: number; // for type 7 Quantum Portal (target block index in physics.blocks)
+  portalPairId?: number; // for type 7 Quantum Portal (1, 2, 3, 4)
 }
 
 export type CollisionEventType =
   | 'wall'
   | 'paddle'
   | 'block_damage'
+  | 'crit_damage'
   | 'block_destroy'
   | 'ball_lost'
   | 'portal_warp'

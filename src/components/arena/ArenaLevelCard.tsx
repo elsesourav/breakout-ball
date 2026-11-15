@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { LevelData } from '../../types/game';
 import { drawLevelPreviewOnCanvas } from '../../utils/helpers';
 import { User, Flame } from 'lucide-react';
+import { currencyService } from '../../services/currency';
+import { sanitizePortals } from '../../services/db';
 
 interface ArenaLevelCardProps {
   level: LevelData;
@@ -11,6 +13,10 @@ interface ArenaLevelCardProps {
 export const ArenaLevelCard: React.FC<ArenaLevelCardProps> = ({ level, onClick }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const isClaimed = currencyService.isArenaLevelClaimed(level.id);
+
+  // Sanitize blocks so lone portals are always paired or converted
+  const cleanLevel = useMemo(() => sanitizePortals(level), [level]);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -20,11 +26,11 @@ export const ArenaLevelCard: React.FC<ArenaLevelCardProps> = ({ level, onClick }
       const displayH = canvas.clientHeight || 96;
       canvas.width = Math.round(displayW * dpr);
       canvas.height = Math.round(displayH * dpr);
-      drawLevelPreviewOnCanvas(canvas, level.blocks, canvas.width, canvas.height, {
+      drawLevelPreviewOnCanvas(canvas, cleanLevel.blocks, canvas.width, canvas.height, {
         showGrid: false,
       });
     }
-  }, [level]);
+  }, [cleanLevel]);
 
   // Clean compact format for play count: e.g. 2314 -> 2.3k, 940 -> 940
   const formattedPlays = useMemo(() => {
@@ -59,6 +65,14 @@ export const ArenaLevelCard: React.FC<ArenaLevelCardProps> = ({ level, onClick }
           className="w-full h-full block"
           style={{ width: '100%', height: '96px' }}
         />
+        {/* Claimed Indicator (No +CORES badge) */}
+        {isClaimed && (
+          <div className="absolute top-1.5 right-1.5 pointer-events-none">
+            <span className="px-1.5 py-0.5 rounded-full text-[8.5px] font-tech font-bold uppercase tracking-wider bg-emerald-950/85 text-emerald-300 border border-emerald-400/40 shadow-sm backdrop-blur-sm">
+              CLAIMED
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Details Bar: Compact 2-row layout with zero wasted padding or unused text */}

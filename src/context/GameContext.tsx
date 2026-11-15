@@ -22,6 +22,9 @@ import {
   replaceAppRoute,
   scrubUrlParams,
 } from '../services/router';
+import { isTodayDailyMission, recordDailyMissionCompletion } from '../services/dailyApex';
+import { INITIAL_LOCAL_LEVELS } from '../constants/levels';
+import { INITIAL_ONLINE_LEVELS } from '../constants/onlineLevels';
 
 interface GameContextType {
   activeTab: ActiveTab;
@@ -58,8 +61,20 @@ interface GameContextType {
   updateLevelPrivacy: (id: string, isPublic: boolean) => Promise<void>;
   recordLevelCompletion: (
     levelId: string,
-    time: number
-  ) => Promise<{ rank: number; isNewBest: boolean; coresEarned?: number; isFirstClear?: boolean }>;
+    time: number,
+    livesRemaining?: number
+  ) => Promise<{
+    rank: number;
+    isNewBest: boolean;
+    coresEarned?: number;
+    isFirstClear?: boolean;
+    starsEarned?: number;
+    previousStars?: number;
+    newBestStars?: number;
+    totalClaimedForLevel?: number;
+    maxCoresForLevel?: number;
+    remainingCoresForLevel?: number;
+  }>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -67,12 +82,23 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const initialRoute = parseCurrentRoute();
   const [activeTab, setActiveTabState] = useState<ActiveTab>(initialRoute.tab);
-  const [screen, setScreenState] = useState<GameScreen>('menu');
-  const [selectedLevel, setSelectedLevel] = useState<LevelData | null>(null);
+  const [screen, setScreenState] = useState<GameScreen>(() => {
+    if (initialRoute.type === 'play') return 'playing';
+    if (initialRoute.type === 'level') return 'preview';
+    return 'menu';
+  });
+  const [selectedLevel, setSelectedLevel] = useState<LevelData | null>(() => {
+    if (initialRoute.levelId) {
+      const allDefaults = [...INITIAL_LOCAL_LEVELS, ...INITIAL_ONLINE_LEVELS];
+      const match = allDefaults.find((l) => l.id === initialRoute.levelId);
+      if (match) return match;
+    }
+    return INITIAL_LOCAL_LEVELS[0] || null;
+  });
   const [editingLevel, setEditingLevel] = useState<LevelData | null>(null);
 
-  const [localLevels, setLocalLevels] = useState<LevelData[]>([]);
-  const [onlineLevels, setOnlineLevels] = useState<LevelData[]>([]);
+  const [localLevels, setLocalLevels] = useState<LevelData[]>(() => INITIAL_LOCAL_LEVELS);
+  const [onlineLevels, setOnlineLevels] = useState<LevelData[]>(() => INITIAL_ONLINE_LEVELS);
   const [userCreatedLevels, setUserCreatedLevels] = useState<LevelData[]>([]);
   const [localProgress, setLocalProgress] = useState<Record<string, LocalLevelProgress>>({});
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>({});
@@ -117,12 +143,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const allLevels = [...locals, ...onlines, ...userLevels];
       const route = parseCurrentRoute();
 
-      if (route.type === 'design-lab') {
-        setScreenState('design-lab');
-        replaceAppRoute('/design-lab');
-        return;
-      }
-
       if (route.type === 'level' && route.levelId) {
         const found = allLevels.find((lvl) => lvl.id === route.levelId);
         if (found) {
@@ -163,9 +183,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const route = parseCurrentRoute();
       const allLevels = [...localLevels, ...onlineLevels, ...userCreatedLevels];
 
-      if (route.type === 'design-lab') {
-        setScreenState('design-lab');
-      } else if (route.type === 'tab') {
+      if (route.type === 'tab') {
         setActiveTabState(route.tab);
         setScreenState('menu');
       } else if (route.type === 'level' && route.levelId) {
@@ -198,7 +216,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setActiveTab = useCallback(
     (tab: ActiveTab) => {
-      soundManager.playClick();
+      soundManager.playClick('tab');
       setActiveTabState(tab);
       setScreenState('menu');
       pushAppRoute(getRoutePath(tab, 'menu'));
@@ -212,9 +230,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         achievementManager.setRestrictedContext(false);
       }
       setScreenState(newScreen);
-      if (newScreen === 'design-lab') {
-        pushAppRoute('/design-lab');
-      } else if (newScreen === 'menu') {
+      if (newScreen === 'menu') {
         pushAppRoute(getRoutePath(activeTab, 'menu'));
       }
     },
@@ -355,13 +371,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const recordLevelCompletion = useCallback(
-    async (levelId: string, time: number) => {
+    async (levelId: string, time: number, livesRemaining: number = 3) => {
       const isRestricted = isLevelSelfMadeOrTest(selectedLevel);
 
       let rank = 1;
       let isNewBest = false;
       let coresEarned = 0;
       let isFirstClear = false;
+      let starsEarned = Math.min(3, Math.max(1, livesRemaining));
+      let previousStars = 0;
+      let newBestStars = starsEarned;
+      let totalClaimedForLevel = 0;
+      let maxCoresForLevel = 0;
+      let remainingCoresForLevel = 0;
 
       // Only submit score and award currency for non-restricted stages
       if (!isRestricted) {
@@ -376,11 +398,33 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const levelNum = parseInt(levelId, 10);
         if (!isNaN(levelNum)) {
-          isFirstClear = !currencyService.isLevelClaimed(levelId);
-          coresEarned = currencyService.earnLevelReward(levelId, levelNum, user.username);
+          // ARCADE MODE: Star system based on hearts completed (1, 2, or 3)
+          const starReward = currencyService.earnLevelRewardWithStars(
+            levelId,
+            levelNum,
+            livesRemaining,
+            user.username
+          );
+          coresEarned = starReward.coresEarned;
+          starsEarned = starReward.starsEarned;
+          previousStars = starReward.previousStars;
+          newBestStars = starReward.newBestStars;
+          totalClaimedForLevel = starReward.totalClaimedForLevel;
+          maxCoresForLevel = starReward.maxCoresForLevel;
+          remainingCoresForLevel = starReward.remainingCoresForLevel;
+          isFirstClear = starReward.isFirstClear;
         } else {
+          // ARENA MODE: One-time reward per arena level
           coresEarned = currencyService.earnArenaReward(levelId, 1.0, user.username);
-          isFirstClear = true;
+          isFirstClear = coresEarned > 0;
+        }
+
+        // Check if this level is today's Daily Apex Mission
+        if (isTodayDailyMission(levelId, onlineLevels)) {
+          const dailyResult = recordDailyMissionCompletion(levelId, onlineLevels, user.username);
+          if (dailyResult.success) {
+            coresEarned += dailyResult.bonusCores;
+          }
         }
       }
 
@@ -395,6 +439,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             completed: false,
             rank: null,
             bestTime: null,
+            stars: 0,
+            claimedCores: 0,
+            maxCores: maxCoresForLevel,
           };
 
           const updatedProgress = {
@@ -404,6 +451,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
               completed: true,
               bestTime: isBetter ? time : current.bestTime,
               rank,
+              stars: newBestStars,
+              claimedCores: totalClaimedForLevel,
+              maxCores: maxCoresForLevel,
             },
             [nextLevelId]: nextUnlocked,
           };
@@ -417,9 +467,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
 
-      return { rank, isNewBest, coresEarned, isFirstClear };
+      return {
+        rank,
+        isNewBest,
+        coresEarned,
+        isFirstClear,
+        starsEarned,
+        previousStars,
+        newBestStars,
+        totalClaimedForLevel,
+        maxCoresForLevel,
+        remainingCoresForLevel,
+      };
     },
-    [user.username, selectedLevel, isLevelSelfMadeOrTest]
+    [user.username, selectedLevel, isLevelSelfMadeOrTest, onlineLevels]
   );
 
   return (

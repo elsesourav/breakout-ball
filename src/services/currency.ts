@@ -11,8 +11,10 @@ import {
   UpgradeState,
   DEFAULT_UPGRADE_STATE,
   getUpgradeCost,
+  getCostBetweenLevels,
   getUpgradeDef,
   getLevelReward,
+  getLevelRewardForStars,
   getArenaReward,
   CURRENCY,
 } from '../constants/upgrades';
@@ -22,6 +24,20 @@ const CURRENCY_KEY = 'breakout_currency';
 const UPGRADES_KEY = 'breakout_upgrades';
 const CLAIMED_LEVELS_KEY = 'breakout_claimed_levels';
 const ARENA_STATS_KEY = 'breakout_arena_stats';
+const LEVEL_STARS_KEY = 'breakout_level_stars';
+const LEVEL_CLAIMED_CORES_KEY = 'breakout_level_claimed_cores';
+
+// ─── Types ───────────────────────────────────────────────────────
+export interface StarRewardResult {
+  coresEarned: number;
+  starsEarned: number;
+  previousStars: number;
+  newBestStars: number;
+  totalClaimedForLevel: number;
+  maxCoresForLevel: number;
+  remainingCoresForLevel: number;
+  isFirstClear: boolean;
+}
 
 // ─── Arena Stats ─────────────────────────────────────────────────
 interface ArenaStats {
@@ -43,6 +59,8 @@ class CurrencyService {
   private balance: number = 0;
   private upgrades: UpgradeState = { ...DEFAULT_UPGRADE_STATE };
   private claimedLevels: Set<string> = new Set();
+  private levelStars: Record<string, number> = {};
+  private levelClaimedCores: Record<string, number> = {};
   private arenaStats: ArenaStats = { ...DEFAULT_ARENA_STATS };
   private loaded = false;
 
@@ -65,6 +83,21 @@ class CurrencyService {
       if (c) this.claimedLevels = new Set(JSON.parse(c));
       const a = localStorage.getItem(ARENA_STATS_KEY);
       if (a) this.arenaStats = { ...DEFAULT_ARENA_STATS, ...JSON.parse(a) };
+      const ls = localStorage.getItem(LEVEL_STARS_KEY);
+      if (ls) this.levelStars = JSON.parse(ls);
+      const lcc = localStorage.getItem(LEVEL_CLAIMED_CORES_KEY);
+      if (lcc) this.levelClaimedCores = JSON.parse(lcc);
+
+      // Backwards compatibility migration for legacy claimed levels
+      this.claimedLevels.forEach((lvlId) => {
+        const num = parseInt(lvlId, 10);
+        if (!isNaN(num)) {
+          if (!this.levelStars[lvlId]) this.levelStars[lvlId] = 3;
+          if (this.levelClaimedCores[lvlId] === undefined) {
+            this.levelClaimedCores[lvlId] = getLevelReward(num);
+          }
+        }
+      });
     } catch { /* use defaults */ }
   }
 
@@ -76,6 +109,12 @@ class CurrencyService {
       if (typeof data.currency === 'number') this.balance = data.currency;
       if (data.upgradeState) this.upgrades = { ...DEFAULT_UPGRADE_STATE, ...data.upgradeState };
       if (Array.isArray(data.claimedLevels)) this.claimedLevels = new Set(data.claimedLevels);
+      if (data.levelStars && typeof data.levelStars === 'object') {
+        this.levelStars = { ...this.levelStars, ...data.levelStars };
+      }
+      if (data.levelClaimedCores && typeof data.levelClaimedCores === 'object') {
+        this.levelClaimedCores = { ...this.levelClaimedCores, ...data.levelClaimedCores };
+      }
       if (data.arenaStats) this.arenaStats = { ...DEFAULT_ARENA_STATS, ...data.arenaStats };
       this.saveToLocal();
     } catch { /* offline — use local */ }
@@ -86,6 +125,8 @@ class CurrencyService {
       localStorage.setItem(CURRENCY_KEY, JSON.stringify(this.balance));
       localStorage.setItem(UPGRADES_KEY, JSON.stringify(this.upgrades));
       localStorage.setItem(CLAIMED_LEVELS_KEY, JSON.stringify([...this.claimedLevels]));
+      localStorage.setItem(LEVEL_STARS_KEY, JSON.stringify(this.levelStars));
+      localStorage.setItem(LEVEL_CLAIMED_CORES_KEY, JSON.stringify(this.levelClaimedCores));
       localStorage.setItem(ARENA_STATS_KEY, JSON.stringify(this.arenaStats));
     } catch { /* storage full */ }
   }
@@ -99,6 +140,8 @@ class CurrencyService {
         currency: this.balance,
         upgradeState: this.upgrades,
         claimedLevels: [...this.claimedLevels],
+        levelStars: this.levelStars,
+        levelClaimedCores: this.levelClaimedCores,
         arenaStats: this.arenaStats,
         updatedAt: new Date().toISOString(),
       }, { merge: true });
@@ -110,33 +153,97 @@ class CurrencyService {
   public getUpgrades(): UpgradeState { return { ...this.upgrades }; }
   public getUpgradeLevel(id: string): number { return this.upgrades[id] ?? 1; }
   public isLevelClaimed(levelId: string): boolean { return this.claimedLevels.has(levelId); }
+  public getLevelStars(levelId: string): number { return this.levelStars[levelId] ?? 0; }
+  public getLevelClaimedCores(levelId: string): number { return this.levelClaimedCores[levelId] ?? 0; }
+  public getLevelMaxCores(levelNum: number): number { return getLevelReward(levelNum); }
+  public getLevelRemainingCores(levelId: string, levelNum: number): number {
+    const max = getLevelReward(levelNum);
+    const claimed = this.getLevelClaimedCores(levelId);
+    return Math.max(0, max - claimed);
+  }
   public getArenaStats(): ArenaStats { return { ...this.arenaStats }; }
+  public isArenaLevelClaimed(levelId: string): boolean {
+    return this.arenaStats.uniqueLevelsCleared.includes(levelId);
+  }
 
   // ─── Earn Currency ───────────────────────────────────────────
 
-  /** Award currency for first-time level completion. Returns cores earned (0 if already claimed). */
-  public earnLevelReward(levelId: string, levelNum: number, username?: string): number {
-    if (this.claimedLevels.has(levelId)) return 0;
-    const reward = getLevelReward(levelNum);
-    this.balance += reward;
-    this.claimedLevels.add(levelId);
-    this.saveToLocal();
-    this.syncToCloud(username).catch(() => {});
-    return reward;
-  }
+  /**
+   * Award currency for arcade level completion with Star-tiered reward division.
+   * - 1 Star (1 heart remaining):  ~33.3% of total core pool
+   * - 2 Stars (2 hearts remaining): ~66.7% of total core pool
+   * - 3 Stars (3 hearts remaining): 100% of total core pool
+   *
+   * Incremental Claiming:
+   * Replaying a level at a higher star rating awards only the delta/remaining cores.
+   * Replaying at the same or lower star rating awards 0 additional cores.
+   */
+  public earnLevelRewardWithStars(
+    levelId: string,
+    levelNum: number,
+    heartsRemaining: number,
+    username?: string
+  ): StarRewardResult {
+    const starsEarned = Math.min(3, Math.max(1, heartsRemaining));
+    const maxReward = getLevelReward(levelNum);
+    const targetCumulative = getLevelRewardForStars(levelNum, starsEarned);
+    const currentClaimed = this.levelClaimedCores[levelId] ?? 0;
+    const prevStars = this.levelStars[levelId] ?? 0;
+    const isFirstClear = currentClaimed === 0 && prevStars === 0;
 
-  /** Award currency for arena match completion. Returns cores earned. */
-  public earnArenaReward(levelId: string, performanceRatio: number, username?: string): number {
-    let reward = getArenaReward(performanceRatio);
-    this.arenaStats.totalPlays++;
+    // Incremental cores earned this run
+    const coresAwarded = Math.max(0, targetCumulative - currentClaimed);
 
-    // First-time arena level clear bonus
-    if (!this.arenaStats.uniqueLevelsCleared.includes(levelId)) {
-      this.arenaStats.uniqueLevelsCleared.push(levelId);
-      reward += CURRENCY.arenaFirstClearBonus;
+    if (coresAwarded > 0) {
+      this.balance += coresAwarded;
+      this.levelClaimedCores[levelId] = currentClaimed + coresAwarded;
     }
 
-    // Daily bonus (first 3 matches)
+    // Record highest star tier achieved
+    const newBestStars = Math.max(prevStars, starsEarned);
+    this.levelStars[levelId] = newBestStars;
+
+    // If 3 stars reached, mark in claimedLevels set
+    if (newBestStars >= 3) {
+      this.claimedLevels.add(levelId);
+    }
+
+    this.saveToLocal();
+    this.syncToCloud(username).catch(() => {});
+
+    return {
+      coresEarned: coresAwarded,
+      starsEarned,
+      previousStars: prevStars,
+      newBestStars,
+      totalClaimedForLevel: this.levelClaimedCores[levelId],
+      maxCoresForLevel: maxReward,
+      remainingCoresForLevel: Math.max(0, maxReward - this.levelClaimedCores[levelId]),
+      isFirstClear,
+    };
+  }
+
+  /** Award currency for level completion (legacy wrapper). */
+  public earnLevelReward(levelId: string, levelNum: number, username?: string): number {
+    return this.earnLevelRewardWithStars(levelId, levelNum, 3, username).coresEarned;
+  }
+
+  /**
+   * Award currency for arena match completion.
+   * Arena Mode: ONE-TIME core reward only! Replaying already cleared arena levels awards 0 cores.
+   */
+  public earnArenaReward(levelId: string, performanceRatio: number, username?: string): number {
+    this.arenaStats.totalPlays++;
+
+    // Arena mode: ONE-TIME reward per arena stage
+    if (this.arenaStats.uniqueLevelsCleared.includes(levelId)) {
+      return 0;
+    }
+
+    this.arenaStats.uniqueLevelsCleared.push(levelId);
+    let reward = getArenaReward(performanceRatio) + CURRENCY.arenaFirstClearBonus;
+
+    // Daily bonus (first N arena matches)
     const today = new Date().toISOString().slice(0, 10);
     if (this.arenaStats.dailyBonusDate !== today) {
       this.arenaStats.dailyBonusDate = today;
@@ -175,6 +282,25 @@ class CurrencyService {
 
     this.balance -= cost;
     this.upgrades[upgradeId] = currentLevel + 1;
+    this.saveToLocal();
+    this.syncToCloud(username).catch(() => {});
+    return true;
+  }
+
+  /** Attempt to purchase an upgrade directly up to targetLevel in one single operation. */
+  public purchaseUpgradeToLevel(upgradeId: string, targetLevel: number, username?: string): boolean {
+    const def = getUpgradeDef(upgradeId);
+    if (!def) return false;
+
+    const currentLevel = this.upgrades[upgradeId] ?? 1;
+    const boundedTarget = Math.min(def.maxLevel, Math.max(currentLevel + 1, targetLevel));
+    if (currentLevel >= boundedTarget) return false;
+
+    const totalCost = getCostBetweenLevels(def.baseCost, currentLevel, boundedTarget);
+    if (this.balance < totalCost) return false;
+
+    this.balance -= totalCost;
+    this.upgrades[upgradeId] = boundedTarget;
     this.saveToLocal();
     this.syncToCloud(username).catch(() => {});
     return true;

@@ -102,16 +102,52 @@ export class ParticleSystem {
   }
 
   public update(width: number, height: number) {
-    // 1. Update stars
+    // 1. Update stars with Black Hole Gravitational Suction
+    const bhX = width * 0.5;
+    const bhY = height - 18;
+
     for (let i = 0; i < this.stars.length; i++) {
       const s = this.stars[i];
-      s.y += s.speed;
-      if (s.y > height) {
-        s.y = 0;
-        s.x = Math.random() * width;
+      // Baseline downward drift
+      s.y += s.speed * 0.8;
+
+      // Only apply gravitational suction when star approaches the lower half
+      if (s.y > height * 0.48) {
+        const dx = bhX - s.x;
+        const dy = bhY - s.y;
+        const distSq = dx * dx + dy * dy;
+        const dist = Math.sqrt(distSq);
+
+        if (dist > 10) {
+          // Softened gravitational force scaled to arena dimensions
+          const pullForce = Math.min(6.5, 52000 / (distSq + 20000));
+          const dirX = dx / dist;
+          const dirY = dy / dist;
+          const tanX = -dirY;
+          const tanY = dirX;
+
+          s.x += dirX * pullForce * 1.6 + tanX * pullForce * 0.75;
+          s.y += dirY * pullForce * 1.6 + tanY * pullForce * 0.75;
+        }
+
+        // Event horizon swallow condition: star plunges into singularity
+        if (dist < 65 || s.y > height + 25) {
+          s.y = -10 - Math.random() * 30;
+          s.x = Math.random() * width;
+          s.alpha = Math.random() * 0.7 + 0.2;
+        } else {
+          s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.01;
+          s.alpha = Math.max(0.15, Math.min(0.9, s.alpha));
+        }
+      } else {
+        if (s.y > height) {
+          s.y = -10 - Math.random() * 20;
+          s.x = Math.random() * width;
+        } else {
+          s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.01;
+          s.alpha = Math.max(0.15, Math.min(0.9, s.alpha));
+        }
       }
-      s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.01;
-      s.alpha = Math.max(0.15, Math.min(0.9, s.alpha));
     }
 
     // 2. Update particles

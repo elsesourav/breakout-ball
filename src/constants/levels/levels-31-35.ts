@@ -8,7 +8,7 @@ import { createLevel } from './types';
  * Visual Grid Format:
  * - '1' - '5' : Destructible Crystal Bricks (HP 1 to 5)
  * - '6' or 'W': Titanium Wall (Indestructible Barrier)
- * - '7' or 'P': Quantum Portal (Paired Warp Gateway)
+ * - 'A' - 'D' : Paired Quantum Portals (A=Pair 1, B=Pair 2, C=Pair 3, D=Pair 4)
  * - '8' or 'E': Countdown EMP Detonator (Kinetic Shockwave)
  * - ' '       : Empty Slot
  */
@@ -36,8 +36,8 @@ export const level32: LevelData = createLevel({
   startRow: 1,
   grid: [
     ' 8 8 8 8 ', // row 1
-    '  5 7 5  ', // row 2
-    ' 6  7  6 ', // row 3
+    '  5 A 5  ', // row 2
+    ' 6  A  6 ', // row 3
     '  4   4  ', // row 4
     '   3 3   ', // row 5
   ],
@@ -50,7 +50,7 @@ export const level33: LevelData = createLevel({
   playCount: 629,
   startRow: 1,
   grid: [
-    '647555746', // row 1
+    '64A555A46', // row 1
     '  38 83  ', // row 2
     '   343   ', // row 3
   ],
@@ -64,7 +64,7 @@ export const level34: LevelData = createLevel({
   startRow: 1,
   grid: [
     '  56 65  ', // row 1
-    ' 7  8  7 ', // row 2
+    ' A  8  A ', // row 2
     '  45 54  ', // row 3
     '   363   ', // row 4
   ],
@@ -78,7 +78,7 @@ export const level35: LevelData = createLevel({
   startRow: 1,
   grid: [
     '655 8 556', // row 1
-    ' 7 6 6 7 ', // row 2
+    ' A 6 6 A ', // row 2
     '  5 5 5  ', // row 3
     '   484   ', // row 4
     '    5    ', // row 5

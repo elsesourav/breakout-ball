@@ -7,6 +7,7 @@ import { drawBallWithPreset } from '../../../engine/draw/ballDrawers';
 
 /**
  * 1. Ball Size Comparison Preview (Current vs Upgraded)
+ * Displays sizing difference with a clear rest gap between pulses.
  */
 export function renderBallSizePreview(
   ctx: CanvasRenderingContext2D,
@@ -30,6 +31,12 @@ export function renderBallSizePreview(
     tier: currentLevel >= 5 ? 3 : currentLevel >= 3 ? 2 : 1,
   });
 
+  // Pulse comparison with 1.4s rest gap
+  const cycleTotal = 3.6;
+  const cycleT = tick % cycleTotal;
+  const isPulsing = cycleT < 2.2;
+  const pulseProg = isPulsing ? cycleT / 2.2 : 1.0;
+
   // Right: UPGRADED Ball with Green Expansion Indicator Ring
   ctx.save();
   ctx.strokeStyle = 'rgba(16, 185, 129, 0.6)';
@@ -39,11 +46,12 @@ export function renderBallSizePreview(
   ctx.arc(rightCenterX, centerY, nextR + 4, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Pulsing expansion aura
-  const auraR = nextR + 6 + Math.sin(tick * 3) * 2;
-  ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
+  // Expansion aura that pulses during active phase and rests during gap phase
+  const auraOffset = isPulsing ? Math.sin(pulseProg * Math.PI * 2) * 2.5 : 0;
+  const auraR = nextR + 5 + auraOffset;
+  ctx.strokeStyle = isPulsing ? 'rgba(16, 185, 129, 0.45)' : 'rgba(16, 185, 129, 0.2)';
   ctx.shadowColor = '#10b981';
-  ctx.shadowBlur = 8;
+  ctx.shadowBlur = isPulsing ? 8 : 2;
   ctx.beginPath();
   ctx.arc(rightCenterX, centerY, auraR, 0, Math.PI * 2);
   ctx.stroke();
@@ -56,7 +64,7 @@ export function renderBallSizePreview(
 }
 
 /**
- * 2. Ball Speed Race Loop Preview (Continuous Velocity Comparison)
+ * 2. Ball Speed Race Loop Preview (Race with Clear 1.5s Starting Gap)
  */
 export function renderBallSpeedPreview(
   ctx: CanvasRenderingContext2D,
@@ -66,53 +74,104 @@ export function renderBallSpeedPreview(
   isMax: boolean,
   tick: number
 ): void {
-  const laneTopY = h * 0.36;
-  const laneBtmY = h * 0.68;
-  const laneW = w - 70;
-  const startX = 35;
+  const leftCenterX = w * 0.25;
+  const rightCenterX = w * 0.75;
+  const topY = h * 0.22;
+  const btmY = h * 0.78;
+  const spanY = btmY - topY;
 
-  const speed1 = 1.2 + (currentLevel - 1) * 0.16;
-  const pos1 = (Math.sin(tick * speed1) * 0.5 + 0.5) * laneW;
+  // Race Cycle: 3.2s active race + 1.5s resting gap at start gate
+  const raceDuration = 3.2;
+  const gapDuration = 1.5;
+  const cycleTotal = raceDuration + gapDuration;
+  const cycleT = tick % cycleTotal;
+  const isRacing = cycleT < raceDuration;
 
-  const speed2 = 1.2 + (isMax ? currentLevel - 1 : currentLevel) * 0.16;
-  const pos2 = (Math.sin(tick * speed2) * 0.5 + 0.5) * laneW;
+  let ballY1 = topY;
+  let ballY2 = topY;
+  let dirY2 = 1;
 
-  // Lane dividers
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-  ctx.fillRect(startX, laneTopY - 14, laneW, 28);
-  ctx.fillRect(startX, laneBtmY - 14, laneW, 28);
+  if (isRacing) {
+    const spd1 = 1.8 + (currentLevel - 1) * 0.12;
+    const pos1 = (Math.sin(cycleT * spd1) * 0.5 + 0.5) * spanY;
+    ballY1 = topY + pos1;
 
-  // Current Ball (Top Lane)
-  drawBallWithPreset(ctx, { x: startX + pos1, y: laneTopY, radius: 12 }, 1, {
+    const nextLvl = isMax ? currentLevel : currentLevel + 1;
+    const spd2 = 1.8 + (nextLvl - 1) * 0.12;
+    const pos2 = (Math.sin(cycleT * spd2) * 0.5 + 0.5) * spanY;
+    ballY2 = topY + pos2;
+    dirY2 = Math.cos(cycleT * spd2) > 0 ? -1 : 1;
+  }
+
+  // Track guides
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0, 247, 255, 0.15)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(leftCenterX, topY - 10);
+  ctx.lineTo(leftCenterX, btmY + 10);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
+  ctx.beginPath();
+  ctx.moveTo(rightCenterX, topY - 10);
+  ctx.lineTo(rightCenterX, btmY + 10);
+  ctx.stroke();
+
+  // Start Line Gate
+  ctx.setLineDash([]);
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = isRacing ? 'rgba(0, 247, 255, 0.3)' : '#00f7ff';
+  ctx.beginPath();
+  ctx.moveTo(leftCenterX - 18, topY);
+  ctx.lineTo(leftCenterX + 18, topY);
+  ctx.moveTo(rightCenterX - 18, topY);
+  ctx.lineTo(rightCenterX + 18, topY);
+  ctx.stroke();
+
+  if (!isRacing) {
+    ctx.font = 'bold 8px monospace, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#00f7ff';
+    ctx.fillText('READY', leftCenterX, topY - 8);
+    ctx.fillStyle = '#10b981';
+    ctx.fillText('BOOST READY', rightCenterX, topY - 8);
+  }
+  ctx.restore();
+
+  // Left (Current Ball)
+  drawBallWithPreset(ctx, { x: leftCenterX, y: ballY1, radius: 12 }, 1, {
     animTick: tick,
   });
 
-  // Upgraded Ball with Comet Trail (Bottom Lane)
-  ctx.save();
-  ctx.shadowColor = '#10b981';
-  ctx.shadowBlur = 14;
-  const trailLen = 22;
-  const dir = Math.cos(tick * speed2) > 0 ? -1 : 1;
-  const grad = ctx.createLinearGradient(
-    startX + pos2,
-    laneBtmY,
-    startX + pos2 + dir * trailLen,
-    laneBtmY
-  );
-  grad.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
-  grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(startX + pos2, laneBtmY - 5, dir * trailLen, 10);
-  ctx.restore();
+  // Right (Upgraded Ball with Enhanced Velocity Comet Trail when moving)
+  if (isRacing) {
+    ctx.save();
+    ctx.shadowColor = '#10b981';
+    ctx.shadowBlur = 12;
+    const trailLen = 22;
+    const grad = ctx.createLinearGradient(
+      rightCenterX,
+      ballY2,
+      rightCenterX,
+      ballY2 + dirY2 * trailLen
+    );
+    grad.addColorStop(0, 'rgba(16, 185, 129, 0.7)');
+    grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(rightCenterX - 4, ballY2, 8, dirY2 * trailLen);
+    ctx.restore();
+  }
 
-  drawBallWithPreset(ctx, { x: startX + pos2, y: laneBtmY, radius: 12 }, 1, {
+  drawBallWithPreset(ctx, { x: rightCenterX, y: ballY2, radius: 12 }, 1, {
     animTick: tick * 1.5,
     tier: 2,
   });
 }
 
 /**
- * 3. Ball Impact Power Blast Preview (Kinetic Shockwave Comparison)
+ * 3. Ball Impact Power Blast Preview (Kinetic Shockwave with 1.8s Resting Gap)
  */
 export function renderBallImpactPreview(
   ctx: CanvasRenderingContext2D,
@@ -126,8 +185,10 @@ export function renderBallImpactPreview(
   const rightCenterX = w * 0.75;
   const centerY = h * 0.52;
 
-  const loopT = (tick % 2.5) / 2.5; // 0 to 1 every 2.5s
-  const strikePoint = 0.55;
+  // Cycle: 2.0s drop & smash + 1.8s resting gap = 3.8s total
+  const cycleTotal = 3.8;
+  const cycleT = tick % cycleTotal;
+  const isDropPhase = cycleT < 2.0;
 
   const blockW = 44;
   const blockH = 22;
@@ -147,11 +208,22 @@ export function renderBallImpactPreview(
   ctx.fillRect(rightBlockX, blockY, blockW, blockH);
   ctx.strokeRect(rightBlockX, blockY, blockW, blockH);
 
+  const startY = centerY - 38;
   let ballY: number;
-  if (loopT < strikePoint) {
-    ballY = centerY - 35 + (loopT / strikePoint) * 35;
+
+  if (isDropPhase) {
+    const strikeTime = 0.8;
+    if (cycleT < strikeTime) {
+      // Falling toward block
+      ballY = startY + (cycleT / strikeTime) * 38;
+    } else {
+      // Bouncing back up to resting position
+      const bounceProg = (cycleT - strikeTime) / (2.0 - strikeTime);
+      ballY = centerY + (1 - bounceProg) * 8 - (bounceProg * 38);
+    }
   } else {
-    ballY = centerY + (1 - (loopT - strikePoint) / (1 - strikePoint)) * 8 - 8;
+    // 1.8s Resting Gap at the launch position
+    ballY = startY;
   }
 
   // Left (Standard Impact)
@@ -163,11 +235,12 @@ export function renderBallImpactPreview(
     tier: 2,
   });
 
-  if (loopT >= strikePoint && loopT <= strikePoint + 0.3) {
-    const blastProg = (loopT - strikePoint) / 0.3;
+  // Shockwave blast trigger right after impact (0.8s to 1.3s)
+  if (isDropPhase && cycleT >= 0.8 && cycleT <= 1.3) {
+    const blastProg = (cycleT - 0.8) / 0.5;
     ctx.save();
     ctx.beginPath();
-    ctx.arc(rightCenterX, blockY, 8 + blastProg * 35, 0, Math.PI * 2);
+    ctx.arc(rightCenterX, blockY, 8 + blastProg * 38, 0, Math.PI * 2);
     ctx.strokeStyle = `rgba(16, 185, 129, ${1 - blastProg})`;
     ctx.lineWidth = 3 * (1 - blastProg);
     ctx.shadowColor = '#10b981';

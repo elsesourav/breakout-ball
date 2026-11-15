@@ -8,12 +8,12 @@ import { CreateMode } from './components/CreateMode';
 import { ProfileView } from './components/ProfileView';
 import { LevelPreviewModal } from './components/LevelPreviewModal';
 import { LevelDesigner } from './components/LevelDesigner';
-import { VisualDesignLab } from './components/VisualDesignLab';
 import { LevelModifierModal } from './components/LevelModifierModal';
 import { GameCanvas } from './components/GameCanvas';
 import { AlertModal } from './components/AlertModal';
 import { AuthModal } from './components/AuthModal';
 import { AchievementToast } from './components/AchievementToast';
+import { CyberToastContainer } from './components/common/CyberToast';
 
 export const AppContent: React.FC = () => {
   const { screen, setScreen, activeTab, editingLevel } = useGame();
@@ -57,8 +57,6 @@ export const AppContent: React.FC = () => {
         <GameCanvas />
       ) : screen === 'designer' ? (
         <LevelDesigner />
-      ) : screen === 'design-lab' ? (
-        <VisualDesignLab onBack={() => setScreen('menu')} />
       ) : (
         <div id="gameMode">
           <div id="modeType" className="w-full h-full relative overflow-hidden">
@@ -80,6 +78,7 @@ export const AppContent: React.FC = () => {
       <AlertModal />
       <AuthModal />
       <AchievementToast />
+      <CyberToastContainer />
     </main>
   );
 };

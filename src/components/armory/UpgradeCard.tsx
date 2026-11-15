@@ -3,6 +3,7 @@ import { ChevronUp, Award } from 'lucide-react';
 import { UpgradeDef } from '../../constants/upgrades';
 import { soundManager } from '../../utils/audio';
 import { CoreIcon } from '../CoreIcon';
+import { AssetThumbnail } from './AssetThumbnail';
 
 interface UpgradeCardProps {
   upgrade: UpgradeDef;
@@ -23,63 +24,68 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
     case 'ball_speed':
       return {
         statName: 'VELOCITY',
-        current: `${level * 8}%`,
-        delta: '8%',
+        current: `${((level - 1) * 3.5).toFixed(1)}%`,
+        delta: '+3.5%',
       };
     case 'ball_size':
       return {
         statName: 'RADIUS',
-        current: `${level * 5}%`,
-        delta: '5%',
+        current: `${(level - 1) * 5}%`,
+        delta: '+5%',
       };
     case 'ball_impact':
       return {
-        statName: 'DAMAGE',
-        current: `${level * 12}%`,
-        delta: '12%',
+        statName: 'IMPACT',
+        current: `${(level - 1) * 12}%`,
+        delta: '+12%',
       };
     case 'paddle_width':
       return {
         statName: 'WIDTH',
-        current: `${level * 8}%`,
-        delta: '8%',
+        current: `${(level - 1) * 8}%`,
+        delta: '+8%',
       };
     case 'paddle_speed':
       return {
         statName: 'SPEED',
-        current: `${level * 10}%`,
-        delta: '10%',
+        current: `${(level - 1) * 10}%`,
+        delta: '+10%',
       };
-    case 'plasma_power':
     case 'expand_power':
       return {
         statName: 'DURATION',
-        current: `${(6 + level * 1.14).toFixed(1)}s`,
-        delta: '1.1s',
-      };
-    case 'mega_power':
-      return {
-        statName: 'DURATION',
-        current: `${(5 + level * 1.0).toFixed(1)}s`,
-        delta: '1.0s',
+        current: `${(6.0 + (level - 1) * 0.8).toFixed(1)}s`,
+        delta: '0.8s',
       };
     case 'slowmo_power':
       return {
         statName: 'DURATION',
-        current: `${(4 + level * 0.86).toFixed(1)}s`,
-        delta: '0.9s',
+        current: `${(4.0 + (level - 1) * 0.75).toFixed(1)}s`,
+        delta: '0.8s',
+      };
+    case 'laser_power':
+      return {
+        statName: 'DURATION',
+        current: `${(5.0 + (level - 1) * 1.0).toFixed(1)}s`,
+        delta: '1.0s',
+      };
+    case 'mega_power':
+      return {
+        statName: 'DURATION',
+        current: `${(5.0 + (level - 1) * 1.2).toFixed(1)}s`,
+        delta: '1.2s',
       };
     case 'multi_power':
       return {
-        statName: 'BALLS',
-        current: `${level + 1}`,
-        delta: '1',
+        statName: 'DURATION',
+        current: `${(6.0 + (level - 1) * 1.5).toFixed(1)}s`,
+        delta: '1.5s',
       };
     case 'shield_power':
       return {
-        statName: 'SHIELD',
-        current: `${level} Charge${level > 1 ? 's' : ''}`,
-        delta: '1 Charge',
+        statName: 'DURATION',
+        current: `${(8.0 + (level - 1) * 2.5).toFixed(1)}s`,
+        delta: '2.5s',
       };
     default:
       return {
@@ -131,7 +137,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
             }}
             className="w-9 h-9 rounded-xl flex items-center justify-center font-tech font-black text-xs text-white shrink-0 overflow-hidden"
           >
-            {icon ? icon : upgrade.symbol}
+            {icon ? icon : <AssetThumbnail upgradeId={upgrade.id} level={level} size={28} />}
           </div>
 
           <div className="flex flex-col">

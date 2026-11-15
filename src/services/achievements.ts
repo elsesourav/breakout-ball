@@ -1,6 +1,7 @@
 import { Achievement } from '../types/game';
 
 const STORAGE_KEY = 'breakout_achievements_v1';
+const VIEWED_STORAGE_KEY = 'breakout_viewed_achievements_v1';
 
 export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   {
@@ -87,6 +88,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
 
 class AchievementManager {
   private unlockedIds: Set<string> = new Set();
+  private viewedIds: Set<string> = new Set();
   private listeners: ((achievement: Achievement) => void)[] = [];
   private isRestrictedContext: boolean = false;
 
@@ -117,11 +119,37 @@ class AchievementManager {
     } catch {
       this.unlockedIds = new Set();
     }
+
+    try {
+      const vRaw = localStorage.getItem(VIEWED_STORAGE_KEY);
+      if (vRaw !== null) {
+        this.viewedIds = new Set(JSON.parse(vRaw));
+      } else {
+        // First run with this key: treat currently existing unlocked as viewed
+        this.viewedIds = new Set(this.unlockedIds);
+        localStorage.setItem(VIEWED_STORAGE_KEY, JSON.stringify(Array.from(this.viewedIds)));
+      }
+    } catch {
+      this.viewedIds = new Set(this.unlockedIds);
+    }
   }
 
   private save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(this.unlockedIds)));
+    } catch {}
+  }
+
+  public getPendingUnviewed(): Achievement | null {
+    const all = this.getAll();
+    const unviewed = all.filter((a) => a.unlocked && !this.viewedIds.has(a.id));
+    return unviewed.length > 0 ? unviewed[unviewed.length - 1] : null;
+  }
+
+  public markAsViewed(id: string): void {
+    this.viewedIds.add(id);
+    try {
+      localStorage.setItem(VIEWED_STORAGE_KEY, JSON.stringify(Array.from(this.viewedIds)));
     } catch {}
   }
 

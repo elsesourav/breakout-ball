@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Play, Check } from 'lucide-react';
+import { Play, Check, Star } from 'lucide-react';
 import { RoadmapNode, SVG_WIDTH } from './types';
 import { LocalLevelProgress } from '../../types/game';
 
@@ -97,21 +97,6 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               : 'hover:scale-[1.02] active:scale-95'
           }`}
         >
-          {/* 3D Saturnian Orbital Ring for Current Active Node */}
-          {isCurrent && (
-            <div
-              className="absolute -inset-2 rounded-full pointer-events-none animate-spin-slow"
-              style={{
-                border: '2px solid rgba(0, 247, 255, 0.75)',
-                boxShadow: '0 0 16px rgba(0, 247, 255, 0.6), inset 0 0 8px rgba(0, 247, 255, 0.35)',
-                transform: 'rotateX(70deg) rotateZ(-25deg)',
-                transformStyle: 'preserve-3d',
-              }}
-            >
-              <div className="w-2.5 h-2.5 rounded-full bg-cyan-300 shadow-[0_0_10px_#00f7ff,0_0_4px_#ffffff] absolute -top-1.5 left-1/2 -translate-x-1/2" />
-            </div>
-          )}
-
           {/* 3D Spherical Vector Cyber Globe Base */}
           <svg
             viewBox="0 0 70 70"
@@ -246,27 +231,40 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             {formattedNumber}
           </span>
 
-          {/* Floating Completed Checkmark Badge on Globe Rim */}
+          {/* Floating Completed Star Badge on Globe Rim */}
           {isComplete && (
             <div
               style={{
                 position: 'absolute',
-                top: '-3px',
-                right: '-3px',
-                width: '22px',
-                height: '22px',
+                top: '-4px',
+                right: '-4px',
+                minWidth: '24px',
+                height: '20px',
+                padding: '0 4px',
                 borderRadius: '9999px',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                boxShadow: '0 0 12px #34d399, 0 2px 6px rgba(0,0,0,0.7)',
+                background:
+                  (progress?.stars ?? 3) === 3
+                    ? 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)'
+                    : (progress?.stars ?? 3) === 2
+                    ? 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)'
+                    : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                boxShadow:
+                  (progress?.stars ?? 3) === 3
+                    ? '0 0 12px rgba(251, 191, 36, 0.8), 0 2px 6px rgba(0,0,0,0.7)'
+                    : '0 0 10px rgba(0, 247, 255, 0.6), 0 2px 6px rgba(0,0,0,0.7)',
                 border: '1.5px solid #ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                gap: '1px',
                 pointerEvents: 'none',
                 zIndex: 10,
               }}
             >
-              <Check style={{ color: '#ffffff' }} className="w-3.5 h-3.5 stroke-[3.5]" />
+              <Star className="w-2.5 h-2.5 fill-white text-white shrink-0" />
+              <span className="font-display font-black text-[10px] text-white leading-none">
+                {progress?.stars ?? 3}
+              </span>
             </div>
           )}
 

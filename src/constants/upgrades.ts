@@ -23,9 +23,23 @@ export const CURRENCY = {
   dailyBonusMaxMatches: 3,
 } as const;
 
-/** Calculate level completion reward (first-time only). */
+/** Calculate level completion reward (first-time max pool). */
 export const getLevelReward = (levelNum: number): number =>
   CURRENCY.baseReward + Math.floor(levelNum * CURRENCY.scaleFactor);
+
+/**
+ * Calculate the cumulative core reward for a level given the stars achieved (1, 2, or 3).
+ * - 1 Star (1 heart remaining):  ~33.3% of total core reward
+ * - 2 Stars (2 hearts remaining): ~66.7% of total core reward
+ * - 3 Stars (3 hearts remaining): 100% of total core reward
+ */
+export const getLevelRewardForStars = (levelNum: number, stars: number): number => {
+  const maxReward = getLevelReward(levelNum);
+  if (stars <= 0) return 0;
+  if (stars === 1) return Math.round(maxReward * (1 / 3));
+  if (stars === 2) return Math.round(maxReward * (2 / 3));
+  return maxReward;
+};
 
 /** Calculate arena match reward based on performance ratio (0–1). */
 export const getArenaReward = (performanceRatio: number): number => {
@@ -45,6 +59,19 @@ export const getCumulativeCost = (baseCost: number, targetLevel: number): number
   let total = 0;
   for (let i = 1; i < targetLevel; i++) {
     total += getUpgradeCost(baseCost, i);
+  }
+  return total;
+};
+
+/** Get cumulative cost to upgrade across multiple levels from fromLevel to toLevel. */
+export const getCostBetweenLevels = (
+  baseCost: number,
+  fromLevel: number,
+  toLevel: number
+): number => {
+  let total = 0;
+  for (let lvl = fromLevel; lvl < toLevel; lvl++) {
+    total += getUpgradeCost(baseCost, lvl);
   }
   return total;
 };
@@ -78,9 +105,9 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
     baseCost: 70,
     accentColor: '#06b6d4',
     glowColor: 'rgba(6, 182, 212, 0.4)',
-    symbol: '↔',
-    statLabel: (lvl) => `+${lvl * 8}% Width`,
-    nextLabel: (lvl) => `+${(lvl + 1) * 8}% Width`,
+    symbol: '',
+    statLabel: (lvl) => `+${(lvl - 1) * 8}% Width`,
+    nextLabel: (lvl) => `+${lvl * 8}% Width`,
   },
   {
     id: 'paddle_speed',
@@ -90,9 +117,9 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
     baseCost: 70,
     accentColor: '#fbbf24',
     glowColor: 'rgba(251, 191, 36, 0.4)',
-    symbol: '⚡',
-    statLabel: (lvl) => `+${lvl * 10}% Speed`,
-    nextLabel: (lvl) => `+${(lvl + 1) * 10}% Speed`,
+    symbol: '',
+    statLabel: (lvl) => `+${(lvl - 1) * 10}% Speed`,
+    nextLabel: (lvl) => `+${lvl * 10}% Speed`,
   },
 ];
 
@@ -106,9 +133,9 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     baseCost: 60,
     accentColor: '#a78bfa',
     glowColor: 'rgba(167, 139, 250, 0.4)',
-    symbol: '◉',
-    statLabel: (lvl) => `+${lvl * 5}% Radius`,
-    nextLabel: (lvl) => `+${(lvl + 1) * 5}% Radius`,
+    symbol: '',
+    statLabel: (lvl) => `+${(lvl - 1) * 5}% Radius`,
+    nextLabel: (lvl) => `+${lvl * 5}% Radius`,
   },
   {
     id: 'ball_speed',
@@ -118,9 +145,9 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     baseCost: 80,
     accentColor: '#00f7ff',
     glowColor: 'rgba(0, 247, 255, 0.4)',
-    symbol: '🚀',
-    statLabel: (lvl) => `+${lvl * 8}% Velocity`,
-    nextLabel: (lvl) => `+${(lvl + 1) * 8}% Velocity`,
+    symbol: '',
+    statLabel: (lvl) => `+${((lvl - 1) * 3.5).toFixed(1)}% Velocity`,
+    nextLabel: (lvl) => `+${(lvl * 3.5).toFixed(1)}% Velocity`,
   },
   {
     id: 'ball_impact',
@@ -130,37 +157,25 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     baseCost: 90,
     accentColor: '#f43f5e',
     glowColor: 'rgba(244, 63, 94, 0.4)',
-    symbol: '💥',
-    statLabel: (lvl) => `+${lvl * 12}% Damage`,
-    nextLabel: (lvl) => `+${(lvl + 1) * 12}% Damage`,
+    symbol: '',
+    statLabel: (lvl) => `+${(lvl - 1) * 12}% Impact`,
+    nextLabel: (lvl) => `+${lvl * 12}% Impact`,
   },
 ];
 
-// ─── Power-Up Upgrades ───────────────────────────────────────────
+// ─── Power-Up Upgrades (All Specialize in Active Duration) ──────
 export const POWER_UPGRADES: UpgradeDef[] = [
   {
-    id: 'laser_power',
-    name: 'Plasma Cannon',
+    id: 'expand_power',
+    name: 'Titan Paddle',
     category: 'power',
-    maxLevel: 8,
-    baseCost: 80,
-    accentColor: '#ff0055',
-    glowColor: 'rgba(255, 0, 85, 0.4)',
-    symbol: '▲',
-    statLabel: (lvl) => `${(6 + lvl * 1.14).toFixed(1)}s Dur`,
-    nextLabel: (lvl) => `${(6 + (lvl + 1) * 1.14).toFixed(1)}s Dur`,
-  },
-  {
-    id: 'mega_power',
-    name: 'Mega Core',
-    category: 'power',
-    maxLevel: 8,
-    baseCost: 80,
-    accentColor: '#ffd700',
-    glowColor: 'rgba(255, 215, 0, 0.4)',
-    symbol: '✹',
-    statLabel: (lvl) => `${(5 + lvl * 1.0).toFixed(1)}s Dur`,
-    nextLabel: (lvl) => `${(5 + (lvl + 1) * 1.0).toFixed(1)}s Dur`,
+    maxLevel: 10,
+    baseCost: 50,
+    accentColor: '#06b6d4',
+    glowColor: 'rgba(6, 182, 212, 0.4)',
+    symbol: '◀▶',
+    statLabel: (lvl) => `${(6.0 + (lvl - 1) * 0.8).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(6.0 + lvl * 0.8).toFixed(1)}s Duration`,
   },
   {
     id: 'slowmo_power',
@@ -171,44 +186,56 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     accentColor: '#b773ff',
     glowColor: 'rgba(183, 115, 255, 0.4)',
     symbol: '⏱',
-    statLabel: (lvl) => `${(4 + lvl * 0.86).toFixed(1)}s Dur`,
-    nextLabel: (lvl) => `${(4 + (lvl + 1) * 0.86).toFixed(1)}s Dur`,
+    statLabel: (lvl) => `${(4.0 + (lvl - 1) * 0.75).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(4.0 + lvl * 0.75).toFixed(1)}s Duration`,
   },
   {
-    id: 'expand_power',
-    name: 'Titan Paddle',
+    id: 'laser_power',
+    name: 'Plasma Cannon',
     category: 'power',
     maxLevel: 8,
-    baseCost: 70,
-    accentColor: '#06b6d4',
-    glowColor: 'rgba(6, 182, 212, 0.4)',
-    symbol: '◀▶',
-    statLabel: (lvl) => `${(6 + lvl * 1.14).toFixed(1)}s Dur`,
-    nextLabel: (lvl) => `${(6 + (lvl + 1) * 1.14).toFixed(1)}s Dur`,
+    baseCost: 95,
+    accentColor: '#ff0055',
+    glowColor: 'rgba(255, 0, 85, 0.4)',
+    symbol: '▲',
+    statLabel: (lvl) => `${(5.0 + (lvl - 1) * 1.0).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(5.0 + lvl * 1.0).toFixed(1)}s Duration`,
+  },
+  {
+    id: 'mega_power',
+    name: 'Mega Core',
+    category: 'power',
+    maxLevel: 6,
+    baseCost: 130,
+    accentColor: '#ffd700',
+    glowColor: 'rgba(255, 215, 0, 0.4)',
+    symbol: '✹',
+    statLabel: (lvl) => `${(5.0 + (lvl - 1) * 1.2).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(5.0 + lvl * 1.2).toFixed(1)}s Duration`,
   },
   {
     id: 'multi_power',
     name: 'Multi-Ball',
     category: 'power',
     maxLevel: 5,
-    baseCost: 120,
+    baseCost: 160,
     accentColor: '#00f7ff',
     glowColor: 'rgba(0, 247, 255, 0.4)',
     symbol: '●●',
-    statLabel: (lvl) => `+${lvl + 1} Balls`,
-    nextLabel: (lvl) => `+${lvl + 2} Balls`,
+    statLabel: (lvl) => `${(6.0 + (lvl - 1) * 1.5).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(6.0 + lvl * 1.5).toFixed(1)}s Duration`,
   },
   {
     id: 'shield_power',
     name: 'Forcefield',
     category: 'power',
-    maxLevel: 3,
-    baseCost: 200,
+    maxLevel: 4,
+    baseCost: 220,
     accentColor: '#10b981',
     glowColor: 'rgba(16, 185, 129, 0.4)',
     symbol: '🛡',
-    statLabel: (lvl) => `${lvl} Charge${lvl > 1 ? 's' : ''}`,
-    nextLabel: (lvl) => `${lvl + 1} Charges`,
+    statLabel: (lvl) => `${(8.0 + (lvl - 1) * 2.5).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(8.0 + lvl * 2.5).toFixed(1)}s Duration`,
   },
 ];
 
@@ -244,4 +271,5 @@ export const SHOP_PACKS: ShopPack[] = [
   { id: 'power', name: 'Power Bundle', cores: 1000, accentColor: '#b773ff', borderColor: 'rgba(183, 115, 255, 0.4)' },
   { id: 'mega', name: 'Mega Vault', cores: 2500, accentColor: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.4)' },
   { id: 'ultra', name: 'Ultra Core', cores: 5000, accentColor: '#ff0055', borderColor: 'rgba(255, 0, 85, 0.4)' },
+  { id: 'titan', name: 'Titan Vault', cores: 10000, accentColor: '#00f7ff', borderColor: 'rgba(0, 247, 255, 0.4)' },
 ];

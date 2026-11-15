@@ -1,8 +1,12 @@
 import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useGame } from '../context/GameContext';
 import { CyberSectionHeader } from './CyberSectionHeader';
 import { CoreIcon } from './CoreIcon';
-import { currencyService } from '../services/currency';
+import { currencyService, DailyCollectStatus } from '../services/currency';
+import { soundManager } from '../utils/audio';
+import { cyberToast } from './common/CyberToast';
+import { Star, Clock } from 'lucide-react';
 import {
   TOTAL_LEVELS,
   SPACING,
@@ -31,25 +35,82 @@ const SCALE_MAX = 1.0;           // actual size (100%) for foreground and summit
 const FOREGROUND_LIMIT_Y = 0.48; // foreground threshold where size growth reaches its limit
 const FADE_ZONE = 0.08;          // top 8% of viewport dissolves into horizon haze
 
+// Retain user's current scroll position across tab navigation (no jarring auto-scroll)
+let savedArcadeScrollTop: number | null = null;
+
+const formatRemainingTime = (ms: number): string => {
+  if (ms <= 0) return '0h 00m 00s';
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${hours}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+};
+
 export const LevelMap: React.FC = () => {
   const { localLevels, localProgress, openPreview, showAlert, user, setActiveTab } = useGame();
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
-  const [dailyAvailable, setDailyAvailable] = useState<boolean>(() => currencyService.getDailyCollectStatus().canCollect);
+  const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() => currencyService.getDailyCollectStatus());
+  const [remainingMs, setRemainingMs] = useState<number>(() => currencyService.getDailyCollectStatus().remainingMs);
   const scrollRef    = useRef<HTMLDivElement>(null);
   const activeRef    = useRef<HTMLDivElement | null>(null);
   const hazeRef      = useRef<HTMLDivElement>(null);
   const rafRef       = useRef<number>(0);
-  const initScrolled = useRef(false);
 
-  // Sync available cores from currencyService
+  // Sync available cores and live daily bonus ticker
   useEffect(() => {
-    setCores(currencyService.getBalance());
-    setDailyAvailable(currencyService.getDailyCollectStatus().canCollect);
+    const updateDaily = () => {
+      const status = currencyService.getDailyCollectStatus();
+      setDailyStatus(status);
+      setRemainingMs(status.remainingMs);
+    };
+
+    updateDaily();
+
+    const handleCurrencyChange = () => {
+      setCores(currencyService.getBalance());
+      updateDaily();
+    };
+    window.addEventListener('currency_balance_changed', handleCurrencyChange);
+
     currencyService.load(user.username).then(() => {
       setCores(currencyService.getBalance());
-      setDailyAvailable(currencyService.getDailyCollectStatus().canCollect);
+      updateDaily();
     });
+
+    const timer = setInterval(() => {
+      updateDaily();
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('currency_balance_changed', handleCurrencyChange);
+      clearInterval(timer);
+    };
   }, [user.username]);
+
+  const handleDailyCollect = () => {
+    if (!dailyStatus.canCollect) {
+      showAlert({
+        title: 'DAILY REWARD',
+        message: `Next free reward available in ${formatRemainingTime(remainingMs)}`,
+        singleBtn: true,
+      });
+      return;
+    }
+    const res = currencyService.claimDailyCores(user.username);
+    if (res.success) {
+      setCores(res.newBalance);
+      const updated = currencyService.getDailyCollectStatus();
+      setDailyStatus(updated);
+      setRemainingMs(updated.remainingMs);
+      soundManager.playCollectCore();
+      showAlert({
+        title: 'REWARD CLAIMED!',
+        message: `+${res.amount} FREE CORES CLAIMED!`,
+        singleBtn: true,
+      });
+    }
+  };
 
   // Cached list of all scalable map elements (.roadmap-scale-item) and conduit segments
   const scaleElementsRef = useRef<HTMLElement[]>([]);
@@ -79,6 +140,14 @@ export const LevelMap: React.FC = () => {
       if (localProgress[String(i)] !== undefined) highest = i;
     }
     return highest;
+  }, [localProgress]);
+
+  // ── Total Campaign Stars Earned ──────────────────────────────────────────────
+  const totalStars = useMemo(() => {
+    return Object.values(localProgress).reduce((acc, p) => {
+      if (!p.completed) return acc;
+      return acc + (p.stars ?? 3);
+    }, 0);
   }, [localProgress]);
 
   // ── Ambient floating bricks ─────────────────────────────────────────────────
@@ -174,22 +243,19 @@ export const LevelMap: React.FC = () => {
     refreshScaleElements();
   }, [currentUnlockedId, nodes, refreshScaleElements]);
 
-  // ── Auto-scroll to active level on mount ─────────────────────────────────────
+  // ── Restore current scroll position without jarring auto-scroll jump ────────
   useEffect(() => {
-    if (initScrolled.current) return;
     const container = scrollRef.current;
     if (!container) return;
-    const timer = setTimeout(() => {
+    if (savedArcadeScrollTop !== null) {
+      container.scrollTop = savedArcadeScrollTop;
+    } else {
       const el = activeRef.current;
-      if (el) {
-        const h = container.clientHeight;
-        container.scrollTo({ top: Math.max(0, el.offsetTop - h * 0.55), behavior: 'smooth' });
-      } else {
-        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-      }
-      initScrolled.current = true;
-    }, 250);
-    return () => clearTimeout(timer);
+      const h = container.clientHeight;
+      const initialTop = el ? Math.max(0, el.offsetTop - h * 0.55) : container.scrollHeight;
+      container.scrollTop = initialTop;
+      savedArcadeScrollTop = initialTop;
+    }
   }, [currentUnlockedId]);
 
   // ── rAF scroll-linked perspective scale ───────────────────────────────────────
@@ -205,6 +271,7 @@ export const LevelMap: React.FC = () => {
       }
 
       const scrollTop = container.scrollTop;
+      savedArcadeScrollTop = scrollTop;
       const viewH = container.clientHeight;
 
       // Perspective projection function:
@@ -213,21 +280,26 @@ export const LevelMap: React.FC = () => {
         const u = rawY / viewH;
 
         // When scrolled near the top of the map, smoothly expand foreground scale so summit nodes reach full 1.0 actual size
-        const topScrollBoost = Math.max(0, 1 - scrollTop / 300);
-        const effectiveLimit = Math.max(0.24, FOREGROUND_LIMIT_Y - topScrollBoost * 0.24);
+        const topScrollBoost = Math.max(0, 1 - scrollTop / 350);
+        if (topScrollBoost >= 0.95) {
+          return { yShift: 0, scale: SCALE_MAX, u, topScrollBoost: 1 };
+        }
+
+        const effectiveLimit = Math.max(0.05, FOREGROUND_LIMIT_Y * (1 - topScrollBoost));
 
         if (u >= effectiveLimit) {
           return { yShift: 0, scale: SCALE_MAX, u, topScrollBoost };
         }
+
         const t = Math.max(0, Math.min(1, (effectiveLimit - u) / effectiveLimit));
-        // Foreshortening compression: pulls top elements down by up to 75px,
-        // gently easing off when scrolled near the top
-        const yShift = t * t * 75 * (1 - topScrollBoost * 0.5);
+        // Foreshortening compression smoothly fades to zero as scrolled to top
+        const yShift = t * t * 75 * Math.max(0, 1 - topScrollBoost);
 
         const ny = Math.max(0, Math.min(1, u));
         const progress = Math.max(0, Math.min(1, ny / effectiveLimit));
         const eased = Math.sin((progress * Math.PI) / 2);
-        const scale = SCALE_MIN + eased * (SCALE_MAX - SCALE_MIN);
+        const baseScale = SCALE_MIN + eased * (SCALE_MAX - SCALE_MIN);
+        const scale = baseScale + (SCALE_MAX - baseScale) * topScrollBoost;
 
         return { yShift, scale, u, topScrollBoost };
       };
@@ -309,13 +381,9 @@ export const LevelMap: React.FC = () => {
   // ── Interaction handlers ──────────────────────────────────────────────────────
   const handleLevelClick = (levelId: number) => {
     if (!localProgress[String(levelId)]) {
-      showAlert({
-        title: 'ROUTE BLOCKED',
-        message: `Firewall obstacle active! Clear Level ${levelId - 1} to shatter the route blocker and connect the path to Level ${levelId < 10 ? '0' + levelId : levelId}.`,
-        titleColor: '#ff0844',
-        btn1Text: 'DISMISS',
-        btn1Color: '#00f7ff',
-      });
+      soundManager.playLockTap();
+      const prevLevel = levelId - 1;
+      cyberToast.locked(`Level ${levelId} Locked • Clear Level ${prevLevel} first`);
       return;
     }
     const level = localLevels[levelId - 1];
@@ -323,13 +391,8 @@ export const LevelMap: React.FC = () => {
   };
 
   const handleBlockerClick = (blocker: RouteBlocker) => {
-    showAlert({
-      title: 'ROUTE BLOCKED',
-      message: `The route to Level ${blocker.toLevel} is blocked! Complete Level ${blocker.fromLevel} to destroy this obstacle and open the path.`,
-      titleColor: '#ff0844',
-      btn1Text: 'DEPLOY CORE',
-      btn1Color: '#00f7ff',
-    });
+    soundManager.playLockTap();
+    cyberToast.locked(`Route Blocked • Clear Level ${blocker.fromLevel} first`);
   };
 
   // ─── Render ──────────────────────────────────────────────────────────────────
@@ -345,7 +408,7 @@ export const LevelMap: React.FC = () => {
         `,
       }}
     >
-      {/* ── Top Floating Cyber Section Header ────────────────────────────── */}
+      {/* ── Top Cyber Section Header (Profile & Cores) ──────────────────── */}
       <div
         className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg"
         style={{
@@ -357,45 +420,86 @@ export const LevelMap: React.FC = () => {
           title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
           subtitle={`@${user.username || 'pilot'}`}
           rightSlot={
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {dailyAvailable && (
-                <button
-                  type="button"
-                  onClick={() => { setActiveTab('armory'); if (typeof window !== 'undefined') { window.history.pushState(null, '', '/shop'); window.dispatchEvent(new CustomEvent('open-core-shop')); } }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/25 via-yellow-500/35 to-amber-500/25 border border-amber-400 text-amber-300 font-tech font-bold text-xs shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
-                  title="Claim 50 Free Cores in Armory Shop"
-                >
-                  <span className="text-xs">🎁</span>
-                  <span className="tracking-wider">FREE 50</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => { setActiveTab('armory'); if (typeof window !== 'undefined') { window.history.pushState(null, '', '/shop'); window.dispatchEvent(new CustomEvent('open-core-shop')); } }}
-                title="View Cores & Shop"
-                style={{
-                  background:
-                    'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
-                  border: '1.2px solid rgba(0, 247, 255, 0.45)',
-                  boxShadow: '0 0 12px rgba(0, 247, 255, 0.25)',
-                }}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.4)] active:scale-95 group transition-all"
-              >
-                <CoreIcon size={15} glow variant="cyan" className="group-hover:rotate-12 transition-transform" />
-                <span className="font-tech font-bold text-xs text-cyan-200">
-                  {cores.toLocaleString()}
-                </span>
-                <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
-                  CORES
-                </span>
-                <span className="w-3.5 h-3.5 rounded-full bg-cyan-400/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center text-[10px] font-bold group-hover:bg-cyan-400 group-hover:text-black transition-colors ml-0.5">
-                  +
-                </span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => { setActiveTab('armory'); if (typeof window !== 'undefined') { window.history.pushState(null, '', '/shop'); window.dispatchEvent(new CustomEvent('open-core-shop')); } }}
+              title="View Cores & Shop"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
+                border: '1.2px solid rgba(0, 247, 255, 0.45)',
+                boxShadow: '0 0 12px rgba(0, 247, 255, 0.25)',
+              }}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.4)] active:scale-95 group transition-all"
+            >
+              <CoreIcon size={15} glow variant="cyan" className="group-hover:rotate-12 transition-transform" />
+              <span className="font-tech font-bold text-xs text-cyan-200">
+                {cores.toLocaleString()}
+              </span>
+              <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
+                CORES
+              </span>
+              <span className="w-3.5 h-3.5 rounded-full bg-cyan-400/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center text-[10px] font-bold group-hover:bg-cyan-400 group-hover:text-black transition-colors ml-0.5">
+                +
+              </span>
+            </button>
           }
         />
+      </div>
+
+      {/* ── Floating Controls Layer: Left (FREE Round Button) & Right (STAR Fixed Badge) ─ */}
+      <div className="absolute top-[58px] inset-x-0 z-50 pointer-events-none flex justify-center">
+        <div className="w-full max-w-[440px] px-3 sm:px-4 flex items-center justify-between">
+          {/* Left: Floating Round FREE Button (Core Cyan Color Theme) */}
+          {dailyStatus.canCollect ? (
+            <motion.button
+              type="button"
+              onClick={handleDailyCollect}
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.92 }}
+              style={{
+                background:
+                  'radial-gradient(circle at 35% 35%, rgba(0, 247, 255, 0.45) 0%, rgba(6, 182, 212, 0.5) 45%, rgba(14, 25, 54, 0.95) 100%)',
+                boxShadow:
+                  '0 0 24px rgba(0, 247, 255, 0.7), 0 4px 14px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.6)',
+              }}
+              className="w-14 h-14 rounded-full border-2 border-cyan-400 flex flex-col items-center justify-center cursor-pointer pointer-events-auto select-none relative group"
+              title="Claim 50 Free Cores!"
+            >
+              <span className="text-xl leading-none filter drop-shadow">🎁</span>
+              <div className="flex items-center gap-1 mt-0.5">
+                <CoreIcon size={13} variant="cyan" glow />
+                <span className="font-tech font-black text-[10px] text-cyan-200 tracking-wider leading-none">
+                  FREE
+                </span>
+              </div>
+              <span className="absolute -top-0.5 -right-0.5 px-1.5 h-4 min-w-[18px] rounded-full bg-cyan-300 border border-[#03040c] text-[8.5px] font-black text-black flex items-center justify-center shadow-[0_0_10px_#00f7ff] animate-pulse font-tech">
+                +50
+              </span>
+            </motion.button>
+          ) : (
+            <div />
+          )}
+
+          {/* Right: Fixed Star Badge */}
+          <div
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(24, 18, 5, 0.94) 100%)',
+              border: '1.2px solid rgba(251, 191, 36, 0.45)',
+              boxShadow:
+                '0 0 14px rgba(251, 191, 36, 0.25), 0 4px 12px rgba(0, 0, 0, 0.5)',
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-amber-300 font-tech font-bold text-xs pointer-events-auto select-none"
+            title={`${totalStars} Stars Collected in Arcade`}
+          >
+            <Star className="w-4 h-4 fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+            <span className="text-sm font-black text-amber-300 tracking-wide">{totalStars}</span>
+            <span className="text-[10px] text-amber-400/70 font-normal">/ {TOTAL_LEVELS * 3}</span>
+          </div>
+        </div>
       </div>
 
       {/* Distance-haze gradient at top (vanishing-point zone) */}
@@ -418,7 +522,7 @@ export const LevelMap: React.FC = () => {
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
           overscrollBehaviorY: 'contain',
-          paddingTop: '64px',
+          paddingTop: '72px',
           paddingBottom: '140px',
           backgroundImage: `
             radial-gradient(ellipse 95% 18% at 50% 1%,   rgba(255,215,0,0.16)   0%, transparent 75%),

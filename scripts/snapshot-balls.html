@@ -111,7 +111,6 @@
   <script src="./dist/renderBundle.js"></script>
   <script>
     const container = document.getElementById('balls-container');
-    const versions = [1, 2, 3];
     const palettes = [
       { name: 'CYAN', glow: '#00f7ff', c1: '#ffffff', c2: '#7df9ff', c3: '#0055ff' },
       { name: 'FIRE', glow: '#ff5500', c1: '#ffffff', c2: '#ff9900', c3: '#ff0055' },
@@ -119,63 +118,103 @@
       { name: 'GOLD', glow: '#ffd700', c1: '#ffffff', c2: '#fef08a', c3: '#eab308' },
     ];
 
-    versions.forEach(vId => {
-      const meta = AssetForge.BALL_PRESET_METADATA[vId];
-      const card = document.createElement('div');
-      card.className = 'version-card';
-
-      card.innerHTML = `
-        <div class="version-header">
-          <div class="version-badge">
-            <span class="badge-num">OPTION ${vId}</span>
-            <span class="badge-title">${meta.name}</span>
-            <span class="badge-tag">${meta.tag}</span>
-          </div>
+    // Card 1: Locked Option 1 Evolution across Tiers 1-3 & Mega Core
+    const meta = AssetForge.BALL_PRESET_METADATA[1];
+    const tierCard = document.createElement('div');
+    tierCard.className = 'version-card';
+    tierCard.innerHTML = `
+      <div class="version-header">
+        <div class="version-badge">
+          <span class="badge-num">ACTIVE SELECTION</span>
+          <span class="badge-title">${meta.name} — UPGRADE EVOLUTION</span>
+          <span class="badge-tag">${meta.tag}</span>
         </div>
-        <div class="balls-grid" id="ball-grid-${vId}"></div>
-      `;
+      </div>
+      <div class="balls-grid" id="tier-balls-grid"></div>
+    `;
+    container.appendChild(tierCard);
 
-      container.appendChild(card);
-      const grid = document.getElementById(`ball-grid-${vId}`);
+    const tierGrid = document.getElementById('tier-balls-grid');
+    const tierItems = [
+      { label: 'TIER 1: PROTO CORE', tier: 1, pal: palettes[0], isMega: false },
+      { label: 'TIER 2: FUSION CORE', tier: 2, pal: palettes[0], isMega: false },
+      { label: 'TIER 3: APEX SPHERE', tier: 3, pal: palettes[0], isMega: false },
+      { label: 'TIER 1 (MEGA OVERDRIVE)', tier: 1, pal: palettes[3], isMega: true },
+      { label: 'TIER 2 (MEGA OVERDRIVE)', tier: 2, pal: palettes[3], isMega: true },
+      { label: 'TIER 3 (MEGA OVERDRIVE)', tier: 3, pal: palettes[3], isMega: true },
+    ];
 
-      // Showcase: Tier 1 Cyan, Tier 2 Cyan, Tier 3 Cyan, Tier 3 Fire, Tier 3 Void, Tier 3 Mega
-      const items = [
-        { label: 'T1 BASE (CYAN)', tier: 1, pal: palettes[0], isMega: false },
-        { label: 'T2 FUSION (CYAN)', tier: 2, pal: palettes[0], isMega: false },
-        { label: 'T3 APEX (CYAN)', tier: 3, pal: palettes[0], isMega: false },
-        { label: 'T3 APEX (FIRE)', tier: 3, pal: palettes[1], isMega: false },
-        { label: 'T3 APEX (VOID)', tier: 3, pal: palettes[2], isMega: false },
-        { label: 'T3 APEX (MEGA CORE)', tier: 3, pal: palettes[3], isMega: true },
-      ];
+    tierItems.forEach(it => {
+      const cell = document.createElement('div');
+      cell.className = 'ball-cell';
+      cell.innerHTML = `<span class="ball-label">${it.label}</span>`;
 
-      items.forEach(it => {
-        const cell = document.createElement('div');
-        cell.className = 'ball-cell';
-        cell.innerHTML = `<span class="ball-label">${it.label}</span>`;
+      const canvas = document.createElement('canvas');
+      canvas.width = 110;
+      canvas.height = 110;
+      const ctx = canvas.getContext('2d');
 
-        const canvas = document.createElement('canvas');
-        canvas.width = 110;
-        canvas.height = 110;
-        const ctx = canvas.getContext('2d');
+      const radius = it.isMega ? 38 : 34;
+      const ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius,
+        isMega: it.isMega
+      };
 
-        const radius = 34;
-        const ball = {
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-          radius,
-          isMega: it.isMega
-        };
-
-        AssetForge.drawBallWithPreset(ctx, ball, vId, {
-          animTick: 2.4,
-          tier: it.tier,
-          palette: it.pal,
-          isMega: it.isMega
-        });
-
-        cell.appendChild(canvas);
-        grid.appendChild(cell);
+      AssetForge.drawBallWithPreset(ctx, ball, 1, {
+        animTick: 2.4,
+        tier: it.tier,
+        palette: it.pal,
+        isMega: it.isMega
       });
+
+      cell.appendChild(canvas);
+      tierGrid.appendChild(cell);
+    });
+
+    // Card 2: Elemental Resonance Palettes (Apex Tier 3)
+    const palCard = document.createElement('div');
+    palCard.className = 'version-card';
+    palCard.innerHTML = `
+      <div class="version-header">
+        <div class="version-badge">
+          <span class="badge-num">ELEMENTAL PALETTES</span>
+          <span class="badge-title">3D STARDUST CHROMATIC SPECTRUM</span>
+          <span class="badge-tag">TIER 3 APEX LEVEL</span>
+        </div>
+      </div>
+      <div class="balls-grid" id="palette-balls-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+    `;
+    container.appendChild(palCard);
+
+    const palGrid = document.getElementById('palette-balls-grid');
+    palettes.forEach(pal => {
+      const cell = document.createElement('div');
+      cell.className = 'ball-cell';
+      cell.innerHTML = `<span class="ball-label">${pal.name} SPECTRUM</span>`;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 110;
+      canvas.height = 110;
+      const ctx = canvas.getContext('2d');
+
+      const ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 34,
+        isMega: false
+      };
+
+      AssetForge.drawBallWithPreset(ctx, ball, 1, {
+        animTick: 2.4,
+        tier: 3,
+        palette: pal,
+        isMega: false
+      });
+
+      cell.appendChild(canvas);
+      palGrid.appendChild(cell);
     });
   </script>
 </body>

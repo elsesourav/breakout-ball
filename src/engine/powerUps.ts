@@ -188,25 +188,25 @@ export class PowerUpManager {
 
     switch (type) {
       case 'megaball': {
-        const dur = 5.0 + (megaLvl - 1) * 1.0;
+        const dur = 5.0 + (megaLvl - 1) * 1.2;
         this.maxDurations.megaball = dur;
         this.buffs.megaBall = dur; // Reset to full duration
         break;
       }
       case 'laser': {
-        const dur = 6.0 + (laserLvl - 1) * 1.14;
+        const dur = 5.0 + (laserLvl - 1) * 1.0;
         this.maxDurations.laser = dur;
         this.buffs.laser = dur; // Reset to full duration
         break;
       }
       case 'slowmo': {
-        const dur = 4.0 + (slowmoLvl - 1) * 0.86;
+        const dur = 4.0 + (slowmoLvl - 1) * 0.75;
         this.maxDurations.slowmo = dur;
         this.buffs.slowMo = dur; // Reset to full duration
         break;
       }
       case 'expand': {
-        const dur = 6.0 + (expandLvl - 1) * 1.14;
+        const dur = 6.0 + (expandLvl - 1) * 0.8;
         this.maxDurations.expand = dur;
         this.buffs.expand = dur; // Reset to full duration
         break;
@@ -273,20 +273,7 @@ export class PowerUpManager {
       });
     }
 
-    // 3. Laser Blasters on Paddle
-    if (this.buffs.laser > 0) {
-      const halfPadW = paddle.width / 2;
-      const cannonOffset = halfPadW * 0.75;
-      ctx.save();
-      ctx.fillStyle = '#ff0055';
-      ctx.shadowColor = '#ff0055';
-      ctx.shadowBlur = 12;
-      ctx.fillRect(paddle.x - cannonOffset - 4, paddle.y - 10, 8, 12);
-      ctx.fillRect(paddle.x + cannonOffset - 4, paddle.y - 10, 8, 12);
-      ctx.restore();
-    }
-
-    // 4. Laser Bolts
+    // 3. Laser Bolts
     for (const bolt of this.lasers) {
       ctx.save();
       ctx.shadowColor = '#ff0055';
@@ -298,12 +285,13 @@ export class PowerUpManager {
       ctx.restore();
     }
 
-    // 5. In-Game Circular Ring Timers for Active Buffs
-    this.renderActiveBuffRings(ctx, canvasWidth, canvasHeight);
+    // 5. In-Game Circular Ring Timers for Active Buffs (Tracks paddle smoothly)
+    this.renderActiveBuffRings(ctx, paddle, canvasWidth, canvasHeight);
   }
 
   private renderActiveBuffRings(
     ctx: CanvasRenderingContext2D,
+    paddle: PaddleState,
     canvasWidth: number,
     canvasHeight: number
   ) {
@@ -359,11 +347,18 @@ export class PowerUpManager {
 
     if (activeItems.length === 0) return;
 
-    const ringRadius = 26;
-    const ringSpacing = 72;
+    const ringRadius = 34;
+    const ringSpacing = 86;
     const totalWidth = (activeItems.length - 1) * ringSpacing;
-    const startX = (canvasWidth - totalWidth) / 2;
-    const ringY = canvasHeight - 270;
+
+    // Smoothly tracks paddle horizontally with screen edge bounds
+    const rawStartX = paddle.x - totalWidth / 2;
+    const minX = ringRadius + 28;
+    const maxX = canvasWidth - ringRadius - 28;
+    const startX = Math.max(minX, Math.min(maxX - totalWidth, rawStartX));
+
+    // Anchored directly above paddle with a comfortable 24px gap
+    const ringY = paddle.y - 78;
 
     ctx.save();
 
@@ -373,28 +368,35 @@ export class PowerUpManager {
       const cy = ringY;
       const ratio = item.isShield ? item.current / item.max : Math.max(0, item.current / item.max);
 
-      // Urgency pulse if remaining time <= 2.5s
+      // Urgency pulse if remaining time <= 2.0s
       let alpha = 1.0;
-      if (!item.isShield && item.current <= 2.5) {
-        alpha = 0.4 + 0.6 * Math.abs(Math.sin(Date.now() * 0.012));
+      if (!item.isShield && item.current <= 2.0) {
+        alpha = 0.45 + 0.55 * Math.abs(Math.sin(Date.now() * 0.015));
       }
       ctx.globalAlpha = alpha;
 
-      // Dark circular backing
-      ctx.fillStyle = 'rgba(6, 12, 34, 0.88)';
+      // Dark cyber circular backing with neon aura
+      ctx.fillStyle = 'rgba(5, 9, 28, 0.92)';
+      ctx.shadowColor = item.meta.glow;
+      ctx.shadowBlur = 12;
       ctx.beginPath();
-      ctx.arc(cx, cy, ringRadius + 4, 0, Math.PI * 2);
+      ctx.arc(cx, cy, ringRadius + 5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Background Track
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      // Outer bezel border
+      ctx.strokeStyle = 'rgba(0, 247, 255, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Background Progress Track
+      ctx.lineWidth = 4.5;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
       ctx.beginPath();
       ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Depleting Progress Ring (clockwise starting from top -Math.PI / 2)
-      ctx.lineWidth = 4;
+      // Depleting Progress Ring (clockwise from top -Math.PI / 2)
+      ctx.lineWidth = 4.5;
       ctx.strokeStyle = item.meta.color;
       ctx.shadowColor = item.meta.glow;
       ctx.shadowBlur = 10;
@@ -402,20 +404,32 @@ export class PowerUpManager {
       ctx.arc(cx, cy, ringRadius, -Math.PI / 2, -Math.PI / 2 + ratio * Math.PI * 2, false);
       ctx.stroke();
 
-      // Center Glyph/Symbol
-      ctx.shadowBlur = 6;
+      // Center Glyph / Symbol (Crisp, proportional font)
+      ctx.shadowBlur = 8;
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 15px monospace';
+      ctx.font = 'bold 22px "Chakra Petch", monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(item.meta.symbol, cx, cy - 1);
 
-      // Label below ring: e.g. "4.2s" or "2x"
+      // Timer Pill Badge below ring (Clear, highly legible, 0px overlap with paddle)
+      const labelText = item.isShield ? `${item.current}x` : `${item.current.toFixed(1)}s`;
+      const pillY = cy + ringRadius + 18;
+
+      ctx.fillStyle = 'rgba(4, 7, 22, 0.92)';
+      ctx.strokeStyle = item.meta.color;
+      ctx.lineWidth = 1.0;
+      ctx.shadowColor = item.meta.glow;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.roundRect(cx - 26, pillY - 10, 52, 20, 6);
+      ctx.fill();
+      ctx.stroke();
+
       ctx.shadowBlur = 4;
       ctx.fillStyle = item.meta.color;
-      ctx.font = 'bold 12px monospace';
-      const labelText = item.isShield ? `${item.current}x` : `${item.current.toFixed(1)}s`;
-      ctx.fillText(labelText, cx, cy + ringRadius + 14);
+      ctx.font = 'bold 14px "Orbitron", monospace';
+      ctx.fillText(labelText, cx, pillY);
     }
 
     ctx.restore();

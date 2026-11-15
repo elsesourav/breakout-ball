@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Matrix Forge Clean UI Snapshot</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: monospace; }
+    body {
+      background: #02030a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+    .designer-phone {
+      width: 400px;
+      background: #06091c;
+      border: 1.5px solid rgba(0, 247, 255, 0.3);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 25px rgba(0, 247, 255, 0.2);
+    }
+    .top-bar {
+      padding: 8px;
+      background: #06091c;
+      border-bottom: 1.5px solid rgba(0, 247, 255, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .title {
+      color: #00f7ff;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px rgba(0, 247, 255, 0.4);
+    }
+    .action-group {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .icon-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: #080c22;
+      border: 1px solid rgba(0, 247, 255, 0.35);
+      color: #00f7ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .brick-badge {
+      font-size: 9px;
+      color: #00f7ff;
+      font-weight: bold;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(0, 247, 255, 0.1);
+      border: 1px solid rgba(0, 247, 255, 0.3);
+    }
+    .hp-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+    .special-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    .block-card {
+      border-radius: 8px;
+      background: rgba(8, 13, 36, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 40px;
+    }
+    .block-card.selected {
+      border: 2px solid #00f7ff;
+      background: rgba(0, 247, 255, 0.18);
+      box-shadow: 0 0 12px rgba(0, 247, 255, 0.5);
+      transform: scale(1.04);
+    }
+    .block-card canvas {
+      width: 100%;
+      height: 20px;
+    }
+    .block-card span {
+      font-size: 8px;
+      font-weight: 900;
+      color: #94a3b8;
+      margin-top: 1px;
+      text-transform: uppercase;
+    }
+    .block-card.selected span {
+      color: #00f7ff;
+    }
+    .canvas-container {
+      width: 100%;
+      height: 480px;
+      background: #030514;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .canvas-container canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .bottom-bar {
+      padding: 8px 12px;
+      background: #06091c;
+      border-top: 1.5px solid rgba(0, 247, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pill-btn {
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      border: 1.5px solid;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-exit {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+    }
+    .btn-test {
+      background: #059669;
+      border-color: #34d399;
+      color: #fff;
+    }
+    .btn-save {
+      background: #00f7ff;
+      border-color: #a5f3fc;
+      color: #000;
+      box-shadow: 0 0 12px rgba(0, 247, 255, 0.5);
+    }
+  </style>
+  <script src="dist/renderBundle.js"></script>
+</head>
+<body>
+  <div class="designer-phone">
+    <!-- COMPACT TOP BAR -->
+    <div class="top-bar">
+      <div class="header-row">
+        <span class="title">⚡ MATRIX FORGE</span>
+        <div class="action-group">
+          <div class="icon-btn">↩</div>
+          <div class="icon-btn">↪</div>
+          <div class="icon-btn">🔀</div>
+          <div class="icon-btn" style="color:#ff0055; border-color:rgba(255,0,85,0.4)">🗑</div>
+          <span class="brick-badge">14 BRICKS</span>
+        </div>
+      </div>
+
+      <!-- STANDARD CORES HP 1 - 5 -->
+      <div class="hp-grid">
+        <div class="block-card selected" id="tool1">
+          <canvas id="c1" width="88" height="48"></canvas>
+          <span>1</span>
+        </div>
+        <div class="block-card" id="tool2">
+          <canvas id="c2" width="88" height="48"></canvas>
+          <span>2</span>
+        </div>
+        <div class="block-card" id="tool3">
+          <canvas id="c3" width="88" height="48"></canvas>
+          <span>3</span>
+        </div>
+        <div class="block-card" id="tool4">
+          <canvas id="c4" width="88" height="48"></canvas>
+          <span>4</span>
+        </div>
+        <div class="block-card" id="tool5">
+          <canvas id="c5" width="88" height="48"></canvas>
+          <span>5</span>
+        </div>
+      </div>
+
+      <!-- SPECIAL MATRIX -->
+      <div class="special-grid">
+        <div class="block-card" id="tool6">
+          <canvas id="c6" width="88" height="48"></canvas>
+          <span>TITANIUM</span>
+        </div>
+        <div class="block-card" id="tool7">
+          <canvas id="c7" width="88" height="48"></canvas>
+          <span style="color:#00f7ff">PORTAL</span>
+        </div>
+        <div class="block-card" id="tool8">
+          <canvas id="c8" width="88" height="48"></canvas>
+          <span style="color:#ffaa00">BLAST ⚡</span>
+        </div>
+        <div class="block-card" id="tool0">
+          <canvas id="c0" width="88" height="48"></canvas>
+          <span style="color:#ff0055">ERASER</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID CANVAS -->
+    <div class="canvas-container">
+      <canvas id="gridCanvas" width="1152" height="1500"></canvas>
+    </div>
+
+    <!-- CLEAN BOTTOM BAR (No private/public button here) -->
+    <div class="bottom-bar">
+      <div class="pill-btn btn-exit">← EXIT</div>
+      <div style="display:flex; gap:8px;">
+        <div class="pill-btn" style="background:rgba(0,247,255,0.08); border-color:rgba(0,247,255,0.3); color:#00f7ff">📋 CODE</div>
+        <div class="pill-btn btn-test">▶ TEST</div>
+        <div class="pill-btn btn-save">💾 SAVE</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const drawBlock = PresetRenderers.drawBlockWithPreset;
+
+    function renderTool(canvasId, type, portalPairId) {
+      const c = document.getElementById(canvasId);
+      const ctx = c.getContext('2d');
+      if (type === 0) {
+        const w = c.width, h = c.height, pad = 2;
+        ctx.fillStyle = '#14040c';
+        ctx.roundRect(pad, pad, w - pad*2, h - pad*2, 4);
+        ctx.fill();
+        ctx.strokeStyle = '#ff0055';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.strokeStyle = '#ff0055';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(w/2 - 8, h/2 - 6); ctx.lineTo(w/2 + 8, h/2 + 6);
+        ctx.moveTo(w/2 + 8, h/2 - 6); ctx.lineTo(w/2 - 8, h/2 + 6);
+        ctx.stroke();
+      } else {
+        const b = {
+          x: 3, y: 2, w: c.width - 6, h: c.height - 4,
+          health: type, initialHealth: type,
+          isDead: false, hitAnim: 0,
+          counter: type === 8 ? 3 : undefined,
+          portalPairId: portalPairId,
+        };
+        drawBlock(ctx, b, 1, { portalCenterStyle: 3 });
+      }
+    }
+
+    renderTool('c1', 1);
+    renderTool('c2', 2);
+    renderTool('c3', 3);
+    renderTool('c4', 4);
+    renderTool('c5', 5);
+    renderTool('c6', 6);
+    renderTool('c7', 7, 1);
+    renderTool('c8', 8);
+    renderTool('c0', 0);
+
+    // Full grid canvas with portals and blast detonators
+    const gc = document.getElementById('gridCanvas');
+    const gctx = gc.getContext('2d');
+    const cols = 9, rows = 11;
+    const cw = gc.width / cols;
+    const ch = 128 * 0.75;
+    const pad = cw * 0.05;
+
+    gctx.fillStyle = '#030514';
+    gctx.fillRect(0, 0, gc.width, gc.height);
+
+    gctx.strokeStyle = 'rgba(0, 247, 255, 0.07)';
+    gctx.lineWidth = 1;
+    for (let r = 0; r <= rows; r++) {
+      gctx.beginPath(); gctx.moveTo(0, r * ch); gctx.lineTo(gc.width, r * ch); gctx.stroke();
+    }
+    for (let c = 0; c <= cols; c++) {
+      gctx.beginPath(); gctx.moveTo(c * cw, 0); gctx.lineTo(c * cw, rows * ch); gctx.stroke();
+    }
+
+    // Portal pair dashed lines: Pair 1: (1,1) <-> (7,1)
+    const p1ax = 1 * cw + cw / 2, p1ay = 1 * ch + ch / 2;
+    const p1bx = 7 * cw + cw / 2, p1by = 1 * ch + ch / 2;
+    gctx.save();
+    gctx.strokeStyle = '#00f7ff';
+    gctx.lineWidth = 3;
+    gctx.setLineDash([12, 10]);
+    gctx.shadowColor = '#00f7ff';
+    gctx.shadowBlur = 10;
+    gctx.beginPath(); gctx.moveTo(p1ax, p1ay); gctx.lineTo(p1bx, p1by); gctx.stroke();
+
+    // Portal pair dashed lines: Pair 2: (2,4) <-> (6,4)
+    const p2ax = 2 * cw + cw / 2, p2ay = 4 * ch + ch / 2;
+    const p2bx = 6 * cw + cw / 2, p2by = 4 * ch + ch / 2;
+    gctx.strokeStyle = '#e879f9';
+    gctx.shadowColor = '#e879f9';
+    gctx.beginPath(); gctx.moveTo(p2ax, p2ay); gctx.lineTo(p2bx, p2by); gctx.stroke();
+    gctx.restore();
+
+    const sampleBlocks = [
+      { x: 1, y: 1, h: 7, portalPairId: 1 },
+      { x: 7, y: 1, h: 7, portalPairId: 1 },
+      { x: 3, y: 1, h: 5 }, { x: 4, y: 1, h: 8 }, { x: 5, y: 1, h: 5 },
+      { x: 2, y: 2, h: 4 }, { x: 3, y: 2, h: 6 }, { x: 4, y: 2, h: 4 }, { x: 5, y: 2, h: 6 }, { x: 6, y: 2, h: 4 },
+      { x: 3, y: 3, h: 3 }, { x: 4, y: 3, h: 8 }, { x: 5, y: 3, h: 3 },
+      { x: 2, y: 4, h: 7, portalPairId: 2 },
+      { x: 6, y: 4, h: 7, portalPairId: 2 },
+      { x: 4, y: 5, h: 2 },
+    ];
+
+    sampleBlocks.forEach(sb => {
+      const b = {
+        x: sb.x * cw + pad, y: sb.y * ch + pad,
+        w: cw - pad * 2, h: ch - pad * 2,
+        health: sb.h, initialHealth: sb.h,
+        isDead: false, hitAnim: 0,
+        counter: sb.h === 8 ? 3 : undefined,
+        portalPairId: sb.portalPairId,
+      };
+      drawBlock(gctx, b, 1, { portalCenterStyle: 3 });
+    });
+
+    gctx.fillStyle = 'rgba(0, 247, 255, 0.02)';
+    gctx.fillRect(0, rows * ch, gc.width, gc.height - rows * ch);
+    gctx.font = '600 24px monospace';
+    gctx.fillStyle = 'rgba(0, 247, 255, 0.2)';
+    gctx.textAlign = 'center';
+    gctx.fillText('▼ PADDLE LAUNCH & REBOUND ZONE ▼', gc.width / 2, rows * ch + 70);
+  </script>
+</body>
+</html>

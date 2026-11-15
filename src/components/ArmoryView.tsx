@@ -2,18 +2,17 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '../context/GameContext';
 import { currencyService, DailyCollectStatus } from '../services/currency';
-import { UpgradeState } from '../constants/upgrades';
+import { UpgradeState, POWER_UPGRADES, PADDLE_UPGRADES } from '../constants/upgrades';
 import { UpgradeTab, UpgradeSubSection } from './armory/UpgradeTab';
 import { ShopTab } from './armory/ShopTab';
 import { CyberSectionHeader } from './CyberSectionHeader';
 import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
 import { CoreIcon } from './CoreIcon';
 import { soundManager } from '../utils/audio';
+import { AssetThumbnail } from './armory/AssetThumbnail';
 import {
   UpgradeTabIcon,
   ShopTabIcon,
-  GameBallIcon,
-  GamePaddleIcon,
 } from './armory/InGameIcons';
 
 type ArmorySection = 'upgrade' | 'shop';
@@ -26,12 +25,17 @@ const SUB_SECTIONS: {
   {
     id: 'ball',
     label: 'BALL',
-    renderIcon: () => <GameBallIcon size={18} />,
+    renderIcon: () => <AssetThumbnail type="ball" size={19} />,
   },
   {
     id: 'paddle',
     label: 'PADDLE',
-    renderIcon: () => <GamePaddleIcon size={20} />,
+    renderIcon: () => <AssetThumbnail type="paddle" size={24} />,
+  },
+  {
+    id: 'power',
+    label: 'POWER',
+    renderIcon: () => <AssetThumbnail type="power" size={19} />,
   },
 ];
 
@@ -46,7 +50,19 @@ export const ArmoryView: React.FC = () => {
     }
     return 'upgrade';
   });
-  const [subSection, setSubSection] = useState<UpgradeSubSection>('ball');
+  const [subSection, setSubSection] = useState<UpgradeSubSection>(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      const prevId = sp.get('preview');
+      if (prevId) {
+        if (POWER_UPGRADES.some((u) => u.id === prevId)) return 'power';
+        if (PADDLE_UPGRADES.some((u) => u.id === prevId)) return 'paddle';
+      }
+      const sub = sp.get('sub');
+      if (sub === 'paddle' || sub === 'power' || sub === 'ball') return sub;
+    }
+    return 'ball';
+  });
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [upgrades, setUpgrades] = useState<UpgradeState>(() => currencyService.getUpgrades());
@@ -58,6 +74,7 @@ export const ArmoryView: React.FC = () => {
   );
   const countUpRef = useRef<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isClaimLockedRef = useRef(false);
 
   // Sync with browser URL / custom events for /shop direct routing
   useEffect(() => {
@@ -132,9 +149,14 @@ export const ArmoryView: React.FC = () => {
     countUpRef.current = requestAnimationFrame(tick);
   }, [displayCores]);
 
-  // Handle successful purchase/upgrade
-  const handleUpgrade = (id: string) => {
-    const success = currencyService.purchaseUpgrade(id);
+  // Handle successful purchase/upgrade (single-level or multi-level bulk upgrade)
+  const handleUpgrade = (id: string, targetLevel?: number) => {
+    let success = false;
+    if (targetLevel && targetLevel > (upgrades[id] || 1)) {
+      success = currencyService.purchaseUpgradeToLevel(id, targetLevel, user.username);
+    } else {
+      success = currencyService.purchaseUpgrade(id, user.username);
+    }
     if (success) {
       const newBalance = currencyService.getBalance();
       setCores(newBalance);
@@ -143,8 +165,14 @@ export const ArmoryView: React.FC = () => {
     }
   };
 
-  // Handle successful core coupon / task claim
-  const handleClaimSuccess = (amount: number) => {
+  // Handle successful core coupon / task claim (locked to prevent duplicate animations)
+  const handleClaimSuccess = useCallback((amount: number) => {
+    if (isClaimLockedRef.current) return;
+    isClaimLockedRef.current = true;
+    setTimeout(() => {
+      isClaimLockedRef.current = false;
+    }, 1500);
+
     const newBalance = currencyService.getBalance();
     setCores(newBalance);
     setClaimAmount(amount);
@@ -169,7 +197,11 @@ export const ArmoryView: React.FC = () => {
     setTimeout(() => {
       startCountUp(newBalance);
     }, 380);
-  };
+  }, [startCountUp]);
+
+  const handleAnimationComplete = useCallback(() => {
+    setIsFlyingCores(false);
+  }, []);
 
   const SECTIONS: {
     id: ArmorySection;
@@ -201,7 +233,7 @@ export const ArmoryView: React.FC = () => {
       <FlyingCoresAnimation
         active={isFlyingCores}
         amount={claimAmount}
-        onComplete={() => setIsFlyingCores(false)}
+        onComplete={handleAnimationComplete}
       />
 
       {/* ── 1. ACCOUNT / PROFILE HEADER (NON-STICKY: Scrolls with page) ──────── */}
@@ -216,19 +248,6 @@ export const ArmoryView: React.FC = () => {
           subtitle={`@${user.username || 'pilot'}`}
           rightSlot={
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Daily 50 Free Cores Pop-up Pill (Visible when 24h reward is available) */}
-              {dailyStatus.canCollect && (
-                <button
-                  type="button"
-                  onClick={() => setActiveSection('shop')}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/25 via-yellow-500/35 to-amber-500/25 border border-amber-400 text-amber-300 font-tech font-bold text-xs shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
-                  title="Claim 50 Free Cores in Core Shop"
-                >
-                  <span className="text-xs">🎁</span>
-                  <span className="tracking-wider">FREE 50</span>
-                </button>
-              )}
-
               {/* Visually Enhanced Cores Button (Click directs to Shop) */}
               <button
                 type="button"
@@ -346,7 +365,7 @@ export const ArmoryView: React.FC = () => {
                       setSubSection(sub.id);
                     }}
                     className={`relative flex-1 py-1.5 flex items-center justify-center gap-1.5 rounded-xl font-tech font-bold text-xs transition-colors cursor-pointer z-10 ${
-                      isActive ? 'text-black' : 'text-slate-400 hover:text-slate-200'
+                      isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     {isActive && (
@@ -355,13 +374,17 @@ export const ArmoryView: React.FC = () => {
                         transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
                         style={{
                           background:
-                            sub.id === 'paddle'
-                              ? 'linear-gradient(135deg, #06b6d4 0%, #0284c7 100%)'
-                              : 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
+                            sub.id === 'power'
+                              ? 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)'
+                              : sub.id === 'paddle'
+                              ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                              : 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
                           boxShadow:
-                            sub.id === 'paddle'
-                              ? '0 0 14px rgba(6, 182, 212, 0.45)'
-                              : '0 0 14px rgba(0, 247, 255, 0.45)',
+                            sub.id === 'power'
+                              ? '0 0 16px rgba(236, 72, 153, 0.5)'
+                              : sub.id === 'paddle'
+                              ? '0 0 16px rgba(16, 185, 129, 0.5)'
+                              : '0 0 16px rgba(139, 92, 246, 0.5)',
                         }}
                         className="absolute inset-0 rounded-xl -z-10"
                       />

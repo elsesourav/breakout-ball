@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { PADDLE_UPGRADES, UpgradeState, UpgradeDef, getUpgradeCost } from '../../constants/upgrades';
 import { UpgradeCard } from './UpgradeCard';
 import { UpgradePreviewModal } from './UpgradePreviewModal';
-import { GamePaddleIcon } from './InGameIcons';
+import { AssetThumbnail } from './AssetThumbnail';
 
 interface PaddleTabProps {
   upgrades: UpgradeState;
   cores: number;
-  onUpgrade: (id: string) => void;
+  onUpgrade: (id: string, targetLevel?: number) => void;
 }
 
 export const PaddleTab: React.FC<PaddleTabProps> = ({ upgrades, cores, onUpgrade }) => {
@@ -47,10 +47,10 @@ export const PaddleTab: React.FC<PaddleTabProps> = ({ upgrades, cores, onUpgrade
               onUpgrade={onUpgrade}
               onSelect={(u) => setSelectedUpgrade(u)}
               icon={
-                <GamePaddleIcon
-                  widthRatio={isWidth ? 0.7 + level * 0.12 : 1}
-                  size={26}
-                  accentColor={upgrade.accentColor}
+                <AssetThumbnail
+                  upgradeId={upgrade.id}
+                  level={level}
+                  size={32}
                 />
               }
             />
@@ -65,8 +65,8 @@ export const PaddleTab: React.FC<PaddleTabProps> = ({ upgrades, cores, onUpgrade
         currentLevel={selectedUpgrade ? upgrades[selectedUpgrade.id] || 1 : 1}
         cores={cores}
         onClose={() => setSelectedUpgrade(null)}
-        onUpgrade={(id) => {
-          onUpgrade(id);
+        onUpgrade={(id, targetLevel) => {
+          onUpgrade(id, targetLevel);
         }}
       />
     </div>

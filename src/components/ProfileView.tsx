@@ -55,6 +55,19 @@ export const ProfileView: React.FC = () => {
     return unsub;
   }, []);
 
+  // Listen for programmatic switch to achievements/badges section from notification
+  useEffect(() => {
+    const handleSwitch = (e: Event) => {
+      const custom = e as CustomEvent<{ section: 'badges' | 'leaderboard' }>;
+      if (custom.detail?.section) {
+        setIsSettingsOpen(false);
+        setActiveSection(custom.detail.section);
+      }
+    };
+    window.addEventListener('profile-switch-section', handleSwitch);
+    return () => window.removeEventListener('profile-switch-section', handleSwitch);
+  }, []);
+
   // Accurately compute sticky lock threshold (distance needed to scroll away hero card)
   useEffect(() => {
     const updateMaxOuter = () => {
@@ -659,11 +672,11 @@ export const ProfileView: React.FC = () => {
           {/* 3. CONTENT CARD: Fills screen below sticky switcher with internal scrolling */}
           <div
             style={{
-              height: 'calc(100dvh - 140px)',
+              height: 'calc(100dvh - 148px)',
               minHeight: '420px',
               maxHeight: '680px',
             }}
-            className="w-full flex flex-col min-h-0"
+            className="w-full flex flex-col min-h-0 mt-2.5 mb-2.5"
           >
             <AnimatePresence mode="wait">
               {activeSection === 'badges' ? (

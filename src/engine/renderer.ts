@@ -7,6 +7,7 @@ import { getActiveDesignConfig, getBallTierFromUpgrades } from '../constants/vis
 import { drawBlockWithPreset } from './draw/blockDrawers';
 import { drawPaddleWithPreset } from './draw/paddleDrawers';
 import { drawBallWithPreset } from './draw/ballDrawers';
+import { drawBlackHoleFloor } from './draw/blackHoleDrawers';
 
 const BALL_SKIN_PALETTES: Record<string, { c1: string; c2: string; c3: string; glow: string }> = {
   cyan: { c1: '#ffffff', c2: '#7df9ff', c3: '#00f7ff', glow: '#00f7ff' },
@@ -93,25 +94,10 @@ export class GameRenderer {
     // 2. Background Stars
     particles.render(ctx);
 
-    // 3. Danger Floor (Lava / Void Laser)
-    ctx.save();
-    const lavaHeight = 44;
-    const lavaGrad = ctx.createLinearGradient(0, h - lavaHeight, 0, h);
-    lavaGrad.addColorStop(0, 'rgba(255, 8, 68, 0.0)');
-    lavaGrad.addColorStop(0.5, 'rgba(255, 8, 68, 0.35)');
-    lavaGrad.addColorStop(1, 'rgba(255, 8, 68, 0.9)');
-    ctx.fillStyle = lavaGrad;
-    ctx.fillRect(0, h - lavaHeight, w, lavaHeight);
+    const animTick = this.animTick;
 
-    ctx.strokeStyle = '#ff0844';
-    ctx.shadowColor = '#ff0844';
-    ctx.shadowBlur = 15;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(0, h - lavaHeight);
-    ctx.lineTo(w, h - lavaHeight);
-    ctx.stroke();
-    ctx.restore();
+    // 3. Cosmic Black Hole Gravitational Singularity Floor
+    drawBlackHoleFloor(ctx, w, h, animTick);
 
     // 4. Power-Up Shards & Shield Barrier
     if (powerUps) {
@@ -119,11 +105,13 @@ export class GameRenderer {
     }
 
     const designConfig = getActiveDesignConfig();
-    const animTick = this.animTick;
 
     // 5. 3D Tactile Blocks Rendering (Dynamic Presets)
     blocks.forEach((block) => {
-      drawBlockWithPreset(ctx, block, designConfig.blockPreset, { animTick });
+      drawBlockWithPreset(ctx, block, designConfig.blockPreset, {
+        animTick,
+        portalCenterStyle: designConfig.portalCenterStyle,
+      });
     });
 
     // 6. 3D Paddle Rendering (Dynamic Presets & Upgrade Progression Tiers)
@@ -131,13 +119,12 @@ export class GameRenderer {
     const hasShield = !!powerUps && (powerUps.buffs.hasShield || powerUps.buffs.shieldCharges > 0);
     const widthLevel = currencyService.getUpgradeLevel('paddle_width');
     const speedLevel = currencyService.getUpgradeLevel('paddle_speed');
-    drawPaddleWithPreset(ctx, paddle, designConfig.paddlePreset, {
+    drawPaddleWithPreset(ctx, paddle, 1, {
       animTick,
       hasLaser,
       hasShield,
       widthLevel,
       speedLevel,
-      weaponVariant: designConfig.paddleWeaponVariant,
       tier: designConfig.paddleTierOverride,
     });
 

@@ -54,7 +54,7 @@ export const TOTAL_LEVELS = 50;
 export const SPACING = 175;
 export const SVG_WIDTH = 380;
 export const BOTTOM_OFFSET = 240;
-export const TOP_OFFSET = 420;
+export const TOP_OFFSET = 580;
 export const TOTAL_HEIGHT = (TOTAL_LEVELS - 1) * SPACING + BOTTOM_OFFSET + TOP_OFFSET;
 
 export const SECTOR_CONFIG: Record<number, SectorInfo> = {

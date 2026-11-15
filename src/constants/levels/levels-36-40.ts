@@ -8,7 +8,7 @@ import { createLevel } from './types';
  * Visual Grid Format:
  * - '1' - '5' : Destructible Crystal Bricks (HP 1 to 5)
  * - '6' or 'W': Titanium Wall (Indestructible Barrier)
- * - '7' or 'P': Quantum Portal (Paired Warp Gateway)
+ * - 'A' - 'D' : Paired Quantum Portals (A=Pair 1, B=Pair 2, C=Pair 3, D=Pair 4)
  * - '8' or 'E': Countdown EMP Detonator (Kinetic Shockwave)
  * - ' '       : Empty Slot
  */
@@ -44,13 +44,13 @@ export const level37: LevelData = createLevel({
 
 export const level38: LevelData = createLevel({
   id: '38',
-  name: 'Level 38: Genesis Overdrive',
+  name: 'Level 38: Warp Fortress',
   creator: 'sourav',
   playCount: 435,
   startRow: 1,
   grid: [
     ' 5558555 ', // row 1
-    '  47 74  ', // row 2
+    '  4A A4  ', // row 2
     '   565   ', // row 3
     '    4    ', // row 4
   ],
@@ -58,7 +58,7 @@ export const level38: LevelData = createLevel({
 
 export const level39: LevelData = createLevel({
   id: '39',
-  name: 'Level 39: Cyber Trident Core',
+  name: 'Level 39: Cyber Trident',
   creator: 'sourav',
   playCount: 449,
   startRow: 0,

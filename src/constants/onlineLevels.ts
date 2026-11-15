@@ -9,7 +9,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 0, y: 1, h: 5 }, { x: 2, y: 1, h: 4 }, { x: 4, y: 1, h: 5 }, { x: 6, y: 1, h: 4 }, { x: 8, y: 1, h: 5 },
-      { x: 1, y: 2, h: 3 }, { x: 3, y: 2, h: 2 }, { x: 5, y: 2, h: 2 }, { x: 7, y: 2, h: 3 },
+      { x: 1, y: 2, h: 3 }, { x: 3, y: 2, h: 8 }, { x: 5, y: 2, h: 8 }, { x: 7, y: 2, h: 3 },
       { x: 2, y: 3, h: 4 }, { x: 4, y: 3, h: 5 }, { x: 6, y: 3, h: 4 },
       { x: 3, y: 4, h: 3 }, { x: 5, y: 4, h: 3 },
     ],
@@ -21,10 +21,10 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 3890,
     isPublic: true,
     blocks: [
-      { x: 2, y: 1, h: 8 }, { x: 4, y: 1, h: 7 }, { x: 6, y: 1, h: 8 },
+      { x: 2, y: 1, h: 8 }, { x: 4, y: 1, h: 7, portalPairId: 1 }, { x: 6, y: 1, h: 8 },
       { x: 1, y: 2, h: 5 }, { x: 3, y: 2, h: 6 }, { x: 5, y: 2, h: 6 }, { x: 7, y: 2, h: 5 },
       { x: 2, y: 3, h: 4 }, { x: 4, y: 3, h: 5 }, { x: 6, y: 3, h: 4 },
-      { x: 3, y: 4, h: 3 }, { x: 4, y: 4, h: 2 }, { x: 5, y: 4, h: 3 },
+      { x: 3, y: 4, h: 3 }, { x: 4, y: 4, h: 7, portalPairId: 1 }, { x: 5, y: 4, h: 3 },
     ],
   },
   {
@@ -35,7 +35,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 0, y: 1, h: 4 }, { x: 1, y: 1, h: 5 }, { x: 7, y: 1, h: 5 }, { x: 8, y: 1, h: 4 },
-      { x: 2, y: 2, h: 3 }, { x: 3, y: 2, h: 7 }, { x: 5, y: 2, h: 7 }, { x: 6, y: 2, h: 3 },
+      { x: 2, y: 2, h: 3 }, { x: 3, y: 2, h: 7, portalPairId: 1 }, { x: 5, y: 2, h: 7, portalPairId: 1 }, { x: 6, y: 2, h: 3 },
       { x: 1, y: 3, h: 2 }, { x: 4, y: 3, h: 8 }, { x: 7, y: 3, h: 2 },
       { x: 3, y: 4, h: 5 }, { x: 4, y: 4, h: 6 }, { x: 5, y: 4, h: 5 },
     ],
@@ -49,7 +49,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     blocks: [
       { x: 4, y: 1, h: 8 },
       { x: 2, y: 2, h: 5 }, { x: 3, y: 2, h: 6 }, { x: 5, y: 2, h: 6 }, { x: 6, y: 2, h: 5 },
-      { x: 1, y: 3, h: 4 }, { x: 4, y: 3, h: 7 }, { x: 7, y: 3, h: 4 },
+      { x: 1, y: 3, h: 7, portalPairId: 1 }, { x: 4, y: 3, h: 8 }, { x: 7, y: 3, h: 7, portalPairId: 1 },
       { x: 0, y: 4, h: 3 }, { x: 3, y: 4, h: 4 }, { x: 5, y: 4, h: 4 }, { x: 8, y: 4, h: 3 },
       { x: 2, y: 5, h: 2 }, { x: 4, y: 5, h: 3 }, { x: 6, y: 5, h: 2 },
     ],
@@ -61,7 +61,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 2314,
     isPublic: true,
     blocks: [
-      { x: 0, y: 1, h: 1 }, { x: 2, y: 1, h: 2 }, { x: 4, y: 1, h: 3 }, { x: 6, y: 1, h: 2 }, { x: 8, y: 1, h: 1 },
+      { x: 0, y: 1, h: 2 }, { x: 2, y: 1, h: 3 }, { x: 4, y: 1, h: 8 }, { x: 6, y: 1, h: 3 }, { x: 8, y: 1, h: 2 },
       { x: 1, y: 2, h: 2 }, { x: 3, y: 2, h: 4 }, { x: 5, y: 2, h: 4 }, { x: 7, y: 2, h: 2 },
       { x: 2, y: 3, h: 3 }, { x: 4, y: 3, h: 5 }, { x: 6, y: 3, h: 3 },
     ],
@@ -73,7 +73,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 1845,
     isPublic: true,
     blocks: [
-      { x: 1, y: 1, h: 4 }, { x: 2, y: 1, h: 4 }, { x: 6, y: 1, h: 4 }, { x: 7, y: 1, h: 4 },
+      { x: 1, y: 1, h: 4 }, { x: 2, y: 1, h: 8 }, { x: 6, y: 1, h: 8 }, { x: 7, y: 1, h: 4 },
       { x: 0, y: 2, h: 3 }, { x: 3, y: 2, h: 5 }, { x: 4, y: 2, h: 5 }, { x: 5, y: 2, h: 5 }, { x: 8, y: 2, h: 3 },
       { x: 0, y: 3, h: 2 }, { x: 2, y: 3, h: 2 }, { x: 6, y: 3, h: 2 }, { x: 8, y: 3, h: 2 },
       { x: 3, y: 4, h: 6 }, { x: 4, y: 4, h: 1 }, { x: 5, y: 4, h: 6 },
@@ -81,16 +81,20 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
   },
   {
     id: 'VORTX',
-    name: 'Vortex',
+    name: 'Vortex Rift',
     creator: 'zen_gamer',
     playCount: 1205,
     isPublic: true,
     blocks: [
-      { x: 3, y: 1, h: 1 }, { x: 4, y: 1, h: 1 }, { x: 5, y: 1, h: 1 },
-      { x: 2, y: 2, h: 2 }, { x: 6, y: 2, h: 2 },
-      { x: 1, y: 3, h: 3 }, { x: 4, y: 3, h: 5 }, { x: 7, y: 3, h: 3 },
+      // Upper hidden vault behind the event horizon
+      { x: 4, y: 0, h: 7, portalPairId: 1 },
+      { x: 2, y: 1, h: 5 }, { x: 3, y: 1, h: 8 }, { x: 5, y: 1, h: 8 }, { x: 6, y: 1, h: 5 },
+      { x: 3, y: 2, h: 6 }, { x: 5, y: 2, h: 6 },
+      // Midfield gravitational containment ring
+      { x: 1, y: 3, h: 3 }, { x: 4, y: 3, h: 4 }, { x: 7, y: 3, h: 3 },
       { x: 2, y: 4, h: 4 }, { x: 6, y: 4, h: 4 },
-      { x: 3, y: 5, h: 2 }, { x: 4, y: 5, h: 2 }, { x: 5, y: 5, h: 2 },
+      // Lower portal entrance
+      { x: 4, y: 5, h: 7, portalPairId: 1 },
     ],
   },
   {
@@ -102,7 +106,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     blocks: [
       { x: 0, y: 2, h: 6 }, { x: 1, y: 2, h: 5 }, { x: 2, y: 2, h: 5 }, { x: 3, y: 2, h: 6 }, { x: 5, y: 2, h: 6 }, { x: 6, y: 2, h: 5 }, { x: 7, y: 2, h: 5 }, { x: 8, y: 2, h: 6 },
       { x: 1, y: 3, h: 4 }, { x: 2, y: 3, h: 3 }, { x: 6, y: 3, h: 3 }, { x: 7, y: 3, h: 4 },
-      { x: 3, y: 4, h: 2 }, { x: 4, y: 4, h: 1 }, { x: 5, y: 4, h: 2 },
+      { x: 3, y: 4, h: 2 }, { x: 4, y: 4, h: 8 }, { x: 5, y: 4, h: 2 },
     ],
   },
   {
@@ -113,8 +117,8 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 4, y: 1, h: 5 },
-      { x: 3, y: 2, h: 4 }, { x: 4, y: 2, h: 4 }, { x: 5, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 3, y: 3, h: 3 }, { x: 4, y: 3, h: 3 }, { x: 5, y: 3, h: 3 }, { x: 6, y: 3, h: 3 },
+      { x: 3, y: 2, h: 4 }, { x: 4, y: 2, h: 8 }, { x: 5, y: 2, h: 4 },
+      { x: 2, y: 3, h: 3 }, { x: 3, y: 3, h: 3 }, { x: 4, y: 3, h: 5 }, { x: 5, y: 3, h: 3 }, { x: 6, y: 3, h: 3 },
       { x: 1, y: 4, h: 2 }, { x: 2, y: 4, h: 2 }, { x: 3, y: 4, h: 2 }, { x: 4, y: 4, h: 2 }, { x: 5, y: 4, h: 2 }, { x: 6, y: 4, h: 2 }, { x: 7, y: 4, h: 2 },
     ],
   },
@@ -126,7 +130,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 1, y: 1, h: 1 }, { x: 3, y: 1, h: 1 }, { x: 5, y: 1, h: 1 }, { x: 7, y: 1, h: 1 },
-      { x: 2, y: 2, h: 2 }, { x: 4, y: 2, h: 2 }, { x: 6, y: 2, h: 2 },
+      { x: 2, y: 2, h: 2 }, { x: 4, y: 2, h: 8 }, { x: 6, y: 2, h: 2 },
       { x: 3, y: 3, h: 3 }, { x: 5, y: 3, h: 3 },
       { x: 4, y: 4, h: 4 },
     ],
@@ -138,9 +142,9 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 590,
     isPublic: true,
     blocks: [
-      { x: 0, y: 1, h: 3 }, { x: 8, y: 1, h: 3 },
+      { x: 0, y: 1, h: 5 }, { x: 8, y: 1, h: 5 },
       { x: 1, y: 2, h: 4 }, { x: 7, y: 2, h: 4 },
-      { x: 2, y: 3, h: 5 }, { x: 3, y: 3, h: 5 }, { x: 5, y: 3, h: 5 }, { x: 6, y: 3, h: 5 },
+      { x: 2, y: 3, h: 5 }, { x: 3, y: 3, h: 5 }, { x: 4, y: 3, h: 8 }, { x: 5, y: 3, h: 5 }, { x: 6, y: 3, h: 5 },
       { x: 3, y: 4, h: 2 }, { x: 5, y: 4, h: 2 },
       { x: 4, y: 5, h: 1 },
     ],
@@ -154,7 +158,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     blocks: [
       { x: 4, y: 1, h: 5 },
       { x: 3, y: 2, h: 4 }, { x: 5, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 6, y: 3, h: 3 },
+      { x: 2, y: 3, h: 3 }, { x: 4, y: 3, h: 8 }, { x: 6, y: 3, h: 3 },
       { x: 1, y: 4, h: 2 }, { x: 7, y: 4, h: 2 },
       { x: 0, y: 5, h: 1 }, { x: 8, y: 5, h: 1 },
     ],
@@ -166,10 +170,34 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 478,
     isPublic: true,
     blocks: [
-      { x: 0, y: 1, h: 5 }, { x: 8, y: 1, h: 5 },
-      { x: 1, y: 2, h: 4 }, { x: 7, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 6, y: 3, h: 3 },
-      { x: 3, y: 4, h: 2 }, { x: 4, y: 4, h: 1 }, { x: 5, y: 4, h: 2 },
+      // Pair 1: Lower-left to Upper-right cross warp
+      { x: 0, y: 5, h: 7, portalPairId: 1 }, { x: 8, y: 1, h: 7, portalPairId: 1 },
+      // Pair 2: Lower-right to Upper-left cross warp
+      { x: 8, y: 5, h: 7, portalPairId: 2 }, { x: 0, y: 1, h: 7, portalPairId: 2 },
+      // Deflection pylons and central kinetic core
+      { x: 1, y: 3, h: 6 }, { x: 7, y: 3, h: 6 },
+      { x: 2, y: 2, h: 4 }, { x: 6, y: 2, h: 4 },
+      { x: 3, y: 3, h: 3 }, { x: 4, y: 3, h: 8 }, { x: 5, y: 3, h: 3 },
+      { x: 3, y: 4, h: 5 }, { x: 5, y: 4, h: 5 },
+    ],
+  },
+  {
+    id: 'QUANTM',
+    name: 'Quantum Collider',
+    creator: 'tachyon',
+    playCount: 465,
+    isPublic: true,
+    blocks: [
+      // Pair 1: Left intake to Right injector
+      { x: 2, y: 4, h: 7, portalPairId: 1 }, { x: 6, y: 1, h: 7, portalPairId: 1 },
+      // Pair 2: Right intake to Left injector
+      { x: 6, y: 4, h: 7, portalPairId: 2 }, { x: 2, y: 1, h: 7, portalPairId: 2 },
+      // Central titanium collider barrier
+      { x: 4, y: 2, h: 6 }, { x: 4, y: 3, h: 6 },
+      // Particle acceleration detonator targets
+      { x: 1, y: 2, h: 8 }, { x: 7, y: 2, h: 8 },
+      { x: 0, y: 3, h: 4 }, { x: 1, y: 3, h: 5 }, { x: 7, y: 3, h: 5 }, { x: 8, y: 3, h: 4 },
+      { x: 3, y: 3, h: 3 }, { x: 5, y: 3, h: 3 },
     ],
   },
   {
@@ -180,7 +208,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 1, y: 1, h: 5 }, { x: 3, y: 1, h: 5 }, { x: 5, y: 1, h: 5 }, { x: 7, y: 1, h: 5 },
-      { x: 2, y: 2, h: 4 }, { x: 4, y: 2, h: 6 }, { x: 6, y: 2, h: 4 },
+      { x: 2, y: 2, h: 4 }, { x: 4, y: 2, h: 8 }, { x: 6, y: 2, h: 4 },
       { x: 1, y: 3, h: 3 }, { x: 7, y: 3, h: 3 },
       { x: 3, y: 4, h: 2 }, { x: 5, y: 4, h: 2 },
       { x: 4, y: 5, h: 1 },
@@ -193,7 +221,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 395,
     isPublic: true,
     blocks: [
-      { x: 4, y: 1, h: 5 },
+      { x: 4, y: 1, h: 8 },
       { x: 2, y: 2, h: 4 }, { x: 4, y: 2, h: 5 }, { x: 6, y: 2, h: 4 },
       { x: 1, y: 3, h: 3 }, { x: 3, y: 3, h: 4 }, { x: 5, y: 3, h: 4 }, { x: 7, y: 3, h: 3 },
       { x: 0, y: 4, h: 2 }, { x: 2, y: 4, h: 3 }, { x: 6, y: 4, h: 3 }, { x: 8, y: 4, h: 2 },
@@ -208,7 +236,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 1, y: 1, h: 2 }, { x: 3, y: 1, h: 4 }, { x: 5, y: 1, h: 4 }, { x: 7, y: 1, h: 2 },
-      { x: 2, y: 2, h: 5 }, { x: 4, y: 2, h: 6 }, { x: 6, y: 2, h: 5 },
+      { x: 2, y: 2, h: 5 }, { x: 4, y: 2, h: 8 }, { x: 6, y: 2, h: 5 },
       { x: 0, y: 3, h: 1 }, { x: 3, y: 3, h: 3 }, { x: 5, y: 3, h: 3 }, { x: 8, y: 3, h: 1 },
       { x: 4, y: 4, h: 5 },
     ],
@@ -220,9 +248,9 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 760,
     isPublic: true,
     blocks: [
-      { x: 0, y: 1, h: 6 }, { x: 2, y: 1, h: 6 }, { x: 4, y: 1, h: 6 }, { x: 6, y: 1, h: 6 }, { x: 8, y: 1, h: 6 },
+      { x: 0, y: 1, h: 6 }, { x: 2, y: 1, h: 5 }, { x: 4, y: 1, h: 6 }, { x: 6, y: 1, h: 5 }, { x: 8, y: 1, h: 6 },
       { x: 1, y: 2, h: 5 }, { x: 3, y: 2, h: 5 }, { x: 5, y: 2, h: 5 }, { x: 7, y: 2, h: 5 },
-      { x: 2, y: 3, h: 4 }, { x: 4, y: 3, h: 4 }, { x: 6, y: 3, h: 4 },
+      { x: 2, y: 3, h: 4 }, { x: 4, y: 3, h: 8 }, { x: 6, y: 3, h: 4 },
       { x: 3, y: 4, h: 3 }, { x: 5, y: 4, h: 3 },
     ],
   },
@@ -235,7 +263,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     blocks: [
       { x: 4, y: 1, h: 5 },
       { x: 3, y: 2, h: 4 }, { x: 4, y: 2, h: 5 }, { x: 5, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 4, y: 3, h: 5 }, { x: 6, y: 3, h: 3 },
+      { x: 2, y: 3, h: 3 }, { x: 4, y: 3, h: 8 }, { x: 6, y: 3, h: 3 },
       { x: 1, y: 4, h: 2 }, { x: 4, y: 4, h: 5 }, { x: 7, y: 4, h: 2 },
       { x: 0, y: 5, h: 1 }, { x: 8, y: 5, h: 1 },
     ],
@@ -248,7 +276,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 4, y: 1, h: 1 },
-      { x: 2, y: 2, h: 2 }, { x: 4, y: 2, h: 3 }, { x: 6, y: 2, h: 2 },
+      { x: 2, y: 2, h: 2 }, { x: 4, y: 2, h: 8 }, { x: 6, y: 2, h: 2 },
       { x: 1, y: 3, h: 3 }, { x: 3, y: 3, h: 4 }, { x: 4, y: 3, h: 5 }, { x: 5, y: 3, h: 4 }, { x: 7, y: 3, h: 3 },
       { x: 4, y: 4, h: 2 },
     ],
@@ -260,7 +288,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 540,
     isPublic: true,
     blocks: [
-      { x: 1, y: 1, h: 3 }, { x: 3, y: 1, h: 5 }, { x: 5, y: 1, h: 5 }, { x: 7, y: 1, h: 3 },
+      { x: 1, y: 1, h: 3 }, { x: 3, y: 1, h: 8 }, { x: 5, y: 1, h: 8 }, { x: 7, y: 1, h: 3 },
       { x: 1, y: 2, h: 3 }, { x: 3, y: 2, h: 4 }, { x: 5, y: 2, h: 4 }, { x: 7, y: 2, h: 3 },
       { x: 1, y: 3, h: 2 }, { x: 3, y: 3, h: 2 }, { x: 5, y: 3, h: 2 }, { x: 7, y: 3, h: 2 },
     ],
@@ -273,7 +301,7 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     isPublic: true,
     blocks: [
       { x: 3, y: 1, h: 6 }, { x: 4, y: 1, h: 5 }, { x: 5, y: 1, h: 6 },
-      { x: 2, y: 2, h: 4 }, { x: 4, y: 2, h: 5 }, { x: 6, y: 2, h: 4 },
+      { x: 2, y: 2, h: 4 }, { x: 4, y: 2, h: 8 }, { x: 6, y: 2, h: 4 },
       { x: 1, y: 3, h: 3 }, { x: 3, y: 3, h: 4 }, { x: 5, y: 3, h: 4 }, { x: 7, y: 3, h: 3 },
       { x: 4, y: 4, h: 2 },
     ],
@@ -285,8 +313,8 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 460,
     isPublic: true,
     blocks: [
-      { x: 2, y: 1, h: 7 }, { x: 4, y: 1, h: 8 }, { x: 6, y: 1, h: 7 },
-      { x: 1, y: 2, h: 4 }, { x: 3, y: 2, h: 5 }, { x: 5, y: 2, h: 5 }, { x: 7, y: 2, h: 4 },
+      { x: 2, y: 1, h: 5 }, { x: 4, y: 1, h: 8 }, { x: 6, y: 1, h: 5 },
+      { x: 1, y: 2, h: 6 }, { x: 3, y: 2, h: 5 }, { x: 5, y: 2, h: 5 }, { x: 7, y: 2, h: 6 },
       { x: 3, y: 3, h: 3 }, { x: 4, y: 3, h: 2 }, { x: 5, y: 3, h: 3 },
     ],
   },
@@ -321,9 +349,9 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
     playCount: 395,
     isPublic: true,
     blocks: [
-      { x: 1, y: 1, h: 3 }, { x: 7, y: 1, h: 3 },
-      { x: 2, y: 2, h: 5 }, { x: 4, y: 2, h: 7 }, { x: 6, y: 2, h: 5 },
-      { x: 3, y: 3, h: 4 }, { x: 5, y: 3, h: 4 },
+      { x: 1, y: 1, h: 4 }, { x: 2, y: 1, h: 4 }, { x: 4, y: 1, h: 6 }, { x: 6, y: 1, h: 4 }, { x: 7, y: 1, h: 4 },
+      { x: 1, y: 2, h: 3 }, { x: 3, y: 2, h: 5 }, { x: 5, y: 2, h: 5 }, { x: 7, y: 2, h: 3 },
+      { x: 3, y: 3, h: 4 }, { x: 4, y: 3, h: 8 }, { x: 5, y: 3, h: 4 },
       { x: 4, y: 4, h: 2 },
     ],
   },
@@ -338,96 +366,6 @@ export const INITIAL_ONLINE_LEVELS: LevelData[] = [
       { x: 2, y: 2, h: 4 }, { x: 3, y: 2, h: 6 }, { x: 5, y: 2, h: 6 }, { x: 6, y: 2, h: 4 },
       { x: 1, y: 3, h: 2 }, { x: 4, y: 3, h: 5 }, { x: 7, y: 3, h: 2 },
       { x: 3, y: 4, h: 3 }, { x: 5, y: 4, h: 3 },
-    ],
-  },
-  {
-    id: 'STRAT',
-    name: 'Stratosphere',
-    creator: 'sky_walker',
-    playCount: 360,
-    isPublic: true,
-    blocks: [
-      { x: 0, y: 1, h: 1 }, { x: 2, y: 1, h: 2 }, { x: 4, y: 1, h: 3 }, { x: 6, y: 1, h: 2 }, { x: 8, y: 1, h: 1 },
-      { x: 1, y: 2, h: 4 }, { x: 3, y: 2, h: 5 }, { x: 5, y: 2, h: 5 }, { x: 7, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 4, y: 3, h: 4 }, { x: 6, y: 3, h: 3 },
-    ],
-  },
-  {
-    id: 'GRAV1',
-    name: 'Gravity Well',
-    creator: 'singularity',
-    playCount: 345,
-    isPublic: true,
-    blocks: [
-      { x: 4, y: 1, h: 7 },
-      { x: 3, y: 2, h: 5 }, { x: 5, y: 2, h: 5 },
-      { x: 2, y: 3, h: 4 }, { x: 4, y: 3, h: 8 }, { x: 6, y: 3, h: 4 },
-      { x: 1, y: 4, h: 3 }, { x: 7, y: 4, h: 3 },
-    ],
-  },
-  {
-    id: 'HYPER',
-    name: 'Hyper Drive',
-    creator: 'warp_master',
-    playCount: 330,
-    isPublic: true,
-    blocks: [
-      { x: 2, y: 1, h: 5 }, { x: 6, y: 1, h: 5 },
-      { x: 1, y: 2, h: 4 }, { x: 4, y: 2, h: 6 }, { x: 7, y: 2, h: 4 },
-      { x: 2, y: 3, h: 3 }, { x: 3, y: 3, h: 4 }, { x: 5, y: 3, h: 4 }, { x: 6, y: 3, h: 3 },
-      { x: 4, y: 4, h: 2 },
-    ],
-  },
-  {
-    id: 'ECHO1',
-    name: 'Echo Station',
-    creator: 'radar_pulse',
-    playCount: 310,
-    isPublic: true,
-    blocks: [
-      { x: 0, y: 2, h: 3 }, { x: 8, y: 2, h: 3 },
-      { x: 2, y: 2, h: 4 }, { x: 6, y: 2, h: 4 },
-      { x: 3, y: 3, h: 5 }, { x: 4, y: 3, h: 5 }, { x: 5, y: 3, h: 5 },
-      { x: 4, y: 4, h: 7 },
-    ],
-  },
-  {
-    id: 'AEON1',
-    name: 'Aeon Gateway',
-    creator: 'timeless',
-    playCount: 295,
-    isPublic: true,
-    blocks: [
-      { x: 1, y: 1, h: 6 }, { x: 4, y: 1, h: 5 }, { x: 7, y: 1, h: 6 },
-      { x: 2, y: 2, h: 4 }, { x: 4, y: 2, h: 7 }, { x: 6, y: 2, h: 4 },
-      { x: 3, y: 3, h: 3 }, { x: 4, y: 3, h: 3 }, { x: 5, y: 3, h: 3 },
-      { x: 4, y: 4, h: 2 },
-    ],
-  },
-  {
-    id: 'FLUX1',
-    name: 'Flux Reactor',
-    creator: 'delorean',
-    playCount: 280,
-    isPublic: true,
-    blocks: [
-      { x: 3, y: 1, h: 8 }, { x: 5, y: 1, h: 8 },
-      { x: 2, y: 2, h: 4 }, { x: 4, y: 2, h: 5 }, { x: 6, y: 2, h: 4 },
-      { x: 1, y: 3, h: 3 }, { x: 7, y: 3, h: 3 },
-      { x: 4, y: 4, h: 2 },
-    ],
-  },
-  {
-    id: 'ZEN1',
-    name: 'Zen Garden',
-    creator: 'bamboo',
-    playCount: 260,
-    isPublic: true,
-    blocks: [
-      { x: 4, y: 1, h: 2 },
-      { x: 2, y: 2, h: 3 }, { x: 6, y: 2, h: 3 },
-      { x: 1, y: 3, h: 4 }, { x: 3, y: 3, h: 5 }, { x: 5, y: 3, h: 5 }, { x: 7, y: 3, h: 4 },
-      { x: 3, y: 4, h: 2 }, { x: 4, y: 4, h: 3 }, { x: 5, y: 4, h: 2 },
     ],
   },
 ];

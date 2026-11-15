@@ -1,10 +1,5 @@
 import { PowerUpDrop } from '../powerUpTypes';
-import { PowerUpPresetId } from '../../constants/visualPresets';
-import {
-  renderFallingTrailSparks,
-  renderCustomPowerUpIcon,
-  draw8PointStar,
-} from './powerUpIconDrawers';
+import { renderFallingTrailSparks, renderCustomPowerUpIcon } from './powerUpIconDrawers';
 
 export interface PowerUpRenderOptions {
   animTick?: number;
@@ -12,256 +7,154 @@ export interface PowerUpRenderOptions {
 }
 
 /**
- * Universal Power-Up Drawing Router
- * Redesigned for pristine spherical clarity:
- *   - Strictly NO messy oval/elliptical background rings!
- *   - Perfectly concentric circular glowing auras & floating spark motes.
- *   - High-contrast custom vector emblems inside every sphere.
+ * Locked Selected Power-Up Drawer: PLANAR DELTA VORTEX
+ *
+ * Transparent kinetic 2D rotating triangle frame with outer dashed orbital
+ * energy ring, inner concentric micro-triangle, 3 luminous vertex gems,
+ * trailing comet sparks, and a centered upright stabilized vector icon.
  */
 export function drawPowerUpWithPreset(
   ctx: CanvasRenderingContext2D,
   drop: PowerUpDrop,
-  preset: PowerUpPresetId = 1,
+  _preset?: number,
   options: PowerUpRenderOptions = {}
 ) {
-  switch (preset) {
-    case 2:
-      drawGyroSingularityCore(ctx, drop, options);
-      break;
-    case 3:
-      drawApexReactorSphere(ctx, drop, options);
-      break;
-    case 1:
-    default:
-      drawOrbitalEnergyCore(ctx, drop, options);
-      break;
-  }
+  drawPlanarDeltaVortex(ctx, drop, options);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESET 1 (CHOSEN): ORBITAL ENERGY CORE (Clean Spherical Aura & Floating Motes)
-// ─────────────────────────────────────────────────────────────────────────────
-export function drawOrbitalEnergyCore(
+export function drawPlanarDeltaVortex(
   ctx: CanvasRenderingContext2D,
   drop: PowerUpDrop,
   options: PowerUpRenderOptions = {}
 ) {
   const animTick = options.animTick !== undefined ? options.animTick : drop.angle;
   const userScale = options.scale || 1.35;
-  const baseR = 24 * userScale; // Radius ~32.4px, diameter ~65px
+  const R = 32 * userScale;
   const meta = drop.meta;
 
   ctx.save();
   ctx.translate(drop.x, drop.y);
 
-  // 1. Gentle Rising Stardust Sparks (Sparkles floating upwards behind the drop)
-  renderFallingTrailSparks(ctx, meta.color, baseR, animTick);
+  // 1. Trail sparks
+  renderFallingTrailSparks(ctx, meta.color, R * 0.8, animTick);
 
-  // 2. Perfectly Concentric Circular Glowing Corona (ZERO oval distortion!)
-  const pulse = Math.sin(animTick * 4) * 0.08 + 1.18;
-  ctx.strokeStyle = meta.glow;
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 18;
-  ctx.lineWidth = 2.2;
+  // 2. Outer Transparent Orbital Energy Ring
+  const pulse = Math.sin(animTick * 4) * 2;
+  ctx.save();
+  ctx.strokeStyle = hexToRgba(meta.color, 0.35);
+  ctx.lineWidth = 1.4;
+  ctx.setLineDash([4, 4]);
   ctx.beginPath();
-  ctx.arc(0, 0, baseR * pulse, 0, Math.PI * 2);
+  ctx.arc(0, 0, R * 1.15 + pulse, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // 3. Rotating 2D Triangle Frame
+  const rot = animTick * 1.6;
+  ctx.save();
+  ctx.rotate(rot);
+
+  // Triangle path
+  ctx.beginPath();
+  for (let i = 0; i < 3; i++) {
+    const angle = -Math.PI / 2 + (i * Math.PI * 2) / 3;
+    const x = Math.cos(angle) * R;
+    const y = Math.sin(angle) * R;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+
+  // Transparent crystalline fill (100% see-through, no opaque background)
+  const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, R);
+  grad.addColorStop(0, hexToRgba(meta.color, 0.24));
+  grad.addColorStop(0.7, hexToRgba(meta.color, 0.08));
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Glowing neon borders
+  ctx.strokeStyle = meta.color;
+  ctx.shadowColor = meta.glow;
+  ctx.shadowBlur = 14;
+  ctx.lineWidth = 2.4 * userScale;
+  ctx.lineJoin = 'round';
   ctx.stroke();
 
-  // Secondary Micro-Aura Ring
-  const pulse2 = Math.cos(animTick * 6) * 0.05 + 1.08;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
-  ctx.lineWidth = 1.2;
+  // Inner concentric micro-triangle
+  const inR = R * 0.72;
   ctx.beginPath();
-  ctx.arc(0, 0, baseR * pulse2, 0, Math.PI * 2);
+  for (let i = 0; i < 3; i++) {
+    const angle = -Math.PI / 2 + (i * Math.PI * 2) / 3;
+    const x = Math.cos(angle) * inR;
+    const y = Math.sin(angle) * inR;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.shadowBlur = 6;
+  ctx.lineWidth = 1.0;
   ctx.stroke();
 
-  // 3. Orbiting Micro-Spark Motes (Clean circular orbit, ZERO oval wire tails)
-  const moteCount = 3;
-  for (let i = 0; i < moteCount; i++) {
-    const theta = animTick * 2.2 + (i * Math.PI * 2) / moteCount;
-    const mx = Math.cos(theta) * (baseR * 1.32);
-    const my = Math.sin(theta) * (baseR * 1.32);
-
-    ctx.fillStyle = meta.color;
-    ctx.shadowColor = meta.color;
+  // 3 Vertex Micro-Gems
+  for (let i = 0; i < 3; i++) {
+    const angle = -Math.PI / 2 + (i * Math.PI * 2) / 3;
+    const x = Math.cos(angle) * R;
+    const y = Math.sin(angle) * R;
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = meta.glow;
     ctx.shadowBlur = 10;
     ctx.beginPath();
-    ctx.arc(mx, my, 3.2, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(mx, my, 1.8, 0, Math.PI * 2);
+    ctx.arc(x, y, 3 * userScale, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // 4. 3D Spherical Glass Core
-  const coreGrad = ctx.createRadialGradient(
-    -baseR * 0.35,
-    -baseR * 0.35,
-    baseR * 0.05,
-    0,
-    0,
-    baseR
-  );
-  coreGrad.addColorStop(0, '#ffffff');
-  coreGrad.addColorStop(0.3, meta.color);
-  coreGrad.addColorStop(0.75, '#0a0d18');
-  coreGrad.addColorStop(1, '#02040a');
+  ctx.restore(); // Undo rotation for the centered icon
 
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 20;
-  ctx.fillStyle = coreGrad;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
-  ctx.fill();
+  // 4. Orbiting Trailing Comet Motes (circling around the outer perimeter)
+  const motesCount = 3;
+  for (let m = 0; m < motesCount; m++) {
+    const angle = -rot * 1.5 + (m * Math.PI * 2) / motesCount;
+    const dist = R * 1.15;
+    const mx = Math.cos(angle) * dist;
+    const my = Math.sin(angle) * dist;
 
-  // Specular Top-Left Glass Arc
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR - 2.5, -Math.PI * 0.85, -Math.PI * 0.15);
-  ctx.stroke();
+    ctx.save();
+    ctx.shadowColor = meta.glow;
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(mx, my, 2.4 * userScale, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
 
-  // Crisp Micro-Rim Line
-  ctx.strokeStyle = meta.glow;
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  // 5. Custom High-Contrast Vector Emblem Icon
-  renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
+  // 5. Centered Upright Vector Icon (Stabilized, High Visibility)
+  ctx.save();
+  const hover = Math.sin(animTick * 3) * 1.5;
+  ctx.translate(0, hover);
+  ctx.shadowColor = 'rgba(0,0,0,0.85)';
+  ctx.shadowBlur = 8;
+  renderCustomPowerUpIcon(ctx, meta.type, 38 * userScale, meta.color);
+  ctx.restore();
 
   ctx.restore();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PRESET 2: GYRO SINGULARITY CORE (Concentric Circular Gimbal Rings)
+// HELPER: HEX TO RGBA
 // ─────────────────────────────────────────────────────────────────────────────
-export function drawGyroSingularityCore(
-  ctx: CanvasRenderingContext2D,
-  drop: PowerUpDrop,
-  options: PowerUpRenderOptions = {}
-) {
-  const animTick = options.animTick !== undefined ? options.animTick : drop.angle;
-  const userScale = options.scale || 1.35;
-  const baseR = 24 * userScale;
-  const meta = drop.meta;
-
-  ctx.save();
-  ctx.translate(drop.x, drop.y);
-
-  // 1. Trail Sparks
-  renderFallingTrailSparks(ctx, meta.color, baseR, animTick);
-
-  // 2. Concentric Circular Gimbal Rings (Clean circular, NO skewed ellipses!)
-  ctx.strokeStyle = meta.glow;
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 14;
-  ctx.lineWidth = 2.0;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR * 1.3, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Cardinal node dots
-  for (let i = 0; i < 4; i++) {
-    const ang = animTick * 1.5 + (i * Math.PI) / 2;
-    const nx = Math.cos(ang) * (baseR * 1.3);
-    const ny = Math.sin(ang) * (baseR * 1.3);
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(nx, ny, 2.5, 0, Math.PI * 2);
-    ctx.fill();
+function hexToRgba(hex: string, alpha: number): string {
+  if (!hex || !hex.startsWith('#')) return `rgba(255, 255, 255, ${alpha})`;
+  let c = hex.substring(1);
+  if (c.length === 3) {
+    c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
   }
-
-  // 3. 3D Spherical Core
-  const coreGrad = ctx.createRadialGradient(-baseR * 0.3, -baseR * 0.3, 2, 0, 0, baseR);
-  coreGrad.addColorStop(0, '#ffffff');
-  coreGrad.addColorStop(0.3, meta.color);
-  coreGrad.addColorStop(0.75, '#0a0d18');
-  coreGrad.addColorStop(1, '#02040a');
-  ctx.fillStyle = coreGrad;
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 18;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = meta.glow;
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  // 4. Custom Icon
-  renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
-
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESET 3: APEX REACTOR SPHERE (Circular Magnetic Containment Ring)
-// ─────────────────────────────────────────────────────────────────────────────
-export function drawApexReactorSphere(
-  ctx: CanvasRenderingContext2D,
-  drop: PowerUpDrop,
-  options: PowerUpRenderOptions = {}
-) {
-  const animTick = options.animTick !== undefined ? options.animTick : drop.angle;
-  const userScale = options.scale || 1.35;
-  const baseR = 24 * userScale;
-  const meta = drop.meta;
-
-  ctx.save();
-  ctx.translate(drop.x, drop.y);
-
-  // 1. Trail Sparks
-  renderFallingTrailSparks(ctx, meta.color, baseR, animTick);
-
-  // 2. Circular Magnetic Containment Brackets
-  ctx.save();
-  ctx.rotate(animTick * 1.2);
-  ctx.strokeStyle = meta.glow;
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 16;
-  ctx.lineWidth = 2.4;
-
-  for (let i = 0; i < 3; i++) {
-    const ang = (i * Math.PI * 2) / 3;
-    const bx = Math.cos(ang) * (baseR * 1.32);
-    const by = Math.sin(ang) * (baseR * 1.32);
-    ctx.fillStyle = '#1e293b';
-    ctx.beginPath();
-    ctx.arc(bx, by, 4.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-  }
-
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR * 1.32, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
-  // 3. Central Core
-  const coreGrad = ctx.createRadialGradient(-baseR * 0.35, -baseR * 0.35, 1, 0, 0, baseR);
-  coreGrad.addColorStop(0, '#ffffff');
-  coreGrad.addColorStop(0.35, meta.color);
-  coreGrad.addColorStop(0.7, '#110526');
-  coreGrad.addColorStop(1, '#020008');
-
-  ctx.fillStyle = coreGrad;
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 22;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  // 4. Custom Icon
-  renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
-
-  ctx.restore();
+  const num = parseInt(c, 16);
+  if (isNaN(num)) return `rgba(255, 255, 255, ${alpha})`;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }

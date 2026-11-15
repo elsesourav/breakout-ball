@@ -21,7 +21,7 @@ export const BLOCK_COLORS: Record<number, { bg: [string, string]; border: string
   5: { bg: ['#ff0844', '#ff7e9e'], border: '#ff20c4', label: '5', text: '#fff' },
   6: { bg: ['#b0b7c1', '#eaeaea'], border: '#ffffff', label: '∞', text: '#333' }, // Wall (unbreakable)
   7: { bg: ['#7928ca', '#00f7ff'], border: '#00f7ff', label: '🌀', text: '#fff' }, // Quantum Portal
-  8: { bg: ['#ff3b00', '#ff8800'], border: '#ffaa00', label: 'EMP', text: '#fff' }, // Countdown Reactor
+  8: { bg: ['#ff3b00', '#ff8800'], border: '#ffaa00', label: '⚡', text: '#fff' }, // Kinetic Detonator Core
 };
 
 export const AUDIO_PATHS = {

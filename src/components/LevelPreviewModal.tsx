@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../context/GameContext';
 import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../utils/helpers';
+import { sanitizePortals } from '../services/db';
 import { CyberRankingTable, RankingEntry } from './leaderboard/CyberRankingTable';
 import {
   Play,
@@ -10,7 +11,20 @@ import {
   RotateCcw,
   Shield,
   Zap,
+  Check,
+  Star,
+  Sparkles,
 } from 'lucide-react';
+import {
+  isTodayDailyMission,
+  isDailyMissionCompleted,
+  getSecondsUntilMidnight,
+  formatDailyCountdown,
+} from '../services/dailyApex';
+import { cyberToast } from './common/CyberToast';
+import { soundManager } from '../utils/audio';
+import { currencyService } from '../services/currency';
+import { CoreIcon } from './CoreIcon';
 
 export const LevelPreviewModal: React.FC = () => {
   const {
@@ -19,16 +33,18 @@ export const LevelPreviewModal: React.FC = () => {
     setScreen,
     startPlayLevel,
     localLevels,
+    onlineLevels,
     localProgress,
     leaderboards,
     user,
   } = useGame();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cleanSelectedLevel = useMemo(() => selectedLevel ? sanitizePortals(selectedLevel) : null, [selectedLevel]);
 
   // Redraw canvas with proper buffer resolution matching display aspect ratio
   useEffect(() => {
-    if (selectedLevel && canvasRef.current) {
+    if (cleanSelectedLevel && canvasRef.current) {
       const canvas = canvasRef.current;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const displayW = canvas.clientWidth || 340;
@@ -36,16 +52,18 @@ export const LevelPreviewModal: React.FC = () => {
       canvas.width = Math.round(displayW * dpr);
       canvas.height = Math.round(displayH * dpr);
       const reservedBottom = Math.round(36 * dpr);
-      drawLevelPreviewOnCanvas(canvas, selectedLevel.blocks, canvas.width, canvas.height, {
+      drawLevelPreviewOnCanvas(canvas, cleanSelectedLevel.blocks, canvas.width, canvas.height, {
         reservedBottom,
       });
     }
-  }, [selectedLevel]);
+  }, [cleanSelectedLevel]);
 
   if (!selectedLevel) return null;
 
+  const isDaily = isTodayDailyMission(selectedLevel.id, onlineLevels);
+  const isDailyClaimed = isDaily && isDailyMissionCompleted();
   const progress = localProgress[selectedLevel.id];
-  const isCompleted = progress?.completed;
+  const isCompleted = progress?.completed || isDailyClaimed;
 
   // Determine if next level should be accessible
   // NEXT button ONLY shows when one level is complete; if locked, next level does NOT show
@@ -93,6 +111,16 @@ export const LevelPreviewModal: React.FC = () => {
 
   const stats = useMemo(() => calculateLevelHp(selectedLevel.blocks), [selectedLevel]);
   const isCampaign = !isNaN(Number(selectedLevel.id));
+  const levelNum = isCampaign ? parseInt(selectedLevel.id, 10) : 0;
+  const starsEarned = isCampaign
+    ? progress?.stars ?? currencyService.getLevelStars(selectedLevel.id)
+    : 0;
+  const maxCores = isCampaign ? currencyService.getLevelMaxCores(levelNum) : 0;
+  const claimedCores = isCampaign
+    ? progress?.claimedCores ?? currencyService.getLevelClaimedCores(selectedLevel.id)
+    : 0;
+  const remainingCores = Math.max(0, maxCores - claimedCores);
+  const isArenaClaimed = !isCampaign ? currencyService.isArenaLevelClaimed(selectedLevel.id) : false;
 
   return (
     <div
@@ -192,33 +220,131 @@ export const LevelPreviewModal: React.FC = () => {
           </div>
         </div>
 
+        {/* Star & Core Progression Bar */}
+        {isCampaign ? (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(8, 14, 38, 0.95) 0%, rgba(15, 23, 52, 0.95) 100%)',
+              border: '1px solid rgba(0, 247, 255, 0.25)',
+              borderRadius: '12px',
+              padding: '8px 12px',
+            }}
+            className="flex items-center justify-between w-full"
+          >
+            {/* Stars */}
+            <div className="flex items-center gap-1.5">
+              <span className="font-tech text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                RATING
+              </span>
+              <div className="flex items-center gap-0.5 text-amber-400">
+                {[1, 2, 3].map((starIdx) => (
+                  <Star
+                    key={`star-${starIdx}`}
+                    className={`w-3.5 h-3.5 ${
+                      starIdx <= starsEarned
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'text-slate-700 fill-slate-800/40'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Core Status */}
+            <div className="flex items-center gap-1.5">
+              <CoreIcon size={14} glow variant="cyan" />
+              <span className="font-tech font-bold text-xs text-cyan-300">
+                {claimedCores} / {maxCores}
+              </span>
+              {remainingCores > 0 ? (
+                <span className="font-tech text-[10px] text-amber-300 font-bold">
+                  ({remainingCores} left at 3★)
+                </span>
+              ) : (
+                <span className="font-tech text-[10px] text-emerald-400 font-bold">
+                  (100% Claimed)
+                </span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(8, 14, 38, 0.95) 0%, rgba(15, 23, 52, 0.95) 100%)',
+              border: '1px solid rgba(0, 247, 255, 0.25)',
+              borderRadius: '12px',
+              padding: '8px 12px',
+            }}
+            className="flex items-center justify-between w-full"
+          >
+            <div className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="font-tech text-xs text-slate-300 uppercase tracking-wider font-bold">
+                ARENA BOUNTY
+              </span>
+            </div>
+            <span
+              className={`font-tech font-bold text-xs ${
+                isArenaClaimed ? 'text-slate-400' : 'text-emerald-400'
+              }`}
+            >
+              {isArenaClaimed ? 'CLAIMED (1-TIME ONLY)' : 'UNCLAIMED (1-TIME ONLY)'}
+            </span>
+          </div>
+        )}
+
         {/* Action Controls: START / REPLAY and HOME */}
         <div className="flex items-center gap-2 w-full mt-0.5">
           {/* 1. START / REPLAY Button */}
-          <button
-            type="button"
-            onClick={() => startPlayLevel(selectedLevel)}
-            style={{
-              borderRadius: '12px',
-              backgroundColor: '#ff0055',
-              backgroundImage: 'linear-gradient(135deg, #ff0844 0%, #ff4b8b 100%)',
-              boxShadow: '0 0 16px rgba(255, 8, 68, 0.45)',
-              border: '1.5px solid #ff7ebd',
-            }}
-            className="flex-1 h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider text-white active:scale-[0.98] transition-all cursor-pointer"
-          >
-            {isCompleted ? (
-              <>
-                <RotateCcw className="w-4 h-4 stroke-[2.5]" />
-                <span>PLAY AGAIN</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 fill-white stroke-[2.5]" />
-                <span>START GAME</span>
-              </>
-            )}
-          </button>
+          {isDailyClaimed ? (
+            <button
+              type="button"
+              onClick={() => {
+                soundManager.playLockTap();
+                cyberToast.info(
+                  `Daily Mission Claimed • Next mission in ${formatDailyCountdown(getSecondsUntilMidnight())}`
+                );
+              }}
+              style={{
+                borderRadius: '12px',
+                backgroundColor: 'rgba(16, 185, 129, 0.16)',
+                border: '1.5px solid rgba(52, 211, 153, 0.55)',
+                boxShadow: '0 0 14px rgba(16, 185, 129, 0.35)',
+              }}
+              className="flex-1 h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider text-emerald-300 active:scale-[0.98] transition-all cursor-pointer"
+              title={`Daily Apex Mission completed for today. Next mission in ${formatDailyCountdown(getSecondsUntilMidnight())}`}
+            >
+              <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
+              <span style={{ color: '#34d399', fontWeight: 900, letterSpacing: '0.06em' }}>
+                CLAIMED FOR TODAY
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => startPlayLevel(selectedLevel)}
+              style={{
+                borderRadius: '12px',
+                backgroundColor: '#ff0055',
+                backgroundImage: 'linear-gradient(135deg, #ff0844 0%, #ff4b8b 100%)',
+                boxShadow: '0 0 16px rgba(255, 8, 68, 0.45)',
+                border: '1.5px solid #ff7ebd',
+              }}
+              className="flex-1 h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider text-white active:scale-[0.98] transition-all cursor-pointer"
+            >
+              {isCompleted ? (
+                <>
+                  <RotateCcw className="w-4 h-4 stroke-[2.5]" />
+                  <span>PLAY AGAIN</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 fill-white stroke-[2.5]" />
+                  <span>START GAME</span>
+                </>
+              )}
+            </button>
+          )}
 
           {/* 2. NEXT LEVEL Button: ONLY shows when level is completed AND next level is unlocked */}
           {canShowNext && (

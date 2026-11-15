@@ -109,7 +109,8 @@ export function draw3DBlock(
   alpha: number = 1.0,
   currentHealth?: number,
   initialHealth?: number,
-  presetOverride?: BlockPresetId
+  presetOverride?: BlockPresetId,
+  portalPairId?: number
 ) {
   if (blockType <= 0) return;
   const preset = presetOverride || getActiveDesignConfig().blockPreset;
@@ -117,20 +118,20 @@ export function draw3DBlock(
   ctx.save();
   if (alpha < 1.0) ctx.globalAlpha = alpha;
 
-  const padding = 3;
   const block: BlockEngineState = {
     index: 0,
     col: 0,
     row: 0,
-    x: bx - padding,
-    y: by - padding,
-    w: bw + padding * 2,
-    h: bh + padding * 2,
+    x: bx,
+    y: by,
+    w: bw,
+    h: bh,
     health: currentHealth !== undefined ? currentHealth : blockType,
     initialHealth: initialHealth !== undefined ? initialHealth : blockType,
     isDead: false,
     hitAnim: 0,
     counter: 3,
+    portalPairId,
   };
 
   drawBlockWithPreset(ctx, block, preset);
@@ -219,6 +220,6 @@ export function drawLevelPreviewOnCanvas(
     const by = startY + block.y * cellH + padding;
     const bw = cellW - padding * 2;
     const bh = cellH - padding * 2;
-    draw3DBlock(ctx, bx, by, bw, bh, block.h);
+    draw3DBlock(ctx, bx, by, bw, bh, block.h, 1.0, undefined, undefined, undefined, block.portalPairId);
   });
 }

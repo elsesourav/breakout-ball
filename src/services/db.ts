@@ -28,6 +28,35 @@ import {
   limit,
 } from 'firebase/firestore';
 
+/**
+ * Ensures all portals remain Quantum Portals (h: 7) and are properly paired.
+ * Under NO circumstances does this function convert a portal (h: 7) into a standard block or Titanium block!
+ */
+export function sanitizePortals(level: LevelData): LevelData {
+  if (!level || !level.blocks || !Array.isArray(level.blocks)) return level;
+  const portals = level.blocks.filter((b) => b.h === 7);
+  if (portals.length === 0) return level;
+
+  // Track existing portal pair IDs (1..4)
+  let unassignedPortalsCount = 0;
+  const newBlocks = level.blocks.map((b) => {
+    if (b.h !== 7) return b;
+    // Keep portal type (h: 7) strictly intact - NEVER convert to Titanium or another block
+    if (b.portalPairId !== undefined && b.portalPairId >= 1 && b.portalPairId <= 4) {
+      return b;
+    }
+    // Allocate sequential pair IDs for unassigned portals (every 2 portals share a pairId)
+    const pairId = Math.min(4, Math.floor(unassignedPortalsCount / 2) + 1);
+    unassignedPortalsCount++;
+    return { ...b, portalPairId: pairId };
+  });
+
+  return {
+    ...level,
+    blocks: newBlocks,
+  };
+}
+
 class CloudDatabaseService {
   private localLevelsKey = 'breakout_db_local_levels';
   private onlineLevelsKey = 'breakout_db_online_levels';
@@ -54,8 +83,33 @@ class CloudDatabaseService {
         localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
       }
     }
-    if (!localStorage.getItem(this.onlineLevelsKey)) {
+    const rawOnline = localStorage.getItem(this.onlineLevelsKey);
+    const curatedMap = new Map(INITIAL_ONLINE_LEVELS.map((l) => [l.id, l]));
+    if (!rawOnline) {
       localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
+    } else {
+      try {
+        const parsed: LevelData[] = JSON.parse(rawOnline);
+        // Curated levels ALWAYS use official validated layouts, keeping live playCount
+        const updatedOnline = parsed.map((l) => {
+          const curated = curatedMap.get(l.id);
+          if (curated) {
+            return {
+              ...curated,
+              playCount: Math.max(curated.playCount || 0, l.playCount || 0),
+            };
+          }
+          return sanitizePortals(l);
+        });
+        INITIAL_ONLINE_LEVELS.forEach((curated) => {
+          if (!updatedOnline.some((l) => l.id === curated.id)) {
+            updatedOnline.push(curated);
+          }
+        });
+        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(updatedOnline));
+      } catch {
+        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
+      }
     }
     if (!localStorage.getItem(this.leaderboardsKey)) {
       localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
@@ -63,19 +117,20 @@ class CloudDatabaseService {
   }
 
   /**
-   * One-time background sync of curated initial stages to Cloud Firestore
+   * Background sync of curated initial stages to Cloud Firestore
    */
   private async syncInitialLevelsToCloud(): Promise<void> {
     try {
-      const snap = await getDocs(query(collection(firestoreDb, 'online_levels'), limit(1)));
-      if (snap.empty) {
-        // Seed curated stages into Firestore so all players immediately see them
-        for (const lvl of INITIAL_ONLINE_LEVELS) {
-          await setDoc(doc(firestoreDb, 'online_levels', lvl.id), {
+      // Overwrite/sync curated initial stages in Firestore so all players receive verified 2-portal pairings
+      for (const lvl of INITIAL_ONLINE_LEVELS) {
+        await setDoc(
+          doc(firestoreDb, 'online_levels', lvl.id),
+          {
             ...lvl,
-            createdAt: new Date().toISOString(),
-          }, { merge: true });
-        }
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
       }
     } catch {}
   }
@@ -104,6 +159,8 @@ class CloudDatabaseService {
   }
 
   public async getOnlineLevels(searchTerm?: string): Promise<LevelData[]> {
+    const curatedMap = new Map(INITIAL_ONLINE_LEVELS.map((l) => [l.id, l]));
+
     // 1. Fetch live levels from Cloud Firestore
     try {
       const q = query(collection(firestoreDb, 'online_levels'), orderBy('playCount', 'desc'), limit(50));
@@ -113,11 +170,24 @@ class CloudDatabaseService {
         const cloudLevels: LevelData[] = snap.docs.map((d) => d.data() as LevelData);
         // Exclude numeric arcade levels
         const cleanCloud = cloudLevels.filter((l) => isNaN(Number(l.id)));
-        const cloudIds = new Set(cleanCloud.map((l) => l.id));
 
-        // Merge with initial curated stages
+        // Merge: Curated levels ALWAYS use official definitions with verified portal pairings,
+        // while adopting any updated playCount.
+        // User-generated levels are strictly sanitized against orphan single portals.
+        const sanitizedCloud = cleanCloud.map((cloudLvl) => {
+          const curated = curatedMap.get(cloudLvl.id);
+          if (curated) {
+            return {
+              ...curated,
+              playCount: Math.max(curated.playCount || 0, cloudLvl.playCount || 0),
+            };
+          }
+          return sanitizePortals(cloudLvl);
+        });
+
+        const cloudIds = new Set(sanitizedCloud.map((l) => l.id));
         const missingCurated = INITIAL_ONLINE_LEVELS.filter((l) => !cloudIds.has(l.id));
-        const merged = [...cleanCloud, ...missingCurated];
+        const merged = [...sanitizedCloud, ...missingCurated];
 
         // Update local cache for offline play
         localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
@@ -129,7 +199,18 @@ class CloudDatabaseService {
     // 2. Offline / Cache fallback
     const raw = localStorage.getItem(this.onlineLevelsKey);
     const rawLevels: LevelData[] = raw ? JSON.parse(raw) : INITIAL_ONLINE_LEVELS;
-    const cleanLevels = rawLevels.filter((l) => isNaN(Number(l.id)));
+    const cleanLevels = rawLevels
+      .map((l) => {
+        const curated = curatedMap.get(l.id);
+        if (curated) {
+          return {
+            ...curated,
+            playCount: Math.max(curated.playCount || 0, l.playCount || 0),
+          };
+        }
+        return sanitizePortals(l);
+      })
+      .filter((l) => isNaN(Number(l.id)));
     return this.filterLevelsByTerm(cleanLevels, searchTerm);
   }
 
@@ -163,17 +244,22 @@ class CloudDatabaseService {
     const foundLocal = local.find((l) => l.id === id);
     if (foundLocal) return foundLocal;
 
-    // 2. Check Firestore
+    // 2. Check curated stages first (authoritative verified layouts)
+    const curated = INITIAL_ONLINE_LEVELS.find((l) => l.id === id);
+    if (curated) return curated;
+
+    // 3. Check Firestore
     try {
       const snap = await getDoc(doc(firestoreDb, 'online_levels', id));
       if (snap.exists()) {
-        return snap.data() as LevelData;
+        return sanitizePortals(snap.data() as LevelData);
       }
     } catch {}
 
-    // 3. Check local cache
+    // 4. Check local cache
     const online = await this.getOnlineLevels();
-    return online.find((l) => l.id === id) || null;
+    const foundOnline = online.find((l) => l.id === id);
+    return foundOnline ? sanitizePortals(foundOnline) : null;
   }
 
   public async saveLevel(level: LevelData): Promise<boolean> {

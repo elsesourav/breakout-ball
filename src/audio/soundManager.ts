@@ -10,6 +10,7 @@ import {
   playSyntheticCoreCollect,
   playSyntheticUpgradeSuccess,
   playSyntheticWarning,
+  playSyntheticLockTap,
 } from './soundPresets';
 import { synthAudio } from '../utils/synthAudio';
 
@@ -101,6 +102,16 @@ class SoundManager {
       this.playStatic('damage', 0.5);
     }
     this.triggerVibrate(50);
+  }
+
+  public playLockTap() {
+    const ctx = this.getContext();
+    if (ctx) {
+      playSyntheticLockTap(ctx, this.volume);
+    } else {
+      this.playStatic('sideHit', 0.15);
+    }
+    this.triggerVibrate(15);
   }
 
   // ── Game Action Sounds ───────────────────────────────────────────

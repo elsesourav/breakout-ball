@@ -1,40 +1,40 @@
 import { BlockEngineState } from '../types';
 import { BLOCK_COLORS } from '../../constants/game';
-import { BlockPresetId } from '../../constants/visualPresets';
+import { renderRefinedPortalCenter, PortalCenterStyle } from './portalCenterDrawers';
+
+export type { PortalCenterStyle };
 
 export interface BlockRenderOptions {
   animTick?: number;
   scale?: number;
+  portalCenterStyle?: PortalCenterStyle;
 }
 
 /**
- * Universal Block Drawing Router
- * Redesigned for TRUE 3D DEPTH and MINIMAL GLOW:
- *   - Clean physical bevels & tone-matched 3D thickness (NO muddy dark bottom!).
- *   - Portal Block (HP 7): Magical cosmic vortex across the ENTIRE block face.
- *   - Titanium Block (HP 6): 100% static brushed tungsten-titanium alloy (ZERO animated effects, zero lag).
- *   - Breakable Blocks (HP 1-5 & EMP 8): Lightweight, zero-lag micro-shimmer on top chamfer.
+ * Universal Block Drawing Router (Selected Design: Armored 3D Slab)
+ *
+ * Physical 3D thickness with tone-matched bevels (NO muddy dark bottom).
+ * Titanium Block (HP 6): 100% static brushed tungsten-titanium alloy (zero animation, zero lag).
+ * Breakable Blocks (HP 1-5 & EMP 8): Lightweight, zero-lag micro-shimmer on top chamfer.
+ * Portal Block (HP 7): Full cosmic background with high-tech Quantum Stargate center (no cartoon swirl emoji).
  */
 export function drawBlockWithPreset(
   ctx: CanvasRenderingContext2D,
   block: BlockEngineState,
-  preset: BlockPresetId = 1,
+  _preset = 1,
   options: BlockRenderOptions = {}
 ) {
   if (block.isDead || block.health <= 0) return;
+  drawArmored3DSlabBlock(ctx, block, options);
+}
 
-  switch (preset) {
-    case 2:
-      drawPrecisionIngotBlock(ctx, block, options);
-      break;
-    case 3:
-      drawReinforcedAlloyBlock(ctx, block, options);
-      break;
-    case 1:
-    default:
-      drawArmored3DSlabBlock(ctx, block, options);
-      break;
-  }
+export function drawBlock(
+  ctx: CanvasRenderingContext2D,
+  block: BlockEngineState,
+  options: BlockRenderOptions = {}
+) {
+  if (block.isDead || block.health <= 0) return;
+  drawArmored3DSlabBlock(ctx, block, options);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -118,7 +118,7 @@ function getBlockTones(hp: number): BlockColorTones {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PRESET 1 (CHOSEN): ARMORED 3D SLAB (Tone-Matched 3D Bevels · Zero Glow)
+// ARMORED 3D SLAB BLOCK (Tone-Matched Bevels · Refined Portal Center)
 // ─────────────────────────────────────────────────────────────────────────────
 export function drawArmored3DSlabBlock(
   ctx: CanvasRenderingContext2D,
@@ -126,19 +126,21 @@ export function drawArmored3DSlabBlock(
   options: BlockRenderOptions = {}
 ) {
   const animTick = options.animTick || 0;
-  const padding = 2;
   const config = BLOCK_COLORS[block.health] || BLOCK_COLORS[1];
 
+  // Proportional padding, chamfer, and bevel depth scaled cleanly to any canvas resolution
+  const padding = Math.max(0.6, Math.min(2.0, Math.min(block.w, block.h) * 0.05));
   const bx = block.x + padding;
   const by = block.y + padding;
   const bw = block.w - padding * 2;
   const bh = block.h - padding * 2;
-  const chamfer = 6;
-  const bevelDepth = 4.5;
+  const chamfer = Math.max(1.0, Math.min(6.0, Math.min(bw * 0.09, bh * 0.16)));
+  const bevelDepth = Math.max(0.8, Math.min(4.5, bh * 0.11));
   const topH = bh - bevelDepth;
+  const portalStyle = options.portalCenterStyle || 3;
 
   ctx.save();
-  ctx.shadowBlur = 0; // Strictly NO fuzzy blur!
+  ctx.shadowBlur = 0; // Strictly NO fuzzy neon blur!
 
   // Hit Flash
   if (block.hitAnim > 0) {
@@ -154,7 +156,7 @@ export function drawArmored3DSlabBlock(
   drawChamferRect(ctx, bx + 1.5, by + bevelDepth + 1.5, bw, topH, chamfer);
   ctx.fill();
 
-  // 2. TONE-MATCHED 3D Under-Bevel Face (Eliminates the dark muddy base!)
+  // 2. TONE-MATCHED 3D Under-Bevel Face (No muddy dark black base)
   if (block.health === 6) {
     // Titanium: Solid Machined Tungsten Base
     const tungBase = ctx.createLinearGradient(bx, by + topH, bx, by + bh);
@@ -172,7 +174,7 @@ export function drawArmored3DSlabBlock(
     drawChamferRect(ctx, bx, by + bevelDepth * 0.4, bw, topH + bevelDepth * 0.6, chamfer);
     ctx.fill();
   } else {
-    // HP 1-5 & EMP: Rich, tone-matched colored 3D bevel (NEVER pitch black!)
+    // HP 1-5 & EMP: Rich, tone-matched colored 3D bevel (NEVER pitch black)
     const tones = getBlockTones(block.health);
     const bevelGrad = ctx.createLinearGradient(bx, by + topH, bx, by + bh);
     bevelGrad.addColorStop(0, tones.bevelTop);
@@ -206,7 +208,7 @@ export function drawArmored3DSlabBlock(
     drawChamferRect(ctx, bx, by, bw, topH, chamfer);
     ctx.stroke();
   } else if (block.health === 7) {
-    // ── PORTAL (HP 7): FULL-BLOCK MAGICAL COSMIC VORTEX (WHOLE SURFACE EFFECT) ──
+    // ── PORTAL (HP 7): FULL-BLOCK MAGICAL COSMIC VORTEX WITH HIGH-TECH STARGATE CENTER ──
     // Deep midnight nebula base
     const portalBaseGrad = ctx.createLinearGradient(bx, by, bx, by + topH);
     portalBaseGrad.addColorStop(0, '#13092c');
@@ -266,23 +268,21 @@ export function drawArmored3DSlabBlock(
       ctx.fill();
     });
 
-    // Central Singularity Event-Horizon Core
-    const coreR = Math.min(bw, topH) * 0.3;
-    const holeGrad = ctx.createRadialGradient(pcx, pcy, 1, pcx, pcy, coreR);
-    holeGrad.addColorStop(0, '#ffffff');
-    holeGrad.addColorStop(0.35, '#38bdf8');
-    holeGrad.addColorStop(0.75, '#8b5cf6');
-    holeGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = holeGrad;
-    ctx.beginPath();
-    ctx.arc(pcx, pcy, coreR, 0, Math.PI * 2);
-    ctx.fill();
+    // ── REFINED PORTAL CENTER (Replaces the cartoon swirl emoji) ──
+    renderRefinedPortalCenter(ctx, pcx, pcy, topH * 0.42, animTick, portalStyle);
 
     ctx.restore(); // Unclip
 
     // Shimmering dimensional event-horizon border around the chamfered rim
     const borderPulse = Math.sin(animTick * 2.5) * 0.25 + 0.75;
-    ctx.strokeStyle = `rgba(56, 189, 248, ${borderPulse})`;
+    const rimColor = block.portalPairId === 2
+      ? `rgba(232, 121, 249, ${borderPulse})`
+      : block.portalPairId === 3
+      ? `rgba(74, 222, 128, ${borderPulse})`
+      : block.portalPairId === 4
+      ? `rgba(250, 204, 21, ${borderPulse})`
+      : `rgba(56, 189, 248, ${borderPulse})`;
+    ctx.strokeStyle = rimColor;
     ctx.lineWidth = 1.6;
     drawChamferRect(ctx, bx, by, bw, topH, chamfer);
     ctx.stroke();
@@ -324,306 +324,70 @@ export function drawArmored3DSlabBlock(
   ctx.lineTo(bx + bw - chamfer - 2, by + 1.5);
   ctx.stroke();
 
-  // 6. 4 Physical Recessed Corner Bolt Sockets (Mechanical Depth Detail)
-  const inset = 5.5;
-  [
-    [bx + inset, by + inset],
-    [bx + bw - inset, by + inset],
-    [bx + inset, by + topH - inset],
-    [bx + bw - inset, by + topH - inset],
-  ].forEach(([cx, cy]) => {
-    // Recessed dark socket
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-    ctx.beginPath();
-    ctx.arc(cx, cy, 2.0, 0, Math.PI * 2);
-    ctx.fill();
-    // Specular corner glint (Top-left)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-    ctx.beginPath();
-    ctx.arc(cx - 0.5, cy - 0.5, 0.8, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  // 7. Engraved Tactile Typography
-  renderEngravedLabel(ctx, block, config, bx + bw / 2, by + topH / 2, topH);
-
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESET 2: PRECISION INGOT (Multi-Faceted Chiseled 3D · Tone-Matched Bevels)
-// ─────────────────────────────────────────────────────────────────────────────
-export function drawPrecisionIngotBlock(
-  ctx: CanvasRenderingContext2D,
-  block: BlockEngineState,
-  options: BlockRenderOptions = {}
-) {
-  const animTick = options.animTick || 0;
-  const padding = 2;
-  const config = BLOCK_COLORS[block.health] || BLOCK_COLORS[1];
-
-  const bx = block.x + padding;
-  const by = block.y + padding;
-  const bw = block.w - padding * 2;
-  const bh = block.h - padding * 2;
-  const bevel = 4.5;
-  const dropH = 5;
-  const faceH = bh - dropH;
-
-  ctx.save();
-  ctx.shadowBlur = 0;
-
-  // Hit Flash
-  if (block.hitAnim > 0) {
-    ctx.fillStyle = `rgba(255, 255, 255, ${0.75 + block.hitAnim * 0.25})`;
-    ctx.fillRect(bx, by, bw, bh);
-    ctx.restore();
-    return;
-  }
-
-  // 1. Ambient Ground Drop Shadow
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-  ctx.fillRect(bx + 1.5, by + dropH + 1.5, bw, bh - dropH);
-
-  // 2. TONE-MATCHED 3D Extruded Bevel (No muddy black!)
-  if (block.health === 6) {
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(bx, by + bh - dropH, bw, dropH);
-    ctx.fillRect(bx + bw - bevel, by + bevel, bevel, bh - bevel);
-  } else if (block.health === 7) {
-    ctx.fillStyle = '#100726';
-    ctx.fillRect(bx, by + bh - dropH, bw, dropH);
-    ctx.fillRect(bx + bw - bevel, by + bevel, bevel, bh - bevel);
-  } else {
-    const tones = getBlockTones(block.health);
-    ctx.fillStyle = tones.bevelBottom;
-    ctx.fillRect(bx, by + bh - dropH, bw, dropH);
-    ctx.fillStyle = tones.bevelTop;
-    ctx.fillRect(bx + bw - bevel, by + bevel, bevel, bh - bevel);
-  }
-
-  // 3. Main Face
-  if (block.health === 6) {
-    // Titanium: 100% Static Brushed Ingot
-    const steelGrad = ctx.createLinearGradient(bx, by, bx, by + faceH);
-    steelGrad.addColorStop(0, '#e2e8f0');
-    steelGrad.addColorStop(0.35, '#94a3b8');
-    steelGrad.addColorStop(0.75, '#475569');
-    steelGrad.addColorStop(1, '#334155');
-    ctx.fillStyle = steelGrad;
-    ctx.fillRect(bx, by, bw, faceH);
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.fillRect(bx + bevel + 2, by + faceH * 0.5 - 2, bw - bevel * 2 - 4, 3);
-  } else if (block.health === 7) {
-    // Portal: Full Cosmic Abyss
-    const pGrad = ctx.createLinearGradient(bx, by, bx, by + faceH);
-    pGrad.addColorStop(0, '#13092c');
-    pGrad.addColorStop(1, '#050110');
-    ctx.fillStyle = pGrad;
-    ctx.fillRect(bx, by, bw, faceH);
-
-    // Full-block cosmic vortex
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(bx, by, bw, faceH);
-    ctx.clip();
-
-    const pcx = bx + bw / 2;
-    const pcy = by + faceH / 2;
-    const maxR = Math.hypot(bw, faceH) * 0.55;
-    ctx.translate(pcx, pcy);
-    ctx.rotate(animTick * 1.5);
-    for (let i = 0; i < 3; i++) {
-      ctx.rotate((Math.PI * 2) / 3);
-      const ag = ctx.createRadialGradient(0, 0, 1, 0, 0, maxR);
-      ag.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-      ag.addColorStop(0.3, 'rgba(56, 189, 248, 0.55)');
-      ag.addColorStop(0.7, 'rgba(168, 85, 247, 0.35)');
-      ag.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = ag;
+  // 6. 4 Physical Recessed Corner Bolt Sockets (Proportional to block size)
+  const showBolts = bw >= 18 && topH >= 10;
+  if (showBolts) {
+    const inset = Math.max(1.5, Math.min(5.5, Math.min(bw * 0.09, topH * 0.16)));
+    const boltR = Math.max(0.6, Math.min(2.0, bw * 0.024));
+    [
+      [bx + inset, by + inset],
+      [bx + bw - inset, by + inset],
+      [bx + inset, by + topH - inset],
+      [bx + bw - inset, by + topH - inset],
+    ].forEach(([cx, cy]) => {
+      // Recessed dark socket
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
       ctx.beginPath();
-      ctx.arc(0, 0, maxR * 0.7, 0, 1.4);
-      ctx.lineTo(0, 0);
+      ctx.arc(cx, cy, boltR, 0, Math.PI * 2);
       ctx.fill();
-    }
-    ctx.restore();
-  } else {
-    const tones = getBlockTones(block.health);
-    const bodyGrad = ctx.createLinearGradient(bx, by, bx, by + faceH);
-    bodyGrad.addColorStop(0, tones.faceTop);
-    bodyGrad.addColorStop(0.5, config.bg[1]);
-    bodyGrad.addColorStop(1, tones.bevelTop);
-    ctx.fillStyle = bodyGrad;
-    ctx.fillRect(bx, by, bw, faceH);
-
-    // Micro-Shimmer on breakable blocks
-    const shimmer = Math.sin(animTick * 2.2 + (bx * 0.04 + by * 0.06));
-    if (shimmer > 0.6) {
-      const glintAlpha = (shimmer - 0.6) * 0.55;
-      ctx.fillStyle = `rgba(255, 255, 255, ${glintAlpha})`;
-      ctx.fillRect(bx + bevel, by + 1, bw - bevel * 2, 1.5);
-    }
-  }
-
-  // 4. Chiseled Bevels
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-  ctx.beginPath();
-  ctx.moveTo(bx, by);
-  ctx.lineTo(bx + bw, by);
-  ctx.lineTo(bx + bw - bevel, by + bevel);
-  ctx.lineTo(bx + bevel, by + bevel);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-  ctx.beginPath();
-  ctx.moveTo(bx, by + faceH);
-  ctx.lineTo(bx + bevel, by + faceH - bevel);
-  ctx.lineTo(bx + bw - bevel, by + faceH - bevel);
-  ctx.lineTo(bx + bw, by + faceH);
-  ctx.closePath();
-  ctx.fill();
-
-  // 5. Engraved Label
-  renderEngravedLabel(ctx, block, config, bx + bw / 2, by + faceH / 2, faceH);
-
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESET 3: REINFORCED ALLOY (Dual-Tier Chassis · Tone-Matched 3D)
-// ─────────────────────────────────────────────────────────────────────────────
-export function drawReinforcedAlloyBlock(
-  ctx: CanvasRenderingContext2D,
-  block: BlockEngineState,
-  options: BlockRenderOptions = {}
-) {
-  const animTick = options.animTick || 0;
-  const padding = 2;
-  const config = BLOCK_COLORS[block.health] || BLOCK_COLORS[1];
-
-  const bx = block.x + padding;
-  const by = block.y + padding;
-  const bw = block.w - padding * 2;
-  const bh = block.h - padding * 2;
-  const r = 5;
-  const dropH = 5;
-  const topH = bh - dropH;
-
-  ctx.save();
-  ctx.shadowBlur = 0;
-
-  // Hit Flash
-  if (block.hitAnim > 0) {
-    ctx.fillStyle = `rgba(255, 255, 255, ${0.75 + block.hitAnim * 0.25})`;
-    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, r);
-    else ctx.rect(bx, by, bw, bh);
-    ctx.fill();
-    ctx.restore();
-    return;
-  }
-
-  // 1. Ambient Drop Shadow
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-  if (ctx.roundRect) ctx.roundRect(bx + 1.5, by + dropH + 1.5, bw, topH, r);
-  else ctx.rect(bx + 1.5, by + dropH + 1.5, bw, topH);
-  ctx.fill();
-
-  // 2. TONE-MATCHED 3D Base
-  if (block.health === 6) {
-    ctx.fillStyle = '#1e293b';
-  } else if (block.health === 7) {
-    ctx.fillStyle = '#100726';
-  } else {
-    const tones = getBlockTones(block.health);
-    ctx.fillStyle = tones.bevelBottom;
-  }
-  if (ctx.roundRect) ctx.roundRect(bx, by + topH * 0.5, bw, topH * 0.5 + dropH, r);
-  else ctx.rect(bx, by + topH * 0.5, bw, topH * 0.5 + dropH);
-  ctx.fill();
-
-  // 3. Top Face
-  if (block.health === 6) {
-    const tungGrad = ctx.createLinearGradient(bx, by, bx, by + topH);
-    tungGrad.addColorStop(0, '#e2e8f0');
-    tungGrad.addColorStop(0.4, '#94a3b8');
-    tungGrad.addColorStop(1, '#334155');
-    ctx.fillStyle = tungGrad;
-  } else if (block.health === 7) {
-    const pGrad = ctx.createLinearGradient(bx, by, bx, by + topH);
-    pGrad.addColorStop(0, '#13092c');
-    pGrad.addColorStop(1, '#050110');
-    ctx.fillStyle = pGrad;
-  } else {
-    const tones = getBlockTones(block.health);
-    const bodyGrad = ctx.createLinearGradient(bx, by, bx, by + topH);
-    bodyGrad.addColorStop(0, tones.faceTop);
-    bodyGrad.addColorStop(0.5, config.bg[1]);
-    bodyGrad.addColorStop(1, tones.bevelTop);
-    ctx.fillStyle = bodyGrad;
-  }
-
-  if (ctx.roundRect) ctx.roundRect(bx, by, bw, topH, r);
-  else ctx.rect(bx, by, bw, topH);
-  ctx.fill();
-
-  // Full cosmic vortex for Portal
-  if (block.health === 7) {
-    ctx.save();
-    if (ctx.roundRect) ctx.roundRect(bx, by, bw, topH, r);
-    ctx.clip();
-    const pcx = bx + bw / 2;
-    const pcy = by + topH / 2;
-    const maxR = Math.hypot(bw, topH) * 0.55;
-    ctx.translate(pcx, pcy);
-    ctx.rotate(animTick * 1.5);
-    for (let i = 0; i < 3; i++) {
-      ctx.rotate((Math.PI * 2) / 3);
-      const ag = ctx.createRadialGradient(0, 0, 1, 0, 0, maxR);
-      ag.addColorStop(0, '#ffffff');
-      ag.addColorStop(0.3, '#38bdf8');
-      ag.addColorStop(0.7, '#8b5cf6');
-      ag.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = ag;
+      // Specular corner glint (Top-left)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
       ctx.beginPath();
-      ctx.arc(0, 0, maxR * 0.7, 0, 1.4);
-      ctx.lineTo(0, 0);
+      ctx.arc(cx - boltR * 0.25, cy - boltR * 0.25, boltR * 0.4, 0, Math.PI * 2);
       ctx.fill();
-    }
+    });
+  }
+
+  // 7. Engraved Tactile Typography / Portal Pair Telemetry
+  if (block.health !== 7) {
+    renderEngravedLabel(ctx, block, config, bx + bw / 2, by + topH / 2, topH);
+  } else if (block.portalPairId !== undefined) {
+    // Portal telemetry pair badge (Proportionally scaled to avoid clipping)
+    const badgeColors: Record<number, { border: string; bg: string; text: string }> = {
+      1: { border: '#00f7ff', bg: 'rgba(0, 247, 255, 0.28)', text: '#00f7ff' },
+      2: { border: '#e879f9', bg: 'rgba(232, 121, 249, 0.28)', text: '#e879f9' },
+      3: { border: '#4ade80', bg: 'rgba(74, 222, 128, 0.28)', text: '#4ade80' },
+      4: { border: '#facc15', bg: 'rgba(250, 204, 21, 0.28)', text: '#facc15' },
+    };
+    const bc = badgeColors[block.portalPairId] || badgeColors[1];
+    ctx.save();
+    const tagR = Math.max(2.8, Math.min(6.5, topH * 0.20));
+    const tagX = bx + bw - tagR - Math.max(2, bw * 0.05);
+    const tagY = by + tagR + Math.max(2, topH * 0.08);
+    ctx.fillStyle = bc.bg;
+    ctx.strokeStyle = bc.border;
+    ctx.lineWidth = Math.max(0.8, tagR * 0.18);
+    ctx.beginPath();
+    ctx.arc(tagX, tagY, tagR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    const fontPx = Math.max(5.5, Math.round(tagR * 1.3));
+    ctx.font = `900 ${fontPx}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = bc.text;
+    ctx.shadowColor = bc.border;
+    ctx.shadowBlur = tagR >= 5 ? 4 : 1;
+    ctx.fillText(String(block.portalPairId), tagX, tagY + 0.5);
     ctx.restore();
   }
-
-  // Micro-shimmer on breakable blocks
-  if (block.health !== 6 && block.health !== 7) {
-    const shimmer = Math.sin(animTick * 2.2 + (bx * 0.04 + by * 0.06));
-    if (shimmer > 0.6) {
-      const glintAlpha = (shimmer - 0.6) * 0.55;
-      ctx.fillStyle = `rgba(255, 255, 255, ${glintAlpha})`;
-      ctx.fillRect(bx + r, by + 1, bw - r * 2, 1.5);
-    }
-  }
-
-  // Specular Top Ridge
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-  ctx.fillRect(bx + r, by + 1, bw - r * 2, 1.2);
-
-  // Outer Border
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
-  ctx.lineWidth = 1.2;
-  if (ctx.roundRect) ctx.roundRect(bx, by, bw, topH, r);
-  else ctx.rect(bx, by, bw, topH);
-  ctx.stroke();
-
-  // Engraved Label
-  renderEngravedLabel(ctx, block, config, bx + bw / 2, by + topH / 2, topH);
 
   ctx.restore();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SHARED 3D ENGRAVED TYPOGRAPHY (Physical Relief Bevels · Zero Glow)
-// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Shared 3D Engraved Typography (Physical Relief Bevels · Scale-Independent)
+ */
 function renderEngravedLabel(
   ctx: CanvasRenderingContext2D,
   block: BlockEngineState,
@@ -638,22 +402,23 @@ function renderEngravedLabel(
 
   let text = String(block.health);
   if (block.health === 6) text = '∞';
-  else if (block.health === 7) text = '🌀';
-  else if (block.health === 8) {
-    const count = block.counter !== undefined ? block.counter : 3;
-    text = `[${count}]`;
-  }
+  else if (block.health === 8) text = '⚡';
 
-  const fontSize = Math.floor(faceH * 0.52);
+  const fontSize = Math.max(5.5, Math.floor(faceH * 0.52));
   ctx.font = `900 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Orbitron', monospace`;
 
+  const shadowOffset = Math.max(0.35, Math.min(1.0, faceH * 0.045));
   // 1. Engraved Bottom Highlight Bevel (Light hitting lower inner groove)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-  ctx.fillText(text, cx, cy + 1.2);
+  if (faceH >= 12) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.fillText(text, cx, cy + shadowOffset);
+  }
 
   // 2. Engraved Top Drop Shadow (Shadow inside upper inner groove)
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-  ctx.fillText(text, cx, cy - 1.0);
+  if (faceH >= 8) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    ctx.fillText(text, cx, cy - shadowOffset);
+  }
 
   // 3. Crisp Surface Text Fill
   ctx.fillStyle = block.health === 8 && block.counter === 1 ? '#ff0055' : config.text;

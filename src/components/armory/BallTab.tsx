@@ -3,12 +3,12 @@ import { useGame } from '../../context/GameContext';
 import { BALL_UPGRADES, UpgradeState, UpgradeDef, getUpgradeCost } from '../../constants/upgrades';
 import { UpgradeCard } from './UpgradeCard';
 import { UpgradePreviewModal } from './UpgradePreviewModal';
-import { GameBallIcon } from './InGameIcons';
+import { AssetThumbnail } from './AssetThumbnail';
 
 interface BallTabProps {
   upgrades: UpgradeState;
   cores: number;
-  onUpgrade: (id: string) => void;
+  onUpgrade: (id: string, targetLevel?: number) => void;
 }
 
 export const BallTab: React.FC<BallTabProps> = ({ upgrades, cores, onUpgrade }) => {
@@ -29,7 +29,7 @@ export const BallTab: React.FC<BallTabProps> = ({ upgrades, cores, onUpgrade }) 
     <div className="w-full flex flex-col gap-3">
       {/* Section Header */}
       <div className="flex items-center justify-between text-[11px] font-tech text-cyan-400 uppercase tracking-wider px-1 pt-0.5">
-        <span>⚡ BALL KINETIC MODULES</span>
+        <span>BALL KINETIC MODULES</span>
         <span className="text-slate-400">TAP CARD TO PREVIEW</span>
       </div>
 
@@ -50,10 +50,10 @@ export const BallTab: React.FC<BallTabProps> = ({ upgrades, cores, onUpgrade }) 
               onUpgrade={onUpgrade}
               onSelect={(u) => setSelectedUpgrade(u)}
               icon={
-                <GameBallIcon
-                  sizeMultiplier={isSize ? 0.75 + level * 0.1 : 1}
-                  size={26}
-                  skin={currentSkin}
+                <AssetThumbnail
+                  upgradeId={upgrade.id}
+                  level={level}
+                  size={30}
                 />
               }
             />
@@ -68,8 +68,8 @@ export const BallTab: React.FC<BallTabProps> = ({ upgrades, cores, onUpgrade }) 
         currentLevel={selectedUpgrade ? upgrades[selectedUpgrade.id] || 1 : 1}
         cores={cores}
         onClose={() => setSelectedUpgrade(null)}
-        onUpgrade={(id) => {
-          onUpgrade(id);
+        onUpgrade={(id, targetLevel) => {
+          onUpgrade(id, targetLevel);
         }}
         currentSkin={currentSkin}
       />

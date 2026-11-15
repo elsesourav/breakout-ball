@@ -208,3 +208,35 @@ export function playSyntheticWarning(
   osc.start(now);
   osc.stop(now + 0.13);
 }
+
+/**
+ * Ultra-short, low-frequency muted tap for locked levels / route obstacles.
+ * Very soft, short (~40ms), low-pitch sine pulse (125Hz -> 70Hz) at low volume.
+ * Gentle, quiet and unobtrusive with zero harsh treble.
+ */
+export function playSyntheticLockTap(
+  ctx: AudioContext,
+  masterVol: number
+): void {
+  if (masterVol <= 0) return;
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  // Pure sine wave for a deep, smooth, non-piercing low thump
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(125, now);
+  osc.frequency.exponentialRampToValueAtTime(70, now + 0.038);
+
+  // Very gentle volume ceiling (0.09) with fast exponential decay
+  gain.gain.setValueAtTime(0.09 * masterVol, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.042);
+}
+
