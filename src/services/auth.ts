@@ -13,7 +13,6 @@ import { supabase } from './supabase';
 import { firebaseAuth, firestoreDb } from './firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as fbSignOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { createDemoPilotUser } from './demoPilotHelper';
 import { handleRequestPasswordOtp, handleVerifyOtpAndResetPassword } from './authRecoveryHelper';
 import { backendApi } from './backendApi';
 
@@ -412,15 +411,6 @@ class AuthService {
 
   public async verifyOtpAndResetPassword(identifier: string, otp: string, newPass: string) {
     return handleVerifyOtpAndResetPassword(identifier, otp, newPass);
-  }
-
-  // ==========================================
-  // DEMO PILOT INSTANT ACCESS (1-CLICK TEST)
-  // ==========================================
-  public loginAsDemoPilot(): AuthUser {
-    const demoUser = createDemoPilotUser();
-    this.setCurrentUser(demoUser);
-    return demoUser;
   }
 
   public async refreshUserProfile(): Promise<AuthUser | null> {

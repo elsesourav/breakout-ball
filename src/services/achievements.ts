@@ -106,11 +106,6 @@ class AchievementManager {
         const arr: string[] = JSON.parse(raw);
         this.unlockedIds = new Set(arr);
         this.viewedIds = new Set(arr);
-      } else if (userKey === 'demo_pilot') {
-        const demoBadges = ['first_blood', 'speed_demon', 'campaign_10', 'combo_master', 'level_architect'];
-        this.unlockedIds = new Set(demoBadges);
-        this.viewedIds = new Set(demoBadges);
-        localStorage.setItem(key, JSON.stringify(demoBadges));
       } else {
         this.unlockedIds = new Set();
         this.viewedIds = new Set();
@@ -120,7 +115,7 @@ class AchievementManager {
     }
 
     // Recover unlocked trophies directly from SQLite database for authenticated player
-    if (userKey && userKey !== 'demo_pilot') {
+    if (userKey) {
       backendApi.getUserTrophies(userKey).then((trophies) => {
         if (trophies && trophies.length > 0) {
           trophies.forEach((t) => {

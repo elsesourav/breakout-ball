@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { authService } from '../../services/auth';
 import { useGame } from '../../context/GameContext';
 import { OAuthButtons } from './OAuthButtons';
-import { LogIn, KeyRound, User, Eye, EyeOff, Loader2, AlertCircle, Rocket } from 'lucide-react';
+import { LogIn, KeyRound, User, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 interface LoginFormProps {
@@ -167,34 +167,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               <span>SIGN IN</span>
             </>
           )}
-        </button>
-
-        {/* Quick Demo Pilot 1-Click Access */}
-        <div className="flex items-center gap-2 my-1">
-          <div className="flex-1 h-px bg-cyan-500/20" />
-          <span className="font-tech text-[10px] text-cyan-400/70 tracking-wider">OR QUICK TEST</span>
-          <div className="flex-1 h-px bg-cyan-500/20" />
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            soundManager.playClick();
-            const demoUser = authService.loginAsDemoPilot();
-            updateUser({
-              fullName: demoUser.fullName,
-              username: demoUser.username,
-              email: demoUser.email,
-              avatarUrl: demoUser.avatarUrl,
-              provider: demoUser.provider,
-              isLoggedIn: true,
-            });
-            onSuccess();
-          }}
-          className="w-full h-10 rounded-xl font-tech font-bold text-xs tracking-wider flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-purple-900/40 via-cyan-950/60 to-blue-900/40 border border-cyan-400/40 text-cyan-300 hover:text-white hover:border-cyan-300 hover:shadow-[0_0_15px_rgba(0,247,255,0.3)] transition-all active:scale-[0.98]"
-        >
-          <Rocket className="w-4 h-4 text-cyan-400 animate-pulse" />
-          <span>🚀 QUICK DEMO PLAYER LOGIN</span>
         </button>
       </form>
 

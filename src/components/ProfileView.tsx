@@ -136,39 +136,58 @@ export const ProfileView: React.FC = () => {
 
     const getInner = () => outer.querySelector<HTMLElement>('[data-inner-scroll="true"]');
 
-    // 1. Wheel Coordinator (Mouse Wheel & Trackpad): Body first, then table
-    const handleWheel = (e: WheelEvent) => {
-      const deltaY = e.deltaY;
-      if (!deltaY) return;
-
+    // Centralized delta dispatcher with seamless handover between outer body and inner table
+    const applyScrollDelta = (dy: number) => {
       const inner = getInner();
-      const maxOuter = maxOuterRef.current;
+      const switcher = switcherRef.current;
+      const maxScrollableOuter = Math.max(0, outer.scrollHeight - outer.clientHeight);
+      const dockThreshold = switcher
+        ? Math.min(switcher.offsetTop, maxScrollableOuter)
+        : Math.min(maxOuterRef.current, maxScrollableOuter);
 
-      if (deltaY > 0) {
-        // Scrolling DOWN
-        if (outer.scrollTop < maxOuter - 0.5) {
-          // Phase 1: Scroll body first until switcher is docked at top
-          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
+      if (dy > 0) {
+        // Scrolling DOWN: Outer body scrolls first until switcher docks at top
+        const outerRemaining = Math.max(0, dockThreshold - outer.scrollTop);
+        if (outerRemaining > 0.5) {
+          const consumeOuter = Math.min(outerRemaining, dy);
+          outer.scrollTop += consumeOuter;
+          const leftover = dy - consumeOuter;
+          if (leftover > 0.5 && inner) {
+            const maxInner = inner.scrollHeight - inner.clientHeight;
+            inner.scrollTop = Math.min(maxInner, inner.scrollTop + leftover);
+          }
         } else if (inner) {
-          // Phase 2: Switcher is docked, now scroll table down
+          // Switcher is docked: inner table scrolls down to player #50
           const maxInner = inner.scrollHeight - inner.clientHeight;
-          inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
+          inner.scrollTop = Math.min(maxInner, inner.scrollTop + dy);
         }
-        e.preventDefault();
-      } else if (deltaY < 0) {
-        // Scrolling UP
+      } else if (dy < 0) {
+        // Scrolling UP: Inner table scrolls up to player #1 first
+        const absDy = Math.abs(dy);
         if (inner && inner.scrollTop > 0.5) {
-          // Phase 1: Scroll table back up to player #1 first
-          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
-        } else if (outer.scrollTop > 0) {
-          // Phase 2: Table is at top, now scroll body back down to reveal Hero card
-          outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
+          const consumeInner = Math.min(inner.scrollTop, absDy);
+          inner.scrollTop -= consumeInner;
+          const leftover = absDy - consumeInner;
+          if (leftover > 0.5) {
+            // Once table reaches top (player #1), outer body scrolls back down to reveal Hero card
+            outer.scrollTop = Math.max(0, outer.scrollTop - leftover);
+          }
+        } else {
+          // Table already at top: outer body scrolls back down to reveal Hero card
+          outer.scrollTop = Math.max(0, outer.scrollTop + dy);
         }
-        e.preventDefault();
       }
     };
 
-    // 2. Touch Coordinator (Mobile Phone & Tablet Touch Swiping with Momentum): Body first, then table
+    // 1. Wheel Coordinator (Mouse Wheel & Trackpad)
+    const handleWheel = (e: WheelEvent) => {
+      const deltaY = e.deltaY;
+      if (!deltaY) return;
+      e.preventDefault();
+      applyScrollDelta(deltaY);
+    };
+
+    // 2. Touch Coordinator (Mobile Phone & Tablet Touch Swiping with Momentum)
     let touchStartY = 0;
     let lastTouchY = 0;
     let lastTouchTime = 0;
@@ -199,7 +218,7 @@ export const ProfileView: React.FC = () => {
       const deltaY = touchStartY - currentY;
       touchStartY = currentY;
 
-      // Track touch velocity for momentum
+      // Track touch velocity for smooth release momentum
       const dt = Math.max(1, now - lastTouchTime);
       const dy = lastTouchY - currentY;
       touchVelocity = (dy / dt) * 16;
@@ -207,28 +226,8 @@ export const ProfileView: React.FC = () => {
       lastTouchTime = now;
 
       if (Math.abs(deltaY) < 0.5) return;
-
-      const inner = getInner();
-      const maxOuter = maxOuterRef.current;
-
-      if (deltaY > 0) {
-        // Dragging content UP / scrolling DOWN: Body first, then table
-        if (outer.scrollTop < maxOuter - 0.5) {
-          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
-        } else if (inner) {
-          const maxInner = inner.scrollHeight - inner.clientHeight;
-          inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
-        }
-        if (e.cancelable) e.preventDefault();
-      } else if (deltaY < 0) {
-        // Dragging content DOWN / scrolling UP: Table first, then body
-        if (inner && inner.scrollTop > 0.5) {
-          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
-        } else if (outer.scrollTop > 0) {
-          outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
-        }
-        if (e.cancelable) e.preventDefault();
-      }
+      if (e.cancelable) e.preventDefault();
+      applyScrollDelta(deltaY);
     };
 
     const handleTouchEnd = () => {
@@ -236,30 +235,13 @@ export const ProfileView: React.FC = () => {
 
       let v = touchVelocity;
       const step = () => {
-        v *= 0.94; // Decay friction
+        v *= 0.94; // Natural decay friction
         if (Math.abs(v) < 0.5) {
           momentumRaf = null;
           return;
         }
 
-        const inner = getInner();
-        const maxOuter = maxOuterRef.current;
-
-        if (v > 0) {
-          if (outer.scrollTop < maxOuter - 0.5) {
-            outer.scrollTop = Math.min(maxOuter, outer.scrollTop + v);
-          } else if (inner) {
-            const maxInner = inner.scrollHeight - inner.clientHeight;
-            inner.scrollTop = Math.min(maxInner, inner.scrollTop + v);
-          }
-        } else if (v < 0) {
-          if (inner && inner.scrollTop > 0.5) {
-            inner.scrollTop = Math.max(0, inner.scrollTop + v);
-          } else if (outer.scrollTop > 0) {
-            outer.scrollTop = Math.max(0, outer.scrollTop + v);
-          }
-        }
-
+        applyScrollDelta(v);
         momentumRaf = requestAnimationFrame(step);
       };
 
