@@ -24,7 +24,7 @@ export const CyberSectionHeader: React.FC<CyberSectionHeaderProps> = ({
         >
           {title}
         </span>
-        <span className="font-tech text-[8.5px] text-slate-400 font-semibold tracking-[0.16em] uppercase leading-none truncate">
+        <span className="font-tech text-[8.5px] text-slate-400 font-semibold tracking-[0.16em] leading-none truncate">
           {subtitle}
         </span>
       </div>

@@ -81,7 +81,14 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
       </div>
 
       {/* Segmented Dash Progress Bar with clean gaps */}
-      <div className="flex items-center gap-1 w-full h-2 rounded-sm bg-black/60 p-0.5 border border-cyan-500/15">
+      <div
+        style={{
+          backgroundColor: 'rgba(5, 8, 24, 0.75)',
+          border: `1px solid ${upgrade.accentColor}25`,
+          borderRadius: '8px',
+        }}
+        className="flex items-center gap-1.5 w-full h-2 p-0.5 shadow-inner"
+      >
         {Array.from({ length: upgrade.maxLevel }).map((_, i) => {
           const isFilled = i < level;
           const isMilestone = (i + 1) % 5 === 0;
@@ -105,8 +112,8 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
         })}
       </div>
 
-      {/* Action Footer: Next Stat & Upgrade Button */}
-      <div className="flex items-center justify-between pt-1 border-t border-cyan-500/15 mt-0.5">
+      {/* Action Footer: Next Stat & Upgrade Button (No horizontal divider line) */}
+      <div className="flex items-center justify-between pt-1 mt-0.5">
         <div className="flex items-center gap-1.5">
           <span className="font-tech text-[9px] text-slate-400 uppercase tracking-wider">
             {isMax ? 'PEAK' : 'NEXT:'}

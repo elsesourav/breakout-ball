@@ -6,6 +6,8 @@ import { ArenaLevelCard } from './arena/ArenaLevelCard';
 import { ArenaPagination } from './arena/ArenaPagination';
 import { DailyFeaturedBanner } from './arena/DailyFeaturedBanner';
 import { CyberSectionHeader } from './CyberSectionHeader';
+import { currencyService } from '../services/currency';
+import { CoreIcon } from './CoreIcon';
 
 const ITEMS_PER_PAGE = 25;
 
@@ -16,13 +18,22 @@ const SEARCH_TARGETS = [
 ];
 
 export const OnlineMode: React.FC = () => {
-  const { onlineLevels, localLevels, openPreview, setActiveTab } = useGame();
+  const { onlineLevels, localLevels, openPreview, setActiveTab, user } = useGame();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterMode, setFilterMode] = useState<'all' | 'popular'>('all');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchTargetIdx, setSearchTargetIdx] = useState(0);
+  const [cores, setCores] = useState<number>(() => currencyService.getBalance());
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sync available cores from currencyService
+  useEffect(() => {
+    setCores(currencyService.getBalance());
+    currencyService.load(user.username).then(() => {
+      setCores(currencyService.getBalance());
+    });
+  }, [user.username]);
 
   // Cycle search target placeholder ticker bottom-to-top
   useEffect(() => {
@@ -75,8 +86,30 @@ export const OnlineMode: React.FC = () => {
       {/* 1. Top Cyber Section Header */}
       <div className="w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md border-b border-cyan-500/15 shadow-lg">
         <CyberSectionHeader
-          title="GLOBAL ARENA"
-          subtitle="COMMUNITY STAGES & GLOBAL RANKINGS"
+          title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
+          subtitle={`@${user.username || 'pilot'}`}
+          rightSlot={
+            <button
+              type="button"
+              onClick={() => setActiveTab('armory')}
+              title="View Cores in Armory"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
+                border: '1.2px solid rgba(0, 247, 255, 0.45)',
+                boxShadow: '0 0 12px rgba(0, 247, 255, 0.25)',
+              }}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-400 active:scale-95 transition-all"
+            >
+              <CoreIcon size={15} glow variant="cyan" />
+              <span className="font-tech font-bold text-xs text-cyan-200">
+                {cores.toLocaleString()}
+              </span>
+              <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
+                CORES
+              </span>
+            </button>
+          }
         />
       </div>
 
