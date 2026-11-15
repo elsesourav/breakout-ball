@@ -69,6 +69,7 @@ export const ArmoryView: React.FC = () => {
     currencyService.getDailyCollectStatus()
   );
   const countUpRef = useRef<number | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Sync with browser URL / custom events for /shop direct routing
   useEffect(() => {
@@ -109,7 +110,7 @@ export const ArmoryView: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Smooth, gradual count-up counter animation over 2.0s
+  // Snappy, energetic count-up counter animation timed with particle arrivals
   const startCountUp = useCallback((target: number) => {
     if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
 
@@ -120,7 +121,7 @@ export const ArmoryView: React.FC = () => {
       return;
     }
 
-    const duration = 2000; // ms - slow, smooth count-up
+    const duration = 750; // ms - fast, punchy arcade count-up
     const startTime = performance.now();
 
     const tick = (now: number) => {
@@ -162,14 +163,24 @@ export const ArmoryView: React.FC = () => {
     setIsFlyingCores(true);
     setDailyStatus(currencyService.getDailyCollectStatus());
 
-    // Pulse the top header badge with radiant cyan glow
-    setIsPulsing(true);
+    // Scroll smoothly to top so header cores badge is in full view
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Pulse the top header badge with radiant cyan glow as cores arrive
+    setTimeout(() => {
+      setIsPulsing(true);
+    }, 380);
+
     setTimeout(() => {
       setIsPulsing(false);
-    }, 2600);
+    }, 1450);
 
-    // Start slow gradual count-up
-    startCountUp(newBalance);
+    // Fast count-up as cores land into badge
+    setTimeout(() => {
+      startCountUp(newBalance);
+    }, 380);
   };
 
   const SECTIONS: {
@@ -191,6 +202,7 @@ export const ArmoryView: React.FC = () => {
 
   return (
     <div
+      ref={scrollContainerRef}
       className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pb-28 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
