@@ -234,6 +234,21 @@ class BackendApiService {
     return Boolean(this.getAdminToken());
   }
 
+  /** Fetch verified user profile directly from ElseSourav ecosystem */
+  public async fetchUserProfile(identifier: string): Promise<{ success: boolean; profile?: any }> {
+    try {
+      const cleanId = identifier.trim().replace(/^@/, '');
+      const res = await fetch(`${this.baseUrl}/api/user/profile/${encodeURIComponent(cleanId)}`, {
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!res.ok) return { success: false };
+      const data = await res.json();
+      return { success: true, profile: data.profile };
+    } catch {
+      return { success: false };
+    }
+  }
+
   private getAdminHeaders(): Record<string, string> {
     const adminToken = this.getAdminToken();
     const token = adminToken || (typeof window !== 'undefined' ? localStorage.getItem('breakout_auth_token') : null);

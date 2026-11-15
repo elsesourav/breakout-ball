@@ -76,7 +76,7 @@ export class GameEngine {
       substeps: 6,
     });
 
-    this.particles = new ParticleSystem(CANVAS_WIDTH, CANVAS_HEIGHT, 85);
+    this.particles = new ParticleSystem(CANVAS_WIDTH, CANVAS_HEIGHT, 240);
     this.renderer = new GameRenderer(CANVAS_WIDTH, CANVAS_HEIGHT);
     this.audio = new AudioBridge(true);
     this.powerUps = new PowerUpManager();

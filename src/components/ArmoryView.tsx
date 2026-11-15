@@ -68,6 +68,7 @@ export const ArmoryView: React.FC = () => {
   const [upgrades, setUpgrades] = useState<UpgradeState>(() => currencyService.getUpgrades());
   const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
   const [claimAmount, setClaimAmount] = useState<number>(50);
+  const [flyOrigin, setFlyOrigin] = useState<{ x: number; y: number } | null>(null);
   const [isPulsing, setIsPulsing] = useState<boolean>(false);
   const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() =>
     currencyService.getDailyCollectStatus()
@@ -166,16 +167,21 @@ export const ArmoryView: React.FC = () => {
   };
 
   // Handle successful core coupon / task claim (locked to prevent duplicate animations)
-  const handleClaimSuccess = useCallback((amount: number) => {
+  const handleClaimSuccess = useCallback((amount: number, origin?: { x: number; y: number }) => {
     if (isClaimLockedRef.current) return;
     isClaimLockedRef.current = true;
     setTimeout(() => {
       isClaimLockedRef.current = false;
-    }, 1900);
+    }, 1800);
 
     const newBalance = currencyService.getBalance();
     setCores(newBalance);
     setClaimAmount(amount);
+    if (origin) {
+      setFlyOrigin(origin);
+    } else {
+      setFlyOrigin({ x: window.innerWidth / 2, y: window.innerHeight * 0.5 });
+    }
     setIsFlyingCores(true);
     setDailyStatus(currencyService.getDailyCollectStatus());
 
@@ -184,19 +190,15 @@ export const ArmoryView: React.FC = () => {
       scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Pulse the top header badge with radiant cyan glow as cores arrive
+    // Subtle glow and smooth count-up timed with crystal arrivals (~650ms)
     setTimeout(() => {
       setIsPulsing(true);
-    }, 550);
+      startCountUp(newBalance);
+    }, 650);
 
     setTimeout(() => {
       setIsPulsing(false);
-    }, 1800);
-
-    // Smooth count-up as cores land into badge
-    setTimeout(() => {
-      startCountUp(newBalance);
-    }, 550);
+    }, 1650);
   }, [startCountUp]);
 
   const handleAnimationComplete = useCallback(() => {
@@ -229,10 +231,11 @@ export const ArmoryView: React.FC = () => {
         color: '#ffffff',
       }}
     >
-      {/* Flying Cores Animation from Center Claim to Top Badge */}
+      {/* Flying Cores Animation from Center/Origin Claim to Top Badge */}
       <FlyingCoresAnimation
         active={isFlyingCores}
         amount={claimAmount}
+        origin={flyOrigin}
         onComplete={handleAnimationComplete}
       />
 
@@ -261,16 +264,15 @@ export const ArmoryView: React.FC = () => {
                 title="Click to Open Core Shop"
                 style={{
                   background: isPulsing
-                    ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.35) 0%, rgba(99, 102, 241, 0.4) 100%)'
+                    ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.28) 0%, rgba(99, 102, 241, 0.32) 100%)'
                     : 'linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(99, 102, 241, 0.28) 100%)',
                   border: isPulsing
-                    ? '1.8px solid #00f7ff'
+                    ? '1.2px solid #00f7ff'
                     : '1.2px solid rgba(0, 247, 255, 0.5)',
                   boxShadow: isPulsing
-                    ? '0 0 25px rgba(0, 247, 255, 0.95), inset 0 0 10px rgba(0, 247, 255, 0.5)'
+                    ? '0 0 14px rgba(0, 247, 255, 0.5)'
                     : '0 0 12px rgba(0, 247, 255, 0.25)',
-                  transform: isPulsing ? 'scale(1.15)' : 'scale(1)',
-                  transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
                 }}
                 className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.45)] active:scale-95 group transition-all"
               >
@@ -278,7 +280,7 @@ export const ArmoryView: React.FC = () => {
                   size={15}
                   glow
                   variant="cyan"
-                  className={`transition-transform duration-300 ${isPulsing ? 'scale-125' : 'group-hover:rotate-12'}`}
+                  className="transition-transform duration-300 group-hover:rotate-12"
                 />
                 <span className={`font-tech font-bold text-xs transition-colors ${isPulsing ? 'text-white' : 'text-cyan-200'}`}>
                   {displayCores.toLocaleString()}

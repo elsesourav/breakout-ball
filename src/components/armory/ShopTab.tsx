@@ -95,7 +95,7 @@ const PACK_META: Record<string, PackMeta> = {
 interface ShopTabProps {
   cores: number;
   username?: string;
-  onClaimSuccess: (coresGranted: number) => void;
+  onClaimSuccess: (coresGranted: number, origin?: { x: number; y: number }) => void;
 }
 
 const formatRemainingTime = (ms: number): string => {
@@ -125,16 +125,22 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
     return () => clearInterval(timer);
   }, []);
 
-  const handleClaimDaily = () => {
+  const handleClaimDaily = (e?: React.MouseEvent) => {
     if (!dailyStatus.canCollect || isClaimingDaily) return;
     setIsClaimingDaily(true);
     soundManager.playUpgradeSuccess();
+
+    let originPos: { x: number; y: number } | undefined;
+    if (e?.currentTarget) {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      originPos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    }
 
     const res = currencyService.claimDailyCores(username);
     if (res.success) {
       setDailyStatus(currencyService.getDailyCollectStatus());
       // Trigger smooth flowing flight animation
-      onClaimSuccess(res.amount);
+      onClaimSuccess(res.amount, originPos);
     }
     setIsClaimingDaily(false);
   };
@@ -268,7 +274,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           {dailyStatus.canCollect ? (
             <button
               type="button"
-              onClick={handleClaimDaily}
+              onClick={(e) => handleClaimDaily(e)}
               disabled={isClaimingDaily}
               style={{
                 backgroundImage: 'linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #d97706 100%)',

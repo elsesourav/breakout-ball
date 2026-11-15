@@ -56,6 +56,7 @@ export const LevelMap: React.FC = () => {
   const [remainingMs, setRemainingMs] = useState<number>(() => currencyService.getDailyCollectStatus().remainingMs);
   const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
   const [claimAmount, setClaimAmount] = useState<number>(50);
+  const [flyOrigin, setFlyOrigin] = useState<{ x: number; y: number } | null>(null);
   const [isPulsing, setIsPulsing] = useState<boolean>(false);
   const scrollRef    = useRef<HTMLDivElement>(null);
   const activeRef    = useRef<HTMLDivElement | null>(null);
@@ -132,7 +133,7 @@ export const LevelMap: React.FC = () => {
     };
   }, [user.username]);
 
-  const handleDailyCollect = () => {
+  const handleDailyCollect = (e?: React.MouseEvent) => {
     if (!dailyStatus.canCollect) {
       showAlert({
         title: 'DAILY REWARD',
@@ -145,7 +146,20 @@ export const LevelMap: React.FC = () => {
     isClaimLockedRef.current = true;
     setTimeout(() => {
       isClaimLockedRef.current = false;
-    }, 1900);
+    }, 1800);
+
+    if (e && e.currentTarget) {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setFlyOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+    } else {
+      const btn = document.getElementById('daily-free-collect-button');
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        setFlyOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+      } else {
+        setFlyOrigin({ x: 50, y: 90 });
+      }
+    }
 
     const res = currencyService.claimDailyCores(user.username);
     if (res.success) {
@@ -157,18 +171,15 @@ export const LevelMap: React.FC = () => {
       setRemainingMs(updated.remainingMs);
       soundManager.playUpgradeSuccess();
 
-      // Pulse top-right badge and start smooth count-up timed with crystal arrivals
+      // Subtle glow and smooth count-up timed with crystal arrivals (~650ms)
       setTimeout(() => {
         setIsPulsing(true);
-      }, 550);
-
-      setTimeout(() => {
         startCountUp(res.newBalance);
-      }, 550);
+      }, 650);
 
       setTimeout(() => {
         setIsPulsing(false);
-      }, 1800);
+      }, 1650);
     }
   };
 
@@ -468,10 +479,11 @@ export const LevelMap: React.FC = () => {
         `,
       }}
     >
-      {/* Flying Cores Animation from Center Claim to Top-Right Badge */}
+      {/* Flying Cores Animation from Collected Button to Top-Right Badge */}
       <FlyingCoresAnimation
         active={isFlyingCores}
         amount={claimAmount}
+        origin={flyOrigin}
         onComplete={() => setIsFlyingCores(false)}
       />
 
@@ -494,16 +506,15 @@ export const LevelMap: React.FC = () => {
               title="View Cores & Shop"
               style={{
                 background: isPulsing
-                  ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.35) 0%, rgba(99, 102, 241, 0.4) 100%)'
+                  ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.28) 0%, rgba(99, 102, 241, 0.32) 100%)'
                   : 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
                 border: isPulsing
-                  ? '1.8px solid #00f7ff'
+                  ? '1.2px solid #00f7ff'
                   : '1.2px solid rgba(0, 247, 255, 0.45)',
                 boxShadow: isPulsing
-                  ? '0 0 25px rgba(0, 247, 255, 0.95), inset 0 0 10px rgba(0, 247, 255, 0.5)'
+                  ? '0 0 14px rgba(0, 247, 255, 0.5)'
                   : '0 0 12px rgba(0, 247, 255, 0.25)',
-                transform: isPulsing ? 'scale(1.15)' : 'scale(1)',
-                transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
               }}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.4)] active:scale-95 group transition-all"
             >
@@ -511,7 +522,7 @@ export const LevelMap: React.FC = () => {
                 size={15}
                 glow
                 variant="cyan"
-                className={`transition-transform duration-300 ${isPulsing ? 'scale-125' : 'group-hover:rotate-12'}`}
+                className="transition-transform duration-300 group-hover:rotate-12"
               />
               <span className={`font-tech font-bold text-xs transition-colors ${isPulsing ? 'text-white' : 'text-cyan-200'}`}>
                 {displayCores.toLocaleString()}
@@ -534,7 +545,8 @@ export const LevelMap: React.FC = () => {
           {dailyStatus.canCollect ? (
             <motion.button
               type="button"
-              onClick={handleDailyCollect}
+              id="daily-free-collect-button"
+              onClick={(e) => handleDailyCollect(e)}
               animate={{ y: [0, -4, 0] }}
               transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
               whileHover={{ scale: 1.1 }}

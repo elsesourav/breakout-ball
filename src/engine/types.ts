@@ -85,6 +85,7 @@ export interface Star {
   alpha: number;
   speed: number;
   twinkleSpeed: number;
+  color?: string;
 }
 
 export interface FloatingText {

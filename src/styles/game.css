@@ -130,7 +130,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #060713;
+  background: #060713 url('/img/bg.jpg') no-repeat center center;
+  background-size: cover;
   overflow: hidden;
   touch-action: manipulation;
   overscroll-behavior: none;

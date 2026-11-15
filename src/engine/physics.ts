@@ -330,24 +330,45 @@ export class PhysicsWorld {
 
         if (isNearPaddle && isNotOnCooldown && isMovingTowardsPaddle) {
           const hitOffset = Math.max(-1, Math.min(1, (ball.x - this.paddle.x) / halfPadW));
-          const maxAngle = (Math.PI / 180) * 62;
-          const bounceAngle = hitOffset * maxAngle;
-          const spin = this.paddle.vx * 0.28;
           const currentSpeed = ball.speed || this.config.ballSpeed;
 
-          let newVx = currentSpeed * Math.sin(bounceAngle) + spin;
-          let newVy = -currentSpeed * Math.cos(bounceAngle);
-          const minVy = -currentSpeed * 0.35;
-          if (newVy > minVy) newVy = minVy; // Ensure strong upward launch trajectory
+          // 15-degree minimum bounce angle enforcement (0.2618 rad):
+          // Ball must NEVER bounce at less than 15 degrees from vertical (no straight-up loops)
+          // and NEVER flatter than 15 degrees from the paddle surface (no flat skimming)
+          const MIN_BOUNCE_ANGLE = (15 * Math.PI) / 180; // 15 degrees
+          const MAX_BASE_ANGLE = (68 * Math.PI) / 180;   // 68 degrees at extreme paddle edges
+          const MAX_ALLOWED_ANGLE = (75 * Math.PI) / 180; // 75 degrees (leaving >= 15 degrees above paddle)
 
-          const newLen = Math.hypot(newVx, newVy);
-          if (newLen > 0.001) {
-            ball.vx = (newVx / newLen) * currentSpeed;
-            ball.vy = (newVy / newLen) * currentSpeed;
-          } else {
-            ball.vx = 0;
-            ball.vy = -currentSpeed;
+          // Determine deflection direction: offset position -> paddle velocity -> ball momentum -> fallback right (+1)
+          const deflectDir =
+            hitOffset !== 0
+              ? Math.sign(hitOffset)
+              : Math.sign(this.paddle.vx) || Math.sign(ball.vx) || 1;
+
+          // Base angle scales progressively from minimum 15 degrees at dead center up to 68 degrees at edges
+          const baseAngleMag = MIN_BOUNCE_ANGLE + Math.abs(hitOffset) * (MAX_BASE_ANGLE - MIN_BOUNCE_ANGLE);
+          const bounceAngle = deflectDir * baseAngleMag;
+
+          // Paddle spin from lateral movement adds dynamic slice
+          const spin = this.paddle.vx * 0.28;
+          const rawVx = currentSpeed * Math.sin(bounceAngle) + spin;
+          const rawVy = -currentSpeed * Math.cos(bounceAngle);
+
+          // Calculate resulting angle from vertical normal
+          let angleFromVertical = Math.atan2(rawVx, -rawVy);
+          let finalAngleMag = Math.abs(angleFromVertical);
+          const finalAngleSign = Math.sign(angleFromVertical) || deflectDir;
+
+          // Enforce bounds: minimum 15 degrees from vertical, and minimum 15 degrees from horizontal
+          if (finalAngleMag < MIN_BOUNCE_ANGLE) {
+            finalAngleMag = MIN_BOUNCE_ANGLE;
+          } else if (finalAngleMag > MAX_ALLOWED_ANGLE) {
+            finalAngleMag = MAX_ALLOWED_ANGLE;
           }
+
+          const finalAngle = finalAngleSign * finalAngleMag;
+          ball.vx = currentSpeed * Math.sin(finalAngle);
+          ball.vy = -currentSpeed * Math.cos(finalAngle);
 
           // Position cleanly above paddle surface to prevent penetration
           ball.y = padTop - ball.radius - 1;

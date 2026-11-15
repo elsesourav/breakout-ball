@@ -1,37 +1,46 @@
 import { Particle, Star, FloatingText } from './types';
 
+const STAR_PALETTE = [
+  'rgba(255, 255, 255, ALPHA)',
+  'rgba(0, 247, 255, ALPHA)',
+  'rgba(251, 191, 36, ALPHA)',
+  'rgba(192, 132, 252, ALPHA)',
+  'rgba(56, 189, 248, ALPHA)',
+];
+
 export class ParticleSystem {
   public particles: Particle[] = [];
   public stars: Star[] = [];
   public floatingTexts: FloatingText[] = [];
   private textCounter: number = 0;
 
-  constructor(width: number, height: number, starCount: number = 130) {
+  constructor(width: number, height: number, starCount: number = 240) {
     this.initStars(width, height, starCount);
   }
 
-  public initStars(width: number, height: number, count: number = 130) {
+  public initStars(width: number, height: number, count: number = 240) {
     this.stars = [];
     for (let i = 0; i < count; i++) {
       this.stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 2.8 + 0.8,
+        size: Math.random() * 2.6 + 0.8,
         alpha: Math.random() * 0.75 + 0.2,
         speed: Math.random() * 0.55 + 0.15,
         twinkleSpeed: Math.random() * 0.03 + 0.01,
+        color: STAR_PALETTE[Math.floor(Math.random() * STAR_PALETTE.length)],
       });
     }
   }
 
   public spawnBlockExplosion(x: number, y: number, color: string, isDestroy: boolean = true) {
-    const count = isDestroy ? 24 : 10;
-    const baseSpeed = isDestroy ? 12 : 6;
+    const count = isDestroy ? 34 : 18;
+    const baseSpeed = isDestroy ? 13 : 7;
 
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * baseSpeed + (isDestroy ? 3 : 1);
-      const life = Math.random() * 0.4 + (isDestroy ? 0.6 : 0.4);
+      const life = Math.random() * 0.45 + (isDestroy ? 0.65 : 0.4);
 
       this.particles.push({
         x,
@@ -49,20 +58,21 @@ export class ParticleSystem {
   }
 
   public spawnPaddleBounce(x: number, y: number) {
-    for (let i = 0; i < 12; i++) {
-      const angle = -Math.PI / 2 + (Math.random() * 1.4 - 0.7);
-      const speed = Math.random() * 8 + 3;
+    const bounceColors = ['#00f7ff', '#38bdf8', '#fbbf24', '#ffffff', '#a855f7'];
+    for (let i = 0; i < 24; i++) {
+      const angle = -Math.PI / 2 + (Math.random() * 1.6 - 0.8);
+      const speed = Math.random() * 9 + 3;
       this.particles.push({
-        x: x + (Math.random() * 30 - 15),
-        y,
+        x: x + (Math.random() * 36 - 18),
+        y: y - 2,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        size: Math.random() * 6 + 3,
-        color: '#00f7ff',
-        alpha: 0.9,
-        life: 0.4,
-        maxLife: 0.4,
-        shape: 'spark',
+        size: Math.random() * 5 + 2.5,
+        color: bounceColors[Math.floor(Math.random() * bounceColors.length)],
+        alpha: 0.95,
+        life: 0.45,
+        maxLife: 0.45,
+        shape: Math.random() > 0.3 ? 'spark' : 'square',
       });
     }
   }
@@ -71,7 +81,7 @@ export class ParticleSystem {
     const isMobile =
       typeof window !== 'undefined' &&
       (window.innerWidth <= 768 || 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0);
-    const count = isMobile ? 18 : 32;
+    const count = isMobile ? 24 : 42;
     const colors = ['#00f7ff', '#ff0844', '#eeff01', '#04ef00', '#b773ff'];
     for (let i = 0; i < count; i++) {
       const x = width * 0.35 + Math.random() * (width * 0.3);
@@ -106,7 +116,28 @@ export class ParticleSystem {
   }
 
   public update(width: number, height: number) {
-    // 1. Update stars with Black Hole Gravitational Suction
+    // 1. Continuous Steady Ambient Particle Stream (Living arcade arena atmosphere)
+    if (this.particles.length < 80 && Math.random() < 0.45) {
+      const ambientColors = ['#00f7ff', '#38bdf8', '#818cf8', '#c084fc', '#facc15'];
+      const chosenColor = ambientColors[Math.floor(Math.random() * ambientColors.length)];
+      const startX = Math.random() * width;
+      const startY = Math.random() * (height * 0.55);
+      const life = Math.random() * 1.8 + 1.2;
+      this.particles.push({
+        x: startX,
+        y: startY,
+        vx: (Math.random() - 0.5) * 1.4,
+        vy: Math.random() * 0.9 + 0.25,
+        size: Math.random() * 3.5 + 1.8,
+        color: chosenColor,
+        alpha: Math.random() * 0.6 + 0.35,
+        life,
+        maxLife: life,
+        shape: Math.random() > 0.4 ? 'spark' : 'square',
+      });
+    }
+
+    // 2. Update stars with Black Hole Gravitational Suction
     const bhX = width * 0.5;
     const bhY = height - 16;
 
@@ -155,14 +186,14 @@ export class ParticleSystem {
       }
     }
 
-    // 2. Update particles
+    // 3. Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.2; // Gravity
+      p.vy += 0.18; // Gravity
       p.vx *= 0.98; // Friction
-      p.life -= 0.025;
+      p.life -= 0.022;
       p.alpha = Math.max(0, p.life / p.maxLife);
 
       if (p.life <= 0) {
@@ -170,7 +201,7 @@ export class ParticleSystem {
       }
     }
 
-    // 3. Update floating texts
+    // 4. Update floating texts
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
       const ft = this.floatingTexts[i];
       ft.y -= 1.8;
@@ -188,7 +219,8 @@ export class ParticleSystem {
     ctx.save();
     for (let i = 0; i < this.stars.length; i++) {
       const s = this.stars[i];
-      ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+      const alphaClamped = Math.max(0.1, Math.min(1.0, s.alpha));
+      ctx.fillStyle = s.color ? s.color.replace('ALPHA', alphaClamped.toFixed(2)) : `rgba(255, 255, 255, ${alphaClamped})`;
       ctx.fillRect(s.x, s.y, s.size, s.size);
     }
     ctx.restore();
@@ -201,7 +233,7 @@ export class ParticleSystem {
       ctx.fillStyle = p.color;
 
       if (p.shape === 'spark') {
-        ctx.fillRect(p.x - p.size / 2, p.y - 1, p.size * 1.5, 2);
+        ctx.fillRect(p.x - p.size / 2, p.y - 1, p.size * 1.6, 2.2);
       } else {
         ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
       }
