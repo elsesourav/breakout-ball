@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
-import { Zap, Ticket, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Ticket, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { SHOP_PACKS, ShopPack } from '../../constants/upgrades';
 import { couponService } from '../../services/coupons';
 import { soundManager } from '../../utils/audio';
+import { CoreIcon } from '../CoreIcon';
+
+const getPackVariant = (id: string): 'emerald' | 'purple' | 'gold' | 'rose' => {
+  switch (id) {
+    case 'starter':
+      return 'emerald';
+    case 'power':
+      return 'purple';
+    case 'mega':
+      return 'gold';
+    case 'ultra':
+    default:
+      return 'rose';
+  }
+};
 
 interface ShopTabProps {
   cores: number;
@@ -95,7 +110,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
               }}
               className="w-10 h-10 rounded-xl flex items-center justify-center mt-1"
             >
-              <Zap style={{ color: pack.accentColor }} className="w-5 h-5 fill-current" />
+              <CoreIcon size={22} glow variant={getPackVariant(pack.id)} />
             </div>
 
             <div className="flex flex-col items-center">
@@ -161,7 +176,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
                 }}
                 className="w-9 h-9 rounded-xl flex items-center justify-center"
               >
-                <Zap style={{ color: selectedPack.accentColor }} className="w-5 h-5 fill-current" />
+                <CoreIcon size={22} glow variant={getPackVariant(selectedPack.id)} />
               </div>
               <div>
                 <h3 className="font-display font-black text-sm text-white">

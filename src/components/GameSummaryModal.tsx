@@ -14,6 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { ScoreState } from '../engine/types';
+import { CoreIcon } from './CoreIcon';
 
 interface GameSummaryModalProps {
   summaryState: ScoreState;
@@ -257,7 +258,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
             className="px-4 py-3 flex items-center justify-between mb-3"
           >
             <div className="flex items-center gap-1.5">
-              <Zap className="w-4 h-4 text-cyan-300" />
+              <CoreIcon size={16} glow variant="cyan" />
               <span className="font-tech text-[10px] text-cyan-200 font-bold uppercase tracking-wider">
                 CORE REWARD
               </span>

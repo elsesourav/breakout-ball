@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Zap } from 'lucide-react';
+import { CoreIcon } from '../CoreIcon';
 
 interface FlyingCoresAnimationProps {
   active: boolean;
@@ -99,9 +99,9 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
                 top: 0,
                 left: 0,
               }}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-400 via-sky-300 to-indigo-500 text-white shadow-[0_0_22px_#00f7ff,0_0_38px_rgba(0,247,255,0.7),inset_0_0_6px_#ffffff] border border-cyan-200"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-[#080d26]/90 shadow-[0_0_20px_#00f7ff,0_0_35px_rgba(0,247,255,0.6)] border border-cyan-300"
             >
-              <Zap className="w-4 h-4 fill-white text-white drop-shadow-[0_0_8px_#00f7ff]" />
+              <CoreIcon size={18} glow variant="cyan" />
             </motion.div>
           );
         })}
@@ -119,7 +119,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
           }}
           className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#080d26]/95 border-2 border-cyan-400 text-cyan-300 font-display font-black text-sm tracking-wider shadow-[0_0_28px_rgba(0,247,255,0.85)] backdrop-blur-xl"
         >
-          <Zap className="w-4 h-4 text-cyan-300 fill-cyan-300 animate-pulse" />
+          <CoreIcon size={20} glow variant="cyan" className="animate-pulse" />
           <span>+{amount.toLocaleString()} CORES CLAIMED</span>
         </motion.div>
       </AnimatePresence>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Home, Zap, Heart, Boxes } from 'lucide-react';
 import { ScoreState } from '../engine/types';
 import { GameSummaryModal } from './GameSummaryModal';
+import { CoreIcon } from './CoreIcon';
 
 interface GameHUDProps {
   lives: number;
@@ -104,8 +105,8 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               <span className="font-tech font-black text-xs text-amber-300">{combo}x</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#06091c]/85 border border-cyan-500/30 shadow-[0_0_10px_rgba(0,247,255,0.2)] backdrop-blur-md">
-              <Zap className="w-3.5 h-3.5 text-cyan-300" />
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#06091c]/85 border border-cyan-500/30 shadow-[0_0_10px_rgba(0,247,255,0.2)] backdrop-blur-md">
+              <CoreIcon size={14} glow variant="cyan" />
               <span className="font-tech font-bold text-xs text-cyan-200">
                 {totalCores.toLocaleString()}
               </span>

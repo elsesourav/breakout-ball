@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '../context/GameContext';
-import { Sparkles, Flame, ShoppingBag, Gauge, Palette } from 'lucide-react';
+import { Flame, ShoppingBag, Gauge, Palette } from 'lucide-react';
 import { currencyService } from '../services/currency';
 import { UpgradeState } from '../constants/upgrades';
 import { BallTab } from './armory/BallTab';
@@ -10,6 +10,7 @@ import { ShopTab } from './armory/ShopTab';
 import { BallSkinSelector } from './profile/BallSkinSelector';
 import { CyberSectionHeader } from './CyberSectionHeader';
 import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
+import { CoreIcon } from './CoreIcon';
 
 type ArmoryTab = 'hangar' | 'kinetics' | 'augments' | 'shop';
 
@@ -142,7 +143,12 @@ export const ArmoryView: React.FC = () => {
               }}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-default"
             >
-              <Sparkles className={`w-3.5 h-3.5 transition-colors ${isPulsing ? 'text-white animate-spin' : 'text-cyan-300'}`} />
+              <CoreIcon
+                size={15}
+                glow
+                variant="cyan"
+                className={`transition-transform duration-300 ${isPulsing ? 'scale-125' : ''}`}
+              />
               <span className={`font-tech font-bold text-xs transition-colors ${isPulsing ? 'text-white' : 'text-cyan-200'}`}>
                 {displayCores.toLocaleString()}
               </span>

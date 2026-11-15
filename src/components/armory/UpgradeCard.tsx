@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronUp, Award } from 'lucide-react';
 import { UpgradeDef } from '../../constants/upgrades';
 import { soundManager } from '../../utils/audio';
+import { CoreIcon } from '../CoreIcon';
 
 interface UpgradeCardProps {
   upgrade: UpgradeDef;
@@ -128,7 +129,10 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
           >
             <ChevronUp className="w-3.5 h-3.5 stroke-[3]" />
             <span>UPGRADE</span>
-            <span className="text-[10px] opacity-80 font-mono">({cost}⬡)</span>
+            <span className="text-[10px] opacity-90 font-mono inline-flex items-center gap-0.5">
+              ({cost}
+              <CoreIcon size={10} glow={false} variant="cyan" />)
+            </span>
           </button>
         ) : (
           <span className="text-emerald-400 font-tech font-bold text-xs flex items-center gap-1">
