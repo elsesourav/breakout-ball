@@ -13,7 +13,7 @@ import { UpgradeTabIcon, ShopTabIcon } from './armory/InGameIcons';
 type ArmorySection = 'upgrade' | 'shop';
 
 export const ArmoryView: React.FC = () => {
-  const { user } = useGame();
+  const { user, setScreen } = useGame();
   const [activeSection, setActiveSection] = useState<ArmorySection>('upgrade');
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
@@ -129,10 +129,16 @@ export const ArmoryView: React.FC = () => {
       />
 
       {/* 1. Sticky Top Cyber Section Header - ALWAYS VISIBLE AT THE TOP */}
-      <div className="sticky top-0 z-[60] w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md border-b border-cyan-500/15 shadow-lg">
+      <div
+        className="sticky top-0 z-[60] w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg pt-1.5 sm:pt-2"
+        style={{
+          borderBottom: '1px solid rgba(0, 247, 255, 0.22)',
+          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
+        }}
+      >
         <CyberSectionHeader
-          title="CYBER ARMORY"
-          subtitle="KINETIC UPGRADES & WORKSHOP"
+          title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
+          subtitle={`@${user.username || 'pilot'}`}
           rightSlot={
             <div
               id="header-cores-badge"
@@ -169,7 +175,7 @@ export const ArmoryView: React.FC = () => {
       </div>
 
       {/* 2. Top-Level Main Switcher: UPGRADE vs SHOP */}
-      <div className="w-full max-w-sm px-3.5 mt-2.5 mb-3">
+      <div className="w-full max-w-sm px-4 sm:px-5 mt-3.5 mb-3.5">
         <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#080d26]/90 border border-cyan-500/20 shadow-lg relative">
           {SECTIONS.map((sec) => {
             const isActive = activeSection === sec.id;
@@ -208,8 +214,28 @@ export const ArmoryView: React.FC = () => {
         </div>
       </div>
 
+      {/* Visual Design Lab Banner / Access Pill */}
+      <div className="w-full max-w-sm px-4 sm:px-5 mb-3.5">
+        <button
+          type="button"
+          onClick={() => setScreen('design-lab')}
+          className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-950/70 via-indigo-950/70 to-purple-950/70 border border-cyan-500/40 hover:border-cyan-400 flex items-center justify-between text-xs font-mono font-bold text-cyan-300 hover:text-white transition-all cursor-pointer shadow-md group active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-base group-hover:rotate-12 transition-transform">⚡</span>
+            <span>VISUAL DESIGN LAB</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+              ASSET FORGE
+            </span>
+          </div>
+          <span className="text-[11px] text-slate-400 group-hover:text-cyan-200">
+            VIEW OPTIONS →
+          </span>
+        </button>
+      </div>
+
       {/* 3. Section Content with Smooth Animated Transitions */}
-      <div className="w-full max-w-sm px-3.5">
+      <div className="w-full max-w-sm px-4 sm:px-5 pb-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}

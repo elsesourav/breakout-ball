@@ -84,7 +84,13 @@ export const OnlineMode: React.FC = () => {
       }}
     >
       {/* 1. Top Cyber Section Header */}
-      <div className="w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md border-b border-cyan-500/15 shadow-lg">
+      <div
+        className="w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg pt-1.5 sm:pt-2"
+        style={{
+          borderBottom: '1px solid rgba(0, 247, 255, 0.22)',
+          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
+        }}
+      >
         <CyberSectionHeader
           title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
           subtitle={`@${user.username || 'pilot'}`}
@@ -115,17 +121,17 @@ export const OnlineMode: React.FC = () => {
 
       {/* Sticky Full-Width High-Blur Search & Filter Controls */}
       <div
-        className="sticky top-0 z-30 w-full flex flex-col items-center pt-2 pb-2.5 mb-3"
+        className="sticky top-0 z-30 w-full flex flex-col items-center pt-2.5 pb-3 mb-3.5"
         style={{
           width: '100%',
-          backgroundColor: 'rgba(6, 7, 20, 0.45)',
+          backgroundColor: 'rgba(6, 7, 20, 0.65)',
           backdropFilter: 'blur(24px) saturate(180%)',
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-          borderBottom: '1px solid rgba(0, 247, 255, 0.15)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+          borderBottom: '1px solid rgba(0, 247, 255, 0.18)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.35)',
         }}
       >
-        <div className="w-full max-w-sm px-3.5 flex flex-col gap-2">
+        <div className="w-full max-w-sm px-4 sm:px-5 flex flex-col gap-2.5">
           {/* Cyber Search Terminal Input */}
           <div className="relative w-full">
             <div
@@ -266,13 +272,13 @@ export const OnlineMode: React.FC = () => {
 
       {/* Daily Featured Challenge Banner (Active on All Stages Page 1) */}
       {!searchTerm && filterMode === 'all' && currentPage === 1 && (
-        <div className="w-full max-w-sm px-3.5 mb-3">
+        <div className="w-full max-w-sm px-4 sm:px-5 mb-3.5">
           <DailyFeaturedBanner levels={arenaLevels} />
         </div>
       )}
 
       {/* Arena Levels Grid */}
-      <div className="w-full max-w-sm px-3.5 grid grid-cols-2 gap-3 mb-4">
+      <div className="w-full max-w-sm px-4 sm:px-5 grid grid-cols-2 gap-3 mb-4">
         {pageLevels.map((lvl) => (
           <ArenaLevelCard
             key={lvl.id}
@@ -284,7 +290,7 @@ export const OnlineMode: React.FC = () => {
 
       {/* No Results Fallback */}
       {pageLevels.length === 0 && (
-        <div className="w-full max-w-sm px-3.5 mb-4">
+        <div className="w-full max-w-sm px-4 sm:px-5 mb-4">
           <div
             style={{
               backgroundColor: 'rgba(8, 14, 38, 0.95)',
@@ -325,7 +331,7 @@ export const OnlineMode: React.FC = () => {
       )}
 
       {/* Responsive Cyber Pagination Bar */}
-      <div className="w-full max-w-sm px-3.5 flex justify-center">
+      <div className="w-full max-w-sm px-4 sm:px-5 flex justify-center">
         <ArenaPagination
           currentPage={currentPage}
           totalPages={totalPages}

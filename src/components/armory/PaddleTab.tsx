@@ -39,7 +39,10 @@ export const PaddleTab: React.FC<PaddleTabProps> = ({ upgrades, cores, onUpgrade
         </div>
 
         {/* Dynamic In-Game Drawn 3D Paddle Display */}
-        <div className="w-full h-24 flex items-center justify-center relative bg-black/40 rounded-xl border border-cyan-500/15 overflow-hidden">
+        <div
+          style={{ border: '1px solid rgba(0, 247, 255, 0.22)' }}
+          className="w-full h-24 flex items-center justify-center relative bg-black/40 rounded-xl overflow-hidden"
+        >
           {/* Background gridlines */}
           <div
             className="absolute inset-0 opacity-15"

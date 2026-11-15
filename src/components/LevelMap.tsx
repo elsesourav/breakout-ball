@@ -1,5 +1,8 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import { useGame } from '../context/GameContext';
+import { CyberSectionHeader } from './CyberSectionHeader';
+import { CoreIcon } from './CoreIcon';
+import { currencyService } from '../services/currency';
 import {
   TOTAL_LEVELS,
   SPACING,
@@ -21,19 +24,29 @@ import { RoadmapNodeItem } from './roadmap/RoadmapNodeItem';
 // Screen-linked perspective depth with strict foreground size ceiling:
 //   normalizedY = 0  → top of viewport (far / vanishing point)  → SCALE_MIN
 //   normalizedY >= FOREGROUND_LIMIT_Y → closer objects          → capped at SCALE_MAX
-// Objects smoothly scale from distant horizon size up to a strict maximum limit
-// in the closer foreground, preventing closer elements from ballooning or becoming oversized.
-const SCALE_MIN = 0.35;          // horizon vanishing size limit
-const SCALE_MAX = 0.85;          // strict maximum size limit for closer objects
-const FOREGROUND_LIMIT_Y = 0.65; // foreground threshold where size growth reaches its limit
+// Objects smoothly scale from distant horizon size up to actual size (1.0)
+// in the closer foreground and summit, ensuring comfortable legibility.
+const SCALE_MIN = 0.50;          // horizon vanishing size limit
+const SCALE_MAX = 1.0;           // actual size (100%) for foreground and summit
+const FOREGROUND_LIMIT_Y = 0.48; // foreground threshold where size growth reaches its limit
 const FADE_ZONE = 0.08;          // top 8% of viewport dissolves into horizon haze
 
 export const LevelMap: React.FC = () => {
-  const { localLevels, localProgress, openPreview, showAlert } = useGame();
+  const { localLevels, localProgress, openPreview, showAlert, user, setActiveTab } = useGame();
+  const [cores, setCores] = useState<number>(() => currencyService.getBalance());
   const scrollRef    = useRef<HTMLDivElement>(null);
   const activeRef    = useRef<HTMLDivElement | null>(null);
+  const hazeRef      = useRef<HTMLDivElement>(null);
   const rafRef       = useRef<number>(0);
   const initScrolled = useRef(false);
+
+  // Sync available cores from currencyService
+  useEffect(() => {
+    setCores(currencyService.getBalance());
+    currencyService.load(user.username).then(() => {
+      setCores(currencyService.getBalance());
+    });
+  }, [user.username]);
 
   // Cached list of all scalable map elements (.roadmap-scale-item) and conduit segments
   const scaleElementsRef = useRef<HTMLElement[]>([]);
@@ -47,10 +60,10 @@ export const LevelMap: React.FC = () => {
       const angle = (i - 1) * 1.05;
       const x = 190 + Math.sin(angle) * 95;
       let zone = 1;
-      if (i > 24) zone = 5;
-      else if (i > 18) zone = 4;
-      else if (i > 12) zone = 3;
-      else if (i > 6)  zone = 2;
+      if (i > 40) zone = 5;
+      else if (i > 30) zone = 4;
+      else if (i > 20) zone = 3;
+      else if (i > 10) zone = 2;
       list.push({ id: i, x: Math.round(x), y: Math.round(y), zone, sector: SECTOR_CONFIG[i] });
     }
     return list;
@@ -75,9 +88,9 @@ export const LevelMap: React.FC = () => {
       { color: '#10b981', glow: 'rgba(16,185,129,0.6)' },
       { color: '#ffd700', glow: 'rgba(255,215,0,0.6)' },
     ];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 28; i++) {
       const p = palette[i % palette.length];
-      const y = (TOTAL_HEIGHT / 18) * i + ((i * 47) % 60);
+      const y = (TOTAL_HEIGHT / 28) * i + ((i * 47) % 60);
       const iL = i % 2 === 0;
       const w = 34 + ((i * 7) % 12);
       const h = 15 + ((i * 3) % 6);
@@ -92,14 +105,16 @@ export const LevelMap: React.FC = () => {
 
   // ── Kinetic hazards ──────────────────────────────────────────────────────────
   const obstacles: Obstacle[] = useMemo(() => ([
-    { id: 'titanium-1', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 2.5  * SPACING },
-    { id: 'plasma-1',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 4.5  * SPACING },
-    { id: 'titanium-2', type: 'titanium', x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 8.5  * SPACING },
-    { id: 'plasma-2',   type: 'plasma',   x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 10.5 * SPACING },
-    { id: 'titanium-3', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 14.5 * SPACING },
-    { id: 'plasma-3',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 16.5 * SPACING },
-    { id: 'titanium-4', type: 'titanium', x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 20.5 * SPACING },
-    { id: 'plasma-4',   type: 'plasma',   x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 22.5 * SPACING },
+    { id: 'titanium-1', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.5  * SPACING },
+    { id: 'plasma-1',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5  * SPACING },
+    { id: 'titanium-2', type: 'titanium', x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.5 * SPACING },
+    { id: 'plasma-2',   type: 'plasma',   x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING },
+    { id: 'titanium-3', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING },
+    { id: 'plasma-3',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 27.5 * SPACING },
+    { id: 'titanium-4', type: 'titanium', x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 33.5 * SPACING },
+    { id: 'plasma-4',   type: 'plasma',   x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 37.5 * SPACING },
+    { id: 'titanium-5', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 43.5 * SPACING },
+    { id: 'plasma-5',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 47.5 * SPACING },
   ]), []);
 
   // ── Route blockers ───────────────────────────────────────────────────────────
@@ -193,36 +208,48 @@ export const LevelMap: React.FC = () => {
       // Computes yShift (foreshortening compression) and scale for any coordinate on screen.
       const projectY = (rawY: number) => {
         const u = rawY / viewH;
-        if (u >= FOREGROUND_LIMIT_Y) {
-          return { yShift: 0, scale: SCALE_MAX, u };
+
+        // When scrolled near the top of the map, smoothly expand foreground scale so summit nodes reach full 1.0 actual size
+        const topScrollBoost = Math.max(0, 1 - scrollTop / 300);
+        const effectiveLimit = Math.max(0.24, FOREGROUND_LIMIT_Y - topScrollBoost * 0.24);
+
+        if (u >= effectiveLimit) {
+          return { yShift: 0, scale: SCALE_MAX, u, topScrollBoost };
         }
-        const t = Math.max(0, Math.min(1, (FOREGROUND_LIMIT_Y - u) / FOREGROUND_LIMIT_Y));
+        const t = Math.max(0, Math.min(1, (effectiveLimit - u) / effectiveLimit));
         // Foreshortening compression: pulls top elements down by up to 75px,
-        // making the vertical distance between top nodes significantly shorter
-        const yShift = t * t * 75;
+        // gently easing off when scrolled near the top
+        const yShift = t * t * 75 * (1 - topScrollBoost * 0.5);
 
         const ny = Math.max(0, Math.min(1, u));
-        const progress = Math.max(0, Math.min(1, ny / FOREGROUND_LIMIT_Y));
+        const progress = Math.max(0, Math.min(1, ny / effectiveLimit));
         const eased = Math.sin((progress * Math.PI) / 2);
         const scale = SCALE_MIN + eased * (SCALE_MAX - SCALE_MIN);
 
-        return { yShift, scale, u };
+        return { yShift, scale, u, topScrollBoost };
       };
+
+      // Fade out the dark horizon haze when scrolling near the summit so the apex area is crystal clear
+      if (hazeRef.current) {
+        const hazeOpacity = Math.min(1, scrollTop / 180);
+        hazeRef.current.style.opacity = hazeOpacity.toFixed(2);
+      }
 
       // 1. Transform all map objects (nodes, route blockers, dormant clamps, banners, hazards, bricks)
       scaleElementsRef.current.forEach((el) => {
         if (!el) return;
         const dataY = parseFloat(el.getAttribute('data-y') || '');
         const rawY = !isNaN(dataY) ? dataY - scrollTop : el.offsetTop - scrollTop;
-        const { yShift, scale, u } = projectY(rawY);
+        const { yShift, scale, u, topScrollBoost } = projectY(rawY);
 
         const baseTransform = el.getAttribute('data-base-transform') || 'translate(-50%, -50%)';
         el.style.transform = `${baseTransform} translateY(${yShift.toFixed(1)}px) scale(${scale.toFixed(3)})`;
         el.style.transformOrigin = 'center center';
 
-        // Only fade out elements when dissolving into the horizon haze at the very top
-        if (u < FADE_ZONE) {
-          el.style.opacity = (Math.max(0, u) / FADE_ZONE).toFixed(3);
+        // Only fade out elements when dissolving into the horizon haze at the very top (disabled when scrolled to summit)
+        const effectiveFadeZone = FADE_ZONE * (1 - topScrollBoost);
+        if (effectiveFadeZone > 0.001 && u < effectiveFadeZone) {
+          el.style.opacity = (Math.max(0, u) / effectiveFadeZone).toFixed(3);
         } else {
           el.style.opacity = '';
         }
@@ -315,9 +342,46 @@ export const LevelMap: React.FC = () => {
         `,
       }}
     >
+      {/* ── Top Floating Cyber Section Header ────────────────────────────── */}
+      <div
+        className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg pt-1.5 sm:pt-2"
+        style={{
+          borderBottom: '1px solid rgba(0, 247, 255, 0.22)',
+          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
+        }}
+      >
+        <CyberSectionHeader
+          title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
+          subtitle={`@${user.username || 'pilot'}`}
+          rightSlot={
+            <button
+              type="button"
+              onClick={() => setActiveTab('armory')}
+              title="View Cores in Armory"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
+                border: '1.2px solid rgba(0, 247, 255, 0.45)',
+                boxShadow: '0 0 12px rgba(0, 247, 255, 0.25)',
+              }}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-400 active:scale-95 transition-all"
+            >
+              <CoreIcon size={15} glow variant="cyan" />
+              <span className="font-tech font-bold text-xs text-cyan-200">
+                {cores.toLocaleString()}
+              </span>
+              <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
+                CORES
+              </span>
+            </button>
+          }
+        />
+      </div>
+
       {/* Distance-haze gradient at top (vanishing-point zone) */}
       <div
-        className="absolute top-0 inset-x-0 h-28 pointer-events-none z-30"
+        ref={hazeRef}
+        className="absolute top-0 inset-x-0 h-32 pointer-events-none z-30 transition-opacity duration-150"
         style={{
           background:
             'radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0,247,255,0.10) 0%, transparent 80%),' +
@@ -334,6 +398,7 @@ export const LevelMap: React.FC = () => {
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
           overscrollBehaviorY: 'contain',
+          paddingTop: '80px',
           paddingBottom: '140px',
           backgroundImage: `
             radial-gradient(ellipse 95% 18% at 50% 1%,   rgba(255,215,0,0.16)   0%, transparent 75%),

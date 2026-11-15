@@ -31,7 +31,10 @@ export const PowerTab: React.FC<PowerTabProps> = ({ upgrades, cores, onUpgrade }
         </div>
 
         {/* 6 In-Game Diamond Shards Row */}
-        <div className="grid grid-cols-6 gap-1 bg-black/40 p-2.5 rounded-xl border border-purple-500/15">
+        <div
+          style={{ border: '1px solid rgba(183, 115, 255, 0.25)' }}
+          className="grid grid-cols-6 gap-1 bg-black/40 p-2.5 rounded-xl"
+        >
           {[
             { name: 'Plasma', symbol: '▲', color: '#ff0055' },
             { name: 'Mega', symbol: '✹', color: '#ffd700' },

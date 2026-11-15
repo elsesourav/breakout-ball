@@ -138,7 +138,10 @@ export const BallTab: React.FC<BallTabProps> = ({ upgrades, cores, onUpgrade }) 
         </div>
 
         {/* Dynamic Canvas Presentation Box */}
-        <div className="w-full h-28 flex items-center justify-center relative bg-black/40 rounded-xl border border-cyan-500/15 overflow-hidden">
+        <div
+          style={{ border: '1px solid rgba(0, 247, 255, 0.22)' }}
+          className="w-full h-28 flex items-center justify-center relative bg-black/40 rounded-xl overflow-hidden"
+        >
           {/* Subtle Cyber Grid Backdrop */}
           <div
             className="absolute inset-0 opacity-15"
