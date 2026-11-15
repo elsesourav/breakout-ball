@@ -252,6 +252,7 @@ export const completionRepository = {
       SELECT 
         ROW_NUMBER() OVER(ORDER BY time_used ASC, score DESC) as rank,
         lc.username,
+        u.full_name as fullName,
         lc.time_used as time,
         lc.score,
         lc.stars,
@@ -434,18 +435,7 @@ export const dailyApexRepository = {
         const bonusCores = 100 + ((seed % 3) * 25);
         const targetCount = Array.isArray(poolLevel.blocks) ? poolLevel.blocks.length : 12;
 
-        insertStmt.run(
-          dateStr,
-          poolLevel.id,
-          poolLevel.name,
-          poolLevel.creator,
-          targetCount,
-          poolLevel.playCount || 680,
-          bonusCores,
-          2,
-          JSON.stringify(poolLevel),
-          now.toISOString()
-        );
+        insertStmt.run(dateStr, poolLevel.id, poolLevel.name, poolLevel.creator, targetCount, poolLevel.playCount || 680, bonusCores, 2, JSON.stringify(poolLevel), now.toISOString());
       }
     }
   },
@@ -456,7 +446,6 @@ export const dailyApexRepository = {
     const todayStr = now.toISOString().split('T')[0];
     const tomorrowDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
     const tomorrowStr = tomorrowDate.toISOString().split('T')[0];
-
     const todayRow = this.getMissionForDate(todayStr) || this.getMissionForDate(tomorrowStr);
     const tomorrowRow = this.getMissionForDate(tomorrowStr);
     const secondsRemaining = Math.max(0, Math.floor((tomorrowDate.getTime() - now.getTime()) / 1000));
