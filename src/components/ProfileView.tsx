@@ -97,6 +97,18 @@ export const ProfileView: React.FC = () => {
     return () => window.removeEventListener('profile-switch-section', handleSwitch);
   }, []);
 
+  // Ensure category switcher is docked when viewing leaderboard so table is fully in view
+  useEffect(() => {
+    if (activeSection === 'leaderboard' && !isSettingsOpen) {
+      const raf = requestAnimationFrame(() => {
+        if (outerContainerRef.current && switcherRef.current) {
+          outerContainerRef.current.scrollTop = switcherRef.current.offsetTop;
+        }
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [activeSection, isSettingsOpen]);
+
   // Dynamically compute exact card height and scroll threshold so top and bottom gaps are pixel-perfect symmetrical
   useEffect(() => {
     const updateLayout = () => {
@@ -233,12 +245,7 @@ export const ProfileView: React.FC = () => {
   }, [isSettingsOpen]);
 
   const handleOuterScroll = () => {
-    const outer = outerContainerRef.current;
-    if (!outer) return;
-    const max = maxOuterRef.current;
-    if (max > 0 && outer.scrollTop > max) {
-      outer.scrollTop = max;
-    }
+    // Outer scroll handler; hard snapping removed to prevent glitching at boundaries
   };
 
   const handleSignIn = () => {
@@ -262,6 +269,16 @@ export const ProfileView: React.FC = () => {
   const handleSectionSwitch = (section: 'badges' | 'leaderboard') => {
     soundManager.play('click');
     setActiveSection(section);
+    if (section === 'leaderboard') {
+      requestAnimationFrame(() => {
+        if (outerContainerRef.current && switcherRef.current) {
+          outerContainerRef.current.scrollTo({
+            top: switcherRef.current.offsetTop,
+            behavior: 'smooth',
+          });
+        }
+      });
+    }
   };
 
   // Calculate player progress stats
