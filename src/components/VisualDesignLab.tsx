@@ -6,12 +6,14 @@ import {
   DesignPresetConfig,
   BlockPresetId,
   PaddlePresetId,
+  TopWeaponVariant,
   PowerUpPresetId,
   BallPresetId,
   PaddleTier,
   BallTier,
   BLOCK_PRESET_METADATA,
   PADDLE_PRESET_METADATA,
+  WEAPON_MOUNT_METADATA,
   BALL_PRESET_METADATA,
   POWERUP_PRESET_METADATA,
 } from '../constants/visualPresets';
@@ -49,6 +51,9 @@ export const VisualDesignLab: React.FC<VisualDesignLabProps> = ({ onBack }) => {
   const [paddleWidthScale, setPaddleWidthScale] = useState(1.0);
   const [hasLaser, setHasLaser] = useState(true);
   const [paddleTier, setPaddleTier] = useState<PaddleTier>(2);
+  const [weaponVariant, setWeaponVariant] = useState<TopWeaponVariant>(
+    config.paddleWeaponVariant || 1
+  );
 
   // Ball controls
   const [ballTier, setBallTier] = useState<BallTier>(2);
@@ -272,7 +277,7 @@ export const VisualDesignLab: React.FC<VisualDesignLabProps> = ({ onBack }) => {
                   }`}
                 >
                   <Crosshair className="w-3.5 h-3.5" />
-                  <span>LASER: {hasLaser ? 'ON' : 'OFF'}</span>
+                  <span>WEAPONS: {hasLaser ? 'ACTIVE' : 'OFF'}</span>
                 </button>
 
                 <button
@@ -315,10 +320,43 @@ export const VisualDesignLab: React.FC<VisualDesignLabProps> = ({ onBack }) => {
                   widthScale={paddleWidthScale}
                   hasLaser={hasLaser}
                   tier={paddleTier}
+                  weaponVariant={weaponVariant}
                 />
               </div>
 
-              {/* 3 Tiers Preview side by side */}
+              {/* Top Weapon Mount Options Switcher */}
+              <div className="mt-4 pt-3 border-t border-slate-800/80">
+                <div className="text-[10px] font-mono font-bold text-slate-400 uppercase mb-2">
+                  TOP WEAPON MOUNT VARIANTS (SELECT FOR GAME):
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {([1, 2, 3, 4] as TopWeaponVariant[]).map((v) => {
+                    const meta = WEAPON_MOUNT_METADATA[v];
+                    const isSelected = weaponVariant === v;
+                    return (
+                      <button
+                        key={`weapon-variant-${v}`}
+                        onClick={() => {
+                          setWeaponVariant(v);
+                          handleApplyPreset({ paddleWeaponVariant: v });
+                        }}
+                        className={`p-2.5 rounded-xl text-left border cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-cyan-950/50 border-cyan-400 text-cyan-300 shadow-[0_0_12px_rgba(0,247,255,0.2)]'
+                            : 'bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="text-[11px] font-mono font-bold text-white mb-0.5">
+                          {meta.name}
+                        </div>
+                        <div className="text-[9px] font-mono text-slate-400">{meta.tag}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3 Tiers Progression Preview */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800/60">
                 {([1, 2, 3] as PaddleTier[]).map((t) => (
                   <button
@@ -642,12 +680,14 @@ function SinglePaddleCanvas({
   widthScale,
   hasLaser,
   tier = 1,
+  weaponVariant = 1,
 }: {
   preset: PaddlePresetId;
   animTick: number;
   widthScale: number;
   hasLaser: boolean;
   tier?: PaddleTier;
+  weaponVariant?: TopWeaponVariant;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -670,8 +710,14 @@ function SinglePaddleCanvas({
       vx: 0,
     };
 
-    drawPaddleWithPreset(ctx, paddle, preset, { animTick, hasLaser, hasShield: true, tier });
-  }, [preset, animTick, widthScale, hasLaser, tier]);
+    drawPaddleWithPreset(ctx, paddle, preset, {
+      animTick,
+      hasLaser,
+      hasShield: true,
+      tier,
+      weaponVariant,
+    });
+  }, [preset, animTick, widthScale, hasLaser, tier, weaponVariant]);
 
   return <canvas ref={canvasRef} width={440} height={80} className="w-full max-w-[440px] h-auto" />;
 }

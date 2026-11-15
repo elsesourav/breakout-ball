@@ -32,7 +32,12 @@ export const ProfileView: React.FC = () => {
     userCreatedLevels,
   } = useGame();
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).has('settings');
+    }
+    return false;
+  });
   const [activeSection, setActiveSection] = useState<'badges' | 'leaderboard'>('badges');
   const [unlockedBadgesCount, setUnlockedBadgesCount] = useState(() => {
     return achievementManager.getAll().filter((a) => a.unlocked).length;

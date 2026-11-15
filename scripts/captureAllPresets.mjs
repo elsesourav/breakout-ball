@@ -26,7 +26,7 @@ const captures = [
     html: path.join(__dirname, 'snapshot-paddles.html'),
     outName: 'paddles-presets-comparison.png',
     width: 1200,
-    height: 380
+    height: 620
   },
   {
     html: path.join(__dirname, 'snapshot-balls.html'),

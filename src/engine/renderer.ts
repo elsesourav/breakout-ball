@@ -137,6 +137,7 @@ export class GameRenderer {
       hasShield,
       widthLevel,
       speedLevel,
+      weaponVariant: designConfig.paddleWeaponVariant,
       tier: designConfig.paddleTierOverride,
     });
 

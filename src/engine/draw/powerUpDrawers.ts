@@ -3,7 +3,6 @@ import { PowerUpPresetId } from '../../constants/visualPresets';
 import {
   renderFallingTrailSparks,
   renderCustomPowerUpIcon,
-  drawHexagon,
   draw8PointStar,
 } from './powerUpIconDrawers';
 
@@ -14,6 +13,10 @@ export interface PowerUpRenderOptions {
 
 /**
  * Universal Power-Up Drawing Router
+ * Redesigned for pristine spherical clarity:
+ *   - Strictly NO messy oval/elliptical background rings!
+ *   - Perfectly concentric circular glowing auras & floating spark motes.
+ *   - High-contrast custom vector emblems inside every sphere.
  */
 export function drawPowerUpWithPreset(
   ctx: CanvasRenderingContext2D,
@@ -36,7 +39,7 @@ export function drawPowerUpWithPreset(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PRESET 1: ORBITAL ENERGY CORE (3D Celestial Sphere with Orbiting Satellites)
+// PRESET 1 (CHOSEN): ORBITAL ENERGY CORE (Clean Spherical Aura & Floating Motes)
 // ─────────────────────────────────────────────────────────────────────────────
 export function drawOrbitalEnergyCore(
   ctx: CanvasRenderingContext2D,
@@ -45,75 +48,97 @@ export function drawOrbitalEnergyCore(
 ) {
   const animTick = options.animTick !== undefined ? options.animTick : drop.angle;
   const userScale = options.scale || 1.35;
-  const baseR = 24 * userScale; // Generously bigger base size (radius ~32.4px, diameter ~65px)
+  const baseR = 24 * userScale; // Radius ~32.4px, diameter ~65px
   const meta = drop.meta;
 
   ctx.save();
   ctx.translate(drop.x, drop.y);
 
-  // 1. Falling Stardust Trail Sparks (Sparkles floating upwards behind the falling drop)
+  // 1. Gentle Rising Stardust Sparks (Sparkles floating upwards behind the drop)
   renderFallingTrailSparks(ctx, meta.color, baseR, animTick);
 
-  // 2. Pulsating Energy Aura Rings (Dual Layer)
-  const pulse = Math.sin(animTick * 5) * 0.12 + 1.15;
+  // 2. Perfectly Concentric Circular Glowing Corona (ZERO oval distortion!)
+  const pulse = Math.sin(animTick * 4) * 0.08 + 1.18;
   ctx.strokeStyle = meta.glow;
   ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 20;
-  ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 18;
+  ctx.lineWidth = 2.2;
   ctx.beginPath();
   ctx.arc(0, 0, baseR * pulse, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Secondary high-frequency crystalline aura
-  const pulse2 = Math.cos(animTick * 7) * 0.08 + 1.05;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-  ctx.lineWidth = 1.5;
+  // Secondary Micro-Aura Ring
+  const pulse2 = Math.cos(animTick * 6) * 0.05 + 1.08;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.lineWidth = 1.2;
   ctx.beginPath();
   ctx.arc(0, 0, baseR * pulse2, 0, Math.PI * 2);
   ctx.stroke();
 
-  // 3. Background Orbiting Satellites (Rendered behind the sphere when Y < 0)
-  render3DOrbitingSatellites(ctx, meta.color, baseR * 1.48, animTick, 'behind');
+  // 3. Orbiting Micro-Spark Motes (Clean circular orbit, ZERO oval wire tails)
+  const moteCount = 3;
+  for (let i = 0; i < moteCount; i++) {
+    const theta = animTick * 2.2 + (i * Math.PI * 2) / moteCount;
+    const mx = Math.cos(theta) * (baseR * 1.32);
+    const my = Math.sin(theta) * (baseR * 1.32);
 
-  // 4. 3D Spherical Core (Clean, round, no background oval ring)
+    ctx.fillStyle = meta.color;
+    ctx.shadowColor = meta.color;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(mx, my, 3.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(mx, my, 1.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 4. 3D Spherical Glass Core
   const coreGrad = ctx.createRadialGradient(
     -baseR * 0.35,
     -baseR * 0.35,
-    baseR * 0.1,
+    baseR * 0.05,
     0,
     0,
     baseR
   );
   coreGrad.addColorStop(0, '#ffffff');
-  coreGrad.addColorStop(0.35, meta.color);
-  coreGrad.addColorStop(0.85, '#050716');
-  coreGrad.addColorStop(1, '#00020a');
+  coreGrad.addColorStop(0.3, meta.color);
+  coreGrad.addColorStop(0.75, '#0a0d18');
+  coreGrad.addColorStop(1, '#02040a');
 
   ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 22;
+  ctx.shadowBlur = 20;
   ctx.fillStyle = coreGrad;
   ctx.beginPath();
   ctx.arc(0, 0, baseR, 0, Math.PI * 2);
   ctx.fill();
 
-  // Specular Reflection Ring
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-  ctx.lineWidth = 2;
+  // Specular Top-Left Glass Arc
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+  ctx.lineWidth = 1.8;
   ctx.beginPath();
-  ctx.arc(0, 0, baseR - 2, 0, Math.PI * 2);
+  ctx.arc(0, 0, baseR - 2.5, -Math.PI * 0.85, -Math.PI * 0.15);
   ctx.stroke();
 
-  // 5. Foreground Orbiting Satellites (Rendered in front of the sphere when Y >= 0)
-  render3DOrbitingSatellites(ctx, meta.color, baseR * 1.45, animTick, 'front');
+  // Crisp Micro-Rim Line
+  ctx.strokeStyle = meta.glow;
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
 
-  // 6. Custom Polished Power Emblem Icon
+  // 5. Custom High-Contrast Vector Emblem Icon
   renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
 
   ctx.restore();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PRESET 2 (V2): GYRO SINGULARITY CORE (Dual-Axis Gimbal Gyro Rings)
+// PRESET 2: GYRO SINGULARITY CORE (Concentric Circular Gimbal Rings)
 // ─────────────────────────────────────────────────────────────────────────────
 export function drawGyroSingularityCore(
   ctx: CanvasRenderingContext2D,
@@ -128,46 +153,30 @@ export function drawGyroSingularityCore(
   ctx.save();
   ctx.translate(drop.x, drop.y);
 
-  // 1. Falling Stardust Trail Sparks
+  // 1. Trail Sparks
   renderFallingTrailSparks(ctx, meta.color, baseR, animTick);
 
-  // 2. Dual-Axis 3D Gyro Rings
-  const tiltX = Math.cos(animTick * 2.5);
-  const tiltY = Math.sin(animTick * 2.0);
-
-  // Outer Gimbal Ring 1
-  ctx.save();
-  ctx.rotate(animTick * 0.8);
+  // 2. Concentric Circular Gimbal Rings (Clean circular, NO skewed ellipses!)
   ctx.strokeStyle = meta.glow;
   ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 16;
-  ctx.lineWidth = 2.5;
+  ctx.shadowBlur = 14;
+  ctx.lineWidth = 2.0;
   ctx.beginPath();
-  ctx.ellipse(0, 0, baseR * 1.35, Math.max(2, baseR * 1.35 * Math.abs(tiltX)), 0, 0, Math.PI * 2);
+  ctx.arc(0, 0, baseR * 1.3, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Node beads on ring 1
-  const nX = Math.cos(animTick * 3) * (baseR * 1.35);
-  const nY = Math.sin(animTick * 3) * (baseR * 1.35 * tiltX);
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(nX, nY, 3, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
+  // Cardinal node dots
+  for (let i = 0; i < 4; i++) {
+    const ang = animTick * 1.5 + (i * Math.PI) / 2;
+    const nx = Math.cos(ang) * (baseR * 1.3);
+    const ny = Math.sin(ang) * (baseR * 1.3);
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(nx, ny, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
-  // Outer Gimbal Ring 2 (Perpendicular)
-  ctx.save();
-  ctx.rotate(-animTick * 0.6 + Math.PI / 2);
-  ctx.strokeStyle = '#ffffff';
-  ctx.shadowColor = meta.glow;
-  ctx.shadowBlur = 10;
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, baseR * 1.2, Math.max(2, baseR * 1.2 * Math.abs(tiltY)), 0, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
-  // 3. Central Dark-Matter Sphere with Specular Sheen
+  // 3. 3D Spherical Core
   const coreGrad = ctx.createRadialGradient(-baseR * 0.3, -baseR * 0.3, 2, 0, 0, baseR);
   coreGrad.addColorStop(0, '#ffffff');
   coreGrad.addColorStop(0.3, meta.color);
@@ -180,21 +189,21 @@ export function drawGyroSingularityCore(
   ctx.arc(0, 0, baseR, 0, Math.PI * 2);
   ctx.fill();
 
-  // Rim ring
   ctx.strokeStyle = meta.glow;
-  ctx.lineWidth = 2.0;
+  ctx.lineWidth = 1.8;
   ctx.beginPath();
   ctx.arc(0, 0, baseR, 0, Math.PI * 2);
   ctx.stroke();
+  ctx.shadowBlur = 0;
 
-  // 4. Power-Up Stamped Icon Badge
+  // 4. Custom Icon
   renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
 
   ctx.restore();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PRESET 3 (V3): APEX REACTOR SPHERE (Hyper-Dense Containment Flux)
+// PRESET 3: APEX REACTOR SPHERE (Circular Magnetic Containment Ring)
 // ─────────────────────────────────────────────────────────────────────────────
 export function drawApexReactorSphere(
   ctx: CanvasRenderingContext2D,
@@ -209,35 +218,34 @@ export function drawApexReactorSphere(
   ctx.save();
   ctx.translate(drop.x, drop.y);
 
-  // 1. Falling Stardust Trail Sparks
+  // 1. Trail Sparks
   renderFallingTrailSparks(ctx, meta.color, baseR, animTick);
 
-  // 2. Triangular Heavy Magnetic Brackets
+  // 2. Circular Magnetic Containment Brackets
   ctx.save();
   ctx.rotate(animTick * 1.2);
   ctx.strokeStyle = meta.glow;
   ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 18;
-  ctx.lineWidth = 3.0;
+  ctx.shadowBlur = 16;
+  ctx.lineWidth = 2.4;
 
   for (let i = 0; i < 3; i++) {
     const ang = (i * Math.PI * 2) / 3;
-    const bx = Math.cos(ang) * (baseR * 1.38);
-    const by = Math.sin(ang) * (baseR * 1.38);
+    const bx = Math.cos(ang) * (baseR * 1.32);
+    const by = Math.sin(ang) * (baseR * 1.32);
     ctx.fillStyle = '#1e293b';
     ctx.beginPath();
-    ctx.arc(bx, by, 5, 0, Math.PI * 2);
+    ctx.arc(bx, by, 4.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
   }
 
-  // Connecting energy arcs between brackets
   ctx.beginPath();
-  ctx.arc(0, 0, baseR * 1.38, 0, Math.PI * 2);
+  ctx.arc(0, 0, baseR * 1.32, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
 
-  // 3. Central Hyper-Dense Reactor Core
+  // 3. Central Core
   const coreGrad = ctx.createRadialGradient(-baseR * 0.35, -baseR * 0.35, 1, 0, 0, baseR);
   coreGrad.addColorStop(0, '#ffffff');
   coreGrad.addColorStop(0.35, meta.color);
@@ -246,240 +254,14 @@ export function drawApexReactorSphere(
 
   ctx.fillStyle = coreGrad;
   ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 24;
+  ctx.shadowBlur = 22;
   ctx.beginPath();
   ctx.arc(0, 0, baseR, 0, Math.PI * 2);
   ctx.fill();
+  ctx.shadowBlur = 0;
 
-  // Triple Chromatic Energy Bands
-  ctx.save();
-  ctx.rotate(-animTick * 2.0);
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, baseR * 0.95, baseR * 0.3, 0, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
-  // Outer high-contrast rim
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2.2;
-  ctx.beginPath();
-  ctx.arc(0, 0, baseR, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // 4. Power-Up Stamped Icon Badge
+  // 4. Custom Icon
   renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
 
   ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESET 2: HEX CYBER CAPSULE (Tactical Drop Pod with Spark Motes)
-// ─────────────────────────────────────────────────────────────────────────────
-export function drawHexCyberCapsule(
-  ctx: CanvasRenderingContext2D,
-  drop: PowerUpDrop,
-  options: PowerUpRenderOptions = {}
-) {
-  const animTick = options.animTick !== undefined ? options.animTick : drop.angle;
-  const userScale = options.scale || 1.35;
-  const baseSize = 25 * userScale;
-  const meta = drop.meta;
-
-  ctx.save();
-  ctx.translate(drop.x, drop.y);
-
-  // 1. Falling Stardust Trail Sparks
-  renderFallingTrailSparks(ctx, meta.color, baseSize, animTick);
-
-  // 2. Rotating Hex Shield Brackets
-  ctx.save();
-  ctx.rotate(-animTick * 1.2);
-  ctx.strokeStyle = meta.glow;
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 14;
-  ctx.lineWidth = 2;
-  drawHexagon(ctx, 0, 0, baseSize * 1.35);
-  ctx.stroke();
-  ctx.restore();
-
-  // 3. Orbiting Spark Motes (3 motes orbiting in an angled plane)
-  const moteCount = 3;
-  for (let m = 0; m < moteCount; m++) {
-    const angle = animTick * 3 + (m * Math.PI * 2) / moteCount;
-    const mx = Math.cos(angle) * (baseSize * 1.55);
-    const my = Math.sin(angle) * (baseSize * 0.7);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = meta.color;
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.arc(mx, my, 4, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Mote trail tail
-    ctx.strokeStyle = meta.color;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(mx, my);
-    ctx.lineTo(mx - Math.sin(angle) * 8, my + Math.cos(angle) * 4);
-    ctx.stroke();
-  }
-
-  // 4. Hexagonal Capsule Hull
-  ctx.save();
-  ctx.rotate(animTick * 0.5);
-
-  const hexGrad = ctx.createLinearGradient(-baseSize, -baseSize, baseSize, baseSize);
-  hexGrad.addColorStop(0, '#1e293b');
-  hexGrad.addColorStop(0.4, meta.color);
-  hexGrad.addColorStop(0.8, '#0f172a');
-  hexGrad.addColorStop(1, '#020617');
-
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 20;
-  ctx.fillStyle = hexGrad;
-  drawHexagon(ctx, 0, 0, baseSize);
-  ctx.fill();
-
-  // Titanium Rim
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2.5;
-  drawHexagon(ctx, 0, 0, baseSize);
-  ctx.stroke();
-
-  ctx.restore();
-
-  // 5. High-Contrast Power Symbol
-  renderCustomPowerUpIcon(ctx, drop.meta.type, baseSize * 0.75, meta.color);
-
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESET 3: QUANTUM STAR PRISM (Crystalline Diamond with Spiral Helix Flare)
-// ─────────────────────────────────────────────────────────────────────────────
-export function drawQuantumStarPrism(
-  ctx: CanvasRenderingContext2D,
-  drop: PowerUpDrop,
-  options: PowerUpRenderOptions = {}
-) {
-  const animTick = options.animTick !== undefined ? options.animTick : drop.angle;
-  const userScale = options.scale || 1.35;
-  const baseSize = 26 * userScale;
-  const meta = drop.meta;
-
-  ctx.save();
-  ctx.translate(drop.x, drop.y);
-
-  // 1. Falling Stardust Trail Sparks
-  renderFallingTrailSparks(ctx, meta.color, baseSize, animTick);
-
-  // 2. Spiraling Helix Orbiting Particles (5 particles expanding and contracting)
-  const helixCount = 5;
-  for (let i = 0; i < helixCount; i++) {
-    const t = animTick * 3.5 + (i * Math.PI * 2) / helixCount;
-    const r = baseSize * (1.2 + Math.sin(t * 2) * 0.25);
-    const hx = Math.cos(t) * r;
-    const hy = Math.sin(t * 1.5) * (r * 0.6);
-
-    ctx.fillStyle = i % 2 === 0 ? '#ffffff' : meta.color;
-    ctx.shadowColor = meta.color;
-    ctx.shadowBlur = 14;
-    ctx.beginPath();
-    ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // 3. 8-Point Rotating Crystal Star Diamond
-  ctx.save();
-  ctx.rotate(animTick * 1.4);
-
-  const starGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, baseSize * 1.1);
-  starGrad.addColorStop(0, '#ffffff');
-  starGrad.addColorStop(0.35, meta.color);
-  starGrad.addColorStop(0.7, '#2e0854');
-  starGrad.addColorStop(1, '#050010');
-
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 24;
-  ctx.fillStyle = starGrad;
-  draw8PointStar(ctx, 0, 0, baseSize * 1.15, baseSize * 0.65);
-  ctx.fill();
-
-  // Star Outline
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2.2;
-  draw8PointStar(ctx, 0, 0, baseSize * 1.15, baseSize * 0.65);
-  ctx.stroke();
-
-  ctx.restore();
-
-  // 4. Center Glowing Circular Core
-  const innerR = baseSize * 0.6;
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(0, 0, innerR, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 5. Custom Power Symbol
-  renderCustomPowerUpIcon(ctx, drop.meta.type, baseSize, meta.color);
-
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER UTILITIES: 3D Satellites, Sparks, Shapes, Symbols
-// ─────────────────────────────────────────────────────────────────────────────
-function render3DOrbitingSatellites(
-  ctx: CanvasRenderingContext2D,
-  color: string,
-  orbitR: number,
-  animTick: number,
-  layer: 'behind' | 'front'
-) {
-  const satelliteCount = 4;
-  const tilt = 0.45; // 3D perspective squish
-
-  for (let i = 0; i < satelliteCount; i++) {
-    const theta = animTick * 2.8 + (i * Math.PI * 2) / satelliteCount;
-    const sx = Math.cos(theta) * orbitR;
-    const sy = Math.sin(theta) * (orbitR * tilt);
-
-    // Z-ordering: behind when sy < 0, in front when sy >= 0
-    if (layer === 'behind' && sy >= 0) continue;
-    if (layer === 'front' && sy < 0) continue;
-
-    const satSize = 3.8 + Math.sin(theta) * 1.6; // Bigger when closer to camera
-
-    ctx.save();
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 14;
-
-    // Glowing Satellite Outer Aura
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(sx, sy, Math.max(2.5, satSize + 1.2), 0, Math.PI * 2);
-    ctx.fill();
-
-    // Bright White Core
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(sx, sy, Math.max(1.8, satSize), 0, Math.PI * 2);
-    ctx.fill();
-
-    // Stardust Tail
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.0;
-    ctx.beginPath();
-    ctx.moveTo(sx, sy);
-    ctx.lineTo(
-      sx + Math.sin(theta) * 12,
-      sy - Math.cos(theta) * (12 * tilt)
-    );
-    ctx.stroke();
-
-    ctx.restore();
-  }
 }
