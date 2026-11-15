@@ -51,7 +51,6 @@ export const PRE_PLAYERS = [
   { username: 'nano_striker', fullName: 'Cedric Roy', title: 'Micro Breaker', baseSkill: 0.46 },
   { username: 'beacon_prime', fullName: 'Orion Vale', title: 'Beacon Sentinel', baseSkill: 0.45 },
   { username: 'vanguard_zero', fullName: 'Zephyr Cole', title: 'Origin Pioneer', baseSkill: 0.44 },
-  { username: 'demo_pilot', fullName: 'Demo Cyber Pilot', title: 'Tactical Trainee', baseSkill: 0.72 },
 ];
 
 const BASE_LEVEL_TIMES = [
@@ -115,9 +114,7 @@ export function seedDatabase() {
     
     // Top 12 players have conquered all 50 campaign levels
     let levelsToComplete = 50;
-    if (player.username === 'demo_pilot') {
-      levelsToComplete = 15;
-    } else if (pIdx >= 12 && pIdx < 27) {
+    if (pIdx >= 12 && pIdx < 27) {
       levelsToComplete = 38 + (pIdx % 11); // 38 to 48 levels
     } else if (pIdx >= 27 && pIdx < 42) {
       levelsToComplete = 24 + (pIdx % 12); // 24 to 35 levels
@@ -137,7 +134,7 @@ export function seedDatabase() {
       avatarUrl,
       trophyCount: 0,
       totalScore: 0,
-      coresBalance: player.username === 'demo_pilot' ? 2500 : Math.floor(player.baseSkill * 3500),
+      coresBalance: Math.floor(player.baseSkill * 3500),
       levelsCompleted: 0
     });
 

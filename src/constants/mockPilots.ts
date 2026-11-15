@@ -70,7 +70,6 @@ export const FALLBACK_GLOBAL_PILOTS: MockPilot[] = [
   { username: 'cosmo_seeker', coresCleared: 18, score: 85100, badgeTitle: 'Deep Space Scout' },
   { username: 'hyper_ion', coresCleared: 17, score: 79800, badgeTitle: 'Charge Master' },
   { username: 'star_glider', coresCleared: 16, score: 74400, badgeTitle: 'Orbital Glider' },
-  { username: 'demo_pilot', coresCleared: 15, score: 68500, badgeTitle: 'Tactical Trainee' },
   { username: 'orbit_knight', coresCleared: 14, score: 63100, badgeTitle: 'Defense Core' },
   { username: 'matrix_cadet', coresCleared: 14, score: 58900, badgeTitle: 'Grid Runner' },
   { username: 'spark_runner', coresCleared: 13, score: 53800, badgeTitle: 'Volt Sprinter' },
