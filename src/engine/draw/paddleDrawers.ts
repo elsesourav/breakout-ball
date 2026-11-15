@@ -1,5 +1,5 @@
 import { PaddleState } from '../types';
-import { PaddleTier, getPaddleTierFromUpgrades } from '../../constants/visualPresets';
+import { PaddleTier, TopWeaponVariant, getPaddleTierFromUpgrades } from '../../constants/visualPresets';
 
 export interface PaddleRenderOptions {
   animTick?: number;
@@ -8,6 +8,7 @@ export interface PaddleRenderOptions {
   tier?: PaddleTier;
   widthLevel?: number;
   speedLevel?: number;
+  weaponVariant?: TopWeaponVariant;
 }
 
 /**
