@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { drawLevelPreviewOnCanvas } from '../utils/helpers';
 import { CANVAS_WIDTH } from '../constants/game';
-import { ArcadeButton, ArcadeSwitch } from '@elsesourav/react-ui';
+import { CustomCyberButton } from './common/CustomCyberButton';
+import { CustomCyberSwitch } from './common/CustomCyberSwitch';
 
 export const LevelModifierModal: React.FC = () => {
   const {
@@ -85,12 +86,12 @@ export const LevelModifierModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Privacy Setting with ArcadeSwitch */}
+        {/* Privacy Setting with CustomCyberSwitch */}
         <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-black/40 border border-white/10">
           <span className="text-xs uppercase tracking-wider font-bold text-slate-300">
             Publish Online:
           </span>
-          <ArcadeSwitch
+          <CustomCyberSwitch
             checked={isPublic}
             onChange={(checked) => setIsPublic(checked)}
             variant="neon-green"
@@ -98,38 +99,34 @@ export const LevelModifierModal: React.FC = () => {
             showText={true}
             onLabel="PUB"
             offLabel="PRV"
-            showBezel={true}
-            showGlow={true}
             ariaLabel="Toggle Public or Private"
           />
         </div>
 
-        {/* Action Buttons using ArcadeButton */}
+        {/* Action Buttons using CustomCyberButton */}
         <div className="flex justify-between items-center gap-3 mt-1">
-          <ArcadeButton
+          <CustomCyberButton
             variant="magenta"
             size="md"
             shape="rounded"
-            mask={true}
             leftIcon={<i className="sbi-trash text-sm mr-1" />}
             onClick={handleDelete}
             className="flex-1 py-2"
           >
             Delete
-          </ArcadeButton>
+          </CustomCyberButton>
 
-          <ArcadeButton
+          <CustomCyberButton
             variant="cyan"
             size="md"
             shape="rounded"
-            mask={true}
             glow={true}
             leftIcon={<i className="sbi-save2 text-sm mr-1" />}
             onClick={handleSave}
             className="flex-1 py-2"
           >
             Save
-          </ArcadeButton>
+          </CustomCyberButton>
         </div>
       </div>
     </div>

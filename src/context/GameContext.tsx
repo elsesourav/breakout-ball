@@ -117,6 +117,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const allLevels = [...locals, ...onlines, ...userLevels];
       const route = parseCurrentRoute();
 
+      if (route.type === 'design-lab') {
+        setScreenState('design-lab');
+        replaceAppRoute('/design-lab');
+        return;
+      }
+
       if (route.type === 'level' && route.levelId) {
         const found = allLevels.find((lvl) => lvl.id === route.levelId);
         if (found) {
@@ -157,7 +163,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const route = parseCurrentRoute();
       const allLevels = [...localLevels, ...onlineLevels, ...userCreatedLevels];
 
-      if (route.type === 'tab') {
+      if (route.type === 'design-lab') {
+        setScreenState('design-lab');
+      } else if (route.type === 'tab') {
         setActiveTabState(route.tab);
         setScreenState('menu');
       } else if (route.type === 'level' && route.levelId) {
@@ -204,7 +212,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         achievementManager.setRestrictedContext(false);
       }
       setScreenState(newScreen);
-      if (newScreen === 'menu') {
+      if (newScreen === 'design-lab') {
+        pushAppRoute('/design-lab');
+      } else if (newScreen === 'menu') {
         pushAppRoute(getRoutePath(activeTab, 'menu'));
       }
     },
@@ -400,7 +410,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           const totalCompleted = Object.values(updatedProgress).filter((p) => p.completed).length;
           if (totalCompleted >= 10) achievementManager.unlock('campaign_10');
-          if (totalCompleted >= 30) achievementManager.unlock('apex_champion');
+          if (totalCompleted >= 50) achievementManager.unlock('apex_champion');
 
           dbService.saveProgress(updatedProgress, user.username);
           return updatedProgress;

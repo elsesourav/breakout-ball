@@ -1,5 +1,11 @@
 import { PowerUpDrop } from '../powerUpTypes';
 import { PowerUpPresetId } from '../../constants/visualPresets';
+import {
+  renderFallingTrailSparks,
+  renderCustomPowerUpIcon,
+  drawHexagon,
+  draw8PointStar,
+} from './powerUpIconDrawers';
 
 export interface PowerUpRenderOptions {
   animTick?: number;
@@ -69,19 +75,7 @@ export function drawOrbitalEnergyCore(
   // 3. Background Orbiting Satellites (Rendered behind the sphere when Y < 0)
   render3DOrbitingSatellites(ctx, meta.color, baseR * 1.48, animTick, 'behind');
 
-  // 4. Rotating Celestial Orbital Ring
-  ctx.save();
-  ctx.rotate(animTick * 0.85);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
-  ctx.shadowColor = meta.color;
-  ctx.shadowBlur = 8;
-  ctx.lineWidth = 2.2;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, baseR * 1.45, baseR * 0.58, 0, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
-  // 5. 3D Spherical Core
+  // 4. 3D Spherical Core (Clean, round, no background oval ring)
   const coreGrad = ctx.createRadialGradient(
     -baseR * 0.35,
     -baseR * 0.35,
@@ -109,11 +103,11 @@ export function drawOrbitalEnergyCore(
   ctx.arc(0, 0, baseR - 2, 0, Math.PI * 2);
   ctx.stroke();
 
-  // 6. Foreground Orbiting Satellites (Rendered in front of the sphere when Y >= 0)
+  // 5. Foreground Orbiting Satellites (Rendered in front of the sphere when Y >= 0)
   render3DOrbitingSatellites(ctx, meta.color, baseR * 1.45, animTick, 'front');
 
-  // 7. High-Contrast Power Emblem / Symbol
-  renderPowerUpSymbol(ctx, meta.symbol, baseR);
+  // 6. Custom Polished Power Emblem Icon
+  renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
 
   ctx.restore();
 }
@@ -194,7 +188,7 @@ export function drawGyroSingularityCore(
   ctx.stroke();
 
   // 4. Power-Up Stamped Icon Badge
-  renderPowerUpSymbol(ctx, drop.meta.symbol, baseR);
+  renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
 
   ctx.restore();
 }
@@ -275,7 +269,7 @@ export function drawApexReactorSphere(
   ctx.stroke();
 
   // 4. Power-Up Stamped Icon Badge
-  renderPowerUpSymbol(ctx, drop.meta.symbol, baseR);
+  renderCustomPowerUpIcon(ctx, drop.meta.type, baseR, meta.color);
 
   ctx.restore();
 }
@@ -358,7 +352,7 @@ export function drawHexCyberCapsule(
   ctx.restore();
 
   // 5. High-Contrast Power Symbol
-  renderPowerUpSymbol(ctx, meta.symbol, baseSize);
+  renderCustomPowerUpIcon(ctx, drop.meta.type, baseSize * 0.75, meta.color);
 
   ctx.restore();
 }
@@ -429,8 +423,8 @@ export function drawQuantumStarPrism(
   ctx.arc(0, 0, innerR, 0, Math.PI * 2);
   ctx.fill();
 
-  // 5. High-Contrast Power Symbol
-  renderPowerUpSymbol(ctx, meta.symbol, baseSize * 0.85);
+  // 5. Custom Power Symbol
+  renderCustomPowerUpIcon(ctx, drop.meta.type, baseSize, meta.color);
 
   ctx.restore();
 }
@@ -488,88 +482,4 @@ function render3DOrbitingSatellites(
 
     ctx.restore();
   }
-}
-
-function renderFallingTrailSparks(
-  ctx: CanvasRenderingContext2D,
-  color: string,
-  baseR: number,
-  animTick: number
-) {
-  const sparkCount = 4;
-  for (let s = 0; s < sparkCount; s++) {
-    const offset = ((animTick * 2.8 + s * 1.5) % 1.0);
-    const ty = -baseR * 0.45 - offset * 32;
-    const tx = Math.sin(animTick * 4 + s * 1.2) * 12;
-    const alpha = Math.max(0, 1.0 - offset);
-
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.arc(tx, ty, 2.5 * alpha, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-
-function renderPowerUpSymbol(
-  ctx: CanvasRenderingContext2D,
-  symbol: string,
-  baseSize: number
-) {
-  ctx.save();
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#050716';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  const fontPx = Math.floor(baseSize * 0.65);
-  ctx.font = `900 ${fontPx}px 'Orbitron', 'Chakra Petch', sans-serif`;
-
-  // Drop shadow behind symbol
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-  ctx.fillText(symbol, 0, 2);
-
-  // Main bold symbol
-  ctx.fillStyle = '#050716';
-  ctx.fillText(symbol, 0, 0);
-
-  ctx.restore();
-}
-
-function drawHexagon(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  r: number
-) {
-  ctx.beginPath();
-  for (let i = 0; i < 6; i++) {
-    const a = (i * Math.PI) / 3;
-    const px = x + Math.cos(a) * r;
-    const py = y + Math.sin(a) * r;
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-}
-
-function draw8PointStar(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  outerR: number,
-  innerR: number
-) {
-  const points = 8;
-  ctx.beginPath();
-  for (let i = 0; i < points * 2; i++) {
-    const a = (i * Math.PI) / points;
-    const r = i % 2 === 0 ? outerR : innerR;
-    const px = cx + Math.cos(a) * r;
-    const py = cy + Math.sin(a) * r;
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
 }

@@ -1,5 +1,7 @@
 import { BlockEngineState, PaddleState } from './types';
 import { currencyService } from '../services/currency';
+import { getActiveDesignConfig } from '../constants/visualPresets';
+import { drawPowerUpWithPreset } from './draw/powerUpDrawers';
 import {
   PowerUpType,
   PowerUpMeta,
@@ -262,37 +264,13 @@ export class PowerUpManager {
       ctx.restore();
     }
 
-    // 2. Falling Power-Up Shards
+    // 2. Falling Power-Up Shards (Dynamic Presets with 3D Orbiting Satellites & Bigger Size)
+    const designConfig = getActiveDesignConfig();
     for (const drop of this.drops) {
-      const size = 26;
-      ctx.save();
-      ctx.translate(drop.x, drop.y);
-      ctx.rotate(drop.angle);
-
-      ctx.shadowColor = drop.meta.glow;
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = drop.meta.color;
-
-      ctx.beginPath();
-      ctx.moveTo(0, -size);
-      ctx.lineTo(size * 0.7, 0);
-      ctx.lineTo(0, size);
-      ctx.lineTo(-size * 0.7, 0);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(0, 0, size * 0.35, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.rotate(-drop.angle);
-      ctx.fillStyle = '#050716';
-      ctx.font = 'bold 12px monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(drop.meta.symbol, 0, 1);
-      ctx.restore();
+      drawPowerUpWithPreset(ctx, drop, designConfig.powerUpPreset, {
+        animTick: drop.angle,
+        scale: designConfig.powerUpScale || 1.35,
+      });
     }
 
     // 3. Laser Blasters on Paddle

@@ -8,6 +8,7 @@ import { CreateMode } from './components/CreateMode';
 import { ProfileView } from './components/ProfileView';
 import { LevelPreviewModal } from './components/LevelPreviewModal';
 import { LevelDesigner } from './components/LevelDesigner';
+import { VisualDesignLab } from './components/VisualDesignLab';
 import { LevelModifierModal } from './components/LevelModifierModal';
 import { GameCanvas } from './components/GameCanvas';
 import { AlertModal } from './components/AlertModal';
@@ -15,7 +16,7 @@ import { AuthModal } from './components/AuthModal';
 import { AchievementToast } from './components/AchievementToast';
 
 export const AppContent: React.FC = () => {
-  const { screen, activeTab, editingLevel } = useGame();
+  const { screen, setScreen, activeTab, editingLevel } = useGame();
 
   // Dynamic mobile-first responsive layout scaling (strictly using 100svh for height)
   useEffect(() => {
@@ -56,6 +57,8 @@ export const AppContent: React.FC = () => {
         <GameCanvas />
       ) : screen === 'designer' ? (
         <LevelDesigner />
+      ) : screen === 'design-lab' ? (
+        <VisualDesignLab onBack={() => setScreen('menu')} />
       ) : (
         <div id="gameMode">
           <div id="modeType" className="w-full h-full relative overflow-hidden">

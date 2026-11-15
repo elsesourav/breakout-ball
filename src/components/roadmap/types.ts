@@ -49,12 +49,12 @@ export interface Obstacle {
   locked?: boolean;
 }
 
-export const TOTAL_LEVELS = 30;
+export const TOTAL_LEVELS = 50;
 // Generous vertical spacing (175px) giving ample room between nodes, obstacle clamps, and beacons
 export const SPACING = 175;
 export const SVG_WIDTH = 380;
 export const BOTTOM_OFFSET = 240;
-export const TOP_OFFSET = 180;
+export const TOP_OFFSET = 420;
 export const TOTAL_HEIGHT = (TOTAL_LEVELS - 1) * SPACING + BOTTOM_OFFSET + TOP_OFFSET;
 
 export const SECTOR_CONFIG: Record<number, SectorInfo> = {
@@ -65,28 +65,28 @@ export const SECTOR_CONFIG: Record<number, SectorInfo> = {
     color: '#00f7ff',
     accentGlow: 'rgba(0, 247, 255, 0.45)',
   },
-  7: {
+  11: {
     number: '02',
     name: 'PULSE GRID',
     subtitle: 'SYNTHWAVE MULTI-STRIKE',
     color: '#818cf8',
     accentGlow: 'rgba(129, 140, 248, 0.45)',
   },
-  13: {
+  21: {
     number: '03',
     name: 'QUANTUM VOID',
     subtitle: 'PORTAL WORMHOLE NEXUS',
     color: '#b773ff',
     accentGlow: 'rgba(183, 115, 255, 0.45)',
   },
-  19: {
+  31: {
     number: '04',
     name: 'CYBER BASTION',
     subtitle: 'HEAVY ARMOR FORTRESS',
     color: '#f43f5e',
     accentGlow: 'rgba(244, 63, 94, 0.45)',
   },
-  25: {
+  41: {
     number: '05',
     name: 'HYPER CORE OVERDRIVE',
     subtitle: 'MASTER APEX GAUNTLET',

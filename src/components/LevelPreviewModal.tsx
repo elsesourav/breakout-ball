@@ -9,7 +9,6 @@ import {
   ArrowLeft,
   Boxes,
   RotateCcw,
-  Sparkles,
   Shield,
   Zap,
 } from 'lucide-react';

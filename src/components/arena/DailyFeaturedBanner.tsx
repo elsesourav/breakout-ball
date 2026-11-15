@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGame } from '../../context/GameContext';
 import { LevelData } from '../../types/game';
-import { Sparkles, Play, Flame, Award } from 'lucide-react';
+import { Play, Flame, Award } from 'lucide-react';
 
 interface DailyFeaturedBannerProps {
   levels: LevelData[];
@@ -33,7 +33,7 @@ export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels
       {/* Header Tag Row: Badge + 2x reputation */}
       <div className="flex items-center justify-between z-10">
         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 font-tech text-[10px] font-bold shadow-[0_0_8px_rgba(255,215,0,0.25)]">
-          <Sparkles className="w-3 h-3 text-amber-300 animate-spin-slow" />
+          <Flame className="w-3 h-3 text-amber-300 fill-amber-400" />
           <span>DAILY APEX MISSION</span>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-tech text-amber-400 font-bold">

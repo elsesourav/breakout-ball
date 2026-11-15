@@ -1,0 +1,3838 @@
+[
+  {
+    "id": "1",
+    "name": "Level 1: EMP Sparks",
+    "layout": {
+      "totalRawHp": 20,
+      "effectiveHp": 9,
+      "breakableCount": 12,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 6,
+        "2": 4,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 11,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.4687339734105993,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.12758282328431717
+    },
+    "difficulty": 0.09,
+    "parTimes": {
+      "gold": 3.8,
+      "silver": 4.5,
+      "bronze": 6.1
+    },
+    "scores": {
+      "lowest": 9811,
+      "balanced": 9847,
+      "maximum": 9868,
+      "star1": 8339,
+      "star2": 9847,
+      "star3": 10361
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 5.5,
+        "avgScore": 9811,
+        "avgCombo": 11,
+        "avgHits": 1,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 4.1,
+        "avgScore": 9847,
+        "avgCombo": 11,
+        "avgHits": 4,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 3.3,
+        "avgScore": 9868,
+        "avgCombo": 11,
+        "avgHits": 5,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 40
+    },
+    "flags": []
+  },
+  {
+    "id": "2",
+    "name": "Level 2: Binary Orbit",
+    "layout": {
+      "totalRawHp": 30,
+      "effectiveHp": 19,
+      "breakableCount": 10,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 2,
+        "5": 0,
+        "6": 1,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.09090909090909091,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6547746552918587,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.27901165283923335
+    },
+    "difficulty": 0.2,
+    "parTimes": {
+      "gold": 11.8,
+      "silver": 47.5,
+      "bronze": 17.5
+    },
+    "scores": {
+      "lowest": 10953,
+      "balanced": 5446,
+      "maximum": 7243,
+      "star1": 9310,
+      "star2": 5446,
+      "star3": 7605
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 15.9,
+        "avgScore": 10953,
+        "avgCombo": 19,
+        "avgHits": 3,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 43.2,
+        "avgScore": 5446,
+        "avgCombo": 5,
+        "avgHits": 12,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 10.3,
+        "avgScore": 7243,
+        "avgCombo": 8,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 35.2
+    },
+    "flags": []
+  },
+  {
+    "id": "3",
+    "name": "Level 3: Reactor Core Alpha",
+    "layout": {
+      "totalRawHp": 22,
+      "effectiveHp": 22,
+      "breakableCount": 8,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 0,
+        "6": 1,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0.05625,
+      "wallDensity": 0.1111111111111111,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6318112314356208,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.30050085138200977
+    },
+    "difficulty": 0.23,
+    "parTimes": {
+      "gold": 15.2,
+      "silver": 15.7,
+      "bronze": 21.6
+    },
+    "scores": {
+      "lowest": 5810,
+      "balanced": 5824,
+      "maximum": 5654,
+      "star1": 4939,
+      "star2": 5824,
+      "star3": 5937
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 19.6,
+        "avgScore": 5810,
+        "avgCombo": 8,
+        "avgHits": 5,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 14.3,
+        "avgScore": 5824,
+        "avgCombo": 8,
+        "avgHits": 4,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13.2,
+        "avgScore": 5654,
+        "avgCombo": 8,
+        "avgHits": 22,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 32.7
+    },
+    "flags": [
+      "WASTED EMP: EMP Reactor has zero breakables in shockwave blast radius."
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Level 4: Chronos Vault",
+    "layout": {
+      "totalRawHp": 24,
+      "effectiveHp": 10,
+      "breakableCount": 7,
+      "wallCount": 6,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "4": 4,
+        "5": 0,
+        "6": 6,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0.46153846153846156,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.26236203029496463
+    },
+    "difficulty": 0.28,
+    "parTimes": {
+      "gold": 29,
+      "silver": 23.2,
+      "bronze": 41.4
+    },
+    "scores": {
+      "lowest": 5008,
+      "balanced": 4373,
+      "maximum": 4118,
+      "star1": 4257,
+      "star2": 4373,
+      "star3": 4324
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 37.6,
+        "avgScore": 5008,
+        "avgCombo": 5,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 21.1,
+        "avgScore": 4373,
+        "avgCombo": 5,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 25.2,
+        "avgScore": 4118,
+        "avgCombo": 4,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 33
+    },
+    "flags": [
+      "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Level 5: Diamond Core",
+    "layout": {
+      "totalRawHp": 19,
+      "effectiveHp": 19,
+      "breakableCount": 8,
+      "wallCount": 1,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 1,
+        "2": 4,
+        "3": 2,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0.1125,
+      "wallDensity": 0.1111111111111111,
+      "portalDisruption": 0,
+      "spanStress": 0.44880338717125845,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.23302126565144632
+    },
+    "difficulty": 0.24,
+    "parTimes": {
+      "gold": 8.3,
+      "silver": 11.7,
+      "bronze": 35.1
+    },
+    "scores": {
+      "lowest": 5302,
+      "balanced": 4752,
+      "maximum": 4070,
+      "star1": 4507,
+      "star2": 4752,
+      "star3": 4274
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 31.9,
+        "avgScore": 5302,
+        "avgCombo": 9,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 10.6,
+        "avgScore": 4752,
+        "avgCombo": 5,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 7.2,
+        "avgScore": 4070,
+        "avgCombo": 4,
+        "avgHits": 3,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 77.4
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "6",
+    "name": "Level 6: Helix Accelerator",
+    "layout": {
+      "totalRawHp": 34,
+      "effectiveHp": 26,
+      "breakableCount": 10,
+      "wallCount": 1,
+      "portalCount": 0,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 1,
+        "7": 0,
+        "8": 2
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0.09090909090909091,
+      "portalDisruption": 0,
+      "spanStress": 0.6882313504294656,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.28232561165532893
+    },
+    "difficulty": 0.23,
+    "parTimes": {
+      "gold": 16,
+      "silver": 36.6,
+      "bronze": 26.7
+    },
+    "scores": {
+      "lowest": 13293,
+      "balanced": 5239,
+      "maximum": 5137,
+      "star1": 11299,
+      "star2": 5239,
+      "star3": 5394
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 24.3,
+        "avgScore": 13293,
+        "avgCombo": 21,
+        "avgHits": 4,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 33.3,
+        "avgScore": 5239,
+        "avgCombo": 6,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13.9,
+        "avgScore": 5137,
+        "avgCombo": 5,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 42.8
+    },
+    "flags": []
+  },
+  {
+    "id": "7",
+    "name": "Level 7: Cluster Detonator",
+    "layout": {
+      "totalRawHp": 32,
+      "effectiveHp": 18,
+      "breakableCount": 11,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 6,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6666666666666667,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.21454545454545454
+    },
+    "difficulty": 0.28,
+    "parTimes": {
+      "gold": 13.3,
+      "silver": 22.3,
+      "bronze": 48.1
+    },
+    "scores": {
+      "lowest": 5700,
+      "balanced": 5009,
+      "maximum": 5776,
+      "star1": 4845,
+      "star2": 5009,
+      "star3": 6065
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 43.7,
+        "avgScore": 5700,
+        "avgCombo": 6,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 20.3,
+        "avgScore": 5009,
+        "avgCombo": 4,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 11.6,
+        "avgScore": 5776,
+        "avgCombo": 5,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 73.5
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "8",
+    "name": "Level 8: Double Helix",
+    "layout": {
+      "totalRawHp": 31,
+      "effectiveHp": 25,
+      "breakableCount": 11,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 4,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6525307421235838,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2569705204094467
+    },
+    "difficulty": 0.25,
+    "parTimes": {
+      "gold": 21.2,
+      "silver": 15.5,
+      "bronze": 34
+    },
+    "scores": {
+      "lowest": 6727,
+      "balanced": 8231,
+      "maximum": 4788,
+      "star1": 5718,
+      "star2": 8231,
+      "star3": 5027
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 30.9,
+        "avgScore": 6727,
+        "avgCombo": 9,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 14.1,
+        "avgScore": 8231,
+        "avgCombo": 10,
+        "avgHits": 4,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 18.4,
+        "avgScore": 4788,
+        "avgCombo": 2,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 40.5
+    },
+    "flags": []
+  },
+  {
+    "id": "9",
+    "name": "Level 9: Twin Pillars",
+    "layout": {
+      "totalRawHp": 27,
+      "effectiveHp": 27,
+      "breakableCount": 14,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 2,
+        "2": 11,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6996596156709537,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2767671241688249
+    },
+    "difficulty": 0.24,
+    "parTimes": {
+      "gold": 18.7,
+      "silver": 28.6,
+      "bronze": 28.3
+    },
+    "scores": {
+      "lowest": 9906,
+      "balanced": 7063,
+      "maximum": 6993,
+      "star1": 8420,
+      "star2": 7063,
+      "star3": 7343
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 25.7,
+        "avgScore": 9906,
+        "avgCombo": 11,
+        "avgHits": 5,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 26,
+        "avgScore": 7063,
+        "avgCombo": 7,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 16.3,
+        "avgScore": 6993,
+        "avgCombo": 6,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 36.6
+    },
+    "flags": []
+  },
+  {
+    "id": "10",
+    "name": "Level 10: Doomsday Matrix",
+    "layout": {
+      "totalRawHp": 46,
+      "effectiveHp": 26,
+      "breakableCount": 11,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 3,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 5,
+        "6": 2,
+        "7": 2,
+        "8": 3
+      },
+      "empCascadeYield": 28,
+      "empChainedBlocks": 14,
+      "shieldingIndex": 0.04090909090909091,
+      "wallDensity": 0.15384615384615385,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8160246899469287,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3561624447507805
+    },
+    "difficulty": 0.27,
+    "parTimes": {
+      "gold": 14.6,
+      "silver": 18.5,
+      "bronze": 23.5
+    },
+    "scores": {
+      "lowest": 7415,
+      "balanced": 6764,
+      "maximum": 6632,
+      "star1": 6303,
+      "star2": 6764,
+      "star3": 6964
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 21.4,
+        "avgScore": 7415,
+        "avgCombo": 7,
+        "avgHits": 5,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 16.8,
+        "avgScore": 6764,
+        "avgCombo": 8,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 12.7,
+        "avgScore": 6632,
+        "avgCombo": 8,
+        "avgHits": 3,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 40.7
+    },
+    "flags": []
+  },
+  {
+    "id": "11",
+    "name": "Level 11: Cyber Chevron",
+    "layout": {
+      "totalRawHp": 17,
+      "effectiveHp": 17,
+      "breakableCount": 10,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 4,
+        "2": 5,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6398717474235545,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.20416258029535134
+    },
+    "difficulty": 0.33,
+    "parTimes": {
+      "gold": 11.2,
+      "silver": 16.6,
+      "bronze": 63
+    },
+    "scores": {
+      "lowest": 4150,
+      "balanced": 5006,
+      "maximum": 4925,
+      "star1": 3528,
+      "star2": 5006,
+      "star3": 5171
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 57.3,
+        "avgScore": 4150,
+        "avgCombo": 5,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 15.1,
+        "avgScore": 5006,
+        "avgCombo": 6,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 9.7,
+        "avgScore": 4925,
+        "avgCombo": 5,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 83.1
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "12",
+    "name": "Level 12: Neon Heart",
+    "layout": {
+      "totalRawHp": 39,
+      "effectiveHp": 32,
+      "breakableCount": 15,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 3,
+        "2": 4,
+        "3": 4,
+        "4": 2,
+        "5": 1,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 10,
+      "empChainedBlocks": 5,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6598850232825259,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3026191171287425
+    },
+    "difficulty": 0.27,
+    "parTimes": {
+      "gold": 17.7,
+      "silver": 41.8,
+      "bronze": 32.3
+    },
+    "scores": {
+      "lowest": 12365,
+      "balanced": 6622,
+      "maximum": 7164,
+      "star1": 10510,
+      "star2": 6622,
+      "star3": 7522
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 29.4,
+        "avgScore": 12365,
+        "avgCombo": 14,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 38,
+        "avgScore": 6622,
+        "avgCombo": 6,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 15.4,
+        "avgScore": 7164,
+        "avgCombo": 6,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 47.6
+    },
+    "flags": []
+  },
+  {
+    "id": "13",
+    "name": "Level 13: Event Horizon",
+    "layout": {
+      "totalRawHp": 32,
+      "effectiveHp": 21,
+      "breakableCount": 8,
+      "wallCount": 5,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 3,
+        "6": 5,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0,
+      "wallDensity": 0.38461538461538464,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3208235687565031
+    },
+    "difficulty": 0.32,
+    "parTimes": {
+      "gold": 43.9,
+      "silver": 13.2,
+      "bronze": 44.2
+    },
+    "scores": {
+      "lowest": 6700,
+      "balanced": 5165,
+      "maximum": 4982,
+      "star1": 5695,
+      "star2": 5165,
+      "star3": 5231
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 40.2,
+        "avgScore": 6700,
+        "avgCombo": 12,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 12,
+        "avgScore": 5165,
+        "avgCombo": 6,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 38.2,
+        "avgScore": 4982,
+        "avgCombo": 6,
+        "avgHits": 16,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 5
+    },
+    "flags": [
+      "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
+    ]
+  },
+  {
+    "id": "14",
+    "name": "Level 14: Prism Crown",
+    "layout": {
+      "totalRawHp": 23,
+      "effectiveHp": 23,
+      "breakableCount": 13,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 6,
+        "2": 4,
+        "3": 3,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6376367495196887,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.24200914879158963
+    },
+    "difficulty": 0.33,
+    "parTimes": {
+      "gold": 14.5,
+      "silver": 23.1,
+      "bronze": 57
+    },
+    "scores": {
+      "lowest": 5400,
+      "balanced": 5724,
+      "maximum": 5902,
+      "star1": 4590,
+      "star2": 5724,
+      "star3": 6197
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 51.8,
+        "avgScore": 5400,
+        "avgCombo": 5,
+        "avgHits": 12,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 21,
+        "avgScore": 5724,
+        "avgCombo": 5,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 12.6,
+        "avgScore": 5902,
+        "avgCombo": 5,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 75.7
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "15",
+    "name": "Level 15: Twin Reactor Nexus",
+    "layout": {
+      "totalRawHp": 30,
+      "effectiveHp": 24,
+      "breakableCount": 8,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0.05625,
+      "wallDensity": 0.2,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6446179708671885,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.328482468357351
+    },
+    "difficulty": 0.31,
+    "parTimes": {
+      "gold": 15.1,
+      "silver": 14.3,
+      "bronze": 41
+    },
+    "scores": {
+      "lowest": 5317,
+      "balanced": 6641,
+      "maximum": 5722,
+      "star1": 4519,
+      "star2": 6641,
+      "star3": 6008
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 37.3,
+        "avgScore": 5317,
+        "avgCombo": 7,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 13,
+        "avgScore": 6641,
+        "avgCombo": 8,
+        "avgHits": 4,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13.1,
+        "avgScore": 5722,
+        "avgCombo": 7,
+        "avgHits": 5,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 64.9
+    },
+    "flags": []
+  },
+  {
+    "id": "16",
+    "name": "Level 16: EMP Labyrinth",
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 24,
+      "breakableCount": 9,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 3,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 3,
+        "6": 2,
+        "7": 2,
+        "8": 3
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.1,
+      "wallDensity": 0.18181818181818182,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8449489742783178,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.36674234614174767
+    },
+    "difficulty": 0.34,
+    "parTimes": {
+      "gold": 14.5,
+      "silver": 14.7,
+      "bronze": 42.9
+    },
+    "scores": {
+      "lowest": 5175,
+      "balanced": 6463,
+      "maximum": 5218,
+      "star1": 4399,
+      "star2": 6463,
+      "star3": 5479
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 39,
+        "avgScore": 5175,
+        "avgCombo": 4,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 13.4,
+        "avgScore": 6463,
+        "avgCombo": 8,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 12.6,
+        "avgScore": 5218,
+        "avgCombo": 5,
+        "avgHits": 5,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 67.7
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "17",
+    "name": "Level 17: Fortress Moat",
+    "layout": {
+      "totalRawHp": 36,
+      "effectiveHp": 25,
+      "breakableCount": 9,
+      "wallCount": 6,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 3,
+        "5": 3,
+        "6": 6,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0,
+      "wallDensity": 0.4,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8449489742783178,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.38083325523265676
+    },
+    "difficulty": 0.35,
+    "parTimes": {
+      "gold": 37.9,
+      "silver": 13.3,
+      "bronze": 42.1
+    },
+    "scores": {
+      "lowest": 6142,
+      "balanced": 5498,
+      "maximum": 4009,
+      "star1": 5221,
+      "star2": 5498,
+      "star3": 4209
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 38.3,
+        "avgScore": 6142,
+        "avgCombo": 9,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 12.1,
+        "avgScore": 5498,
+        "avgCombo": 6,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 33,
+        "avgScore": 4009,
+        "avgCombo": 4,
+        "avgHits": 15,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 13.8
+    },
+    "flags": [
+      "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
+    ]
+  },
+  {
+    "id": "18",
+    "name": "Level 18: Stargate Nexus",
+    "layout": {
+      "totalRawHp": 33,
+      "effectiveHp": 20,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 2,
+        "4": 5,
+        "5": 0,
+        "6": 2,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 18,
+      "empChainedBlocks": 9,
+      "shieldingIndex": 0,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.823606797749979,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3108137469352241
+    },
+    "difficulty": 0.38,
+    "parTimes": {
+      "gold": 11.5,
+      "silver": 21.7,
+      "bronze": 62.6
+    },
+    "scores": {
+      "lowest": 4550,
+      "balanced": 6073,
+      "maximum": 5149,
+      "star1": 3868,
+      "star2": 6073,
+      "star3": 5406
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 56.9,
+        "avgScore": 4550,
+        "avgCombo": 4,
+        "avgHits": 12,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 19.7,
+        "avgScore": 6073,
+        "avgCombo": 7,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 10,
+        "avgScore": 5149,
+        "avgCombo": 4,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 82.4
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "19",
+    "name": "Level 19: Quantum Cross",
+    "layout": {
+      "totalRawHp": 27,
+      "effectiveHp": 19,
+      "breakableCount": 7,
+      "wallCount": 0,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 0,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0.35,
+      "spanStress": 0.810818510677892,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2775318675107747
+    },
+    "difficulty": 0.41,
+    "parTimes": {
+      "gold": 14.9,
+      "silver": 27.4,
+      "bronze": 72.3
+    },
+    "scores": {
+      "lowest": 3600,
+      "balanced": 5289,
+      "maximum": 4258,
+      "star1": 3060,
+      "star2": 5289,
+      "star3": 4471
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 65.7,
+        "avgScore": 3600,
+        "avgCombo": 4,
+        "avgHits": 16,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 24.9,
+        "avgScore": 5289,
+        "avgCombo": 7,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13,
+        "avgScore": 4258,
+        "avgCombo": 5,
+        "avgHits": 5,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 80.2
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "20",
+    "name": "Level 20: Genesis Arc",
+    "layout": {
+      "totalRawHp": 20,
+      "effectiveHp": 20,
+      "breakableCount": 15,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 10,
+        "2": 5,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.22176762470055905
+    },
+    "difficulty": 0.4,
+    "parTimes": {
+      "gold": 15.9,
+      "silver": 22,
+      "bronze": 80.1
+    },
+    "scores": {
+      "lowest": 4600,
+      "balanced": 7616,
+      "maximum": 6755,
+      "star1": 3910,
+      "star2": 7616,
+      "star3": 7093
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 72.8,
+        "avgScore": 4600,
+        "avgCombo": 2,
+        "avgHits": 15,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 20,
+        "avgScore": 7616,
+        "avgCombo": 6,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13.8,
+        "avgScore": 6755,
+        "avgCombo": 7,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 81
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "21",
+    "name": "Level 21: Quantum Gateway Alpha",
+    "layout": {
+      "totalRawHp": 20,
+      "effectiveHp": 20,
+      "breakableCount": 9,
+      "wallCount": 0,
+      "portalCount": 2,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 1,
+        "2": 5,
+        "3": 3,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 2,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6318112314356208,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2570444119880704
+    },
+    "difficulty": 0.4,
+    "parTimes": {
+      "gold": 14,
+      "silver": 32.7,
+      "bronze": 77.4
+    },
+    "scores": {
+      "lowest": 4050,
+      "balanced": 4384,
+      "maximum": 4495,
+      "star1": 3443,
+      "star2": 4384,
+      "star3": 4720
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 70.4,
+        "avgScore": 4050,
+        "avgCombo": 4,
+        "avgHits": 13,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 29.7,
+        "avgScore": 4384,
+        "avgCombo": 5,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 12.2,
+        "avgScore": 4495,
+        "avgCombo": 3,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 82.7
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "22",
+    "name": "Level 22: Asteroid Shards",
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 27,
+      "breakableCount": 9,
+      "wallCount": 0,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 3,
+        "6": 0,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8335496832484569,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.33185063430545036
+    },
+    "difficulty": 0.32,
+    "parTimes": {
+      "gold": 17,
+      "silver": 48.8,
+      "bronze": 44
+    },
+    "scores": {
+      "lowest": 6700,
+      "balanced": 5504,
+      "maximum": 9164,
+      "star1": 5695,
+      "star2": 5504,
+      "star3": 9622
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 40,
+        "avgScore": 6700,
+        "avgCombo": 7,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 44.4,
+        "avgScore": 5504,
+        "avgCombo": 7,
+        "avgHits": 17,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 14.8,
+        "avgScore": 9164,
+        "avgCombo": 12,
+        "avgHits": 3,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 63
+    },
+    "flags": []
+  },
+  {
+    "id": "23",
+    "name": "Level 23: Quantum Apex Gate",
+    "layout": {
+      "totalRawHp": 40,
+      "effectiveHp": 23,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 24,
+      "empChainedBlocks": 12,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.823606797749979,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3411546560261332
+    },
+    "difficulty": 0.41,
+    "parTimes": {
+      "gold": 13.2,
+      "silver": 30.8,
+      "bronze": 64.7
+    },
+    "scores": {
+      "lowest": 5200,
+      "balanced": 4431,
+      "maximum": 5862,
+      "star1": 4420,
+      "star2": 4431,
+      "star3": 6155
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 58.8,
+        "avgScore": 5200,
+        "avgCombo": 6,
+        "avgHits": 13,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 28,
+        "avgScore": 4431,
+        "avgCombo": 4,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 11.5,
+        "avgScore": 5862,
+        "avgCombo": 8,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 80.4
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "24",
+    "name": "Level 24: Bastion Ramparts",
+    "layout": {
+      "totalRawHp": 40,
+      "effectiveHp": 26,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.847847879612821,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3638817273964686
+    },
+    "difficulty": 0.4,
+    "parTimes": {
+      "gold": 24.4,
+      "silver": 19.5,
+      "bronze": 61.1
+    },
+    "scores": {
+      "lowest": 7300,
+      "balanced": 7391,
+      "maximum": 8985,
+      "star1": 6205,
+      "star2": 7391,
+      "star3": 9434
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 55.5,
+        "avgScore": 7300,
+        "avgCombo": 7,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 17.7,
+        "avgScore": 7391,
+        "avgCombo": 9,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 21.2,
+        "avgScore": 8985,
+        "avgCombo": 10,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 61.8
+    },
+    "flags": []
+  },
+  {
+    "id": "25",
+    "name": "Level 25: Shielded Bunker",
+    "layout": {
+      "totalRawHp": 30,
+      "effectiveHp": 23,
+      "breakableCount": 8,
+      "wallCount": 9,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 0,
+        "4": 2,
+        "5": 3,
+        "6": 9,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 10,
+      "empChainedBlocks": 5,
+      "shieldingIndex": 0.05625,
+      "wallDensity": 0.5294117647058824,
+      "portalDisruption": 0,
+      "spanStress": 0.6347002767500278,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.33504294258202283
+    },
+    "difficulty": 0.43,
+    "parTimes": {
+      "gold": 39.6,
+      "silver": 41.9,
+      "bronze": 71.4
+    },
+    "scores": {
+      "lowest": 4150,
+      "balanced": 3797,
+      "maximum": 4000,
+      "star1": 3528,
+      "star2": 3797,
+      "star3": 4200
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 64.9,
+        "avgScore": 4150,
+        "avgCombo": 3,
+        "avgHits": 14,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 38.1,
+        "avgScore": 3797,
+        "avgCombo": 4,
+        "avgHits": 20,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 34.4,
+        "avgScore": 4000,
+        "avgCombo": 4,
+        "avgHits": 16,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 47
+    },
+    "flags": [
+      "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
+    ]
+  },
+  {
+    "id": "26",
+    "name": "Level 26: Shield Wall Delta",
+    "layout": {
+      "totalRawHp": 34,
+      "effectiveHp": 27,
+      "breakableCount": 10,
+      "wallCount": 4,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 2,
+        "4": 4,
+        "5": 1,
+        "6": 4,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 10,
+      "empChainedBlocks": 5,
+      "shieldingIndex": 0,
+      "wallDensity": 0.2857142857142857,
+      "portalDisruption": 0,
+      "spanStress": 0.63569751761237,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.31002995231718017
+    },
+    "difficulty": 0.41,
+    "parTimes": {
+      "gold": 15.8,
+      "silver": 24.1,
+      "bronze": 71.1
+    },
+    "scores": {
+      "lowest": 5450,
+      "balanced": 6285,
+      "maximum": 6240,
+      "star1": 4633,
+      "star2": 6285,
+      "star3": 6552
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 64.6,
+        "avgScore": 5450,
+        "avgCombo": 5,
+        "avgHits": 13,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 21.9,
+        "avgScore": 6285,
+        "avgCombo": 6,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13.7,
+        "avgScore": 6240,
+        "avgCombo": 6,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 78.8
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "27",
+    "name": "Level 27: Orbital Ring",
+    "layout": {
+      "totalRawHp": 24,
+      "effectiveHp": 24,
+      "breakableCount": 12,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 2,
+        "2": 8,
+        "3": 2,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.46243277820691386,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.22209218945830977
+    },
+    "difficulty": 0.44,
+    "parTimes": {
+      "gold": 11.4,
+      "silver": 52,
+      "bronze": 89.5
+    },
+    "scores": {
+      "lowest": 5050,
+      "balanced": 5001,
+      "maximum": 6720,
+      "star1": 4293,
+      "star2": 5001,
+      "star3": 7056
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 81.4,
+        "avgScore": 5050,
+        "avgCombo": 4,
+        "avgHits": 18,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 47.3,
+        "avgScore": 5001,
+        "avgCombo": 4,
+        "avgHits": 12,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 9.9,
+        "avgScore": 6720,
+        "avgCombo": 6,
+        "avgHits": 4,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 87.8
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "28",
+    "name": "Level 28: Quantum Cataclysm",
+    "layout": {
+      "totalRawHp": 42,
+      "effectiveHp": 39,
+      "breakableCount": 10,
+      "wallCount": 1,
+      "portalCount": 4,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 4,
+        "5": 4,
+        "6": 1,
+        "7": 4,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.09090909090909091,
+      "portalDisruption": 0.7,
+      "spanStress": 0.8160246899469287,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.4654718853102211
+    },
+    "difficulty": 0.39,
+    "parTimes": {
+      "gold": 24,
+      "silver": 47.2,
+      "bronze": 45.1
+    },
+    "scores": {
+      "lowest": 10850,
+      "balanced": 6196,
+      "maximum": 9427,
+      "star1": 9223,
+      "star2": 6196,
+      "star3": 9898
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 41,
+        "avgScore": 10850,
+        "avgCombo": 12,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 42.9,
+        "avgScore": 6196,
+        "avgCombo": 8,
+        "avgHits": 12,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 20.9,
+        "avgScore": 9427,
+        "avgCombo": 13,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 49
+    },
+    "flags": []
+  },
+  {
+    "id": "29",
+    "name": "Level 29: Quantum Lattice",
+    "layout": {
+      "totalRawHp": 40,
+      "effectiveHp": 34,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0.09,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.823606797749979,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.4224046560261332
+    },
+    "difficulty": 0.42,
+    "parTimes": {
+      "gold": 10.1,
+      "silver": 36.6,
+      "bronze": 58.7
+    },
+    "scores": {
+      "lowest": 7250,
+      "balanced": 10921,
+      "maximum": 8347,
+      "star1": 6163,
+      "star2": 10921,
+      "star3": 8764
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 53.4,
+        "avgScore": 7250,
+        "avgCombo": 6,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 33.3,
+        "avgScore": 10921,
+        "avgCombo": 18,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 8.8,
+        "avgScore": 8347,
+        "avgCombo": 8,
+        "avgHits": 3,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 83.5
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "30",
+    "name": "Level 30: Dreadnought Bastion",
+    "layout": {
+      "totalRawHp": 49,
+      "effectiveHp": 35,
+      "breakableCount": 11,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 7,
+        "6": 3,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0.21428571428571427,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8345207879911715,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.4150482480688056
+    },
+    "difficulty": 0.6,
+    "parTimes": {
+      "gold": 61.2,
+      "silver": 95.3,
+      "bronze": 119.7
+    },
+    "scores": {
+      "lowest": 16650,
+      "balanced": 8933,
+      "maximum": 8067,
+      "star1": 14153,
+      "star2": 8933,
+      "star3": 8470
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 108.8,
+        "avgScore": 16650,
+        "avgCombo": 17,
+        "avgHits": 19,
+        "winRate": 0.3333333333333333
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 86.6,
+        "avgScore": 8933,
+        "avgCombo": 10,
+        "avgHits": 22,
+        "winRate": 0.6666666666666666
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 53.2,
+        "avgScore": 8067,
+        "avgCombo": 10,
+        "avgHits": 23,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 51.1
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
+    ]
+  },
+  {
+    "id": "31",
+    "name": "Level 31: Crossed Sabers",
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 27,
+      "breakableCount": 11,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 4,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.8486326242032244,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2991130754486655
+    },
+    "difficulty": 0.48,
+    "parTimes": {
+      "gold": 13.7,
+      "silver": 57.2,
+      "bronze": 89.4
+    },
+    "scores": {
+      "lowest": 5000,
+      "balanced": 6205,
+      "maximum": 5936,
+      "star1": 4250,
+      "star2": 6205,
+      "star3": 6233
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 81.3,
+        "avgScore": 5000,
+        "avgCombo": 4,
+        "avgHits": 18,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 52,
+        "avgScore": 6205,
+        "avgCombo": 4,
+        "avgHits": 13,
+        "winRate": 0.6666666666666666
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 11.9,
+        "avgScore": 5936,
+        "avgCombo": 6,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 85.4
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "32",
+    "name": "Level 32: Chaos Lattice",
+    "layout": {
+      "totalRawHp": 36,
+      "effectiveHp": 22,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 4,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 4
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0.135,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6666666666666667,
+      "enclosedCount": 2,
+      "staticDifficulty": 0.33375
+    },
+    "difficulty": 0.5,
+    "parTimes": {
+      "gold": 29.2,
+      "silver": 87.7,
+      "bronze": 94.3
+    },
+    "scores": {
+      "lowest": 6850,
+      "balanced": 4917,
+      "maximum": 6015,
+      "star1": 5823,
+      "star2": 4917,
+      "star3": 6316
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 85.7,
+        "avgScore": 6850,
+        "avgCombo": 5,
+        "avgHits": 17,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 79.7,
+        "avgScore": 4917,
+        "avgCombo": 6,
+        "avgHits": 25,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 25.4,
+        "avgScore": 6015,
+        "avgCombo": 7,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 70.4
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "33",
+    "name": "Level 33: Pulse Bastion",
+    "layout": {
+      "totalRawHp": 45,
+      "effectiveHp": 20,
+      "breakableCount": 12,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 4,
+        "4": 3,
+        "5": 3,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 36,
+      "empChainedBlocks": 18,
+      "shieldingIndex": 0,
+      "wallDensity": 0.14285714285714285,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8121320343559643,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.30552110385469333
+    },
+    "difficulty": 0.44,
+    "parTimes": {
+      "gold": 23,
+      "silver": 52.9,
+      "bronze": 78.3
+    },
+    "scores": {
+      "lowest": 7100,
+      "balanced": 5782,
+      "maximum": 7050,
+      "star1": 6035,
+      "star2": 5782,
+      "star3": 7403
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 71.2,
+        "avgScore": 7100,
+        "avgCombo": 6,
+        "avgHits": 15,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 48.1,
+        "avgScore": 5782,
+        "avgCombo": 6,
+        "avgHits": 24,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 20,
+        "avgScore": 7050,
+        "avgCombo": 7,
+        "avgHits": 15,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 71.9
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "34",
+    "name": "Level 34: Hypercube Warp",
+    "layout": {
+      "totalRawHp": 37,
+      "effectiveHp": 26,
+      "breakableCount": 9,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 3,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.1,
+      "wallDensity": 0.25,
+      "portalDisruption": 0.35,
+      "spanStress": 0.63569751761237,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.3583091730964009
+    },
+    "difficulty": 0.5,
+    "parTimes": {
+      "gold": 17.4,
+      "silver": 23.9,
+      "bronze": 87.8
+    },
+    "scores": {
+      "lowest": 5150,
+      "balanced": 4258,
+      "maximum": 5840,
+      "star1": 4378,
+      "star2": 4258,
+      "star3": 6132
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 79.8,
+        "avgScore": 5150,
+        "avgCombo": 6,
+        "avgHits": 17,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 21.7,
+        "avgScore": 4258,
+        "avgCombo": 5,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 15.1,
+        "avgScore": 5840,
+        "avgCombo": 7,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 81.1
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "35",
+    "name": "Level 35: Omega Bastion",
+    "layout": {
+      "totalRawHp": 54,
+      "effectiveHp": 41,
+      "breakableCount": 12,
+      "wallCount": 4,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 8,
+        "6": 4,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 18,
+      "empChainedBlocks": 9,
+      "shieldingIndex": 0.075,
+      "wallDensity": 0.25,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8211083193570267,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.4753253388126448
+    },
+    "difficulty": 0.44,
+    "parTimes": {
+      "gold": 22.7,
+      "silver": 64.8,
+      "bronze": 55.3
+    },
+    "scores": {
+      "lowest": 6767,
+      "balanced": 8450,
+      "maximum": 7740,
+      "star1": 5752,
+      "star2": 8450,
+      "star3": 8127
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 50.3,
+        "avgScore": 6767,
+        "avgCombo": 6,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 58.9,
+        "avgScore": 8450,
+        "avgCombo": 7,
+        "avgHits": 17,
+        "winRate": 0.6666666666666666
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 19.7,
+        "avgScore": 7740,
+        "avgCombo": 8,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 60.8
+    },
+    "flags": []
+  },
+  {
+    "id": "36",
+    "name": "Level 36: Titanium Vault Gate",
+    "layout": {
+      "totalRawHp": 31,
+      "effectiveHp": 28,
+      "breakableCount": 7,
+      "wallCount": 7,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 4,
+        "6": 7,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.0642857142857143,
+      "wallDensity": 0.5,
+      "portalDisruption": 0,
+      "spanStress": 0.6666666666666667,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.3692532467532468
+    },
+    "difficulty": 0.43,
+    "parTimes": {
+      "gold": 63.4,
+      "silver": 29,
+      "bronze": 66.2
+    },
+    "scores": {
+      "lowest": 5400,
+      "balanced": 5896,
+      "maximum": 3450,
+      "star1": 4590,
+      "star2": 5896,
+      "star3": 3623
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 60.2,
+        "avgScore": 5400,
+        "avgCombo": 7,
+        "avgHits": 13,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 26.4,
+        "avgScore": 5896,
+        "avgCombo": 10,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 55.1,
+        "avgScore": 3450,
+        "avgCombo": 4,
+        "avgHits": 22,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 8.5
+    },
+    "flags": [
+      "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
+    ]
+  },
+  {
+    "id": "37",
+    "name": "Level 37: Solar Flare",
+    "layout": {
+      "totalRawHp": 45,
+      "effectiveHp": 31,
+      "breakableCount": 13,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 4,
+        "5": 2,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6330767255342354,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.29223423610286253
+    },
+    "difficulty": 0.5,
+    "parTimes": {
+      "gold": 11.3,
+      "silver": 28.9,
+      "bronze": 97.9
+    },
+    "scores": {
+      "lowest": 5300,
+      "balanced": 6359,
+      "maximum": 7904,
+      "star1": 4505,
+      "star2": 6359,
+      "star3": 8299
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 89,
+        "avgScore": 5300,
+        "avgCombo": 4,
+        "avgHits": 18,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 26.3,
+        "avgScore": 6359,
+        "avgCombo": 5,
+        "avgHits": 14,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 9.8,
+        "avgScore": 7904,
+        "avgCombo": 7,
+        "avgHits": 9,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 89
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "38",
+    "name": "Level 38: Genesis Overdrive",
+    "layout": {
+      "totalRawHp": 55,
+      "effectiveHp": 44,
+      "breakableCount": 12,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 8,
+        "6": 1,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.0375,
+      "wallDensity": 0.07692307692307693,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.4304083589662933
+    },
+    "difficulty": 0.45,
+    "parTimes": {
+      "gold": 20.2,
+      "silver": 30.4,
+      "bronze": 64.1
+    },
+    "scores": {
+      "lowest": 16600,
+      "balanced": 8450,
+      "maximum": 7842,
+      "star1": 14110,
+      "star2": 8450,
+      "star3": 8234
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 58.3,
+        "avgScore": 16600,
+        "avgCombo": 26,
+        "avgHits": 13,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 27.6,
+        "avgScore": 8450,
+        "avgCombo": 8,
+        "avgHits": 20,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 17.6,
+        "avgScore": 7842,
+        "avgCombo": 7,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 69.8
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "39",
+    "name": "Level 39: Cyber Trident Core",
+    "layout": {
+      "totalRawHp": 43,
+      "effectiveHp": 40,
+      "breakableCount": 11,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 1,
+        "3": 2,
+        "4": 3,
+        "5": 4,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.04090909090909091,
+      "wallDensity": 0.15384615384615385,
+      "portalDisruption": 0,
+      "spanStress": 0.8148344622118299,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.41007481968142484
+    },
+    "difficulty": 0.47,
+    "parTimes": {
+      "gold": 33.2,
+      "silver": 90.5,
+      "bronze": 74.1
+    },
+    "scores": {
+      "lowest": 7600,
+      "balanced": 6930,
+      "maximum": 5713,
+      "star1": 6460,
+      "star2": 6930,
+      "star3": 5999
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 67.4,
+        "avgScore": 7600,
+        "avgCombo": 10,
+        "avgHits": 14,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 82.3,
+        "avgScore": 6930,
+        "avgCombo": 8,
+        "avgHits": 25,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 28.9,
+        "avgScore": 5713,
+        "avgCombo": 4,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 57.1
+    },
+    "flags": []
+  },
+  {
+    "id": "40",
+    "name": "Level 40: Obsidian Monolith",
+    "layout": {
+      "totalRawHp": 53,
+      "effectiveHp": 25,
+      "breakableCount": 13,
+      "wallCount": 3,
+      "portalCount": 0,
+      "empCount": 3,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 6,
+        "6": 3,
+        "7": 0,
+        "8": 3
+      },
+      "empCascadeYield": 40,
+      "empChainedBlocks": 20,
+      "shieldingIndex": 0.03461538461538462,
+      "wallDensity": 0.1875,
+      "portalDisruption": 0,
+      "spanStress": 0.6247805496750857,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2895868376960181
+    },
+    "difficulty": 0.56,
+    "parTimes": {
+      "gold": 17.9,
+      "silver": 56.4,
+      "bronze": 148.5
+    },
+    "scores": {
+      "lowest": 15350,
+      "balanced": 6127,
+      "maximum": 4927,
+      "star1": 13048,
+      "star2": 6127,
+      "star3": 5173
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 135,
+        "avgScore": 15350,
+        "avgCombo": 14,
+        "avgHits": 25,
+        "winRate": 0
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 51.3,
+        "avgScore": 6127,
+        "avgCombo": 9,
+        "avgHits": 17,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 15.6,
+        "avgScore": 4927,
+        "avgCombo": 4,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 88.4
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "41",
+    "name": "Level 41: Hourglass Matrix",
+    "layout": {
+      "totalRawHp": 38,
+      "effectiveHp": 38,
+      "breakableCount": 19,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 6,
+        "2": 8,
+        "3": 4,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6640175430798527,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3414208132801597
+    },
+    "difficulty": 0.49,
+    "parTimes": {
+      "gold": 14.9,
+      "silver": 23.7,
+      "bronze": 89.8
+    },
+    "scores": {
+      "lowest": 18900,
+      "balanced": 9145,
+      "maximum": 10325,
+      "star1": 16065,
+      "star2": 9145,
+      "star3": 10841
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 81.6,
+        "avgScore": 18900,
+        "avgCombo": 21,
+        "avgHits": 16,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 21.5,
+        "avgScore": 9145,
+        "avgCombo": 8,
+        "avgHits": 16,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13,
+        "avgScore": 10325,
+        "avgCombo": 8,
+        "avgHits": 8,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 84.1
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "42",
+    "name": "Level 42: Grand Apex Reactor",
+    "layout": {
+      "totalRawHp": 63,
+      "effectiveHp": 42,
+      "breakableCount": 14,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 9,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 30,
+      "empChainedBlocks": 15,
+      "shieldingIndex": 0.03214285714285715,
+      "wallDensity": 0.125,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.44905844155844155
+    },
+    "difficulty": 0.49,
+    "parTimes": {
+      "gold": 30.8,
+      "silver": 68.3,
+      "bronze": 74.6
+    },
+    "scores": {
+      "lowest": 11550,
+      "balanced": 10668,
+      "maximum": 7130,
+      "star1": 9818,
+      "star2": 10668,
+      "star3": 7487
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 67.8,
+        "avgScore": 11550,
+        "avgCombo": 14,
+        "avgHits": 13,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 62.1,
+        "avgScore": 10668,
+        "avgCombo": 8,
+        "avgHits": 20,
+        "winRate": 0.6666666666666666
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 26.8,
+        "avgScore": 7130,
+        "avgCombo": 6,
+        "avgHits": 21,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 60.5
+    },
+    "flags": []
+  },
+  {
+    "id": "43",
+    "name": "Level 43: Singularity Overdrive",
+    "layout": {
+      "totalRawHp": 57,
+      "effectiveHp": 30,
+      "breakableCount": 13,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 8,
+        "6": 1,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 38,
+      "empChainedBlocks": 19,
+      "shieldingIndex": 0,
+      "wallDensity": 0.07142857142857142,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6247805496750857,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.33034045907463944
+    },
+    "difficulty": 0.59,
+    "parTimes": {
+      "gold": 32.5,
+      "silver": 68.4,
+      "bronze": 154.2
+    },
+    "scores": {
+      "lowest": 13850,
+      "balanced": 7174,
+      "maximum": 6081,
+      "star1": 11773,
+      "star2": 7174,
+      "star3": 6385
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 140.2,
+        "avgScore": 13850,
+        "avgCombo": 5,
+        "avgHits": 29,
+        "winRate": 0
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 62.2,
+        "avgScore": 7174,
+        "avgCombo": 10,
+        "avgHits": 17,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 28.3,
+        "avgScore": 6081,
+        "avgCombo": 5,
+        "avgHits": 11,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 79.8
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "44",
+    "name": "Level 44: Space Invader",
+    "layout": {
+      "totalRawHp": 49,
+      "effectiveHp": 41,
+      "breakableCount": 17,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 2,
+        "2": 4,
+        "3": 4,
+        "4": 6,
+        "5": 0,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0.15882352941176472,
+      "wallDensity": 0.10526315789473684,
+      "portalDisruption": 0,
+      "spanStress": 0.8271099895830676,
+      "enclosedCount": 4,
+      "staticDifficulty": 0.4404709453837028
+    },
+    "difficulty": 0.52,
+    "parTimes": {
+      "gold": 22.8,
+      "silver": 23.8,
+      "bronze": 82.4
+    },
+    "scores": {
+      "lowest": 8250,
+      "balanced": 17277,
+      "maximum": 11705,
+      "star1": 7013,
+      "star2": 17277,
+      "star3": 12290
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 74.9,
+        "avgScore": 8250,
+        "avgCombo": 8,
+        "avgHits": 16,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 21.6,
+        "avgScore": 17277,
+        "avgCombo": 14,
+        "avgHits": 4,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 19.8,
+        "avgScore": 11705,
+        "avgCombo": 12,
+        "avgHits": 13,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 73.6
+    },
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "45",
+    "name": "Level 45: Laser Citadel",
+    "layout": {
+      "totalRawHp": 41,
+      "effectiveHp": 35,
+      "breakableCount": 10,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 3,
+        "5": 4,
+        "6": 3,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0.09,
+      "wallDensity": 0.23076923076923078,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.4093375547704891
+    },
+    "difficulty": 0.58,
+    "parTimes": {
+      "gold": 25.1,
+      "silver": 32.9,
+      "bronze": 102.2
+    },
+    "scores": {
+      "lowest": 5950,
+      "balanced": 7073,
+      "maximum": 7788,
+      "star1": 5058,
+      "star2": 7073,
+      "star3": 8177
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 92.9,
+        "avgScore": 5950,
+        "avgCombo": 6,
+        "avgHits": 22,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 29.9,
+        "avgScore": 7073,
+        "avgCombo": 9,
+        "avgHits": 7,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 21.8,
+        "avgScore": 7788,
+        "avgCombo": 9,
+        "avgHits": 25,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 76.5
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "46",
+    "name": "Level 46: Fortress Citadel 2",
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 32,
+      "breakableCount": 9,
+      "wallCount": 4,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 4,
+        "5": 2,
+        "6": 4,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.05,
+      "wallDensity": 0.3076923076923077,
+      "portalDisruption": 0,
+      "spanStress": 0.857203899958469,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3908707947839801
+    },
+    "difficulty": 0.6,
+    "parTimes": {
+      "gold": 34.2,
+      "silver": 62,
+      "bronze": 121.6
+    },
+    "scores": {
+      "lowest": 5600,
+      "balanced": 4277,
+      "maximum": 4725,
+      "star1": 4760,
+      "star2": 4277,
+      "star3": 4961
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 110.5,
+        "avgScore": 5600,
+        "avgCombo": 7,
+        "avgHits": 24,
+        "winRate": 1
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 56.4,
+        "avgScore": 4277,
+        "avgCombo": 4,
+        "avgHits": 21,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 29.7,
+        "avgScore": 4725,
+        "avgCombo": 4,
+        "avgHits": 20,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 73.1
+    },
+    "flags": [
+      "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes.",
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "47",
+    "name": "Level 47: Titan Citadel Core",
+    "layout": {
+      "totalRawHp": 53,
+      "effectiveHp": 33,
+      "breakableCount": 12,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 7,
+        "6": 3,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 28,
+      "empChainedBlocks": 14,
+      "shieldingIndex": 0,
+      "wallDensity": 0.2,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8057983021710107,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.39586974532565156
+    },
+    "difficulty": 0.61,
+    "parTimes": {
+      "gold": 18.2,
+      "silver": 94.4,
+      "bronze": 141.5
+    },
+    "scores": {
+      "lowest": 13100,
+      "balanced": 8483,
+      "maximum": 7905,
+      "star1": 11135,
+      "star2": 8483,
+      "star3": 8300
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 128.6,
+        "avgScore": 13100,
+        "avgCombo": 7,
+        "avgHits": 24,
+        "winRate": 0
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 85.8,
+        "avgScore": 8483,
+        "avgCombo": 7,
+        "avgHits": 30,
+        "winRate": 0.6666666666666666
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 15.8,
+        "avgScore": 7905,
+        "avgCombo": 6,
+        "avgHits": 21,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 87.7
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "48",
+    "name": "Level 48: Cyber Skull",
+    "layout": {
+      "totalRawHp": 50,
+      "effectiveHp": 40,
+      "breakableCount": 14,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 4,
+        "5": 3,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 14,
+      "empChainedBlocks": 7,
+      "shieldingIndex": 0.1285714285714286,
+      "wallDensity": 0.125,
+      "portalDisruption": 0,
+      "spanStress": 0.6570609943132644,
+      "enclosedCount": 2,
+      "staticDifficulty": 0.4039974608353013
+    },
+    "difficulty": 0.61,
+    "parTimes": {
+      "gold": 15.9,
+      "silver": 36.2,
+      "bronze": 145.8
+    },
+    "scores": {
+      "lowest": 13650,
+      "balanced": 10327,
+      "maximum": 6471,
+      "star1": 11603,
+      "star2": 10327,
+      "star3": 6795
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 132.5,
+        "avgScore": 13650,
+        "avgCombo": 9,
+        "avgHits": 25,
+        "winRate": 0
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 32.9,
+        "avgScore": 10327,
+        "avgCombo": 11,
+        "avgHits": 17,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 13.8,
+        "avgScore": 6471,
+        "avgCombo": 5,
+        "avgHits": 6,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 89.6
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "49",
+    "name": "Level 49: Plasma Supernova",
+    "layout": {
+      "totalRawHp": 65,
+      "effectiveHp": 47,
+      "breakableCount": 15,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 4,
+        "5": 8,
+        "6": 0,
+        "7": 0,
+        "8": 2
+      },
+      "empCascadeYield": 26,
+      "empChainedBlocks": 13,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.625831151817511,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3929655818635357
+    },
+    "difficulty": 0.62,
+    "parTimes": {
+      "gold": 27.9,
+      "silver": 64.5,
+      "bronze": 134.5
+    },
+    "scores": {
+      "lowest": 16750,
+      "balanced": 11617,
+      "maximum": 10325,
+      "star1": 14238,
+      "star2": 11617,
+      "star3": 10841
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 122.3,
+        "avgScore": 16750,
+        "avgCombo": 5,
+        "avgHits": 27,
+        "winRate": 0
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 58.6,
+        "avgScore": 11617,
+        "avgCombo": 12,
+        "avgHits": 15,
+        "winRate": 0.6666666666666666
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 24.3,
+        "avgScore": 10325,
+        "avgCombo": 10,
+        "avgHits": 10,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 80.1
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  },
+  {
+    "id": "50",
+    "name": "Level 50: Anvil Core",
+    "layout": {
+      "totalRawHp": 55,
+      "effectiveHp": 44,
+      "breakableCount": 13,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 3,
+        "4": 2,
+        "5": 7,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.13846153846153847,
+      "wallDensity": 0.13333333333333333,
+      "portalDisruption": 0,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 2,
+      "staticDifficulty": 0.4291102820432164
+    },
+    "difficulty": 0.63,
+    "parTimes": {
+      "gold": 35.9,
+      "silver": 107.1,
+      "bronze": 159
+    },
+    "scores": {
+      "lowest": 13150,
+      "balanced": 5317,
+      "maximum": 7304,
+      "star1": 11178,
+      "star2": 5317,
+      "star3": 7669
+    },
+    "performance": {
+      "lowest": {
+        "profileId": "lowest",
+        "profileName": "Stock Base (Lowest Power / Lvl 1)",
+        "avgTime": 144.5,
+        "avgScore": 13150,
+        "avgCombo": 5,
+        "avgHits": 27,
+        "winRate": 0
+      },
+      "balanced": {
+        "profileId": "balanced",
+        "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
+        "avgTime": 97.4,
+        "avgScore": 5317,
+        "avgCombo": 7,
+        "avgHits": 23,
+        "winRate": 1
+      },
+      "maximum": {
+        "profileId": "maximum",
+        "profileName": "Overdrive Apex (Max Power / Lvl 10)",
+        "avgTime": 31.2,
+        "avgScore": 7304,
+        "avgCombo": 6,
+        "avgHits": 16,
+        "winRate": 1
+      },
+      "powerSpeedupPct": 78.4
+    },
+    "flags": [
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
+  }
+]

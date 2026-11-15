@@ -187,20 +187,37 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
 
                 {/* Pilot Username & Initials */}
                 <div className="flex items-center gap-1.5 min-w-0 pl-1 overflow-hidden">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-600 to-indigo-600 flex items-center justify-center text-[9px] font-bold font-tech text-white flex-shrink-0">
-                    {entry.username.slice(0, 1).toUpperCase()}
-                  </div>
-                  <span
-                    className={`font-ui text-xs truncate ${
-                      isUser ? 'font-black text-cyan-300' : 'font-semibold text-slate-200'
+                  <div
+                    style={
+                      isUser
+                        ? {
+                            background: 'linear-gradient(135deg, #00f7ff 0%, #3b82f6 100%)',
+                            boxShadow: '0 0 8px rgba(0, 247, 255, 0.45)',
+                            color: '#000000',
+                          }
+                        : undefined
+                    }
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold font-tech flex-shrink-0 ${
+                      isUser
+                        ? 'font-black'
+                        : 'bg-gradient-to-tr from-cyan-600 to-indigo-600 text-white'
                     }`}
-                    style={{ color: isUser ? '#00f7ff' : '#e2e8f0' }}
                   >
-                    @{entry.username}
-                  </span>
-                  {isUser && (
-                    <span className="text-[8px] font-tech font-bold px-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 flex-shrink-0">
-                      YOU
+                    {isUser ? 'Y' : entry.username.slice(0, 1).toUpperCase()}
+                  </div>
+                  {isUser ? (
+                    <div className="flex items-center gap-1 min-w-0">
+                      <span
+                        className="font-ui font-black text-xs tracking-wide"
+                        style={{ color: '#00f7ff', textShadow: '0 0 8px rgba(0, 247, 255, 0.6)' }}
+                      >
+                        You
+                      </span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block animate-pulse flex-shrink-0" />
+                    </div>
+                  ) : (
+                    <span className="font-ui text-xs truncate font-semibold text-slate-200">
+                      @{entry.username}
                     </span>
                   )}
                 </div>

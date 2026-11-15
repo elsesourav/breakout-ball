@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
 import { authService } from '../../services/auth';
-import { Badge } from '@elsesourav/react-ui';
+import { CustomCyberBadge } from '../common/CustomCyberBadge';
 
 export const UserAvatarMenu: React.FC = () => {
   const { user, updateUser, setActiveTab, setIsAuthModalOpen, setAuthMode } = useGame();
@@ -56,9 +56,9 @@ export const UserAvatarMenu: React.FC = () => {
 
           <div className="flex justify-between items-center px-1">
             <span className="text-[10px] text-slate-400">Account:</span>
-            <Badge variant={user.isLoggedIn ? 'primary' : 'secondary'} size="sm">
+            <CustomCyberBadge variant={user.isLoggedIn ? 'primary' : 'secondary'} size="sm">
               {user.isLoggedIn ? 'Verified' : 'Guest'}
-            </Badge>
+            </CustomCyberBadge>
           </div>
 
           <button

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useGame } from '../../context/GameContext';
 import { BallSkin } from '../../types/game';
-import { Sparkles, Check } from 'lucide-react';
+import { Palette, Check } from 'lucide-react';
 
 interface SkinOption {
   id: BallSkin;
@@ -120,10 +120,10 @@ export const BallSkinSelector: React.FC = () => {
   }, [currentSkin]);
 
   return (
-    <div className="w-full max-w-sm rounded-xl bg-[#080d26]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-      <div className="flex items-center justify-between pb-2 border-b border-white/10">
+    <div className="w-full max-w-sm rounded-xl bg-[#080d26]/90 border border-cyan-500/25 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
+      <div className="flex items-center justify-between pb-2 border-b border-cyan-500/20">
         <div className="flex items-center gap-2 text-cyan-400 font-display font-black text-xs tracking-wider uppercase">
-          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <Palette className="w-4 h-4 text-cyan-400" />
           <span>Ball Core Energy</span>
         </div>
         <span className="font-tech text-[10px] font-bold text-slate-400">
@@ -132,7 +132,7 @@ export const BallSkinSelector: React.FC = () => {
       </div>
 
       {/* Live Preview Display */}
-      <div className="flex items-center justify-between bg-black/40 border border-white/5 rounded-xl p-2.5">
+      <div className="flex items-center justify-between bg-black/40 border border-cyan-500/15 rounded-xl p-2.5">
         <div className="flex flex-col gap-0.5">
           <span className="text-[10px] font-tech text-slate-400 uppercase tracking-widest">
             ACTIVE CORE

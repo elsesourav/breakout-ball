@@ -23,7 +23,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     id: 'combo_10',
     title: 'Unstoppable Flow',
     description: 'Reach a blistering 10x combo streak',
-    icon: 'sparkles',
+    icon: 'zap',
     category: 'combat',
     unlocked: false,
   },
@@ -62,7 +62,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   {
     id: 'apex_champion',
     title: 'Apex Legend',
-    description: 'Conquer all 30 arcade campaign stages',
+    description: 'Conquer all 50 arcade campaign stages',
     icon: 'crown',
     category: 'mastery',
     unlocked: false,

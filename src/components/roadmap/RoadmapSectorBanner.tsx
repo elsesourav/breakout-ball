@@ -78,15 +78,15 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
         );
       })}
 
-      {/* Grand Apex Summit Reactor at Level 30 */}
+      {/* Grand Apex Summit Reactor at Level 50 */}
       {summitNode && (
         <div
-          className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none"
+          className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none whitespace-nowrap"
           data-base-transform="translateX(-50%)"
-          data-y={summitNode.y - 95}
+          data-y={summitNode.y - 170}
           style={{
-            left: `${(summitNode.x / SVG_WIDTH) * 100}%`,
-            top: `${summitNode.y - 95}px`,
+            left: '50%',
+            top: `${summitNode.y - 170}px`,
             transform: 'translateX(-50%)',
             willChange: 'transform, opacity',
           }}
@@ -98,22 +98,48 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               border: '2.5px solid #ffd700',
               boxShadow: '0 4px 0 #92400e, 0 8px 25px rgba(255, 215, 0, 0.8), inset 0 2px 4px #ffffff',
             }}
-            className="w-14 h-14 rounded-full flex items-center justify-center mb-1"
+            className="w-14 h-14 rounded-full flex items-center justify-center mb-2"
           >
             <Trophy style={{ color: '#ffd700' }} className="w-7 h-7 drop-shadow-[0_0_12px_#ffd700]" />
           </div>
-          <span
-            className="font-display font-black text-sm tracking-widest text-amber-300"
+
+          {/* High-tech Apex Cyber Card - No Text Wrapping / No Overlap */}
+          <div
+            className="flex flex-col items-center px-5 py-2.5 rounded-2xl border select-none whitespace-nowrap shadow-2xl"
             style={{
-              textShadow: '0 0 14px rgba(255, 215, 0, 0.75)',
-              letterSpacing: '0.1em',
+              backgroundColor: 'rgba(6, 10, 26, 0.96)',
+              borderColor: '#ffd700',
+              boxShadow: '0 4px 25px rgba(0,0,0,0.9), 0 0 18px rgba(255, 215, 0, 0.45), inset 0 1px 2px rgba(255,255,255,0.3)',
             }}
           >
-            GRAND APEX REACTOR
-          </span>
-          <span className="font-tech text-[10px] font-bold tracking-wide text-amber-100">
-            FINAL OVERDRIVE CORE
-          </span>
+            <div className="flex items-center gap-2 leading-none whitespace-nowrap">
+              <span
+                className="font-display font-black text-xs tracking-wider whitespace-nowrap text-amber-300"
+                style={{
+                  letterSpacing: '0.08em',
+                  textShadow: '0 0 10px rgba(255, 215, 0, 0.7)',
+                }}
+              >
+                GRAND APEX REACTOR
+              </span>
+              <span className="font-display font-black text-xs text-amber-400">
+                //
+              </span>
+              <span
+                className="font-display font-black text-xs tracking-wider whitespace-nowrap text-white"
+                style={{
+                  letterSpacing: '0.08em',
+                  textShadow: '0 0 10px rgba(255, 255, 255, 0.6)',
+                }}
+              >
+                STAGE 50
+              </span>
+            </div>
+
+            <span className="font-tech text-[10px] font-bold tracking-widest mt-1.5 whitespace-nowrap text-amber-200">
+              FINAL OVERDRIVE CORE
+            </span>
+          </div>
         </div>
       )}
     </>

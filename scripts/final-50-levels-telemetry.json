@@ -1,0 +1,6802 @@
+[
+  {
+    "id": "1",
+    "name": "Level 1: EMP Sparks",
+    "creator": "sourav",
+    "playCount": 1500,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 1
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 1
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.11,
+    "parTimes": {
+      "gold": 3.8,
+      "silver": 4.6,
+      "bronze": 6.1
+    },
+    "scores": {
+      "lowest": 9811,
+      "balanced": 9846,
+      "maximum": 9868,
+      "star1": 8339,
+      "star2": 9846,
+      "star3": 10361
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 5.5,
+        "avgScore": 9811,
+        "avgCombo": 11
+      },
+      "balanced": {
+        "avgTime": 4.2,
+        "avgScore": 9846,
+        "avgCombo": 11
+      },
+      "maximum": {
+        "avgTime": 3.3,
+        "avgScore": 9868,
+        "avgCombo": 11
+      },
+      "speedupPct": 40
+    },
+    "layout": {
+      "totalRawHp": 20,
+      "effectiveHp": 9,
+      "breakableCount": 12,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 6,
+        "2": 4,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 11,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.4687339734105993,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.12758282328431717
+    }
+  },
+  {
+    "id": "2",
+    "name": "Level 2: Binary Orbit",
+    "creator": "sourav",
+    "playCount": 1510,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.25,
+    "parTimes": {
+      "gold": 9.5,
+      "silver": 23.1,
+      "bronze": 17.5
+    },
+    "scores": {
+      "lowest": 10953,
+      "balanced": 5174,
+      "maximum": 6394,
+      "star1": 9310,
+      "star2": 5174,
+      "star3": 6714
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 15.9,
+        "avgScore": 10953,
+        "avgCombo": 19
+      },
+      "balanced": {
+        "avgTime": 21,
+        "avgScore": 5174,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 8.3,
+        "avgScore": 6394,
+        "avgCombo": 7
+      },
+      "speedupPct": 47.8
+    },
+    "layout": {
+      "totalRawHp": 30,
+      "effectiveHp": 19,
+      "breakableCount": 10,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 2,
+        "5": 0,
+        "6": 1,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.09090909090909091,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6547746552918587,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.27901165283923335
+    }
+  },
+  {
+    "id": "3",
+    "name": "Level 3: Reactor Core Alpha",
+    "creator": "sourav",
+    "playCount": 1485,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.28,
+    "parTimes": {
+      "gold": 18.2,
+      "silver": 13.1,
+      "bronze": 21.6
+    },
+    "scores": {
+      "lowest": 5810,
+      "balanced": 5254,
+      "maximum": 7481,
+      "star1": 4939,
+      "star2": 5254,
+      "star3": 7855
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 19.6,
+        "avgScore": 5810,
+        "avgCombo": 8
+      },
+      "balanced": {
+        "avgTime": 11.9,
+        "avgScore": 5254,
+        "avgCombo": 7
+      },
+      "maximum": {
+        "avgTime": 15.8,
+        "avgScore": 7481,
+        "avgCombo": 11
+      },
+      "speedupPct": 19.4
+    },
+    "layout": {
+      "totalRawHp": 22,
+      "effectiveHp": 22,
+      "breakableCount": 8,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 0,
+        "6": 1,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0.05625,
+      "wallDensity": 0.1111111111111111,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6318112314356208,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.30050085138200977
+    }
+  },
+  {
+    "id": "4",
+    "name": "Level 4: Chronos Vault",
+    "creator": "sourav",
+    "playCount": 1422,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.29,
+    "parTimes": {
+      "gold": 11.6,
+      "silver": 69.3,
+      "bronze": 41.4
+    },
+    "scores": {
+      "lowest": 5008,
+      "balanced": 5011,
+      "maximum": 3973,
+      "star1": 4257,
+      "star2": 5011,
+      "star3": 4172
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 37.6,
+        "avgScore": 5008,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 63,
+        "avgScore": 5011,
+        "avgCombo": 10
+      },
+      "maximum": {
+        "avgTime": 10.1,
+        "avgScore": 3973,
+        "avgCombo": 4
+      },
+      "speedupPct": 73.1
+    },
+    "layout": {
+      "totalRawHp": 24,
+      "effectiveHp": 10,
+      "breakableCount": 7,
+      "wallCount": 6,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "4": 4,
+        "5": 0,
+        "6": 6,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0.46153846153846156,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.26236203029496463
+    }
+  },
+  {
+    "id": "5",
+    "name": "Level 5: Diamond Core",
+    "creator": "sourav",
+    "playCount": 1354,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.29,
+    "parTimes": {
+      "gold": 22.1,
+      "silver": 29,
+      "bronze": 35.1
+    },
+    "scores": {
+      "lowest": 5302,
+      "balanced": 3690,
+      "maximum": 4319,
+      "star1": 4507,
+      "star2": 3690,
+      "star3": 4535
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 31.9,
+        "avgScore": 5302,
+        "avgCombo": 9
+      },
+      "balanced": {
+        "avgTime": 26.4,
+        "avgScore": 3690,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 19.2,
+        "avgScore": 4319,
+        "avgCombo": 5
+      },
+      "speedupPct": 39.8
+    },
+    "layout": {
+      "totalRawHp": 19,
+      "effectiveHp": 19,
+      "breakableCount": 8,
+      "wallCount": 1,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 1,
+        "2": 4,
+        "3": 2,
+        "4": 1,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0.1125,
+      "wallDensity": 0.1111111111111111,
+      "portalDisruption": 0,
+      "spanStress": 0.44880338717125845,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.23302126565144632
+    }
+  },
+  {
+    "id": "6",
+    "name": "Level 6: Helix Accelerator",
+    "creator": "sourav",
+    "playCount": 1317,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "h": 2
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      }
+    ],
+    "difficulty": 0.3,
+    "parTimes": {
+      "gold": 20,
+      "silver": 38.5,
+      "bronze": 26.7
+    },
+    "scores": {
+      "lowest": 13293,
+      "balanced": 4439,
+      "maximum": 5040,
+      "star1": 11299,
+      "star2": 4439,
+      "star3": 5292
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 24.3,
+        "avgScore": 13293,
+        "avgCombo": 21
+      },
+      "balanced": {
+        "avgTime": 35,
+        "avgScore": 4439,
+        "avgCombo": 6
+      },
+      "maximum": {
+        "avgTime": 17.4,
+        "avgScore": 5040,
+        "avgCombo": 5
+      },
+      "speedupPct": 28.4
+    },
+    "layout": {
+      "totalRawHp": 34,
+      "effectiveHp": 26,
+      "breakableCount": 10,
+      "wallCount": 1,
+      "portalCount": 0,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 1,
+        "7": 0,
+        "8": 2
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0.09090909090909091,
+      "portalDisruption": 0,
+      "spanStress": 0.6882313504294656,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.28232561165532893
+    }
+  },
+  {
+    "id": "7",
+    "name": "Level 7: Cluster Detonator",
+    "creator": "sourav",
+    "playCount": 1319,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.31,
+    "parTimes": {
+      "gold": 12,
+      "silver": 13.4,
+      "bronze": 48.1
+    },
+    "scores": {
+      "lowest": 5700,
+      "balanced": 5771,
+      "maximum": 5690,
+      "star1": 4845,
+      "star2": 5771,
+      "star3": 5975
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 43.7,
+        "avgScore": 5700,
+        "avgCombo": 6
+      },
+      "balanced": {
+        "avgTime": 12.2,
+        "avgScore": 5771,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 10.4,
+        "avgScore": 5690,
+        "avgCombo": 4
+      },
+      "speedupPct": 76.2
+    },
+    "layout": {
+      "totalRawHp": 32,
+      "effectiveHp": 18,
+      "breakableCount": 11,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 6,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6666666666666667,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.21454545454545454
+    }
+  },
+  {
+    "id": "8",
+    "name": "Level 8: Double Helix",
+    "creator": "sourav",
+    "playCount": 1334,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "h": 2
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.31,
+    "parTimes": {
+      "gold": 20.8,
+      "silver": 16.8,
+      "bronze": 34
+    },
+    "scores": {
+      "lowest": 6727,
+      "balanced": 6767,
+      "maximum": 4923,
+      "star1": 5718,
+      "star2": 6767,
+      "star3": 5169
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 30.9,
+        "avgScore": 6727,
+        "avgCombo": 9
+      },
+      "balanced": {
+        "avgTime": 15.3,
+        "avgScore": 6767,
+        "avgCombo": 8
+      },
+      "maximum": {
+        "avgTime": 18.1,
+        "avgScore": 4923,
+        "avgCombo": 3
+      },
+      "speedupPct": 41.4
+    },
+    "layout": {
+      "totalRawHp": 31,
+      "effectiveHp": 25,
+      "breakableCount": 11,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 4,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6525307421235838,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2569705204094467
+    }
+  },
+  {
+    "id": "9",
+    "name": "Level 9: Twin Pillars",
+    "creator": "sourav",
+    "playCount": 1321,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.31,
+    "parTimes": {
+      "gold": 19.9,
+      "silver": 23.4,
+      "bronze": 28.3
+    },
+    "scores": {
+      "lowest": 9906,
+      "balanced": 7543,
+      "maximum": 6844,
+      "star1": 8420,
+      "star2": 7543,
+      "star3": 7186
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 25.7,
+        "avgScore": 9906,
+        "avgCombo": 11
+      },
+      "balanced": {
+        "avgTime": 21.3,
+        "avgScore": 7543,
+        "avgCombo": 9
+      },
+      "maximum": {
+        "avgTime": 17.3,
+        "avgScore": 6844,
+        "avgCombo": 7
+      },
+      "speedupPct": 32.7
+    },
+    "layout": {
+      "totalRawHp": 27,
+      "effectiveHp": 27,
+      "breakableCount": 14,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 2,
+        "2": 11,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6996596156709537,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2767671241688249
+    }
+  },
+  {
+    "id": "10",
+    "name": "Level 10: Doomsday Matrix",
+    "creator": "sourav",
+    "playCount": 1267,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "h": 7
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 4
+      }
+    ],
+    "difficulty": 0.33,
+    "parTimes": {
+      "gold": 19.8,
+      "silver": 15.4,
+      "bronze": 23.5
+    },
+    "scores": {
+      "lowest": 7415,
+      "balanced": 7475,
+      "maximum": 8645,
+      "star1": 6303,
+      "star2": 7475,
+      "star3": 9077
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 21.4,
+        "avgScore": 7415,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 14,
+        "avgScore": 7475,
+        "avgCombo": 8
+      },
+      "maximum": {
+        "avgTime": 17.2,
+        "avgScore": 8645,
+        "avgCombo": 11
+      },
+      "speedupPct": 19.6
+    },
+    "layout": {
+      "totalRawHp": 46,
+      "effectiveHp": 26,
+      "breakableCount": 11,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 3,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 5,
+        "6": 2,
+        "7": 2,
+        "8": 3
+      },
+      "empCascadeYield": 28,
+      "empChainedBlocks": 14,
+      "shieldingIndex": 0.04090909090909091,
+      "wallDensity": 0.15384615384615385,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8160246899469287,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3561624447507805
+    }
+  },
+  {
+    "id": "11",
+    "name": "Level 11: Cyber Chevron",
+    "creator": "sourav",
+    "playCount": 1196,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.35,
+    "parTimes": {
+      "gold": 13.8,
+      "silver": 15.2,
+      "bronze": 63
+    },
+    "scores": {
+      "lowest": 4150,
+      "balanced": 4706,
+      "maximum": 4949,
+      "star1": 3528,
+      "star2": 4706,
+      "star3": 5196
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 57.3,
+        "avgScore": 4150,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 13.8,
+        "avgScore": 4706,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 12,
+        "avgScore": 4949,
+        "avgCombo": 6
+      },
+      "speedupPct": 79.1
+    },
+    "layout": {
+      "totalRawHp": 17,
+      "effectiveHp": 17,
+      "breakableCount": 10,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 4,
+        "2": 5,
+        "3": 1,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6398717474235545,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.20416258029535134
+    }
+  },
+  {
+    "id": "12",
+    "name": "Level 12: Neon Heart",
+    "creator": "sourav",
+    "playCount": 1147,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "h": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "h": 1
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.35,
+    "parTimes": {
+      "gold": 11.4,
+      "silver": 18.7,
+      "bronze": 32.3
+    },
+    "scores": {
+      "lowest": 12365,
+      "balanced": 7775,
+      "maximum": 9051,
+      "star1": 10510,
+      "star2": 7775,
+      "star3": 9504
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 29.4,
+        "avgScore": 12365,
+        "avgCombo": 14
+      },
+      "balanced": {
+        "avgTime": 17,
+        "avgScore": 7775,
+        "avgCombo": 6
+      },
+      "maximum": {
+        "avgTime": 9.9,
+        "avgScore": 9051,
+        "avgCombo": 9
+      },
+      "speedupPct": 66.3
+    },
+    "layout": {
+      "totalRawHp": 39,
+      "effectiveHp": 32,
+      "breakableCount": 15,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 3,
+        "2": 4,
+        "3": 4,
+        "4": 2,
+        "5": 1,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 10,
+      "empChainedBlocks": 5,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6598850232825259,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3026191171287425
+    }
+  },
+  {
+    "id": "13",
+    "name": "Level 13: Event Horizon",
+    "creator": "sourav",
+    "playCount": 1140,
+    "blocks": [
+      {
+        "x": 3,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.36,
+    "parTimes": {
+      "gold": 29.9,
+      "silver": 26,
+      "bronze": 44.2
+    },
+    "scores": {
+      "lowest": 6700,
+      "balanced": 5286,
+      "maximum": 4279,
+      "star1": 5695,
+      "star2": 5286,
+      "star3": 4493
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 40.2,
+        "avgScore": 6700,
+        "avgCombo": 12
+      },
+      "balanced": {
+        "avgTime": 23.6,
+        "avgScore": 5286,
+        "avgCombo": 7
+      },
+      "maximum": {
+        "avgTime": 26,
+        "avgScore": 4279,
+        "avgCombo": 4
+      },
+      "speedupPct": 35.3
+    },
+    "layout": {
+      "totalRawHp": 32,
+      "effectiveHp": 21,
+      "breakableCount": 8,
+      "wallCount": 5,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 3,
+        "6": 5,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0,
+      "wallDensity": 0.38461538461538464,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3208235687565031
+    }
+  },
+  {
+    "id": "14",
+    "name": "Level 14: Prism Crown",
+    "creator": "sourav",
+    "playCount": 1155,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 1
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.37,
+    "parTimes": {
+      "gold": 15.1,
+      "silver": 18.4,
+      "bronze": 57
+    },
+    "scores": {
+      "lowest": 5400,
+      "balanced": 6432,
+      "maximum": 5574,
+      "star1": 4590,
+      "star2": 6432,
+      "star3": 5853
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 51.8,
+        "avgScore": 5400,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 16.7,
+        "avgScore": 6432,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 13.1,
+        "avgScore": 5574,
+        "avgCombo": 5
+      },
+      "speedupPct": 74.7
+    },
+    "layout": {
+      "totalRawHp": 23,
+      "effectiveHp": 23,
+      "breakableCount": 13,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 6,
+        "2": 4,
+        "3": 3,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6376367495196887,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.24200914879158963
+    }
+  },
+  {
+    "id": "15",
+    "name": "Level 15: Twin Reactor Nexus",
+    "creator": "sourav",
+    "playCount": 1153,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.37,
+    "parTimes": {
+      "gold": 13.8,
+      "silver": 18.6,
+      "bronze": 41
+    },
+    "scores": {
+      "lowest": 5317,
+      "balanced": 5778,
+      "maximum": 5499,
+      "star1": 4519,
+      "star2": 5778,
+      "star3": 5774
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 37.3,
+        "avgScore": 5317,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 16.9,
+        "avgScore": 5778,
+        "avgCombo": 7
+      },
+      "maximum": {
+        "avgTime": 12,
+        "avgScore": 5499,
+        "avgCombo": 7
+      },
+      "speedupPct": 67.8
+    },
+    "layout": {
+      "totalRawHp": 30,
+      "effectiveHp": 24,
+      "breakableCount": 8,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0.05625,
+      "wallDensity": 0.2,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6446179708671885,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.328482468357351
+    }
+  },
+  {
+    "id": "16",
+    "name": "Level 16: EMP Labyrinth",
+    "creator": "sourav",
+    "playCount": 1109,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.39,
+    "parTimes": {
+      "gold": 19,
+      "silver": 29,
+      "bronze": 42.9
+    },
+    "scores": {
+      "lowest": 5175,
+      "balanced": 4966,
+      "maximum": 4387,
+      "star1": 4399,
+      "star2": 4966,
+      "star3": 4606
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 39,
+        "avgScore": 5175,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 26.4,
+        "avgScore": 4966,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 16.5,
+        "avgScore": 4387,
+        "avgCombo": 4
+      },
+      "speedupPct": 57.7
+    },
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 24,
+      "breakableCount": 9,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 3,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 3,
+        "6": 2,
+        "7": 2,
+        "8": 3
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.1,
+      "wallDensity": 0.18181818181818182,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8449489742783178,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.36674234614174767
+    }
+  },
+  {
+    "id": "17",
+    "name": "Level 17: Fortress Moat",
+    "creator": "sourav",
+    "playCount": 1039,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.4,
+    "parTimes": {
+      "gold": 12.8,
+      "silver": 26.8,
+      "bronze": 42.1
+    },
+    "scores": {
+      "lowest": 6142,
+      "balanced": 4266,
+      "maximum": 4522,
+      "star1": 5221,
+      "star2": 4266,
+      "star3": 4748
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 38.3,
+        "avgScore": 6142,
+        "avgCombo": 9
+      },
+      "balanced": {
+        "avgTime": 24.4,
+        "avgScore": 4266,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 11.1,
+        "avgScore": 4522,
+        "avgCombo": 4
+      },
+      "speedupPct": 71
+    },
+    "layout": {
+      "totalRawHp": 36,
+      "effectiveHp": 25,
+      "breakableCount": 9,
+      "wallCount": 6,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 3,
+        "5": 3,
+        "6": 6,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0,
+      "wallDensity": 0.4,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8449489742783178,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.38083325523265676
+    }
+  },
+  {
+    "id": "18",
+    "name": "Level 18: Stargate Nexus",
+    "creator": "sourav",
+    "playCount": 981,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.41,
+    "parTimes": {
+      "gold": 21.7,
+      "silver": 33.1,
+      "bronze": 62.6
+    },
+    "scores": {
+      "lowest": 4550,
+      "balanced": 6880,
+      "maximum": 5002,
+      "star1": 3868,
+      "star2": 6880,
+      "star3": 5252
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 56.9,
+        "avgScore": 4550,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 30.1,
+        "avgScore": 6880,
+        "avgCombo": 10
+      },
+      "maximum": {
+        "avgTime": 18.9,
+        "avgScore": 5002,
+        "avgCombo": 4
+      },
+      "speedupPct": 66.8
+    },
+    "layout": {
+      "totalRawHp": 33,
+      "effectiveHp": 20,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 2,
+        "4": 5,
+        "5": 0,
+        "6": 2,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 18,
+      "empChainedBlocks": 9,
+      "shieldingIndex": 0,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.823606797749979,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3108137469352241
+    }
+  },
+  {
+    "id": "19",
+    "name": "Level 19: Quantum Cross",
+    "creator": "sourav",
+    "playCount": 962,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 0,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 5
+      }
+    ],
+    "difficulty": 0.43,
+    "parTimes": {
+      "gold": 13.5,
+      "silver": 35.3,
+      "bronze": 72.3
+    },
+    "scores": {
+      "lowest": 3600,
+      "balanced": 4940,
+      "maximum": 4858,
+      "star1": 3060,
+      "star2": 4940,
+      "star3": 5101
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 65.7,
+        "avgScore": 3600,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 32.1,
+        "avgScore": 4940,
+        "avgCombo": 7
+      },
+      "maximum": {
+        "avgTime": 11.7,
+        "avgScore": 4858,
+        "avgCombo": 6
+      },
+      "speedupPct": 82.2
+    },
+    "layout": {
+      "totalRawHp": 27,
+      "effectiveHp": 19,
+      "breakableCount": 7,
+      "wallCount": 0,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 0,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0.35,
+      "spanStress": 0.810818510677892,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2775318675107747
+    }
+  },
+  {
+    "id": "20",
+    "name": "Level 20: Genesis Arc",
+    "creator": "sourav",
+    "playCount": 975,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.43,
+    "parTimes": {
+      "gold": 22.9,
+      "silver": 13.3,
+      "bronze": 80.1
+    },
+    "scores": {
+      "lowest": 4600,
+      "balanced": 8775,
+      "maximum": 6127,
+      "star1": 3910,
+      "star2": 8775,
+      "star3": 6433
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 72.8,
+        "avgScore": 4600,
+        "avgCombo": 2
+      },
+      "balanced": {
+        "avgTime": 12.1,
+        "avgScore": 8775,
+        "avgCombo": 9
+      },
+      "maximum": {
+        "avgTime": 19.9,
+        "avgScore": 6127,
+        "avgCombo": 4
+      },
+      "speedupPct": 72.7
+    },
+    "layout": {
+      "totalRawHp": 20,
+      "effectiveHp": 20,
+      "breakableCount": 15,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 10,
+        "2": 5,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.22176762470055905
+    }
+  },
+  {
+    "id": "21",
+    "name": "Level 21: Quantum Gateway Alpha",
+    "creator": "sourav",
+    "playCount": 981,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.43,
+    "parTimes": {
+      "gold": 11.6,
+      "silver": 30.8,
+      "bronze": 77.4
+    },
+    "scores": {
+      "lowest": 4050,
+      "balanced": 4285,
+      "maximum": 4174,
+      "star1": 3443,
+      "star2": 4285,
+      "star3": 4383
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 70.4,
+        "avgScore": 4050,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 28,
+        "avgScore": 4285,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 10.1,
+        "avgScore": 4174,
+        "avgCombo": 3
+      },
+      "speedupPct": 85.7
+    },
+    "layout": {
+      "totalRawHp": 20,
+      "effectiveHp": 20,
+      "breakableCount": 9,
+      "wallCount": 0,
+      "portalCount": 2,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 1,
+        "2": 5,
+        "3": 3,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 2,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6318112314356208,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2570444119880704
+    }
+  },
+  {
+    "id": "22",
+    "name": "Level 22: Asteroid Shards",
+    "creator": "sourav",
+    "playCount": 950,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 7
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 7
+      }
+    ],
+    "difficulty": 0.44,
+    "parTimes": {
+      "gold": 16.9,
+      "silver": 83.6,
+      "bronze": 59.3
+    },
+    "scores": {
+      "lowest": 6650,
+      "balanced": 5250,
+      "maximum": 10858,
+      "star1": 5653,
+      "star2": 5250,
+      "star3": 11401
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 53.9,
+        "avgScore": 6650,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 76,
+        "avgScore": 5250,
+        "avgCombo": 8
+      },
+      "maximum": {
+        "avgTime": 14.7,
+        "avgScore": 10858,
+        "avgCombo": 16
+      },
+      "speedupPct": 72.7
+    },
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 27,
+      "breakableCount": 9,
+      "wallCount": 0,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 3,
+        "6": 0,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8335496832484569,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.33185063430545036
+    }
+  },
+  {
+    "id": "23",
+    "name": "Level 23: Quantum Apex Gate",
+    "creator": "sourav",
+    "playCount": 884,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.45,
+    "parTimes": {
+      "gold": 13.7,
+      "silver": 14,
+      "bronze": 64.7
+    },
+    "scores": {
+      "lowest": 5200,
+      "balanced": 5356,
+      "maximum": 5027,
+      "star1": 4420,
+      "star2": 5356,
+      "star3": 5278
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 58.8,
+        "avgScore": 5200,
+        "avgCombo": 6
+      },
+      "balanced": {
+        "avgTime": 12.7,
+        "avgScore": 5356,
+        "avgCombo": 7
+      },
+      "maximum": {
+        "avgTime": 11.9,
+        "avgScore": 5027,
+        "avgCombo": 6
+      },
+      "speedupPct": 79.8
+    },
+    "layout": {
+      "totalRawHp": 40,
+      "effectiveHp": 23,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 24,
+      "empChainedBlocks": 12,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.823606797749979,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3411546560261332
+    }
+  },
+  {
+    "id": "24",
+    "name": "Level 24: Bastion Ramparts",
+    "creator": "sourav",
+    "playCount": 818,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.45,
+    "parTimes": {
+      "gold": 18.6,
+      "silver": 89.4,
+      "bronze": 61.1
+    },
+    "scores": {
+      "lowest": 7300,
+      "balanced": 5125,
+      "maximum": 7520,
+      "star1": 6205,
+      "star2": 5125,
+      "star3": 7896
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 55.5,
+        "avgScore": 7300,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 81.3,
+        "avgScore": 5125,
+        "avgCombo": 6
+      },
+      "maximum": {
+        "avgTime": 16.2,
+        "avgScore": 7520,
+        "avgCombo": 7
+      },
+      "speedupPct": 70.8
+    },
+    "layout": {
+      "totalRawHp": 40,
+      "effectiveHp": 26,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.847847879612821,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3638817273964686
+    }
+  },
+  {
+    "id": "25",
+    "name": "Level 25: Shielded Bunker",
+    "creator": "sourav",
+    "playCount": 787,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.46,
+    "parTimes": {
+      "gold": 47.3,
+      "silver": 63.7,
+      "bronze": 71.4
+    },
+    "scores": {
+      "lowest": 4150,
+      "balanced": 3937,
+      "maximum": 4125,
+      "star1": 3528,
+      "star2": 3937,
+      "star3": 4331
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 64.9,
+        "avgScore": 4150,
+        "avgCombo": 3
+      },
+      "balanced": {
+        "avgTime": 57.9,
+        "avgScore": 3937,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 41.1,
+        "avgScore": 4125,
+        "avgCombo": 6
+      },
+      "speedupPct": 36.7
+    },
+    "layout": {
+      "totalRawHp": 30,
+      "effectiveHp": 23,
+      "breakableCount": 8,
+      "wallCount": 9,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 0,
+        "4": 2,
+        "5": 3,
+        "6": 9,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 10,
+      "empChainedBlocks": 5,
+      "shieldingIndex": 0.05625,
+      "wallDensity": 0.5294117647058824,
+      "portalDisruption": 0,
+      "spanStress": 0.6347002767500278,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.33504294258202283
+    }
+  },
+  {
+    "id": "26",
+    "name": "Level 26: Shield Wall Delta",
+    "creator": "sourav",
+    "playCount": 794,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.46,
+    "parTimes": {
+      "gold": 11.3,
+      "silver": 23.7,
+      "bronze": 71.1
+    },
+    "scores": {
+      "lowest": 5450,
+      "balanced": 6337,
+      "maximum": 5654,
+      "star1": 4633,
+      "star2": 6337,
+      "star3": 5937
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 64.6,
+        "avgScore": 5450,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 21.5,
+        "avgScore": 6337,
+        "avgCombo": 6
+      },
+      "maximum": {
+        "avgTime": 9.8,
+        "avgScore": 5654,
+        "avgCombo": 6
+      },
+      "speedupPct": 84.8
+    },
+    "layout": {
+      "totalRawHp": 34,
+      "effectiveHp": 27,
+      "breakableCount": 10,
+      "wallCount": 4,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 2,
+        "4": 4,
+        "5": 1,
+        "6": 4,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 10,
+      "empChainedBlocks": 5,
+      "shieldingIndex": 0,
+      "wallDensity": 0.2857142857142857,
+      "portalDisruption": 0,
+      "spanStress": 0.63569751761237,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.31002995231718017
+    }
+  },
+  {
+    "id": "27",
+    "name": "Level 27: Orbital Ring",
+    "creator": "sourav",
+    "playCount": 806,
+    "blocks": [
+      {
+        "x": 3,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.47,
+    "parTimes": {
+      "gold": 9.3,
+      "silver": 26.4,
+      "bronze": 89.5
+    },
+    "scores": {
+      "lowest": 5050,
+      "balanced": 5376,
+      "maximum": 6496,
+      "star1": 4293,
+      "star2": 5376,
+      "star3": 6821
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 81.4,
+        "avgScore": 5050,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 24,
+        "avgScore": 5376,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 8.1,
+        "avgScore": 6496,
+        "avgCombo": 6
+      },
+      "speedupPct": 90
+    },
+    "layout": {
+      "totalRawHp": 24,
+      "effectiveHp": 24,
+      "breakableCount": 12,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 2,
+        "2": 8,
+        "3": 2,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.46243277820691386,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.22209218945830977
+    }
+  },
+  {
+    "id": "28",
+    "name": "Level 28: Quantum Cataclysm",
+    "creator": "sourav",
+    "playCount": 787,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "h": 8
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.49,
+    "parTimes": {
+      "gold": 17.1,
+      "silver": 39.2,
+      "bronze": 45.1
+    },
+    "scores": {
+      "lowest": 10850,
+      "balanced": 6985,
+      "maximum": 9751,
+      "star1": 9223,
+      "star2": 6985,
+      "star3": 10239
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 41,
+        "avgScore": 10850,
+        "avgCombo": 12
+      },
+      "balanced": {
+        "avgTime": 35.6,
+        "avgScore": 6985,
+        "avgCombo": 11
+      },
+      "maximum": {
+        "avgTime": 14.9,
+        "avgScore": 9751,
+        "avgCombo": 14
+      },
+      "speedupPct": 63.7
+    },
+    "layout": {
+      "totalRawHp": 42,
+      "effectiveHp": 39,
+      "breakableCount": 10,
+      "wallCount": 1,
+      "portalCount": 4,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 4,
+        "5": 4,
+        "6": 1,
+        "7": 4,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.045,
+      "wallDensity": 0.09090909090909091,
+      "portalDisruption": 0.7,
+      "spanStress": 0.8160246899469287,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.4654718853102211
+    }
+  },
+  {
+    "id": "29",
+    "name": "Level 29: Quantum Lattice",
+    "creator": "sourav",
+    "playCount": 728,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.5,
+    "parTimes": {
+      "gold": 16.9,
+      "silver": 17.3,
+      "bronze": 58.7
+    },
+    "scores": {
+      "lowest": 7250,
+      "balanced": 12657,
+      "maximum": 7332,
+      "star1": 6163,
+      "star2": 12657,
+      "star3": 7699
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 53.4,
+        "avgScore": 7250,
+        "avgCombo": 6
+      },
+      "balanced": {
+        "avgTime": 15.7,
+        "avgScore": 12657,
+        "avgCombo": 20
+      },
+      "maximum": {
+        "avgTime": 14.7,
+        "avgScore": 7332,
+        "avgCombo": 6
+      },
+      "speedupPct": 72.5
+    },
+    "layout": {
+      "totalRawHp": 40,
+      "effectiveHp": 34,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0.09,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.823606797749979,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.4224046560261332
+    }
+  },
+  {
+    "id": "30",
+    "name": "Level 30: Dreadnought Bastion",
+    "creator": "sourav",
+    "playCount": 658,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      }
+    ],
+    "difficulty": 0.5,
+    "parTimes": {
+      "gold": 18.5,
+      "silver": 64.2,
+      "bronze": 59
+    },
+    "scores": {
+      "lowest": 11050,
+      "balanced": 6775,
+      "maximum": 7672,
+      "star1": 9393,
+      "star2": 6775,
+      "star3": 8056
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 53.6,
+        "avgScore": 11050,
+        "avgCombo": 14
+      },
+      "balanced": {
+        "avgTime": 58.4,
+        "avgScore": 6775,
+        "avgCombo": 9
+      },
+      "maximum": {
+        "avgTime": 16.1,
+        "avgScore": 7672,
+        "avgCombo": 8
+      },
+      "speedupPct": 70
+    },
+    "layout": {
+      "totalRawHp": 49,
+      "effectiveHp": 35,
+      "breakableCount": 11,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 7,
+        "6": 3,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0.21428571428571427,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8345207879911715,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.4150482480688056
+    }
+  },
+  {
+    "id": "31",
+    "name": "Level 31: Crossed Sabers",
+    "creator": "sourav",
+    "playCount": 616,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.52,
+    "parTimes": {
+      "gold": 10.5,
+      "silver": 22.7,
+      "bronze": 89.4
+    },
+    "scores": {
+      "lowest": 5000,
+      "balanced": 5210,
+      "maximum": 5599,
+      "star1": 4250,
+      "star2": 5210,
+      "star3": 5879
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 81.3,
+        "avgScore": 5000,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 20.6,
+        "avgScore": 5210,
+        "avgCombo": 6
+      },
+      "maximum": {
+        "avgTime": 9.1,
+        "avgScore": 5599,
+        "avgCombo": 6
+      },
+      "speedupPct": 88.8
+    },
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 27,
+      "breakableCount": 11,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 4,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.8486326242032244,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2991130754486655
+    }
+  },
+  {
+    "id": "32",
+    "name": "Level 32: Chaos Lattice",
+    "creator": "sourav",
+    "playCount": 614,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.53,
+    "parTimes": {
+      "gold": 32,
+      "silver": 110.6,
+      "bronze": 94.3
+    },
+    "scores": {
+      "lowest": 6850,
+      "balanced": 6850,
+      "maximum": 5730,
+      "star1": 5823,
+      "star2": 6850,
+      "star3": 6017
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 85.7,
+        "avgScore": 6850,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 100.5,
+        "avgScore": 6850,
+        "avgCombo": 11
+      },
+      "maximum": {
+        "avgTime": 27.8,
+        "avgScore": 5730,
+        "avgCombo": 7
+      },
+      "speedupPct": 67.6
+    },
+    "layout": {
+      "totalRawHp": 36,
+      "effectiveHp": 22,
+      "breakableCount": 10,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 4,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 4
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0.135,
+      "wallDensity": 0.16666666666666666,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6666666666666667,
+      "enclosedCount": 2,
+      "staticDifficulty": 0.33375
+    }
+  },
+  {
+    "id": "33",
+    "name": "Level 33: Pulse Bastion",
+    "creator": "sourav",
+    "playCount": 629,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.54,
+    "parTimes": {
+      "gold": 13.6,
+      "silver": 84,
+      "bronze": 101.6
+    },
+    "scores": {
+      "lowest": 6500,
+      "balanced": 8295,
+      "maximum": 6178,
+      "star1": 5525,
+      "star2": 8295,
+      "star3": 6487
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 92.4,
+        "avgScore": 6500,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 76.4,
+        "avgScore": 8295,
+        "avgCombo": 4
+      },
+      "maximum": {
+        "avgTime": 11.8,
+        "avgScore": 6178,
+        "avgCombo": 6
+      },
+      "speedupPct": 87.2
+    },
+    "layout": {
+      "totalRawHp": 45,
+      "effectiveHp": 20,
+      "breakableCount": 12,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 4,
+        "4": 3,
+        "5": 3,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 36,
+      "empChainedBlocks": 18,
+      "shieldingIndex": 0,
+      "wallDensity": 0.14285714285714285,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8121320343559643,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.30552110385469333
+    }
+  },
+  {
+    "id": "34",
+    "name": "Level 34: Hypercube Warp",
+    "creator": "sourav",
+    "playCount": 621,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.54,
+    "parTimes": {
+      "gold": 22.4,
+      "silver": 24.6,
+      "bronze": 87.8
+    },
+    "scores": {
+      "lowest": 5150,
+      "balanced": 4589,
+      "maximum": 5213,
+      "star1": 4378,
+      "star2": 4589,
+      "star3": 5474
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 79.8,
+        "avgScore": 5150,
+        "avgCombo": 6
+      },
+      "balanced": {
+        "avgTime": 22.4,
+        "avgScore": 4589,
+        "avgCombo": 3
+      },
+      "maximum": {
+        "avgTime": 19.5,
+        "avgScore": 5213,
+        "avgCombo": 6
+      },
+      "speedupPct": 75.6
+    },
+    "layout": {
+      "totalRawHp": 37,
+      "effectiveHp": 26,
+      "breakableCount": 9,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 4,
+        "6": 3,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.1,
+      "wallDensity": 0.25,
+      "portalDisruption": 0.35,
+      "spanStress": 0.63569751761237,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.3583091730964009
+    }
+  },
+  {
+    "id": "35",
+    "name": "Level 35: Omega Bastion",
+    "creator": "sourav",
+    "playCount": 572,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 5
+      }
+    ],
+    "difficulty": 0.54,
+    "parTimes": {
+      "gold": 12,
+      "silver": 16.5,
+      "bronze": 56.4
+    },
+    "scores": {
+      "lowest": 6650,
+      "balanced": 9375,
+      "maximum": 8216,
+      "star1": 5653,
+      "star2": 9375,
+      "star3": 8627
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 51.3,
+        "avgScore": 6650,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 15,
+        "avgScore": 9375,
+        "avgCombo": 10
+      },
+      "maximum": {
+        "avgTime": 10.4,
+        "avgScore": 8216,
+        "avgCombo": 8
+      },
+      "speedupPct": 79.7
+    },
+    "layout": {
+      "totalRawHp": 54,
+      "effectiveHp": 41,
+      "breakableCount": 12,
+      "wallCount": 4,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 8,
+        "6": 4,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 18,
+      "empChainedBlocks": 9,
+      "shieldingIndex": 0.075,
+      "wallDensity": 0.25,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8211083193570267,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.4753253388126448
+    }
+  },
+  {
+    "id": "36",
+    "name": "Level 36: Titanium Vault Gate",
+    "creator": "sourav",
+    "playCount": 501,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      }
+    ],
+    "difficulty": 0.55,
+    "parTimes": {
+      "gold": 65.1,
+      "silver": 35.8,
+      "bronze": 88.7
+    },
+    "scores": {
+      "lowest": 5150,
+      "balanced": 4994,
+      "maximum": 3200,
+      "star1": 4378,
+      "star2": 4994,
+      "star3": 3360
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 80.6,
+        "avgScore": 5150,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 32.5,
+        "avgScore": 4994,
+        "avgCombo": 8
+      },
+      "maximum": {
+        "avgTime": 56.6,
+        "avgScore": 3200,
+        "avgCombo": 3
+      },
+      "speedupPct": 29.8
+    },
+    "layout": {
+      "totalRawHp": 31,
+      "effectiveHp": 28,
+      "breakableCount": 7,
+      "wallCount": 7,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 2,
+        "5": 4,
+        "6": 7,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.0642857142857143,
+      "wallDensity": 0.5,
+      "portalDisruption": 0,
+      "spanStress": 0.6666666666666667,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.3692532467532468
+    }
+  },
+  {
+    "id": "37",
+    "name": "Level 37: Solar Flare",
+    "creator": "sourav",
+    "playCount": 447,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 0,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 4
+      }
+    ],
+    "difficulty": 0.55,
+    "parTimes": {
+      "gold": 23.7,
+      "silver": 18.3,
+      "bronze": 97.9
+    },
+    "scores": {
+      "lowest": 5300,
+      "balanced": 6959,
+      "maximum": 5909,
+      "star1": 4505,
+      "star2": 6959,
+      "star3": 6204
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 89,
+        "avgScore": 5300,
+        "avgCombo": 4
+      },
+      "balanced": {
+        "avgTime": 16.6,
+        "avgScore": 6959,
+        "avgCombo": 6
+      },
+      "maximum": {
+        "avgTime": 20.6,
+        "avgScore": 5909,
+        "avgCombo": 4
+      },
+      "speedupPct": 76.9
+    },
+    "layout": {
+      "totalRawHp": 45,
+      "effectiveHp": 31,
+      "breakableCount": 13,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 4,
+        "5": 2,
+        "6": 0,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 20,
+      "empChainedBlocks": 10,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6330767255342354,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.29223423610286253
+    }
+  },
+  {
+    "id": "38",
+    "name": "Level 38: Genesis Overdrive",
+    "creator": "sourav",
+    "playCount": 435,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 4
+      }
+    ],
+    "difficulty": 0.55,
+    "parTimes": {
+      "gold": 42.4,
+      "silver": 51,
+      "bronze": 64.1
+    },
+    "scores": {
+      "lowest": 16600,
+      "balanced": 10818,
+      "maximum": 9306,
+      "star1": 14110,
+      "star2": 10818,
+      "star3": 9771
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 58.3,
+        "avgScore": 16600,
+        "avgCombo": 26
+      },
+      "balanced": {
+        "avgTime": 46.4,
+        "avgScore": 10818,
+        "avgCombo": 15
+      },
+      "maximum": {
+        "avgTime": 36.9,
+        "avgScore": 9306,
+        "avgCombo": 8
+      },
+      "speedupPct": 36.7
+    },
+    "layout": {
+      "totalRawHp": 55,
+      "effectiveHp": 44,
+      "breakableCount": 12,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 8,
+        "6": 1,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.0375,
+      "wallDensity": 0.07692307692307693,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.4304083589662933
+    }
+  },
+  {
+    "id": "39",
+    "name": "Level 39: Cyber Trident Core",
+    "creator": "sourav",
+    "playCount": 449,
+    "blocks": [
+      {
+        "x": 0,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "h": 8
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.56,
+    "parTimes": {
+      "gold": 37.1,
+      "silver": 17.3,
+      "bronze": 74.1
+    },
+    "scores": {
+      "lowest": 7600,
+      "balanced": 7484,
+      "maximum": 5299,
+      "star1": 6460,
+      "star2": 7484,
+      "star3": 5564
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 67.4,
+        "avgScore": 7600,
+        "avgCombo": 10
+      },
+      "balanced": {
+        "avgTime": 15.7,
+        "avgScore": 7484,
+        "avgCombo": 9
+      },
+      "maximum": {
+        "avgTime": 32.3,
+        "avgScore": 5299,
+        "avgCombo": 5
+      },
+      "speedupPct": 52.1
+    },
+    "layout": {
+      "totalRawHp": 43,
+      "effectiveHp": 40,
+      "breakableCount": 11,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 1,
+        "3": 2,
+        "4": 3,
+        "5": 4,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.04090909090909091,
+      "wallDensity": 0.15384615384615385,
+      "portalDisruption": 0,
+      "spanStress": 0.8148344622118299,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.41007481968142484
+    }
+  },
+  {
+    "id": "40",
+    "name": "Level 40: Obsidian Monolith",
+    "creator": "sourav",
+    "playCount": 451,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 0,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.57,
+    "parTimes": {
+      "gold": 22.5,
+      "silver": 41.8,
+      "bronze": 148.5
+    },
+    "scores": {
+      "lowest": 15350,
+      "balanced": 5683,
+      "maximum": 6160,
+      "star1": 13048,
+      "star2": 5683,
+      "star3": 6468
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 135,
+        "avgScore": 15350,
+        "avgCombo": 14
+      },
+      "balanced": {
+        "avgTime": 38,
+        "avgScore": 5683,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 19.6,
+        "avgScore": 6160,
+        "avgCombo": 7
+      },
+      "speedupPct": 85.5
+    },
+    "layout": {
+      "totalRawHp": 53,
+      "effectiveHp": 25,
+      "breakableCount": 13,
+      "wallCount": 3,
+      "portalCount": 0,
+      "empCount": 3,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 2,
+        "5": 6,
+        "6": 3,
+        "7": 0,
+        "8": 3
+      },
+      "empCascadeYield": 40,
+      "empChainedBlocks": 20,
+      "shieldingIndex": 0.03461538461538462,
+      "wallDensity": 0.1875,
+      "portalDisruption": 0,
+      "spanStress": 0.6247805496750857,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.2895868376960181
+    }
+  },
+  {
+    "id": "41",
+    "name": "Level 41: Hourglass Matrix",
+    "creator": "sourav",
+    "playCount": 414,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "h": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "h": 1
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "h": 1
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.57,
+    "parTimes": {
+      "gold": 17,
+      "silver": 24.2,
+      "bronze": 89.8
+    },
+    "scores": {
+      "lowest": 18900,
+      "balanced": 8249,
+      "maximum": 9728,
+      "star1": 16065,
+      "star2": 8249,
+      "star3": 10214
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 81.6,
+        "avgScore": 18900,
+        "avgCombo": 21
+      },
+      "balanced": {
+        "avgTime": 22,
+        "avgScore": 8249,
+        "avgCombo": 8
+      },
+      "maximum": {
+        "avgTime": 14.8,
+        "avgScore": 9728,
+        "avgCombo": 9
+      },
+      "speedupPct": 81.9
+    },
+    "layout": {
+      "totalRawHp": 38,
+      "effectiveHp": 38,
+      "breakableCount": 19,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 0,
+      "hpDistribution": {
+        "1": 6,
+        "2": 8,
+        "3": 4,
+        "4": 1,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0
+      },
+      "empCascadeYield": 0,
+      "empChainedBlocks": 0,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.6640175430798527,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3414208132801597
+    }
+  },
+  {
+    "id": "42",
+    "name": "Level 42: Grand Apex Reactor",
+    "creator": "sourav",
+    "playCount": 345,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 4
+      }
+    ],
+    "difficulty": 0.59,
+    "parTimes": {
+      "gold": 17.1,
+      "silver": 46.5,
+      "bronze": 74.6
+    },
+    "scores": {
+      "lowest": 11550,
+      "balanced": 8214,
+      "maximum": 6677,
+      "star1": 9818,
+      "star2": 8214,
+      "star3": 7011
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 67.8,
+        "avgScore": 11550,
+        "avgCombo": 14
+      },
+      "balanced": {
+        "avgTime": 42.3,
+        "avgScore": 8214,
+        "avgCombo": 9
+      },
+      "maximum": {
+        "avgTime": 14.9,
+        "avgScore": 6677,
+        "avgCombo": 5
+      },
+      "speedupPct": 78
+    },
+    "layout": {
+      "totalRawHp": 63,
+      "effectiveHp": 42,
+      "breakableCount": 14,
+      "wallCount": 2,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 9,
+        "6": 2,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 30,
+      "empChainedBlocks": 15,
+      "shieldingIndex": 0.03214285714285715,
+      "wallDensity": 0.125,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.44905844155844155
+    }
+  },
+  {
+    "id": "43",
+    "name": "Level 43: Singularity Overdrive",
+    "creator": "sourav",
+    "playCount": 283,
+    "blocks": [
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.61,
+    "parTimes": {
+      "gold": 40.8,
+      "silver": 58.9,
+      "bronze": 154.2
+    },
+    "scores": {
+      "lowest": 13850,
+      "balanced": 6497,
+      "maximum": 6667,
+      "star1": 11773,
+      "star2": 6497,
+      "star3": 7000
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 140.2,
+        "avgScore": 13850,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 53.5,
+        "avgScore": 6497,
+        "avgCombo": 7
+      },
+      "maximum": {
+        "avgTime": 35.5,
+        "avgScore": 6667,
+        "avgCombo": 7
+      },
+      "speedupPct": 74.7
+    },
+    "layout": {
+      "totalRawHp": 57,
+      "effectiveHp": 30,
+      "breakableCount": 13,
+      "wallCount": 1,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 2,
+        "5": 8,
+        "6": 1,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 38,
+      "empChainedBlocks": 19,
+      "shieldingIndex": 0,
+      "wallDensity": 0.07142857142857142,
+      "portalDisruption": 0.35,
+      "spanStress": 0.6247805496750857,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.33034045907463944
+    }
+  },
+  {
+    "id": "44",
+    "name": "Level 44: Space Invader",
+    "creator": "sourav",
+    "playCount": 259,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 3
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 3
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "h": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "h": 2
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "h": 2
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "h": 1
+      }
+    ],
+    "difficulty": 0.61,
+    "parTimes": {
+      "gold": 28.9,
+      "silver": 28.3,
+      "bronze": 82.4
+    },
+    "scores": {
+      "lowest": 8250,
+      "balanced": 13732,
+      "maximum": 7523,
+      "star1": 7013,
+      "star2": 13732,
+      "star3": 7899
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 74.9,
+        "avgScore": 8250,
+        "avgCombo": 8
+      },
+      "balanced": {
+        "avgTime": 25.7,
+        "avgScore": 13732,
+        "avgCombo": 16
+      },
+      "maximum": {
+        "avgTime": 25.1,
+        "avgScore": 7523,
+        "avgCombo": 7
+      },
+      "speedupPct": 66.5
+    },
+    "layout": {
+      "totalRawHp": 49,
+      "effectiveHp": 41,
+      "breakableCount": 17,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 2,
+        "2": 4,
+        "3": 4,
+        "4": 6,
+        "5": 0,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 12,
+      "empChainedBlocks": 6,
+      "shieldingIndex": 0.15882352941176472,
+      "wallDensity": 0.10526315789473684,
+      "portalDisruption": 0,
+      "spanStress": 0.8271099895830676,
+      "enclosedCount": 4,
+      "staticDifficulty": 0.4404709453837028
+    }
+  },
+  {
+    "id": "45",
+    "name": "Level 45: Laser Citadel",
+    "creator": "sourav",
+    "playCount": 269,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 7
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 6
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.63,
+    "parTimes": {
+      "gold": 20.2,
+      "silver": 47.6,
+      "bronze": 102.2
+    },
+    "scores": {
+      "lowest": 5950,
+      "balanced": 8199,
+      "maximum": 7908,
+      "star1": 5058,
+      "star2": 8199,
+      "star3": 8303
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 92.9,
+        "avgScore": 5950,
+        "avgCombo": 6
+      },
+      "balanced": {
+        "avgTime": 43.3,
+        "avgScore": 8199,
+        "avgCombo": 12
+      },
+      "maximum": {
+        "avgTime": 17.6,
+        "avgScore": 7908,
+        "avgCombo": 8
+      },
+      "speedupPct": 81.1
+    },
+    "layout": {
+      "totalRawHp": 41,
+      "effectiveHp": 35,
+      "breakableCount": 10,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 3,
+        "5": 4,
+        "6": 3,
+        "7": 2,
+        "8": 1
+      },
+      "empCascadeYield": 8,
+      "empChainedBlocks": 4,
+      "shieldingIndex": 0.09,
+      "wallDensity": 0.23076923076923078,
+      "portalDisruption": 0.35,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 1,
+      "staticDifficulty": 0.4093375547704891
+    }
+  },
+  {
+    "id": "46",
+    "name": "Level 46: Fortress Citadel 2",
+    "creator": "sourav",
+    "playCount": 278,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.64,
+    "parTimes": {
+      "gold": 31.7,
+      "silver": 48,
+      "bronze": 121.6
+    },
+    "scores": {
+      "lowest": 5600,
+      "balanced": 5163,
+      "maximum": 4731,
+      "star1": 4760,
+      "star2": 5163,
+      "star3": 4968
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 110.5,
+        "avgScore": 5600,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 43.6,
+        "avgScore": 5163,
+        "avgCombo": 8
+      },
+      "maximum": {
+        "avgTime": 27.6,
+        "avgScore": 4731,
+        "avgCombo": 4
+      },
+      "speedupPct": 75
+    },
+    "layout": {
+      "totalRawHp": 35,
+      "effectiveHp": 32,
+      "breakableCount": 9,
+      "wallCount": 4,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 2,
+        "4": 4,
+        "5": 2,
+        "6": 4,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 4,
+      "empChainedBlocks": 2,
+      "shieldingIndex": 0.05,
+      "wallDensity": 0.3076923076923077,
+      "portalDisruption": 0,
+      "spanStress": 0.857203899958469,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3908707947839801
+    }
+  },
+  {
+    "id": "47",
+    "name": "Level 47: Titan Citadel Core",
+    "creator": "sourav",
+    "playCount": 253,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 6
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "h": 7
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "h": 7
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 4
+      }
+    ],
+    "difficulty": 0.65,
+    "parTimes": {
+      "gold": 36.8,
+      "silver": 62.2,
+      "bronze": 141.5
+    },
+    "scores": {
+      "lowest": 13100,
+      "balanced": 5750,
+      "maximum": 7635,
+      "star1": 11135,
+      "star2": 5750,
+      "star3": 8017
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 128.6,
+        "avgScore": 13100,
+        "avgCombo": 7
+      },
+      "balanced": {
+        "avgTime": 56.5,
+        "avgScore": 5750,
+        "avgCombo": 5
+      },
+      "maximum": {
+        "avgTime": 32,
+        "avgScore": 7635,
+        "avgCombo": 6
+      },
+      "speedupPct": 75.1
+    },
+    "layout": {
+      "totalRawHp": 53,
+      "effectiveHp": 33,
+      "breakableCount": 12,
+      "wallCount": 3,
+      "portalCount": 2,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 3,
+        "5": 7,
+        "6": 3,
+        "7": 2,
+        "8": 2
+      },
+      "empCascadeYield": 28,
+      "empChainedBlocks": 14,
+      "shieldingIndex": 0,
+      "wallDensity": 0.2,
+      "portalDisruption": 0.35,
+      "spanStress": 0.8057983021710107,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.39586974532565156
+    }
+  },
+  {
+    "id": "48",
+    "name": "Level 48: Cyber Skull",
+    "creator": "sourav",
+    "playCount": 190,
+    "blocks": [
+      {
+        "x": 2,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 4
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "h": 4
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "h": 8
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 3
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 2
+      }
+    ],
+    "difficulty": 0.67,
+    "parTimes": {
+      "gold": 26.6,
+      "silver": 73.2,
+      "bronze": 145.8
+    },
+    "scores": {
+      "lowest": 13650,
+      "balanced": 7471,
+      "maximum": 7648,
+      "star1": 11603,
+      "star2": 7471,
+      "star3": 8030
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 132.5,
+        "avgScore": 13650,
+        "avgCombo": 9
+      },
+      "balanced": {
+        "avgTime": 66.5,
+        "avgScore": 7471,
+        "avgCombo": 10
+      },
+      "maximum": {
+        "avgTime": 23.1,
+        "avgScore": 7648,
+        "avgCombo": 8
+      },
+      "speedupPct": 82.6
+    },
+    "layout": {
+      "totalRawHp": 50,
+      "effectiveHp": 40,
+      "breakableCount": 14,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 2,
+        "3": 4,
+        "4": 4,
+        "5": 3,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 14,
+      "empChainedBlocks": 7,
+      "shieldingIndex": 0.1285714285714286,
+      "wallDensity": 0.125,
+      "portalDisruption": 0,
+      "spanStress": 0.6570609943132644,
+      "enclosedCount": 2,
+      "staticDifficulty": 0.4039974608353013
+    }
+  },
+  {
+    "id": "49",
+    "name": "Level 49: Plasma Supernova",
+    "creator": "sourav",
+    "playCount": 121,
+    "blocks": [
+      {
+        "x": 4,
+        "y": 0,
+        "h": 8
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "h": 5
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 4
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.69,
+    "parTimes": {
+      "gold": 16,
+      "silver": 70.3,
+      "bronze": 134.5
+    },
+    "scores": {
+      "lowest": 16750,
+      "balanced": 8525,
+      "maximum": 12777,
+      "star1": 14238,
+      "star2": 8525,
+      "star3": 13416
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 122.3,
+        "avgScore": 16750,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 63.9,
+        "avgScore": 8525,
+        "avgCombo": 15
+      },
+      "maximum": {
+        "avgTime": 13.9,
+        "avgScore": 12777,
+        "avgCombo": 13
+      },
+      "speedupPct": 88.6
+    },
+    "layout": {
+      "totalRawHp": 65,
+      "effectiveHp": 47,
+      "breakableCount": 15,
+      "wallCount": 0,
+      "portalCount": 0,
+      "empCount": 2,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 1,
+        "4": 4,
+        "5": 8,
+        "6": 0,
+        "7": 0,
+        "8": 2
+      },
+      "empCascadeYield": 26,
+      "empChainedBlocks": 13,
+      "shieldingIndex": 0,
+      "wallDensity": 0,
+      "portalDisruption": 0,
+      "spanStress": 0.625831151817511,
+      "enclosedCount": 0,
+      "staticDifficulty": 0.3929655818635357
+    }
+  },
+  {
+    "id": "50",
+    "name": "Level 50: Anvil Core",
+    "creator": "sourav",
+    "playCount": 90,
+    "blocks": [
+      {
+        "x": 1,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "h": 5
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "h": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "h": 6
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "h": 4
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "h": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "h": 3
+      }
+    ],
+    "difficulty": 0.7,
+    "parTimes": {
+      "gold": 16.4,
+      "silver": 63.8,
+      "bronze": 159
+    },
+    "scores": {
+      "lowest": 13150,
+      "balanced": 7366,
+      "maximum": 6292,
+      "star1": 11178,
+      "star2": 7366,
+      "star3": 6607
+    },
+    "performance": {
+      "lowest": {
+        "avgTime": 144.5,
+        "avgScore": 13150,
+        "avgCombo": 5
+      },
+      "balanced": {
+        "avgTime": 58,
+        "avgScore": 7366,
+        "avgCombo": 7
+      },
+      "maximum": {
+        "avgTime": 14.3,
+        "avgScore": 6292,
+        "avgCombo": 5
+      },
+      "speedupPct": 90.1
+    },
+    "layout": {
+      "totalRawHp": 55,
+      "effectiveHp": 44,
+      "breakableCount": 13,
+      "wallCount": 2,
+      "portalCount": 0,
+      "empCount": 1,
+      "hpDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 3,
+        "4": 2,
+        "5": 7,
+        "6": 2,
+        "7": 0,
+        "8": 1
+      },
+      "empCascadeYield": 16,
+      "empChainedBlocks": 8,
+      "shieldingIndex": 0.13846153846153847,
+      "wallDensity": 0.13333333333333333,
+      "portalDisruption": 0,
+      "spanStress": 0.629965982852212,
+      "enclosedCount": 2,
+      "staticDifficulty": 0.4291102820432164
+    }
+  }
+]

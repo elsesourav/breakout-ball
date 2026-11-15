@@ -23,6 +23,16 @@ const GLOBAL_PILOTS: Omit<ScoreLeaderboardEntry, 'rank'>[] = [
   { username: 'hyper_dash', score: 149300, coresCleared: 18, badgeTitle: 'Challenger' },
   { username: 'retro_pilot', score: 124500, coresCleared: 15, badgeTitle: 'Cadet Striker' },
   { username: 'nova_cadet', score: 98200, coresCleared: 12, badgeTitle: 'Rookie Pilot' },
+  { username: 'pixel_master', score: 87400, coresCleared: 11, badgeTitle: 'Arcade Cadet' },
+  { username: 'laser_runner', score: 76100, coresCleared: 10, badgeTitle: 'Laser Scout' },
+  { username: 'void_walker', score: 65900, coresCleared: 9, badgeTitle: 'Void Runner' },
+  { username: 'solar_flare', score: 54300, coresCleared: 8, badgeTitle: 'Star Cadet' },
+  { username: 'crypto_striker', score: 42100, coresCleared: 6, badgeTitle: 'Sector Scout' },
+  { username: 'echo_pulse', score: 33800, coresCleared: 5, badgeTitle: 'Pulse Cadet' },
+  { username: 'zero_gravity', score: 25400, coresCleared: 4, badgeTitle: 'Orbit Trainee' },
+  { username: 'plasma_storm', score: 18200, coresCleared: 3, badgeTitle: 'Novice Pilot' },
+  { username: 'nebula_rider', score: 12500, coresCleared: 2, badgeTitle: 'Trainee' },
+  { username: 'omega_cadet', score: 7800, coresCleared: 1, badgeTitle: 'Recruit' },
 ];
 
 const WEEKLY_PILOTS: Omit<ScoreLeaderboardEntry, 'rank'>[] = [
@@ -32,6 +42,12 @@ const WEEKLY_PILOTS: Omit<ScoreLeaderboardEntry, 'rank'>[] = [
   { username: 'arcade_queen', score: 104200, coresCleared: 17, badgeTitle: 'Challenger' },
   { username: 'breakout_pro', score: 92800, coresCleared: 15, badgeTitle: 'Core Striker' },
   { username: 'neon_striker', score: 81500, coresCleared: 13, badgeTitle: 'Rookie' },
+  { username: 'quantum_ace', score: 71200, coresCleared: 11, badgeTitle: 'Weekly Scout' },
+  { username: 'hyper_dash', score: 58900, coresCleared: 9, badgeTitle: 'Weekly Cadet' },
+  { username: 'retro_pilot', score: 44200, coresCleared: 7, badgeTitle: 'Sector Runner' },
+  { username: 'nova_cadet', score: 31000, coresCleared: 5, badgeTitle: 'Recruit' },
+  { username: 'laser_runner', score: 21500, coresCleared: 3, badgeTitle: 'Trainee' },
+  { username: 'solar_flare', score: 12800, coresCleared: 2, badgeTitle: 'Novice' },
 ];
 
 export const OverallScoreLeaderboard: React.FC = () => {
@@ -117,21 +133,23 @@ export const OverallScoreLeaderboard: React.FC = () => {
       }}
       className="w-full h-full overflow-hidden backdrop-blur-xl"
     >
-      {/* 1. Header Bar: Trophy Icon, Title & Compact Tab Toggle (Strictly Single-Line Fit) */}
+      {/* 1. Header Bar: Trophy Icon, Title & Compact Tab Toggle */}
       <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-cyan-500/20 bg-cyan-950/20 flex-shrink-0 gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.3)] flex-shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-400/35 flex items-center justify-center text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.25)] flex-shrink-0">
             <Trophy className="w-3.5 h-3.5 text-amber-400" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-tech text-[8.5px] text-cyan-400 tracking-widest uppercase font-bold leading-none">
-              SCORE
-            </span>
-            <h3 className="font-display font-black text-[11px] text-white tracking-wider leading-tight mt-0.5 whitespace-nowrap">
-              LEADERBOARD
-            </h3>
-            <span className="font-tech text-[8px] text-slate-400 whitespace-nowrap leading-none mt-0.5">
-              GLOBAL RANKINGS
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="font-tech text-[9px] font-bold text-cyan-400 tracking-wider">
+                SCORE
+              </span>
+              <h3 className="font-display font-bold text-[11.5px] text-white tracking-wide whitespace-nowrap">
+                LEADERBOARD
+              </h3>
+            </div>
+            <span className="font-ui text-[9px] text-slate-400 tracking-normal leading-none mt-1 whitespace-nowrap">
+              Global Pilot Rankings
             </span>
           </div>
         </div>
@@ -203,13 +221,16 @@ export const OverallScoreLeaderboard: React.FC = () => {
           <CoreIcon size={11} glow variant="cyan" />
           CORES
         </span>
-        <span className="text-right font-bold pr-1">SCORE</span>
+        <span className="text-right font-bold pr-2">SCORE</span>
       </div>
 
       {/* 3. Skeleton Loading State or Ranking Rows List */}
       {isLoading ? (
-        /* Cyberpunk Skeleton Loader with Shimmer Wave */
-        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 cyber-scroll">
+        /* Cyberpunk Skeleton Loader with Shimmer Wave (No scrollbar) */
+        <div
+          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar"
+          data-inner-scroll="true"
+        >
           {[...Array(6)].map((_, idx) => (
             <div
               key={`skeleton-${idx}`}
@@ -242,18 +263,20 @@ export const OverallScoreLeaderboard: React.FC = () => {
                 <div className="h-2.5 w-7 rounded cyber-shimmer-box" />
               </div>
 
-              {/* Score Placeholder */}
-              <div className="flex flex-col items-end gap-1 pr-1">
+              {/* Score Placeholder (No PTS label box) */}
+              <div className="flex justify-end pr-2">
                 <div className="h-3 w-12 rounded cyber-shimmer-box" />
-                <div className="h-2 w-6 rounded cyber-shimmer-box opacity-50" />
               </div>
             </div>
           ))}
         </div>
       ) : (
-        /* Real Rankings Rows List (Independently Scrollable) */
-        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 cyber-scroll">
-          {rankedList.slice(0, 10).map((entry) => {
+        /* Real Rankings Rows List (Independently Scrollable, No scrollbar) */
+        <div
+          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar"
+          data-inner-scroll="true"
+        >
+          {rankedList.slice(0, 20).map((entry) => {
             const isUser = entry.isCurrentUser;
             const isRank1 = entry.rank === 1;
             const isRank2 = entry.rank === 2;
@@ -392,21 +415,18 @@ export const OverallScoreLeaderboard: React.FC = () => {
                   <span className="text-[10px] text-slate-500">/30</span>
                 </div>
 
-                {/* Score */}
-                <div className="text-right pr-1">
+                {/* Score (Clean number without repeating PTS in every row) */}
+                <div className="text-right pr-2">
                   <span
-                    className={`font-tech font-black text-xs tracking-wider ${
+                    className={`font-tech font-bold text-xs tracking-wider ${
                       isUser
-                        ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(0,247,255,0.6)]'
+                        ? 'text-cyan-300 font-black drop-shadow-[0_0_8px_rgba(0,247,255,0.6)]'
                         : isRank1
-                        ? 'text-amber-300'
+                        ? 'text-amber-300 font-extrabold'
                         : 'text-white'
                     }`}
                   >
                     {entry.score >= 1000 ? `${(entry.score / 1000).toFixed(1)}k` : entry.score}
-                  </span>
-                  <span className="block text-[8px] font-tech text-cyan-400 uppercase tracking-widest leading-none">
-                    PTS
                   </span>
                 </div>
               </div>

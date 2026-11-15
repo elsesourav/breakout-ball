@@ -61,7 +61,7 @@ export interface GameSettings {
 
 export type ActiveTab = 'local' | 'online' | 'armory' | 'create' | 'profile';
 
-export type GameScreen = 'menu' | 'preview' | 'playing' | 'designer';
+export type GameScreen = 'menu' | 'preview' | 'playing' | 'designer' | 'design-lab';
 
 export interface AlertConfig {
   title: string;

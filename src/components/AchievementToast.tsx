@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Achievement } from '../types/game';
 import { achievementManager } from '../services/achievements';
 import { synthAudio } from '../utils/synthAudio';
-import { Trophy, Zap, Sparkles, Flame, Crown, Shield, Target, Compass, Timer, Palette, Globe, X } from 'lucide-react';
+import { Trophy, Zap, Flame, Crown, Shield, Target, Compass, Timer, Palette, Globe, X } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   zap: Zap,
   flame: Flame,
-  sparkles: Sparkles,
+  sparkles: Zap,
   compass: Compass,
   target: Target,
   timer: Timer,

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ball 3D Design Versions & Upgrades</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #030612;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 24px;
+      width: 1200px;
+    }
+    .header {
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(0, 247, 255, 0.35);
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #00f7ff;
+      text-transform: uppercase;
+    }
+    .version-card {
+      background: #06091c;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    }
+    .version-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .version-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-num {
+      background: #0f172a;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .badge-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+    .badge-tag {
+      font-size: 10px;
+      font-family: monospace;
+      background: rgba(0, 247, 255, 0.12);
+      border: 1px solid rgba(0, 247, 255, 0.35);
+      color: #7df9ff;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+    .balls-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+    .ball-cell {
+      background: #02040c;
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      border-radius: 10px;
+      padding: 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ball-label {
+      font-size: 10px;
+      font-family: monospace;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">🔮 3D BALL DESIGN VERSIONS & UPGRADE TIERS</div>
+    <div style="font-size: 11px; font-family: monospace; color: #64748b;">STRICTLY INTERNAL 3D EFFECTS · ZERO OUTSIDE PARTICLES</div>
+  </div>
+
+  <div id="balls-container"></div>
+
+  <script src="./dist/renderBundle.js"></script>
+  <script>
+    const container = document.getElementById('balls-container');
+    const versions = [1, 2, 3];
+    const palettes = [
+      { name: 'CYAN', glow: '#00f7ff', c1: '#ffffff', c2: '#7df9ff', c3: '#0055ff' },
+      { name: 'FIRE', glow: '#ff5500', c1: '#ffffff', c2: '#ff9900', c3: '#ff0055' },
+      { name: 'VOID', glow: '#c084fc', c1: '#ffffff', c2: '#e879f9', c3: '#7c3aed' },
+      { name: 'GOLD', glow: '#ffd700', c1: '#ffffff', c2: '#fef08a', c3: '#eab308' },
+    ];
+
+    versions.forEach(vId => {
+      const meta = AssetForge.BALL_PRESET_METADATA[vId];
+      const card = document.createElement('div');
+      card.className = 'version-card';
+
+      card.innerHTML = `
+        <div class="version-header">
+          <div class="version-badge">
+            <span class="badge-num">OPTION ${vId}</span>
+            <span class="badge-title">${meta.name}</span>
+            <span class="badge-tag">${meta.tag}</span>
+          </div>
+        </div>
+        <div class="balls-grid" id="ball-grid-${vId}"></div>
+      `;
+
+      container.appendChild(card);
+      const grid = document.getElementById(`ball-grid-${vId}`);
+
+      // Showcase: Tier 1 Cyan, Tier 2 Cyan, Tier 3 Cyan, Tier 3 Fire, Tier 3 Void, Tier 3 Mega
+      const items = [
+        { label: 'T1 BASE (CYAN)', tier: 1, pal: palettes[0], isMega: false },
+        { label: 'T2 FUSION (CYAN)', tier: 2, pal: palettes[0], isMega: false },
+        { label: 'T3 APEX (CYAN)', tier: 3, pal: palettes[0], isMega: false },
+        { label: 'T3 APEX (FIRE)', tier: 3, pal: palettes[1], isMega: false },
+        { label: 'T3 APEX (VOID)', tier: 3, pal: palettes[2], isMega: false },
+        { label: 'T3 APEX (MEGA CORE)', tier: 3, pal: palettes[3], isMega: true },
+      ];
+
+      items.forEach(it => {
+        const cell = document.createElement('div');
+        cell.className = 'ball-cell';
+        cell.innerHTML = `<span class="ball-label">${it.label}</span>`;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 110;
+        canvas.height = 110;
+        const ctx = canvas.getContext('2d');
+
+        const radius = 34;
+        const ball = {
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          radius,
+          isMega: it.isMega
+        };
+
+        AssetForge.drawBallWithPreset(ctx, ball, vId, {
+          animTick: 2.4,
+          tier: it.tier,
+          palette: it.pal,
+          isMega: it.isMega
+        });
+
+        cell.appendChild(canvas);
+        grid.appendChild(cell);
+      });
+    });
+  </script>
+</body>
+</html>

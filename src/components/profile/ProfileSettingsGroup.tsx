@@ -1,32 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
-import { ArcadeSlider, ArcadeSwitch } from '@elsesourav/react-ui';
-import { Volume2, Vibrate, Compass, Sliders, Trash2 } from 'lucide-react';
+import { CustomCyberSlider } from '../common/CustomCyberSlider';
+import { CustomCyberSwitch } from '../common/CustomCyberSwitch';
+import { Volume2, Vibrate, Compass, Sliders, Trash2, AlertTriangle } from 'lucide-react';
+import { soundManager } from '../../utils/audio';
 
 export const ProfileSettingsGroup: React.FC = () => {
-  const { settings, updateSettings, showAlert } = useGame();
+  const { settings, updateSettings } = useGame();
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetInputText, setResetInputText] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
-  const handleResetProgress = () => {
-    showAlert({
-      title: 'RESET PROGRESS?',
-      message: 'This will reset your local campaign progress back to Core 01. This action cannot be undone.',
-      titleColor: '#ef4444',
-      btn1Text: 'CANCEL',
-      btn1Color: '#94a3b8',
-      btn2Text: 'RESET ALL',
-      btn2Color: '#ef4444',
-      onConfirm: () => {
-        localStorage.removeItem('breakout_db_progress');
-        window.location.reload();
-      },
-    });
+  const handleOpenReset = () => {
+    soundManager.play('click');
+    setResetInputText('');
+    setIsResetModalOpen(true);
+  };
+
+  const isMatch = resetInputText.trim().toLowerCase() === 'reset all';
+
+  const handleConfirmReset = () => {
+    if (!isMatch) return;
+    setIsResetting(true);
+    soundManager.play('damage');
+    setTimeout(() => {
+      // Clear all breakout game localStorage keys
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('breakout_') || key.includes('breakout'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k));
+      // Force reload to completely reset game engine & progress state
+      window.location.reload();
+    }, 400);
   };
 
   return (
     <>
       {/* Audio & Haptics Settings */}
-      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-cyan-400 text-xs font-display font-black tracking-wider uppercase">
+      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-cyan-500/25 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
+        <div className="flex items-center gap-2 pb-2 border-b border-cyan-500/15 text-cyan-400 text-xs font-display font-black tracking-wider uppercase">
           <Volume2 className="w-4 h-4 text-cyan-400" />
           <span>Sound & Feedback</span>
         </div>
@@ -38,7 +54,7 @@ export const ProfileSettingsGroup: React.FC = () => {
               MASTER VOLUME
             </span>
           </div>
-          <ArcadeSlider
+          <CustomCyberSlider
             value={settings.volume}
             onChange={(val) => updateSettings({ volume: val })}
             min={0}
@@ -46,8 +62,6 @@ export const ProfileSettingsGroup: React.FC = () => {
             step={0.01}
             variant="neon-cyan"
             size="md"
-            showBezel={true}
-            showGlow={true}
             showValue={true}
             formatValue={(v) => `${Math.round(v * 100)}%`}
             className="w-full font-tech"
@@ -68,7 +82,7 @@ export const ProfileSettingsGroup: React.FC = () => {
               </span>
             </div>
           </div>
-          <ArcadeSwitch
+          <CustomCyberSwitch
             checked={settings.vibrate}
             onChange={(checked) => updateSettings({ vibrate: checked })}
             variant="neon-green"
@@ -76,8 +90,6 @@ export const ProfileSettingsGroup: React.FC = () => {
             showText={true}
             onLabel="ON"
             offLabel="OFF"
-            showBezel={true}
-            showGlow={true}
             className="font-tech"
             ariaLabel="Vibration Toggle"
           />
@@ -85,8 +97,8 @@ export const ProfileSettingsGroup: React.FC = () => {
       </div>
 
       {/* Controls & Simulation Settings */}
-      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-purple-400 text-xs font-display font-black tracking-wider uppercase">
+      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-cyan-500/25 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
+        <div className="flex items-center gap-2 pb-2 border-b border-cyan-500/15 text-purple-400 text-xs font-display font-black tracking-wider uppercase">
           <Compass className="w-4 h-4 text-purple-400" />
           <span>Controls & Simulation</span>
         </div>
@@ -104,7 +116,7 @@ export const ProfileSettingsGroup: React.FC = () => {
               </span>
             </div>
           </div>
-          <ArcadeSwitch
+          <CustomCyberSwitch
             checked={settings.gyroscope}
             onChange={(checked) => updateSettings({ gyroscope: checked })}
             variant="cyber-purple"
@@ -112,24 +124,38 @@ export const ProfileSettingsGroup: React.FC = () => {
             showText={true}
             onLabel="ON"
             offLabel="OFF"
-            showBezel={true}
-            showGlow={true}
             className="font-tech"
             ariaLabel="Gyroscope Toggle"
           />
         </div>
 
-        {/* Gyroscope Sensitivity Slider */}
-        <div className="flex flex-col gap-1.5 pt-1">
+        {/* Gyroscope Sensitivity Slider (Disabled when Gyroscope is OFF) */}
+        <div
+          className={`flex flex-col gap-1.5 pt-1 transition-all duration-200 ${
+            !settings.gyroscope ? 'opacity-40 pointer-events-none select-none' : 'opacity-100'
+          }`}
+        >
           <div className="flex justify-between items-center text-xs">
             <div className="flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-pink-400" style={{ color: '#f472b6' }} />
-              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
+              <Sliders
+                className="w-3.5 h-3.5"
+                style={{ color: settings.gyroscope ? '#f472b6' : '#94a3b8' }}
+              />
+              <span
+                className={`font-settings-title text-xs font-bold tracking-wider ${
+                  settings.gyroscope ? 'text-white' : 'text-slate-400'
+                }`}
+              >
                 TILT SENSITIVITY
               </span>
             </div>
+            {!settings.gyroscope && (
+              <span className="font-tech text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                DISABLED
+              </span>
+            )}
           </div>
-          <ArcadeSlider
+          <CustomCyberSlider
             value={settings.gyroSensitivity}
             onChange={(val) => updateSettings({ gyroSensitivity: val })}
             min={0.05}
@@ -137,9 +163,8 @@ export const ProfileSettingsGroup: React.FC = () => {
             step={0.01}
             variant="candy-pink"
             size="md"
-            showBezel={true}
-            showGlow={true}
             showValue={true}
+            disabled={!settings.gyroscope}
             formatValue={(v) => `${Math.round(v * 100)}%`}
             className="w-full font-tech"
             ariaLabel="Gyroscope Sensitivity"
@@ -148,8 +173,8 @@ export const ProfileSettingsGroup: React.FC = () => {
       </div>
 
       {/* Data Management & Storage */}
-      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-white/10 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-2 pb-2 border-b border-white/10 text-slate-300 text-xs font-display font-black tracking-wider uppercase">
+      <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-cyan-500/25 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
+        <div className="flex items-center gap-2 pb-2 border-b border-cyan-500/15 text-slate-300 text-xs font-display font-black tracking-wider uppercase">
           <Trash2 className="w-4 h-4 text-red-400" />
           <span>Data & Storage</span>
         </div>
@@ -157,22 +182,114 @@ export const ProfileSettingsGroup: React.FC = () => {
         <div className="flex items-center justify-between pt-0.5">
           <div className="flex flex-col">
             <span className="font-settings-title text-xs font-bold text-white tracking-wider">
-              RESET CAMPAIGN
+              RESET ALL DATA
             </span>
             <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
-              Reset stage unlocks & best records
+              Wipe all progress, records & local stages
             </span>
           </div>
 
           <button
             type="button"
-            onClick={handleResetProgress}
-            className="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-tech font-bold text-xs transition-all active:scale-95 cursor-pointer"
+            onClick={handleOpenReset}
+            className="px-3.5 py-1.5 rounded-xl border border-red-500/40 bg-red-500/15 hover:bg-red-500/25 text-red-400 font-tech font-bold text-xs transition-all active:scale-95 cursor-pointer shadow-[0_0_10px_rgba(239,68,68,0.2)]"
           >
-            RESET
+            RESET ALL
           </button>
         </div>
       </div>
+
+      {/* High-Stakes Reset Confirmation Modal */}
+      {isResetModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div
+            className="w-full max-w-sm rounded-2xl bg-[#080c24] border-2 border-red-500/60 p-5 shadow-[0_0_35px_rgba(239,68,68,0.4)] flex flex-col gap-4 text-white relative animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with warning icon */}
+            <div className="flex items-center gap-3 pb-3 border-b border-red-500/30">
+              <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(239,68,68,0.3)]">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="font-display font-black text-sm text-red-400 tracking-wider">
+                  CONFIRM SYSTEM RESET
+                </h3>
+                <span className="font-mono text-[10px] text-red-300/80">
+                  PERMANENT DELETION
+                </span>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="font-ui text-xs text-slate-300 leading-relaxed">
+              This action will permanently wipe all campaign core progress, high scores, custom designed stages, and achievements.
+            </p>
+
+            {/* Instruction */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-ui text-xs text-slate-300 flex items-center gap-1 flex-wrap">
+                <span>To confirm, please type</span>
+                <span className="font-mono font-bold text-red-400 bg-red-950/60 px-1.5 py-0.5 rounded border border-red-500/40">
+                  reset all
+                </span>
+                <span>below:</span>
+              </label>
+
+              <input
+                type="text"
+                value={resetInputText}
+                onChange={(e) => setResetInputText(e.target.value)}
+                placeholder="Type 'reset all'"
+                autoFocus
+                className="w-full px-3 py-2 rounded-xl bg-black/70 border border-red-500/50 text-white font-mono text-center font-bold text-sm tracking-wider focus:border-red-400 focus:shadow-[0_0_16px_rgba(239,68,68,0.4)] transition-all outline-none"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.play('click');
+                  setIsResetModalOpen(false);
+                }}
+                className="h-10 rounded-xl border border-cyan-500/30 bg-cyan-950/40 hover:bg-cyan-900/50 text-cyan-200 font-tech font-bold text-xs tracking-wider transition-all active:scale-95 cursor-pointer"
+              >
+                CANCEL
+              </button>
+
+              <button
+                type="button"
+                disabled={!isMatch || isResetting}
+                onClick={handleConfirmReset}
+                style={
+                  isMatch && !isResetting
+                    ? {
+                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                        border: '1.5px solid #ef4444',
+                        boxShadow: '0 0 20px rgba(239, 68, 68, 0.75)',
+                        color: '#ffffff',
+                        opacity: 1,
+                        cursor: 'pointer',
+                      }
+                    : {
+                        background: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        color: 'rgba(239, 68, 68, 0.4)',
+                        opacity: 0.4,
+                        cursor: 'not-allowed',
+                      }
+                }
+                className="h-10 rounded-xl font-tech font-black text-xs tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isResetting ? 'RESETTING...' : 'RESET ALL'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

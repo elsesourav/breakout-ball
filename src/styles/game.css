@@ -146,8 +146,9 @@ main {
   height: var(--window-height);
   background: rgba(10, 11, 20, 0.95);
   border-radius: calc(var(--s) * 0.15);
-  box-shadow: 0 0 35px rgba(99, 102, 241, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.85);
-  outline: 1.5px solid rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(0, 247, 255, 0.28);
+  box-shadow: 0 0 35px rgba(0, 247, 255, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.85);
+  outline: none;
   overflow: hidden;
 }
 
@@ -1479,3 +1480,176 @@ button[role="switch"] span,
 .cyber-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 247, 255, 0.8);
 }
+
+/* Hide scrollbar completely while maintaining full scrollability */
+.no-scrollbar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ==========================================================================
+   CYBER SHIMMER SKELETON ANIMATION
+   ========================================================================== */
+
+@keyframes cyber-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.cyber-shimmer-box {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0, 247, 255, 0.1) !important;
+  border: 1px solid rgba(0, 247, 255, 0.22) !important;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0, 247, 255, 0.15), inset 0 0 6px rgba(0, 247, 255, 0.08) !important;
+}
+
+.cyber-shimmer-box::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 247, 255, 0.15) 25%,
+    rgba(0, 247, 255, 0.45) 50%,
+    rgba(0, 247, 255, 0.15) 75%,
+    transparent 100%
+  );
+  animation: cyber-shimmer 1.4s infinite ease-in-out;
+  content: '';
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   CYBER ARCADE ACTION BUTTONS & COMPONENTS
+   ========================================================================== */
+
+.cyber-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #030712 !important;
+  background: linear-gradient(135deg, #00f7ff 0%, #00a6ff 50%, #0066ff 100%) !important;
+  border: 1.5px solid #00f7ff !important;
+  box-shadow: 0 0 16px rgba(0, 247, 255, 0.45), 0 4px 10px rgba(0, 102, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.cyber-btn-primary:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 0 24px rgba(0, 247, 255, 0.65), 0 4px 14px rgba(0, 102, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.cyber-btn-primary:active {
+  transform: translateY(1px);
+  filter: brightness(0.95);
+  box-shadow: 0 0 10px rgba(0, 247, 255, 0.4);
+}
+
+.cyber-btn-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-family: 'Orbitron', 'Chakra Petch', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #00f7ff !important;
+  background: linear-gradient(180deg, rgba(6, 28, 48, 0.9) 0%, rgba(3, 14, 28, 0.95) 100%) !important;
+  border: 1.5px solid rgba(0, 247, 255, 0.45) !important;
+  box-shadow: 0 0 14px rgba(0, 247, 255, 0.2), inset 0 1px 0 rgba(0, 247, 255, 0.25);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.cyber-btn-glass:hover {
+  background: linear-gradient(180deg, rgba(8, 38, 66, 0.95) 0%, rgba(4, 20, 40, 0.98) 100%) !important;
+  border-color: #00f7ff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 22px rgba(0, 247, 255, 0.45), inset 0 1px 0 rgba(0, 247, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.cyber-btn-glass:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 8px rgba(0, 247, 255, 0.25);
+}
+
+.cyber-btn-settings {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #00f7ff !important;
+  background: linear-gradient(180deg, rgba(14, 22, 54, 0.85) 0%, rgba(7, 12, 32, 0.95) 100%) !important;
+  border: 1.5px solid rgba(0, 247, 255, 0.35) !important;
+  box-shadow: 0 0 12px rgba(0, 247, 255, 0.18);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.cyber-btn-settings:hover {
+  background: linear-gradient(180deg, rgba(20, 32, 78, 0.9) 0%, rgba(10, 16, 46, 0.98) 100%) !important;
+  border-color: #00f7ff !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(0, 247, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.cyber-btn-settings:hover svg {
+  transform: rotate(60deg);
+}
+
+.cyber-btn-settings svg {
+  transition: transform 0.3s ease;
+}
+
+.cyber-btn-settings:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 6px rgba(0, 247, 255, 0.2);
+}
+

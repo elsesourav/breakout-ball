@@ -123,8 +123,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
           <div
             style={{
               backgroundColor: `${upgrade.accentColor}18`,
-              border: `1.2px solid ${upgrade.accentColor}60`,
-              boxShadow: `0 0 10px ${upgrade.glowColor}`,
+              border: `1px solid ${upgrade.accentColor}60`,
             }}
             className="w-9 h-9 rounded-xl flex items-center justify-center font-tech font-black text-xs text-white shrink-0 overflow-hidden"
           >
@@ -144,24 +143,15 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
               </span>
               {!isMax && statBreakdown.delta ? (
                 <span
-                  style={{
-                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                    border: '1px solid rgba(52, 211, 153, 0.45)',
-                    boxShadow: '0 0 6px rgba(16, 185, 129, 0.2)',
-                  }}
-                  className="font-tech text-[10px] font-bold text-emerald-300 px-1.5 py-0.5 rounded-md inline-flex items-center tracking-wide"
+                  className="font-tech text-[10px] font-bold text-emerald-300 px-1 py-0.5 rounded-md inline-flex items-center tracking-wide"
                 >
-                  [+ {statBreakdown.delta}]
+                  + {statBreakdown.delta}
                 </span>
               ) : isMax ? (
                 <span
-                  style={{
-                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                    border: '1px solid rgba(52, 211, 153, 0.45)',
-                  }}
                   className="font-tech text-[10px] font-bold text-emerald-300 px-1.5 py-0.5 rounded-md inline-flex items-center tracking-wider"
                 >
-                  [MAX]
+                  MAX
                 </span>
               ) : null}
             </div>

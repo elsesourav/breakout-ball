@@ -1,7 +1,7 @@
 import { ActiveTab, GameScreen } from '../types/game';
 
 export interface RouteState {
-  type: 'tab' | 'level' | 'play';
+  type: 'tab' | 'level' | 'play' | 'design-lab';
   tab: ActiveTab;
   levelId?: string;
 }
@@ -48,6 +48,10 @@ export const parseCurrentRoute = (): RouteState => {
     return { type: 'play', tab: 'local', levelId };
   }
 
+  if (path === '/design-lab' || path === '/lab') {
+    return { type: 'design-lab', tab: 'local' };
+  }
+
   // Primary tabs
   if (path === '/arena') {
     return { type: 'tab', tab: 'online' };
@@ -74,6 +78,9 @@ export const getRoutePath = (
   screen: GameScreen,
   levelId?: string | null
 ): string => {
+  if (screen === 'design-lab') {
+    return '/design-lab';
+  }
   if (screen === 'preview' && levelId) {
     return `/level/${encodeURIComponent(levelId)}`;
   }

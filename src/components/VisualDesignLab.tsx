@@ -289,61 +289,57 @@ export const VisualDesignLab: React.FC<VisualDesignLabProps> = ({ onBack }) => {
               </div>
             </div>
 
-            {/* 3 Paddle Versions */}
-            {([1, 2, 3] as PaddlePresetId[]).map((vId) => {
-              const meta = PADDLE_PRESET_METADATA[vId];
-              const isCurrent = config.paddlePreset === vId;
-
-              return (
-                <div
-                  key={`paddle-version-${vId}`}
-                  className={`rounded-2xl p-4 transition-all border ${
-                    isCurrent
-                      ? 'bg-[#060c24]/90 border-blue-400/50 shadow-[0_0_24px_rgba(59,130,246,0.15)]'
-                      : 'bg-[#060919]/70 border-slate-800/80 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-3 mb-3 border-b border-slate-800 pb-2.5">
-                    <div className="flex items-center gap-2">
-                      <span className="font-display font-black text-sm text-white tracking-wider">
-                        {meta.name}
-                      </span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-950/60 text-blue-300 border border-blue-800/40">
-                        {meta.tag}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => handleApplyPreset({ paddlePreset: vId })}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
-                        isCurrent
-                          ? 'bg-blue-500 text-slate-950 shadow-[0_0_12px_rgba(59,130,246,0.6)] cursor-default'
-                          : 'bg-slate-800 hover:bg-blue-600/30 text-slate-300 hover:text-blue-200 border border-slate-700'
-                      }`}
-                    >
-                      {isCurrent ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>ACTIVE</span>
-                        </>
-                      ) : (
-                        <span>SELECT FOR GAME</span>
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="bg-[#02040c] rounded-xl border border-slate-800/80 p-3 flex items-center justify-center">
-                    <SinglePaddleCanvas
-                      preset={vId}
-                      animTick={animTick}
-                      widthScale={paddleWidthScale}
-                      hasLaser={hasLaser}
-                      tier={paddleTier}
-                    />
-                  </div>
+            {/* Selected Mech Titan Dreadnought Showcase */}
+            <div className="rounded-2xl p-4 bg-[#060c24]/90 border border-blue-400/50 shadow-[0_0_24px_rgba(59,130,246,0.15)]">
+              <div className="flex items-center justify-between gap-3 mb-3 border-b border-slate-800 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-display font-black text-sm text-white tracking-wider">
+                    MECH TITAN DREADNOUGHT
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-950/60 text-blue-300 border border-blue-800/40">
+                    SELECTED (ACTIVE IN GAME)
+                  </span>
                 </div>
-              );
-            })}
+
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-mono font-bold bg-blue-500 text-slate-950 shadow-[0_0_12px_rgba(59,130,246,0.6)]">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>ACTIVE</span>
+                </div>
+              </div>
+
+              {/* Live Canvas for this Paddle */}
+              <div className="bg-[#02040c] rounded-xl border border-slate-800/80 p-4 flex items-center justify-center">
+                <SinglePaddleCanvas
+                  preset={1}
+                  animTick={animTick}
+                  widthScale={paddleWidthScale}
+                  hasLaser={hasLaser}
+                  tier={paddleTier}
+                />
+              </div>
+
+              {/* 3 Tiers Preview side by side */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800/60">
+                {([1, 2, 3] as PaddleTier[]).map((t) => (
+                  <button
+                    key={`p-tier-btn-${t}`}
+                    onClick={() => {
+                      setPaddleTier(t);
+                      handleApplyPreset({ paddleTierOverride: t });
+                    }}
+                    className={`p-2 rounded-xl text-left border cursor-pointer transition-all ${
+                      paddleTier === t
+                        ? 'bg-blue-950/40 border-blue-400 text-blue-300'
+                        : 'bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <div className="text-[11px] font-mono font-bold">
+                      TIER {t} {t === 1 ? '(BASE)' : t === 2 ? '(REINFORCED)' : '(APEX)'}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </section>
         )}
 
@@ -555,22 +551,23 @@ export const VisualDesignLab: React.FC<VisualDesignLabProps> = ({ onBack }) => {
                   <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                     {(
                       [
-                        'multi_ball',
-                        'mega_ball',
-                        'laser_paddle',
-                        'slow_motion',
+                        'multiball',
+                        'megaball',
+                        'laser',
+                        'slowmo',
                         'shield',
-                        'expand_paddle',
+                        'expand',
                       ] as PowerUpType[]
                     ).map((type) => {
                       const cfg = POWER_UP_CONFIGS[type];
+                      const label = cfg ? cfg.label : type.toUpperCase();
                       return (
                         <div
                           key={`p-${vId}-${type}`}
                           className="flex flex-col items-center p-2 rounded-xl bg-[#02040c] border border-slate-800/80 hover:border-amber-500/40 transition-all"
                         >
                           <span className="text-[9px] font-mono font-bold text-slate-400 mb-1">
-                            {cfg.label.toUpperCase()}
+                            {label}
                           </span>
                           <SinglePowerUpCanvas
                             type={type}

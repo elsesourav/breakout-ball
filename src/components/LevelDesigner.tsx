@@ -4,7 +4,7 @@ import { BlockData } from '../types/game';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GRID_ROWS, GRID_COLS, BLOCK_COLORS } from '../constants/game';
 import { generateLevelId, draw3DBlock, calculateLevelHp } from '../utils/helpers';
 import { soundManager } from '../utils/audio';
-import { Play, Save, ArrowLeft, Undo2, Redo2, Lock, Globe, Eraser, Sparkles, Infinity, Atom, Zap } from 'lucide-react';
+import { Play, Save, ArrowLeft, Undo2, Redo2, Lock, Globe, Eraser, Infinity, Atom, Zap, Copy } from 'lucide-react';
 
 const STANDARD_TOOLS = [1, 2, 3, 4, 5];
 const SPECIAL_TOOLS = [
@@ -133,6 +133,38 @@ export const LevelDesigner: React.FC = () => {
         });
         setScreen('menu');
       },
+    });
+  };
+
+  const handleCopyGridCode = () => {
+    if (placedBlocks.length === 0) {
+      showAlert({
+        title: 'EMPTY MATRIX',
+        message: 'Place at least one block on the grid to copy level code.',
+        btn1Text: 'OKAY',
+        singleBtn: true,
+      });
+      return;
+    }
+    const minY = Math.min(...placedBlocks.map((b) => b.y));
+    const maxY = Math.max(...placedBlocks.map((b) => b.y));
+    const rows: string[] = [];
+    for (let y = minY; y <= maxY; y++) {
+      let line = '';
+      for (let x = 0; x < GRID_ROWS; x++) {
+        const found = placedBlocks.find((b) => b.x === x && b.y === y);
+        line += found ? String(found.h) : ' ';
+      }
+      rows.push(`    '${line}', // row ${y}`);
+    }
+    const code = `export const customLevel: LevelData = createLevel({\n  id: '${generateLevelId()}',\n  name: 'Custom Level',\n  creator: '${user.username || 'creator'}',\n  playCount: 100,\n  startRow: ${minY},\n  grid: [\n${rows.join('\n')}\n  ],\n});`;
+    navigator.clipboard?.writeText(code);
+    soundManager.playClick();
+    showAlert({
+      title: 'GRID CODE COPIED',
+      message: 'Visual 9-column grid code has been copied to your clipboard! You can paste it into any level file.',
+      btn1Text: 'AWESOME',
+      singleBtn: true,
     });
   };
 
@@ -275,7 +307,7 @@ export const LevelDesigner: React.FC = () => {
       <div className="w-full px-3 py-2 flex flex-col gap-1.5 z-20 shadow-lg bg-[#06091c]/95 border-b border-cyan-500/25">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <Zap className="w-3.5 h-3.5 text-cyan-400" />
             <span className="font-display font-black text-xs tracking-wider text-[#00f7ff] [text-shadow:0_0_8px_rgba(0,247,255,0.4)]">
               MATRIX FORGE
             </span>
@@ -404,6 +436,16 @@ export const LevelDesigner: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCopyGridCode}
+            title="Copy TypeScript Visual Grid Code"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-display font-bold text-xs text-cyan-300 hover:text-white bg-cyan-950/40 border border-cyan-500/40 hover:border-cyan-400 cursor-pointer active:scale-95 transition-all shadow-[0_0_10px_rgba(0,247,255,0.2)]"
+          >
+            <Copy className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">CODE</span>
+          </button>
+
           <button
             type="button"
             onClick={handleTestLevel}

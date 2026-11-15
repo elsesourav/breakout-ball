@@ -41,8 +41,18 @@ class CloudDatabaseService {
   }
 
   private seedLocalCache() {
-    if (!localStorage.getItem(this.localLevelsKey)) {
+    const rawLocal = localStorage.getItem(this.localLevelsKey);
+    if (!rawLocal) {
       localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+    } else {
+      try {
+        const parsed = JSON.parse(rawLocal);
+        if (!Array.isArray(parsed) || parsed.length < INITIAL_LOCAL_LEVELS.length) {
+          localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+        }
+      } catch {
+        localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+      }
     }
     if (!localStorage.getItem(this.onlineLevelsKey)) {
       localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
@@ -76,7 +86,21 @@ class CloudDatabaseService {
 
   public async getLocalLevels(): Promise<LevelData[]> {
     const raw = localStorage.getItem(this.localLevelsKey);
-    return raw ? JSON.parse(raw) : INITIAL_LOCAL_LEVELS;
+    if (!raw) {
+      localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+      return INITIAL_LOCAL_LEVELS;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.length < INITIAL_LOCAL_LEVELS.length) {
+        localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+        return INITIAL_LOCAL_LEVELS;
+      }
+      return parsed;
+    } catch {
+      localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
+      return INITIAL_LOCAL_LEVELS;
+    }
   }
 
   public async getOnlineLevels(searchTerm?: string): Promise<LevelData[]> {

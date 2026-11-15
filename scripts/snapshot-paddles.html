@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Selected Paddle Chassis & Upgrades</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #030612;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 24px;
+      width: 1200px;
+    }
+    .header {
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(59, 130, 246, 0.35);
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #38bdf8;
+      text-transform: uppercase;
+    }
+    .version-card {
+      background: #06091c;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    }
+    .version-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .version-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-num {
+      background: #0f172a;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .badge-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+    .badge-tag {
+      font-size: 10px;
+      font-family: monospace;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #7df9ff;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+    .tier-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .tier-cell {
+      background: #02040c;
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 12px;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .tier-label {
+      font-size: 11px;
+      font-family: monospace;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-bottom: 12px;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">🏓 MECH TITAN DREADNOUGHT (SELECTED DESIGN)</div>
+    <div style="font-size: 11px; font-family: monospace; color: #64748b;">DYNAMIC ARMORY UPGRADE EVOLUTION</div>
+  </div>
+
+  <div class="version-card">
+    <div class="version-header">
+      <div class="version-badge">
+        <span class="badge-num">ACTIVE PADDLE</span>
+        <span class="badge-title">MECH TITAN DREADNOUGHT</span>
+        <span class="badge-tag">APPLIED IN GAME</span>
+      </div>
+    </div>
+    <div class="tier-row" id="tier-row"></div>
+  </div>
+
+  <script src="./dist/renderBundle.js"></script>
+  <script>
+    const row = document.getElementById('tier-row');
+    const tiers = [
+      { t: 1, label: 'TIER 1 (BASE CHASSIS)', widthScale: 0.95, hasLaser: false },
+      { t: 2, label: 'TIER 2 (REINFORCED + THRUSTERS)', widthScale: 1.05, hasLaser: true },
+      { t: 3, label: 'TIER 3 (APEX OVERDRIVE + DEFLECTOR)', widthScale: 1.15, hasLaser: true },
+    ];
+
+    tiers.forEach(item => {
+      const cell = document.createElement('div');
+      cell.className = 'tier-cell';
+      cell.innerHTML = `<span class="tier-label">${item.label}</span>`;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 360;
+      canvas.height = 80;
+      const ctx = canvas.getContext('2d');
+
+      const pw = 240 * item.widthScale;
+      const ph = 40;
+      const paddle = {
+        x: canvas.width / 2,
+        y: (canvas.height - ph) / 2 - 4,
+        width: pw,
+        height: ph,
+        targetX: canvas.width / 2,
+        vx: 0
+      };
+
+      AssetForge.drawPaddleWithPreset(ctx, paddle, 1, {
+        animTick: 2.8,
+        hasLaser: item.hasLaser,
+        hasShield: true,
+        tier: item.t
+      });
+
+      cell.appendChild(canvas);
+      row.appendChild(cell);
+    });
+  </script>
+</body>
+</html>
