@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Settings, UserCheck, Mail, ShieldCheck, LogOut, Cloud, LogIn, UserPlus, Database, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Settings, Mail, ShieldCheck, LogOut, Cloud, LogIn, UserPlus, Database, ExternalLink } from 'lucide-react';
 import { ProfileSettingsGroup } from './ProfileSettingsGroup';
 import { BackendAdminModal } from '../admin/BackendAdminModal';
 import { isUserAdmin } from '../../services/auth';
@@ -61,7 +61,6 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
         <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <UserCheck className="w-4 h-4 text-emerald-400" />
               <span className="font-display font-bold text-xs text-white">
                 {displayName}
               </span>
@@ -71,9 +70,6 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
                 </span>
               )}
             </div>
-            <span className="text-[10px] font-tech font-bold px-2 py-0.5 rounded-full border border-emerald-500/50 text-emerald-300 bg-emerald-950/60">
-              ONLINE
-            </span>
           </div>
 
           {user.email && (

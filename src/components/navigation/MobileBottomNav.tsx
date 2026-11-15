@@ -19,7 +19,7 @@ export const MobileBottomNav: React.FC = () => {
     { id: 'local' as ActiveTab, label: 'Arcade', icon: NavArcadeIcon },
     { id: 'online' as ActiveTab, label: 'Arena', icon: NavArenaIcon },
     { id: 'armory' as ActiveTab, label: 'Armory', icon: NavArmoryIcon },
-    { id: 'profile' as ActiveTab, label: user.isLoggedIn ? `@${user.username}` : 'Profile', icon: NavProfileIcon },
+    { id: 'profile' as ActiveTab, label: 'Profile', icon: NavProfileIcon },
   ];
 
   return (
@@ -39,7 +39,6 @@ export const MobileBottomNav: React.FC = () => {
             item.id === 'online'
               ? activeTab === 'online' || activeTab === 'create'
               : activeTab === item.id;
-          const isProfile = item.id === 'profile';
           const Icon = item.icon;
 
           return (
@@ -59,7 +58,7 @@ export const MobileBottomNav: React.FC = () => {
                 />
               )}
 
-              {/* Icon / Avatar with spring scale */}
+              {/* Icon with spring scale */}
               <motion.div
                 animate={{
                   scale: isActive ? 1.15 : 1,
@@ -72,19 +71,10 @@ export const MobileBottomNav: React.FC = () => {
                   filter: isActive ? 'drop-shadow(0 0 10px rgba(0,247,255,0.85))' : 'none',
                 }}
               >
-                {isProfile && user.isLoggedIn ? (
-                  <div className="relative">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-[11px] font-black text-black font-mono shadow-[0_0_8px_#00f7ff]">
-                      {user.username.slice(0, 1).toUpperCase()}
-                    </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border border-black shadow-[0_0_4px_#34d399]" />
-                  </div>
-                ) : (
-                  <Icon active={isActive} className="w-5 h-5" style={{ color: isActive ? '#00f7ff' : '#94a3b8' }} />
-                )}
+                <Icon active={isActive} className="w-5 h-5" style={{ color: isActive ? '#00f7ff' : '#94a3b8' }} />
               </motion.div>
 
-              {/* Clean Footer Label (Normalized without harsh box border/background) */}
+              {/* Clean Footer Label */}
               <span
                 className="relative z-10 font-tech text-[10.5px] tracking-wider uppercase truncate max-w-[76px] block mt-1 transition-colors duration-200"
                 style={{

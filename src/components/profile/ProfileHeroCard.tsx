@@ -1,5 +1,5 @@
-import React from 'react';
-import { UserCheck, User as UserIcon, Settings, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck, Pencil } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User as UserIcon, Settings, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck, Pencil } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 interface ProfileHeroCardProps {
@@ -36,6 +36,12 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
   onSignIn,
   onCreateAccount,
 }) => {
+  const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [user.avatarUrl]);
+
   return (
     <div
       style={{
@@ -49,17 +55,19 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
       {/* Header: Avatar, Pilot Name, and Settings Component Button */}
       <div className="flex items-center gap-3.5">
         <div className="relative flex-shrink-0 group">
-          {user.isLoggedIn && user.avatarUrl ? (
+          {user.isLoggedIn && user.avatarUrl && !imgError ? (
             <img
               src={user.avatarUrl}
-              alt={displayName}
+              alt=""
+              referrerPolicy="no-referrer"
+              onError={() => setImgError(true)}
               style={{ width: '40px', height: '40px' }}
               className="w-10 h-10 rounded-full object-cover border-2 border-cyan-400 shadow-[0_0_14px_rgba(0,247,255,0.45)]"
             />
           ) : user.isLoggedIn ? (
             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 via-indigo-600 to-purple-600 p-[2px] shadow-[0_0_14px_rgba(0,247,255,0.4)]">
               <div className="w-full h-full rounded-full bg-[#070a1a] flex items-center justify-center text-cyan-300 font-tech font-bold text-sm tracking-wider">
-                {(user.username || 'P').slice(0, 2).toUpperCase()}
+                {(displayName || user.username || 'P').slice(0, 2).toUpperCase()}
               </div>
             </div>
           ) : (
@@ -84,14 +92,6 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
               <Pencil className="w-2.5 h-2.5" />
             </button>
           )}
-
-          <span
-            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#090d24] ${
-              user.isLoggedIn
-                ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]'
-                : 'bg-cyan-400/80 shadow-[0_0_6px_#00f7ff]'
-            }`}
-          />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -99,7 +99,6 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
             <h2 className="text-base font-bold text-white truncate font-display tracking-wide">
               {displayName}
             </h2>
-            {user.isLoggedIn && <UserCheck className="w-4 h-4 text-cyan-400 flex-shrink-0" />}
           </div>
           {displayHandle ? (
             <p className="text-xs text-cyan-400 font-tech truncate mt-0.5">@{displayHandle}</p>
@@ -109,11 +108,6 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          {user.isLoggedIn && (
-            <span className="text-[10px] font-tech font-bold px-2 py-0.5 rounded-full border border-emerald-500/50 text-emerald-300 bg-emerald-950/60 shadow-[0_0_8px_rgba(16,185,129,0.3)]">
-              ONLINE
-            </span>
-          )}
           <button
             type="button"
             onClick={() => {

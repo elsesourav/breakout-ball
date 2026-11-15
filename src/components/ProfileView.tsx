@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '../context/GameContext';
 import {
-  UserCheck,
   LogIn,
   LogOut,
   Trophy,
