@@ -4,7 +4,7 @@ export interface CoreIconProps {
   size?: number | string;
   className?: string;
   glow?: boolean;
-  variant?: 'cyan' | 'gold' | 'purple' | 'emerald' | 'rose';
+  variant?: 'cyan' | 'gold' | 'purple' | 'emerald' | 'rose' | 'blue';
   style?: React.CSSProperties;
 }
 
@@ -14,6 +14,12 @@ const THEMES = {
     secondary: '#0088cc',
     glow: 'rgba(0, 247, 255, 0.7)',
     inner: '#e0ffff',
+  },
+  blue: {
+    primary: '#38bdf8',
+    secondary: '#2563eb',
+    glow: 'rgba(56, 189, 248, 0.7)',
+    inner: '#eff6ff',
   },
   gold: {
     primary: '#ffd700',
@@ -34,10 +40,10 @@ const THEMES = {
     inner: '#ecfdf5',
   },
   rose: {
-    primary: '#fb7185',
-    secondary: '#e11d48',
-    glow: 'rgba(251, 113, 133, 0.7)',
-    inner: '#fff1f2',
+    primary: '#f87171',
+    secondary: '#dc2626',
+    glow: 'rgba(239, 68, 68, 0.7)',
+    inner: '#fef2f2',
   },
 };
 

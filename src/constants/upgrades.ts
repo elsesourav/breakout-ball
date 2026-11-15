@@ -267,9 +267,9 @@ export interface ShopPack {
 }
 
 export const SHOP_PACKS: ShopPack[] = [
-  { id: 'starter', name: 'Starter Pack', cores: 500, accentColor: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' },
-  { id: 'power', name: 'Power Bundle', cores: 1000, accentColor: '#b773ff', borderColor: 'rgba(183, 115, 255, 0.4)' },
-  { id: 'mega', name: 'Mega Vault', cores: 2500, accentColor: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.4)' },
-  { id: 'ultra', name: 'Ultra Core', cores: 5000, accentColor: '#ff0055', borderColor: 'rgba(255, 0, 85, 0.4)' },
+  { id: 'starter', name: 'Starter Pack', cores: 500, accentColor: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)' },
+  { id: 'power', name: 'Power Bundle', cores: 1000, accentColor: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' },
+  { id: 'mega', name: 'Mega Vault', cores: 2500, accentColor: '#3b82f6', borderColor: 'rgba(59, 130, 246, 0.4)' },
+  { id: 'ultra', name: 'Ultra Core', cores: 5000, accentColor: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)' },
   { id: 'titan', name: 'Titan Vault', cores: 10000, accentColor: '#00f7ff', borderColor: 'rgba(0, 247, 255, 0.4)' },
 ];

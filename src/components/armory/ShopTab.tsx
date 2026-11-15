@@ -8,14 +8,14 @@ import { CoreIcon } from '../CoreIcon';
 import { BackendAdminModal } from '../admin/BackendAdminModal';
 import { authService, isUserAdmin } from '../../services/auth';
 
-const getPackVariant = (id: string): 'emerald' | 'purple' | 'gold' | 'rose' | 'cyan' => {
+const getPackVariant = (id: string): 'gold' | 'emerald' | 'blue' | 'rose' | 'cyan' => {
   switch (id) {
     case 'starter':
-      return 'emerald';
-    case 'power':
-      return 'purple';
-    case 'mega':
       return 'gold';
+    case 'power':
+      return 'emerald';
+    case 'mega':
+      return 'blue';
     case 'ultra':
       return 'rose';
     case 'titan':
@@ -39,46 +39,51 @@ interface PackMeta {
 
 const PACK_META: Record<string, PackMeta> = {
   starter: {
-    btnGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)',
+    // 500: Yellow
+    btnGradient: 'linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%)',
     btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 14px rgba(16, 185, 129, 0.45)',
-    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(16, 185, 129, 0.1)',
-    cardBorder: '1.2px solid rgba(16, 185, 129, 0.35)',
-    iconBg: 'rgba(16, 185, 129, 0.15)',
-    iconBorder: '1.2px solid rgba(16, 185, 129, 0.5)',
-    iconGlow: '0 0 10px rgba(16, 185, 129, 0.25)',
+    btnShadow: '0 0 14px rgba(234, 179, 8, 0.45)',
+    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(234, 179, 8, 0.12)',
+    cardBorder: '1.2px solid rgba(234, 179, 8, 0.4)',
+    iconBg: 'rgba(234, 179, 8, 0.15)',
+    iconBorder: '1.2px solid rgba(234, 179, 8, 0.5)',
+    iconGlow: '0 0 10px rgba(234, 179, 8, 0.25)',
   },
   power: {
-    btnGradient: 'linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #9333ea 100%)',
-    btnTextColor: 'text-white font-black drop-shadow-sm',
-    btnShadow: '0 0 16px rgba(168, 85, 247, 0.5)',
-    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(183, 115, 255, 0.14)',
-    cardBorder: '1.2px solid rgba(183, 115, 255, 0.38)',
-    iconBg: 'rgba(183, 115, 255, 0.15)',
-    iconBorder: '1.2px solid rgba(183, 115, 255, 0.5)',
-    iconGlow: '0 0 12px rgba(183, 115, 255, 0.3)',
+    // 1000: Green
+    btnGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)',
+    btnTextColor: 'text-slate-950 font-black',
+    btnShadow: '0 0 16px rgba(16, 185, 129, 0.5)',
+    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(16, 185, 129, 0.14)',
+    cardBorder: '1.2px solid rgba(16, 185, 129, 0.38)',
+    iconBg: 'rgba(16, 185, 129, 0.15)',
+    iconBorder: '1.2px solid rgba(16, 185, 129, 0.5)',
+    iconGlow: '0 0 12px rgba(16, 185, 129, 0.3)',
   },
   mega: {
-    btnGradient: 'linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #d97706 100%)',
-    btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 16px rgba(245, 158, 11, 0.55)',
-    cardGlow: '0 4px 20px rgba(0, 0, 0, 0.65), 0 0 16px rgba(255, 215, 0, 0.18)',
-    cardBorder: '1.3px solid rgba(255, 215, 0, 0.45)',
-    iconBg: 'rgba(255, 215, 0, 0.16)',
-    iconBorder: '1.2px solid rgba(255, 215, 0, 0.55)',
-    iconGlow: '0 0 14px rgba(255, 215, 0, 0.35)',
+    // 2500: Blue
+    btnGradient: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%)',
+    btnTextColor: 'text-white font-black drop-shadow-sm',
+    btnShadow: '0 0 16px rgba(59, 130, 246, 0.55)',
+    cardGlow: '0 4px 20px rgba(0, 0, 0, 0.65), 0 0 16px rgba(59, 130, 246, 0.2)',
+    cardBorder: '1.3px solid rgba(59, 130, 246, 0.45)',
+    iconBg: 'rgba(59, 130, 246, 0.16)',
+    iconBorder: '1.2px solid rgba(59, 130, 246, 0.55)',
+    iconGlow: '0 0 14px rgba(59, 130, 246, 0.35)',
   },
   ultra: {
-    btnGradient: 'linear-gradient(135deg, #fb7185 0%, #f43f5e 50%, #e11d48 100%)',
+    // 5000: Reddish
+    btnGradient: 'linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%)',
     btnTextColor: 'text-white font-black drop-shadow-sm',
-    btnShadow: '0 0 18px rgba(244, 63, 94, 0.55)',
-    cardGlow: '0 4px 22px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 0, 85, 0.22)',
-    cardBorder: '1.3px solid rgba(255, 0, 85, 0.45)',
-    iconBg: 'rgba(255, 0, 85, 0.16)',
-    iconBorder: '1.2px solid rgba(255, 0, 85, 0.55)',
-    iconGlow: '0 0 14px rgba(255, 0, 85, 0.35)',
+    btnShadow: '0 0 18px rgba(239, 68, 68, 0.55)',
+    cardGlow: '0 4px 22px rgba(0, 0, 0, 0.7), 0 0 20px rgba(239, 68, 68, 0.22)',
+    cardBorder: '1.3px solid rgba(239, 68, 68, 0.45)',
+    iconBg: 'rgba(239, 68, 68, 0.16)',
+    iconBorder: '1.2px solid rgba(239, 68, 68, 0.55)',
+    iconGlow: '0 0 14px rgba(239, 68, 68, 0.35)',
   },
   titan: {
+    // 10000: Cyan Glory
     btnGradient: 'linear-gradient(135deg, #a5f3fc 0%, #22d3ee 35%, #06b6d4 70%, #00f7ff 100%)',
     btnTextColor: 'text-slate-950 font-black',
     btnShadow: '0 0 24px rgba(0, 247, 255, 0.8), 0 0 10px rgba(255, 215, 0, 0.4)',
@@ -212,15 +217,15 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
 
       {/* ── 2. Clean 2-Column Grid (Daily Free + Shop Packs) ─────────────── */}
       <div className="grid grid-cols-2 gap-2.5">
-        {/* Card 1: Daily Free Apex Reward Card */}
+        {/* Card 1: Daily Free Apex Reward Card (Clean & Simple, White Claim Button with Shine) */}
         <div
           style={{
             backgroundColor: 'rgba(8, 13, 38, 0.94)',
             border: dailyStatus.canCollect
-              ? '1.3px solid rgba(245, 158, 11, 0.65)'
+              ? '1.3px solid rgba(0, 247, 255, 0.38)'
               : '1.2px solid rgba(148, 163, 184, 0.25)',
             boxShadow: dailyStatus.canCollect
-              ? '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 16px rgba(245, 158, 11, 0.3)'
+              ? '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 247, 255, 0.14)'
               : '0 4px 18px rgba(0, 0, 0, 0.6)',
             borderRadius: '18px',
           }}
@@ -231,11 +236,11 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
             <span
               className={`text-[8.5px] font-tech font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider border flex items-center gap-1 ${
                 dailyStatus.canCollect
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-400/50 shadow-[0_0_8px_rgba(245,158,11,0.4)]'
+                  ? 'bg-cyan-500/15 text-cyan-300 border-cyan-400/40 shadow-[0_0_8px_rgba(0,247,255,0.25)]'
                   : 'bg-slate-800/60 text-slate-400 border-slate-700/60'
               }`}
             >
-              <Sparkles className="w-2.5 h-2.5" />
+              <Sparkles className="w-2.5 h-2.5 text-cyan-300" />
               <span>FREE</span>
             </span>
           </div>
@@ -243,13 +248,13 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           <div
             style={{
               backgroundColor: dailyStatus.canCollect
-                ? 'rgba(245, 158, 11, 0.18)'
+                ? 'rgba(0, 247, 255, 0.12)'
                 : 'rgba(100, 116, 139, 0.15)',
               border: dailyStatus.canCollect
-                ? '1.2px solid rgba(245, 158, 11, 0.55)'
+                ? '1.2px solid rgba(0, 247, 255, 0.45)'
                 : '1.2px solid rgba(100, 116, 139, 0.35)',
               boxShadow: dailyStatus.canCollect
-                ? '0 0 14px rgba(245, 158, 11, 0.35)'
+                ? '0 0 12px rgba(0, 247, 255, 0.25)'
                 : 'none',
             }}
             className="w-11 h-11 rounded-xl flex items-center justify-center mt-0.5"
@@ -257,7 +262,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
             <CoreIcon
               size={24}
               glow={dailyStatus.canCollect}
-              variant={dailyStatus.canCollect ? 'gold' : 'cyan'}
+              variant="cyan"
             />
           </div>
 
@@ -270,20 +275,20 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
             </span>
           </div>
 
-          {/* Action Button: FREE when ready, or Locked with Timer when claimed */}
+          {/* Action Button: Clean White Button with "CLAIM" text and smooth continuous shine */}
           {dailyStatus.canCollect ? (
             <button
               type="button"
               onClick={(e) => handleClaimDaily(e)}
               disabled={isClaimingDaily}
               style={{
-                backgroundImage: 'linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #d97706 100%)',
-                boxShadow: '0 0 16px rgba(245, 158, 11, 0.6)',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%)',
+                boxShadow: '0 2px 10px rgba(255, 255, 255, 0.25), 0 0 10px rgba(0, 247, 255, 0.2)',
               }}
-              className="w-full py-2 px-2 rounded-xl text-slate-950 font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:brightness-110 flex items-center justify-center gap-1.5 shadow-md"
+              className="w-full py-2 px-2 rounded-xl font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:brightness-105 flex items-center justify-center gap-1.5 shadow-md relative overflow-hidden btn-shine-sweep select-none"
             >
-              <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span className="tracking-widest">FREE</span>
+              <Ticket className="w-3.5 h-3.5 stroke-[2.8] text-[#090d1f] relative z-10" />
+              <span className="tracking-widest font-black text-[#090d1f] relative z-10">CLAIM</span>
             </button>
           ) : (
             <div
@@ -295,7 +300,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
               title={`Daily reward claimed! Next reward in ${formatRemainingTime(dailyStatus.remainingMs)}`}
             >
               <Lock className="w-3 h-3 text-slate-400 shrink-0" />
-              <span className="font-mono text-[10.5px] text-amber-300 font-bold whitespace-nowrap">
+              <span className="font-mono text-[10.5px] text-cyan-300 font-bold whitespace-nowrap">
                 {formatRemainingTime(dailyStatus.remainingMs)}
               </span>
             </div>
