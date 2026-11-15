@@ -59,7 +59,7 @@ export const AchievementsList: React.FC = () => {
                 BADGES SHOWCASE
               </h3>
               <span className="font-tech text-[10px] text-amber-400 tracking-widest mt-0.5 truncate">
-                PILOT ACCOMPLISHMENTS
+                PLAYER ACCOMPLISHMENTS
               </span>
             </div>
           </div>

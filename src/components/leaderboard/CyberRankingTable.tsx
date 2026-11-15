@@ -46,7 +46,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
           className="font-tech text-[10px] tracking-wider uppercase font-semibold"
           style={{ color: '#94a3b8' }}
         >
-          GLOBAL TOP PILOTS
+          GLOBAL TOP PLAYERS
         </span>
       </div>
 
@@ -61,7 +61,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
         className="px-3 py-1.5 text-[10px] font-tech text-slate-400 border-b border-white/10 uppercase tracking-wider"
       >
         <span className="text-center font-bold">RANK</span>
-        <span className="text-left pl-1 font-bold">PILOT</span>
+        <span className="text-left pl-1 font-bold">PLAYER</span>
         <span className="text-right font-bold">SCORE</span>
         <span className="text-right pr-1 font-bold">TIME</span>
       </div>
@@ -243,7 +243,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
       {/* Scrollable Indicator Pill for Top 10 Leaderboard */}
       {entries.length > 6 && (
         <div className="py-1 px-3 bg-black/60 border-t border-white/5 flex items-center justify-between text-[9px] font-tech text-slate-400">
-          <span>TOP 10 PILOTS</span>
+          <span>TOP 10 PLAYERS</span>
           <span className="text-cyan-400/90 font-bold animate-pulse tracking-wider">SCROLL FOR MORE ▼</span>
         </div>
       )}

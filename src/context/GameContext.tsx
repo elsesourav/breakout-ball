@@ -105,7 +105,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [settings, setSettings] = useState<GameSettings>(() => {
     const saved = localStorage.getItem('breakout_settings');
-    return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+    if (!saved) return DEFAULT_SETTINGS;
+    try {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
   });
 
   const [user, setUser] = useState<UserProfile>(() => {
@@ -210,7 +215,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Sync settings with audio manager
   useEffect(() => {
+    soundManager.setSoundEnabled(settings.soundEnabled);
     soundManager.setVolume(settings.volume);
+    soundManager.setMusicEnabled(settings.musicEnabled);
+    soundManager.setSfxEnabled(settings.sfxEnabled);
+    soundManager.setClickSoundEnabled(settings.clickSoundEnabled);
     soundManager.setVibrate(settings.vibrate);
     localStorage.setItem('breakout_settings', JSON.stringify(settings));
   }, [settings]);

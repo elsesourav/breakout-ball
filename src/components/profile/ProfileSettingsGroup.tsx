@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
 import { CustomCyberSlider } from '../common/CustomCyberSlider';
 import { CustomCyberSwitch } from '../common/CustomCyberSwitch';
-import { Volume2, Vibrate, Compass, Sliders, Trash2, AlertTriangle } from 'lucide-react';
+import { Volume2, VolumeX, Music, Zap, MousePointer, Vibrate, Compass, Sliders, Trash2, AlertTriangle } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 export const ProfileSettingsGroup: React.FC = () => {
@@ -42,13 +42,54 @@ export const ProfileSettingsGroup: React.FC = () => {
     <>
       {/* Audio & Haptics Settings */}
       <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-cyan-500/25 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center gap-2 pb-2 border-b border-cyan-500/15 text-cyan-400 text-xs font-display font-black tracking-wider uppercase">
-          <Volume2 className="w-4 h-4 text-cyan-400" />
-          <span>Sound & Feedback</span>
+        <div className="flex items-center justify-between pb-2 border-b border-cyan-500/15 text-xs font-display font-black tracking-wider uppercase">
+          <div className="flex items-center gap-2 text-cyan-400">
+            {settings.soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+            <span>Sound & Feedback</span>
+          </div>
+          <span className={`text-[9px] font-tech font-bold px-1.5 py-0.5 rounded border ${
+            settings.soundEnabled
+              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/40 shadow-[0_0_8px_rgba(0,247,255,0.3)]'
+              : 'bg-slate-800/60 text-slate-400 border-slate-700'
+          }`}>
+            {settings.soundEnabled ? 'AUDIO ON' : 'AUDIO MUTED'}
+          </span>
         </div>
 
-        {/* Master Volume */}
-        <div className="flex flex-col gap-1.5">
+        {/* 1. Master Audio Switch (DEFAULT: OFF) */}
+        <div className="flex justify-between items-center py-1">
+          <div className="flex items-center gap-2.5">
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center border transition-all ${
+              settings.soundEnabled
+                ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 shadow-[0_0_10px_rgba(0,247,255,0.3)]'
+                : 'bg-slate-800/60 border-slate-700 text-slate-500'
+            }`}>
+              {settings.soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            </div>
+            <div className="flex flex-col">
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
+                MASTER AUDIO
+              </span>
+              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+                {settings.soundEnabled ? 'All audio streams active' : 'All audio streams muted (Default OFF)'}
+              </span>
+            </div>
+          </div>
+          <CustomCyberSwitch
+            checked={settings.soundEnabled}
+            onChange={(checked) => updateSettings({ soundEnabled: checked })}
+            variant="neon-cyan"
+            size="md"
+            showText={true}
+            onLabel="ON"
+            offLabel="OFF"
+            className="font-tech"
+            ariaLabel="Master Audio Toggle"
+          />
+        </div>
+
+        {/* 2. Master Volume Slider (DEFAULT: 50%) */}
+        <div className={`flex flex-col gap-1.5 transition-opacity ${settings.soundEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
           <div className="flex justify-between items-center text-xs">
             <span className="font-settings-title text-xs font-bold text-white tracking-wider">
               MASTER VOLUME
@@ -69,8 +110,86 @@ export const ProfileSettingsGroup: React.FC = () => {
           />
         </div>
 
-        {/* Vibration Toggle */}
-        <div className="flex justify-between items-center pt-1">
+        {/* 3. Background Music Toggle (DEFAULT: OFF) */}
+        <div className={`flex justify-between items-center pt-1 transition-opacity ${settings.soundEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+          <div className="flex items-center gap-2.5">
+            <Music className="w-4 h-4 text-purple-400 flex-shrink-0" />
+            <div className="flex flex-col">
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
+                BACKGROUND MUSIC
+              </span>
+              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+                Ambient cyber combat tracks
+              </span>
+            </div>
+          </div>
+          <CustomCyberSwitch
+            checked={settings.musicEnabled}
+            onChange={(checked) => updateSettings({ musicEnabled: checked })}
+            variant="cyber-purple"
+            size="md"
+            showText={true}
+            onLabel="ON"
+            offLabel="OFF"
+            className="font-tech"
+            ariaLabel="Background Music Toggle"
+          />
+        </div>
+
+        {/* 4. Action Sounds (SFX) Toggle */}
+        <div className={`flex justify-between items-center pt-1 transition-opacity ${settings.soundEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+          <div className="flex items-center gap-2.5">
+            <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            <div className="flex flex-col">
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
+                ACTION SOUNDS (SFX)
+              </span>
+              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+                Ball bounces, block hits & combos
+              </span>
+            </div>
+          </div>
+          <CustomCyberSwitch
+            checked={settings.sfxEnabled}
+            onChange={(checked) => updateSettings({ sfxEnabled: checked })}
+            variant="neon-green"
+            size="md"
+            showText={true}
+            onLabel="ON"
+            offLabel="OFF"
+            className="font-tech"
+            ariaLabel="Action Sounds Toggle"
+          />
+        </div>
+
+        {/* 5. Button Clicks Toggle */}
+        <div className={`flex justify-between items-center pt-1 transition-opacity ${settings.soundEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+          <div className="flex items-center gap-2.5">
+            <MousePointer className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+            <div className="flex flex-col">
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
+                BUTTON & MENU CLICKS
+              </span>
+              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+                High-tech tactile UI clicks
+              </span>
+            </div>
+          </div>
+          <CustomCyberSwitch
+            checked={settings.clickSoundEnabled}
+            onChange={(checked) => updateSettings({ clickSoundEnabled: checked })}
+            variant="neon-cyan"
+            size="md"
+            showText={true}
+            onLabel="ON"
+            offLabel="OFF"
+            className="font-tech"
+            ariaLabel="Button Clicks Toggle"
+          />
+        </div>
+
+        {/* 6. Vibration Haptics Toggle (DEFAULT: ON) */}
+        <div className="flex justify-between items-center pt-1 border-t border-cyan-500/10">
           <div className="flex items-center gap-2.5">
             <Vibrate className="w-4 h-4 text-emerald-400 flex-shrink-0" style={{ color: '#34d399' }} />
             <div className="flex flex-col">
@@ -78,7 +197,7 @@ export const ProfileSettingsGroup: React.FC = () => {
                 VIBRATION HAPTICS
               </span>
               <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
-                Touch & collision haptic buzz
+                Touch & collision haptic buzz (Active)
               </span>
             </div>
           </div>

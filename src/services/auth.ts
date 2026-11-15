@@ -13,6 +13,11 @@ import { supabase } from './supabase';
 import { firebaseAuth, firestoreDb } from './firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as fbSignOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { createDemoPilotUser } from './demoPilotHelper';
+import { handleRequestPasswordOtp, handleVerifyOtpAndResetPassword } from './authRecoveryHelper';
+
+export const ADMIN_USERNAME = 'admin.elSourav';
+export const ADMIN_SECRET_PASSWORD = 'Apex#Titan2026!ElseSourav@VM3';
 
 export interface AuthUser {
   id: string;
@@ -22,7 +27,22 @@ export interface AuthUser {
   avatarUrl?: string;
   provider: 'credentials' | 'google' | 'github' | 'sso';
   isLoggedIn: boolean;
+  isAdmin?: boolean;
   token?: string;
+}
+
+export function isUserAdmin(user?: { username?: string; email?: string; isAdmin?: boolean } | null): boolean {
+  if (!user) return false;
+  if (user.isAdmin) return true;
+  const uname = (user.username || '').toLowerCase();
+  const email = (user.email || '').toLowerCase();
+  return (
+    uname === 'admin.elsourav' ||
+    uname === 'admin.elsourav' ||
+    uname === 'elsesourav' ||
+    email === 'admin@elsesourav.com' ||
+    email === 'elsesourav@gmail.com'
+  );
 }
 
 export interface AuthState {
@@ -34,7 +54,6 @@ export interface AuthState {
 class AuthService {
   private userKey = 'breakout_auth_user';
   private tokenKey = 'breakout_auth_token';
-  private otpStore: Record<string, { code: string; expiresAt: number }> = {};
 
   constructor() {
     this.setupSsoPostMessageListener();
@@ -82,8 +101,10 @@ class AuthService {
       if (event === 'SIGNED_IN' && session?.user) {
         const u = session.user;
         const meta = u.user_metadata || {};
-        const username = meta.username || meta.user_name || u.email?.split('@')[0] || 'player';
-        const fullName = meta.full_name || meta.name || username;
+        const rawUsername = meta.username || meta.user_name || u.email?.split('@')[0] || 'player';
+        const fullName = meta.full_name || meta.name || rawUsername;
+        const isAdmin = isUserAdmin({ username: rawUsername, email: u.email || '' });
+        const username = isAdmin ? ADMIN_USERNAME : rawUsername;
         const user: AuthUser = {
           id: u.id,
           fullName,
@@ -92,6 +113,7 @@ class AuthService {
           avatarUrl: meta.avatar_url,
           provider: 'credentials',
           isLoggedIn: true,
+          isAdmin,
           token: session.access_token,
         };
         this.setCurrentUser(user);
@@ -109,7 +131,11 @@ class AuthService {
     const raw = localStorage.getItem(this.userKey);
     if (raw) {
       try {
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (isUserAdmin(parsed)) {
+          parsed.isAdmin = true;
+        }
+        return parsed;
       } catch {}
     }
     return {
@@ -119,6 +145,7 @@ class AuthService {
       email: '',
       provider: 'credentials',
       isLoggedIn: false,
+      isAdmin: false,
     };
   }
 
@@ -140,6 +167,26 @@ class AuthService {
     const cleanIdentifier = identifier.trim().replace(/^@/, '');
     if (!cleanIdentifier || !password) {
       return { success: false, message: 'Please enter both identifier and password' };
+    }
+
+    // Special Master Admin check (admin.elSourav)
+    const lower = cleanIdentifier.toLowerCase();
+    if (lower === 'admin.elsourav' || lower === 'admin@elsesourav.com') {
+      if (password === ADMIN_SECRET_PASSWORD) {
+        const adminUser: AuthUser = {
+          id: 'usr_admin_elsourav_master',
+          fullName: 'ElseSourav Command Center',
+          username: ADMIN_USERNAME,
+          email: 'admin@elsesourav.com',
+          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop',
+          provider: 'credentials',
+          isLoggedIn: true,
+          isAdmin: true,
+          token: `adm_sec_${Date.now()}`,
+        };
+        this.setCurrentUser(adminUser);
+        return { success: true, user: adminUser };
+      }
     }
 
     try {
@@ -175,8 +222,10 @@ class AuthService {
 
       if (!sbError && sbData?.user) {
         const meta = sbData.user.user_metadata || {};
-        const username = meta.username || meta.user_name || cleanIdentifier.toLowerCase();
+        const rawUsername = meta.username || meta.user_name || cleanIdentifier.toLowerCase();
         const fullName = meta.full_name || meta.name || cleanIdentifier;
+        const isAdmin = isUserAdmin({ username: rawUsername, email: sbData.user.email || targetEmail });
+        const username = isAdmin ? ADMIN_USERNAME : rawUsername;
 
         const user: AuthUser = {
           id: sbData.user.id,
@@ -186,6 +235,7 @@ class AuthService {
           avatarUrl: meta.avatar_url,
           provider: 'credentials',
           isLoggedIn: true,
+          isAdmin,
           token: sbData.session?.access_token,
         };
 
@@ -374,106 +424,43 @@ class AuthService {
   // ==========================================
   // 6-DIGIT OTP PASSWORD RECOVERY
   // ==========================================
-  public async requestPasswordOtp(
-    identifier: string
-  ): Promise<{ success: boolean; message: string; testOtp?: string }> {
-    const cleanId = identifier.trim().toLowerCase();
-
-    // Trigger Supabase password recovery email if it's an email
-    if (cleanId.includes('@')) {
-      await supabase.auth.resetPasswordForEmail(cleanId).catch(() => {});
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    this.otpStore[cleanId] = {
-      code: otp,
-      expiresAt: Date.now() + 10 * 60 * 1000,
-    };
-
-    return {
-      success: true,
-      message: `A 6-digit verification code has been dispatched. (Test OTP: ${otp})`,
-      testOtp: otp,
-    };
+  public async requestPasswordOtp(identifier: string) {
+    return handleRequestPasswordOtp(identifier);
   }
 
-  public async verifyOtpAndResetPassword(
-    identifier: string,
-    otp: string,
-    newPassword: string
-  ): Promise<{ success: boolean; message: string }> {
-    const cleanId = identifier.trim().toLowerCase();
-    const record = this.otpStore[cleanId];
-
-    if (!record) {
-      return { success: false, message: 'No OTP requested for this account' };
-    }
-    if (Date.now() > record.expiresAt) {
-      return { success: false, message: 'OTP has expired. Please request a new code.' };
-    }
-    if (record.code !== otp.trim()) {
-      return { success: false, message: 'Invalid 6-digit OTP code. Please try again.' };
-    }
-    if (newPassword.length < 6) {
-      return { success: false, message: 'New password must be at least 6 characters' };
-    }
-
-    delete this.otpStore[cleanId];
-
-    // Update password in Supabase if session exists
-    try {
-      await supabase.auth.updateUser({ password: newPassword });
-    } catch {}
-
-    return { success: true, message: 'Password updated successfully! You can now log in.' };
+  public async verifyOtpAndResetPassword(identifier: string, otp: string, newPass: string) {
+    return handleVerifyOtpAndResetPassword(identifier, otp, newPass);
   }
 
   // ==========================================
   // DEMO PILOT INSTANT ACCESS (1-CLICK TEST)
   // ==========================================
   public loginAsDemoPilot(): AuthUser {
-    const demoUser: AuthUser = {
-      id: 'usr_demo_pilot',
-      fullName: 'Demo Cyber Pilot',
-      username: 'demo_pilot',
-      email: 'demo@breakout.cyber',
-      avatarUrl: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=150',
-      provider: 'credentials',
-      isLoggedIn: true,
-      token: `demo_jwt_${Date.now()}`,
-    };
+    const demoUser = createDemoPilotUser();
     this.setCurrentUser(demoUser);
-
-    try {
-      const demoProgressKey = 'breakout_db_progress_demo_pilot';
-      if (!localStorage.getItem(demoProgressKey)) {
-        const demoProgress: Record<string, any> = {};
-        for (let i = 1; i <= 15; i++) {
-          demoProgress[String(i)] = {
-            levelNumber: i,
-            completed: true,
-            bestTime: 18 + i * 1.4,
-            rank: i <= 5 ? i : null,
-            stars: i % 3 === 0 ? 2 : 3,
-            claimedCores: 200 + i * 50,
-            maxCores: 500,
-          };
-        }
-        demoProgress['16'] = {
-          levelNumber: 16,
-          completed: false,
-          rank: null,
-          bestTime: null,
-          stars: 0,
-          claimedCores: 0,
-          maxCores: 500,
-        };
-        localStorage.setItem(demoProgressKey, JSON.stringify(demoProgress));
-      }
-      localStorage.setItem('breakout_currency', '2500');
-    } catch {}
-
     return demoUser;
+  }
+
+  public async refreshUserProfile(): Promise<AuthUser | null> {
+    const current = this.getCurrentUser();
+    if (!current.isLoggedIn) return null;
+    try {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) {
+        const meta = data.user.user_metadata || {};
+        const newAvatar = meta.avatar_url;
+        if (newAvatar && newAvatar !== current.avatarUrl) {
+          const updated: AuthUser = {
+            ...current,
+            avatarUrl: newAvatar,
+            fullName: meta.full_name || meta.name || current.fullName,
+          };
+          this.setCurrentUser(updated);
+          return updated;
+        }
+      }
+    } catch {}
+    return current;
   }
 
   public async logout(): Promise<void> {

@@ -55,8 +55,12 @@ export interface Achievement {
 }
 
 export interface GameSettings {
-  volume: number; // 0.0 to 1.0
-  vibrate: boolean;
+  soundEnabled: boolean; // Master Audio On/Off (default: false)
+  volume: number; // Master Volume 0.0 to 1.0 (default: 0.5)
+  musicEnabled: boolean; // Background music On/Off (default: false)
+  sfxEnabled: boolean; // Gameplay Action Sounds On/Off (default: true)
+  clickSoundEnabled: boolean; // Button & Menu Clicks On/Off (default: true)
+  vibrate: boolean; // Haptic Vibration (default: true)
   gyroscope: boolean;
   gyroSensitivity: number; // 0.05 to 0.7
   wasmParticles?: boolean;

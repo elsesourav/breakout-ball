@@ -22,6 +22,7 @@ import { ProfileSettingsView } from './profile/ProfileSettingsView';
 import { ProfileHeroCard } from './profile/ProfileHeroCard';
 import { achievementManager } from '../services/achievements';
 import { soundManager } from '../utils/audio';
+import { authService } from '../services/auth';
 
 export const ProfileView: React.FC = () => {
   const {
@@ -48,6 +49,18 @@ export const ProfileView: React.FC = () => {
     }
     return 'badges';
   });
+
+  // Auto-refresh profile avatar when user returns to game tab from ElseSourav.com
+  useEffect(() => {
+    const handleFocus = async () => {
+      const refreshed = await authService.refreshUserProfile();
+      if (refreshed?.avatarUrl && refreshed.avatarUrl !== user.avatarUrl) {
+        updateUser({ avatarUrl: refreshed.avatarUrl, fullName: refreshed.fullName });
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user.avatarUrl, updateUser]);
   const [unlockedBadgesCount, setUnlockedBadgesCount] = useState(() => {
     return achievementManager.getAll().filter((a) => a.unlocked).length;
   });
@@ -57,6 +70,7 @@ export const ProfileView: React.FC = () => {
   const heroCardRef = useRef<HTMLDivElement>(null);
   const switcherRef = useRef<HTMLDivElement>(null);
   const maxOuterRef = useRef<number>(320);
+  const [contentCardHeight, setContentCardHeight] = useState<number | null>(null);
 
   useEffect(() => {
     achievementManager.loadForUser(user.username);
@@ -83,21 +97,35 @@ export const ProfileView: React.FC = () => {
     return () => window.removeEventListener('profile-switch-section', handleSwitch);
   }, []);
 
-  // Accurately compute sticky lock threshold (distance needed to scroll away hero card)
+  // Dynamically compute exact card height and scroll threshold so top and bottom gaps are pixel-perfect symmetrical
   useEffect(() => {
-    const updateMaxOuter = () => {
-      if (heroCardRef.current) {
-        maxOuterRef.current = heroCardRef.current.offsetHeight + 12;
+    const updateLayout = () => {
+      if (!outerContainerRef.current || !switcherRef.current) return;
+      if (switcherRef.current) {
+        maxOuterRef.current = switcherRef.current.offsetTop;
+      } else if (heroCardRef.current) {
+        maxOuterRef.current = heroCardRef.current.offsetHeight + 18;
+      }
+      const viewportHeight = outerContainerRef.current.clientHeight;
+      const switcherHeight = switcherRef.current.offsetHeight;
+      const CARD_GAP = 14; // Symmetrical 14px gap on both top and bottom
+      const computedHeight = viewportHeight - switcherHeight - (CARD_GAP * 2);
+      if (computedHeight > 220) {
+        setContentCardHeight(computedHeight);
       }
     };
-    updateMaxOuter();
-    const raf = requestAnimationFrame(updateMaxOuter);
-    window.addEventListener('resize', updateMaxOuter);
+
+    updateLayout();
+    const raf1 = requestAnimationFrame(() => {
+      updateLayout();
+      requestAnimationFrame(updateLayout);
+    });
+    window.addEventListener('resize', updateLayout);
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', updateMaxOuter);
+      cancelAnimationFrame(raf1);
+      window.removeEventListener('resize', updateLayout);
     };
-  }, [isSettingsOpen]);
+  }, [isSettingsOpen, activeSection]);
 
   // Desktop Mouse Wheel Coordinator: smooth transition between hero collapse and internal card scroll
   useEffect(() => {
@@ -188,7 +216,7 @@ export const ProfileView: React.FC = () => {
   const completedCount = Object.values(localProgress).filter((p) => p.completed).length;
 
   // Format identity details
-  const displayName = user.isLoggedIn ? (user.fullName || 'Pilot') : 'Anonymous';
+  const displayName = user.isLoggedIn ? (user.fullName || 'Player') : 'Anonymous';
   const displayHandle = user.isLoggedIn ? user.username : null;
 
   const providerLabel =
@@ -204,7 +232,7 @@ export const ProfileView: React.FC = () => {
     <div
       ref={outerContainerRef}
       onScroll={handleOuterScroll}
-      className="w-full h-full relative overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 py-3 gap-3 pb-6 select-none cyber-grid-bg no-scrollbar"
+      className="w-full h-full relative overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 pt-0 pb-0 select-none cyber-grid-bg no-scrollbar"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',
@@ -228,9 +256,9 @@ export const ProfileView: React.FC = () => {
         /* =========================================================================
             VIEW 2: MAIN PROFILE PAGE (Profile card, Stats, Sign-In/Up & Leaderboard/Badges)
             ========================================================================= */
-        <div className="w-full max-w-sm flex flex-col gap-2.5">
+        <div className="w-full max-w-sm flex flex-col">
           {/* 1. Hero Player Profile Card */}
-          <div ref={heroCardRef} className="w-full">
+          <div ref={heroCardRef} className="w-full mt-2 mb-2.5">
             <ProfileHeroCard
               user={user}
               displayName={displayName}
@@ -256,7 +284,7 @@ export const ProfileView: React.FC = () => {
               zIndex: 30,
               backgroundColor: 'rgba(5, 7, 22, 0.98)',
             }}
-            className="w-full pt-1.5 pb-2.5 backdrop-blur-md"
+            className="w-full pt-1 pb-1 backdrop-blur-md"
           >
             {/* Category Switcher: 1st BADGES, 2nd LEADERBOARD (Both use Yellow Button) */}
             <div
@@ -321,14 +349,16 @@ export const ProfileView: React.FC = () => {
             </div>
           </div>
 
-          {/* 3. CONTENT CARD: Fills screen below sticky switcher with internal scrolling and clean gap */}
+          {/* 3. CONTENT CARD: Sits below sticky switcher with SYMMETRICAL even top and bottom gaps */}
           <div
             style={{
-              height: 'calc(100dvh - 150px)',
-              minHeight: '400px',
-              maxHeight: '660px',
+              height: contentCardHeight ? `${contentCardHeight}px` : 'calc(100dvh - 176px)',
+              maxHeight: contentCardHeight ? `${contentCardHeight}px` : 'calc(100dvh - 176px)',
+              minHeight: '340px',
+              marginTop: '14px',
+              marginBottom: '14px',
             }}
-            className="w-full flex flex-col min-h-0 mt-3 mb-2"
+            className="w-full flex flex-col min-h-0"
           >
             <AnimatePresence mode="wait">
               {activeSection === 'badges' ? (

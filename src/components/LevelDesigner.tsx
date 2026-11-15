@@ -33,11 +33,11 @@ const SPECIAL_TOOLS = [
   { id: 0, label: 'ERASER', shortLabel: 'ERASER', color: '#ff0055' },
 ];
 
-const PORTAL_COLORS: Record<number, { border: string; bg: string; text: string }> = {
-  1: { border: '#00f7ff', bg: 'rgba(0, 247, 255, 0.25)', text: '#00f7ff' },
-  2: { border: '#e879f9', bg: 'rgba(232, 121, 249, 0.25)', text: '#e879f9' },
-  3: { border: '#4ade80', bg: 'rgba(74, 222, 128, 0.25)', text: '#4ade80' },
-  4: { border: '#facc15', bg: 'rgba(250, 204, 21, 0.25)', text: '#facc15' },
+const PORTAL_COLORS: Record<number, { border: string; bg: string; text: string; name: string }> = {
+  1: { border: '#00f7ff', bg: 'rgba(0, 247, 255, 0.25)', text: '#00f7ff', name: 'CYAN' },
+  2: { border: '#e879f9', bg: 'rgba(232, 121, 249, 0.25)', text: '#e879f9', name: 'MAGENTA' },
+  3: { border: '#fbbf24', bg: 'rgba(251, 191, 36, 0.25)', text: '#fbbf24', name: 'AMBER' },
+  4: { border: '#34d399', bg: 'rgba(52, 211, 153, 0.25)', text: '#34d399', name: 'EMERALD' },
 };
 
 interface GridCell {
@@ -870,10 +870,11 @@ export const LevelDesigner: React.FC = () => {
       ctx.strokeRect(bx - 3, by - 3, bw + 6, bh + 6);
 
       // HUD Telemetry label
-      ctx.font = '900 13px monospace';
+      const pairName = PORTAL_COLORS[draggedPortal.pairId]?.name || 'PORTAL';
+      ctx.font = '900 12px monospace';
       ctx.fillStyle = PORTAL_COLORS[draggedPortal.pairId]?.border || '#00f7ff';
       ctx.textAlign = 'center';
-      ctx.fillText(`MOVE GATE #${draggedPortal.pairId}`, bx + bw / 2, by + bh + 18);
+      ctx.fillText(`MOVE ${pairName} GATE`, bx + bw / 2, by + bh + 18);
       ctx.restore();
     }
 
@@ -1587,11 +1588,11 @@ export const LevelDesigner: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <BlockIconPreview toolId={7} pairId={1} width={50} height={24} />
                       <span className="font-display font-black text-xs text-[#00f7ff]">
-                        Portal Gate (Teleports Balls)
+                        Portal Gate (Linked Color Pairs)
                       </span>
                     </div>
                     <p className="text-slate-300 text-xs leading-relaxed">
-                      Teleports the ball between two linked gates. Portals are always placed in matching pairs (1 to 4 pairs). When a ball enters one portal, it instantly emerges from its partner preserving speed and trajectory!
+                      Teleports balls between color-matched gates (Cyan, Magenta, Amber, Emerald). When a ball penetrates at least 50% into a portal, it instantly emerges from its partner preserving velocity and angle!
                     </p>
                     <div className="p-2 rounded-lg bg-cyan-950/70 border border-cyan-500/35 text-[11px] text-cyan-200 flex items-center gap-1.5 mt-0.5">
                       <strong className="text-cyan-400 shrink-0">💡 Drag & Move:</strong>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Activity, Ticket, Database, CheckCircle, AlertCircle, RefreshCw, Trash2, Power } from 'lucide-react';
+import { X, Activity, Ticket, Database, CheckCircle, AlertCircle, RefreshCw, Trash2, Power, ShieldAlert } from 'lucide-react';
 import { backendApi, BackendHealthResponse, BackendActivityLog, AdminCoupon } from '../../services/backendApi';
+import { authService, isUserAdmin } from '../../services/auth';
 
 interface BackendAdminModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
   const [newMaxUses, setNewMaxUses] = useState('1000');
 
   const fetchAll = async () => {
+    if (!isUserAdmin(authService.getCurrentUser())) return;
     setIsLoading(true);
     try {
       const [h, l, c, d] = await Promise.all([
@@ -87,6 +89,28 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
   };
 
   if (!isOpen) return null;
+
+  if (!isUserAdmin(authService.getCurrentUser())) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div className="w-full max-w-md rounded-2xl bg-[#080c24] border-2 border-red-500/50 p-6 flex flex-col items-center gap-3 text-center text-white font-tech shadow-[0_0_35px_rgba(239,68,68,0.3)]">
+          <ShieldAlert className="w-10 h-10 text-red-400" />
+          <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider font-display">
+            ACCESS RESTRICTED // ADMIN ONLY
+          </h3>
+          <p className="text-xs text-slate-300">
+            This terminal requires authorization as @admin.elSourav. Please log in with your admin credentials to access backend controls.
+          </p>
+          <button
+            onClick={onClose}
+            className="mt-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all cursor-pointer"
+          >
+            DISMISS
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md">

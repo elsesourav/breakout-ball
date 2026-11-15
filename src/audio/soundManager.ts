@@ -16,8 +16,12 @@ import { synthAudio } from '../utils/synthAudio';
 
 class SoundManager {
   private ctx: AudioContext | null = null;
-  private volume: number = 1.0;
-  private vibrateEnabled: boolean = true;
+  private soundEnabled: boolean = false; // Master audio OFF by default
+  private volume: number = 0.5; // Master volume 50% by default
+  private musicEnabled: boolean = false; // Background music OFF by default
+  private sfxEnabled: boolean = true; // Action sounds active when sound is ON
+  private clickSoundEnabled: boolean = true; // Button clicks active when sound is ON
+  private vibrateEnabled: boolean = true; // Vibration ON by default
   private bgAudio: HTMLAudioElement | null = null;
   private currentTrack: number = 0;
   private cache: Record<string, HTMLAudioElement> = {};
@@ -39,6 +43,7 @@ class SoundManager {
 
   private getContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
+    if (!this.soundEnabled) return null;
     if (!this.ctx) {
       const AudioCtx =
         window.AudioContext ||
@@ -51,6 +56,34 @@ class SoundManager {
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
+  }
+
+  public setSoundEnabled(enabled: boolean) {
+    this.soundEnabled = enabled;
+    synthAudio.setEnabled(this.soundEnabled && this.sfxEnabled);
+    if (!enabled) {
+      this.stopBgMusic();
+    }
+  }
+
+  public isSoundEnabled(): boolean {
+    return this.soundEnabled;
+  }
+
+  public setMusicEnabled(enabled: boolean) {
+    this.musicEnabled = enabled;
+    if (!enabled || !this.soundEnabled) {
+      this.stopBgMusic();
+    }
+  }
+
+  public setSfxEnabled(enabled: boolean) {
+    this.sfxEnabled = enabled;
+    synthAudio.setEnabled(this.soundEnabled && this.sfxEnabled);
+  }
+
+  public setClickSoundEnabled(enabled: boolean) {
+    this.clickSoundEnabled = enabled;
   }
 
   public setVolume(vol: number) {
@@ -67,6 +100,7 @@ class SoundManager {
 
   // ── High-Tech Button Clicks ───────────────────────────────────────
   public playClick(type: ClickSoundType = 'cyber') {
+    if (!this.soundEnabled || !this.clickSoundEnabled || this.volume <= 0) return;
     const ctx = this.getContext();
     if (ctx) {
       playSyntheticClick(ctx, this.volume, type);
@@ -77,39 +111,47 @@ class SoundManager {
 
   // ── Armory & Economy Sounds ───────────────────────────────────────
   public playCollectCore(step = 1) {
-    const ctx = this.getContext();
-    if (ctx) {
-      playSyntheticCoreCollect(ctx, this.volume, step);
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      const ctx = this.getContext();
+      if (ctx) {
+        playSyntheticCoreCollect(ctx, this.volume, step);
+      }
     }
     this.triggerVibrate(20);
   }
 
   public playUpgradeSuccess() {
-    const ctx = this.getContext();
-    if (ctx) {
-      playSyntheticUpgradeSuccess(ctx, this.volume);
-    } else {
-      this.playStatic('win', 1.0);
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      const ctx = this.getContext();
+      if (ctx) {
+        playSyntheticUpgradeSuccess(ctx, this.volume);
+      } else {
+        this.playStatic('win', 1.0);
+      }
     }
     this.triggerVibrate([40, 30, 80]);
   }
 
   public playInsufficientFunds() {
-    const ctx = this.getContext();
-    if (ctx) {
-      playSyntheticWarning(ctx, this.volume);
-    } else {
-      this.playStatic('damage', 0.5);
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      const ctx = this.getContext();
+      if (ctx) {
+        playSyntheticWarning(ctx, this.volume);
+      } else {
+        this.playStatic('damage', 0.5);
+      }
     }
     this.triggerVibrate(50);
   }
 
   public playLockTap() {
-    const ctx = this.getContext();
-    if (ctx) {
-      playSyntheticLockTap(ctx, this.volume);
-    } else {
-      this.playStatic('sideHit', 0.15);
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      const ctx = this.getContext();
+      if (ctx) {
+        playSyntheticLockTap(ctx, this.volume);
+      } else {
+        this.playStatic('sideHit', 0.15);
+      }
     }
     this.triggerVibrate(15);
   }
@@ -120,7 +162,7 @@ class SoundManager {
   }
 
   private playStatic(name: keyof typeof AUDIO_PATHS, volumeMultiplier = 1.0) {
-    if (this.volume <= 0) return;
+    if (!this.soundEnabled || !this.sfxEnabled || this.volume <= 0) return;
     try {
       const src = AUDIO_PATHS[name];
       const sound = new Audio(src);
@@ -138,12 +180,16 @@ class SoundManager {
   }
 
   public playCountdownTick(count: number | string) {
-    synthAudio.playCountdownTick(count);
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      synthAudio.playCountdownTick(count);
+    }
     this.triggerVibrate(25);
   }
 
   public playCountdownGo() {
-    synthAudio.playCountdownGo();
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      synthAudio.playCountdownGo();
+    }
     this.triggerVibrate([50, 40, 100]);
   }
 
@@ -164,7 +210,7 @@ class SoundManager {
 
   public startBgMusic() {
     this.stopBgMusic();
-    if (this.volume <= 0) return;
+    if (!this.soundEnabled || !this.musicEnabled || this.volume <= 0) return;
     try {
       const track = this.currentTrack === 0 ? AUDIO_PATHS.bg0 : AUDIO_PATHS.bg1;
       this.bgAudio = new Audio(track);

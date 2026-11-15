@@ -1,6 +1,6 @@
 import { BlockEngineState } from '../types';
 import { BLOCK_COLORS } from '../../constants/game';
-import { renderRefinedPortalCenter, PortalCenterStyle } from './portalCenterDrawers';
+import { renderRefinedPortalCenter, PortalCenterStyle, PORTAL_PAIR_THEMES } from './portalCenterDrawers';
 
 export type { PortalCenterStyle };
 
@@ -228,6 +228,7 @@ export function drawArmored3DSlabBlock(
     const maxR = Math.hypot(bw, topH) * 0.55;
 
     // Sweeping rotating cosmic nebula arms spanning across the entire block face
+    const pairTheme = PORTAL_PAIR_THEMES[block.portalPairId || 1] || PORTAL_PAIR_THEMES[1];
     ctx.save();
     ctx.translate(pcx, pcy);
     ctx.rotate(animTick * 1.5);
@@ -236,9 +237,9 @@ export function drawArmored3DSlabBlock(
       ctx.rotate((Math.PI * 2) / 3);
       const armGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, maxR);
       armGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
-      armGrad.addColorStop(0.25, 'rgba(56, 189, 248, 0.6)');
-      armGrad.addColorStop(0.6, 'rgba(192, 132, 252, 0.45)');
-      armGrad.addColorStop(0.85, 'rgba(244, 63, 94, 0.2)');
+      armGrad.addColorStop(0.3, pairTheme.primary);
+      armGrad.addColorStop(0.65, pairTheme.secondary);
+      armGrad.addColorStop(0.85, pairTheme.dark);
       armGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
 
       ctx.fillStyle = armGrad;
@@ -268,24 +269,20 @@ export function drawArmored3DSlabBlock(
       ctx.fill();
     });
 
-    // ── REFINED PORTAL CENTER (Replaces the cartoon swirl emoji) ──
-    renderRefinedPortalCenter(ctx, pcx, pcy, topH * 0.42, animTick, portalStyle);
+    // ── REFINED PORTAL CENTER (High-tech Stargate/Singularity aperture) ──
+    renderRefinedPortalCenter(ctx, pcx, pcy, topH * 0.42, animTick, portalStyle, block.portalPairId || 1);
 
     ctx.restore(); // Unclip
 
-    // Shimmering dimensional event-horizon border around the chamfered rim
+    // Shimmering dimensional event-horizon border around the chamfered rim in pair's distinct color
     const borderPulse = Math.sin(animTick * 2.5) * 0.25 + 0.75;
-    const rimColor = block.portalPairId === 2
-      ? `rgba(232, 121, 249, ${borderPulse})`
-      : block.portalPairId === 3
-      ? `rgba(74, 222, 128, ${borderPulse})`
-      : block.portalPairId === 4
-      ? `rgba(250, 204, 21, ${borderPulse})`
-      : `rgba(56, 189, 248, ${borderPulse})`;
-    ctx.strokeStyle = rimColor;
+    ctx.strokeStyle = pairTheme.primary;
     ctx.lineWidth = 1.6;
+    ctx.shadowColor = pairTheme.glow;
+    ctx.shadowBlur = 4;
     drawChamferRect(ctx, bx, by, bw, topH, chamfer);
     ctx.stroke();
+    ctx.shadowBlur = 0;
   } else {
     // ── HP 1-5 & EMP 8: RICH VIBRANT METALLIC SLAB (NO DARK MUDDY BOTTOM) ──
     const tones = getBlockTones(block.health);
@@ -348,37 +345,46 @@ export function drawArmored3DSlabBlock(
     });
   }
 
-  // 7. Engraved Tactile Typography / Portal Pair Telemetry
+  // 7. Engraved Tactile Typography / Portal Telemetry Resonance Node
   if (block.health !== 7) {
     renderEngravedLabel(ctx, block, config, bx + bw / 2, by + topH / 2, topH);
   } else if (block.portalPairId !== undefined) {
-    // Portal telemetry pair badge (Proportionally scaled to avoid clipping)
-    const badgeColors: Record<number, { border: string; bg: string; text: string }> = {
-      1: { border: '#00f7ff', bg: 'rgba(0, 247, 255, 0.28)', text: '#00f7ff' },
-      2: { border: '#e879f9', bg: 'rgba(232, 121, 249, 0.28)', text: '#e879f9' },
-      3: { border: '#4ade80', bg: 'rgba(74, 222, 128, 0.28)', text: '#4ade80' },
-      4: { border: '#facc15', bg: 'rgba(250, 204, 21, 0.28)', text: '#facc15' },
-    };
-    const bc = badgeColors[block.portalPairId] || badgeColors[1];
+    // Portal telemetry resonance node (Identified strictly by distinct pair color — NO NUMBERS)
+    const pairTheme = PORTAL_PAIR_THEMES[block.portalPairId] || PORTAL_PAIR_THEMES[1];
     ctx.save();
-    const tagR = Math.max(2.8, Math.min(6.5, topH * 0.20));
+    const tagR = Math.max(3.0, Math.min(6.5, topH * 0.20));
     const tagX = bx + bw - tagR - Math.max(2, bw * 0.05);
     const tagY = by + tagR + Math.max(2, topH * 0.08);
-    ctx.fillStyle = bc.bg;
-    ctx.strokeStyle = bc.border;
-    ctx.lineWidth = Math.max(0.8, tagR * 0.18);
+
+    // Glowing outer aura
+    ctx.shadowColor = pairTheme.primary;
+    ctx.shadowBlur = tagR >= 5 ? 6 : 3;
+
+    // Dark inset bezel
+    ctx.fillStyle = 'rgba(5, 7, 20, 0.85)';
+    ctx.strokeStyle = pairTheme.primary;
+    ctx.lineWidth = Math.max(1.0, tagR * 0.25);
     ctx.beginPath();
     ctx.arc(tagX, tagY, tagR, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    const fontPx = Math.max(5.5, Math.round(tagR * 1.3));
-    ctx.font = `900 ${fontPx}px monospace`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = bc.text;
-    ctx.shadowColor = bc.border;
-    ctx.shadowBlur = tagR >= 5 ? 4 : 1;
-    ctx.fillText(String(block.portalPairId), tagX, tagY + 0.5);
+
+    // Vibrant glowing quantum core gem
+    const coreGrad = ctx.createRadialGradient(tagX - tagR * 0.2, tagY - tagR * 0.2, 0.5, tagX, tagY, tagR * 0.65);
+    coreGrad.addColorStop(0, '#ffffff');
+    coreGrad.addColorStop(0.4, pairTheme.primary);
+    coreGrad.addColorStop(1.0, pairTheme.secondary);
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath();
+    ctx.arc(tagX, tagY, tagR * 0.62, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Specular highlight glint
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.beginPath();
+    ctx.arc(tagX - tagR * 0.25, tagY - tagR * 0.25, Math.max(0.6, tagR * 0.2), 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.restore();
   }
 

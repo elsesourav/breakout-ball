@@ -36,8 +36,12 @@ export const AUDIO_PATHS = {
 };
 
 export const DEFAULT_SETTINGS: GameSettings = {
-  volume: 1.0,
-  vibrate: true,
+  soundEnabled: false, // Default audio is OFF
+  volume: 0.5, // Default volume is 50%
+  musicEnabled: false, // Background music is OFF by default
+  sfxEnabled: true, // Action sounds enabled when master audio is toggled ON
+  clickSoundEnabled: true, // Button clicks enabled when master audio is toggled ON
+  vibrate: true, // Haptic vibrator is ON by default
   gyroscope: false,
   gyroSensitivity: 0.4,
   wasmParticles: true,

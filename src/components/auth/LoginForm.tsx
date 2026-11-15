@@ -194,7 +194,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           className="w-full h-10 rounded-xl font-tech font-bold text-xs tracking-wider flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-purple-900/40 via-cyan-950/60 to-blue-900/40 border border-cyan-400/40 text-cyan-300 hover:text-white hover:border-cyan-300 hover:shadow-[0_0_15px_rgba(0,247,255,0.3)] transition-all active:scale-[0.98]"
         >
           <Rocket className="w-4 h-4 text-cyan-400 animate-pulse" />
-          <span>🚀 QUICK DEMO PILOT LOGIN (@demo_pilot)</span>
+          <span>🚀 QUICK DEMO PLAYER LOGIN</span>
         </button>
       </form>
 

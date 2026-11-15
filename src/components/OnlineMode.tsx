@@ -190,8 +190,8 @@ export const OnlineMode: React.FC = () => {
         }}
       >
         <CyberSectionHeader
-          title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
-          subtitle={`@${user.username || 'pilot'}`}
+          title={user.fullName || user.username.toUpperCase() || 'CYBER PLAYER'}
+          subtitle={`@${user.username || 'player'}`}
           rightSlot={
             <div className="flex items-center gap-2 flex-shrink-0">
               <button

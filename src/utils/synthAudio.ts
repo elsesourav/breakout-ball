@@ -5,10 +5,12 @@
 
 class SynthAudioEngine {
   private ctx: AudioContext | null = null;
-  private volume: number = 0.8;
+  private volume: number = 0.5;
+  private enabled: boolean = false; // Audio disabled by default
 
   private initContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
+    if (!this.enabled) return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
@@ -21,6 +23,10 @@ class SynthAudioEngine {
     return this.ctx;
   }
 
+  public setEnabled(enabled: boolean) {
+    this.enabled = enabled;
+  }
+
   public setVolume(vol: number) {
     this.volume = Math.max(0, Math.min(1, vol));
   }
@@ -29,7 +35,7 @@ class SynthAudioEngine {
    * Dynamic Combo Tone: Pitch climbs gracefully with combo streak!
    */
   public playComboHit(combo: number = 1) {
-    if (this.volume <= 0) return;
+    if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
@@ -56,7 +62,7 @@ class SynthAudioEngine {
   }
 
   public playPaddleBounce() {
-    if (this.volume <= 0) return;
+    if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
@@ -79,7 +85,7 @@ class SynthAudioEngine {
   }
 
   public playPortalWarp() {
-    if (this.volume <= 0) return;
+    if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
@@ -102,7 +108,7 @@ class SynthAudioEngine {
   }
 
   public playPowerup() {
-    if (this.volume <= 0) return;
+    if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
@@ -132,7 +138,7 @@ class SynthAudioEngine {
    * Distinct resonant harmonic frequencies for '3', '2', and '1'
    */
   public playCountdownTick(count: number | string) {
-    if (this.volume <= 0) return;
+    if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
@@ -186,7 +192,7 @@ class SynthAudioEngine {
    * Layered chord ascent + punchy sub-bass impact
    */
   public playCountdownGo() {
-    if (this.volume <= 0) return;
+    if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
@@ -235,7 +241,7 @@ class SynthAudioEngine {
   }
 
   public playAchievementChime() {
-    if (this.volume <= 0) return;
+    if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();
     if (!ctx) return;
 

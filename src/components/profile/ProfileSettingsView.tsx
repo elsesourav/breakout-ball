@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Settings, UserCheck, Mail, ShieldCheck, LogOut, Cloud, LogIn, UserPlus, Database } from 'lucide-react';
+import { ArrowLeft, Settings, UserCheck, Mail, ShieldCheck, LogOut, Cloud, LogIn, UserPlus, Database, ExternalLink } from 'lucide-react';
 import { ProfileSettingsGroup } from './ProfileSettingsGroup';
 import { BackendAdminModal } from '../admin/BackendAdminModal';
+import { isUserAdmin } from '../../services/auth';
 import { soundManager } from '../../utils/audio';
 
 interface ProfileSettingsViewProps {
@@ -29,6 +30,7 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
   onCreateAccount,
 }) => {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const isAdmin = user.isLoggedIn && isUserAdmin({ username: displayHandle || displayName, email: user.email, isAdmin: (user as any).isAdmin });
 
   return (
     <div className="w-full max-w-sm flex flex-col gap-3.5 animate-in fade-in slide-in-from-right-4 duration-200">
@@ -96,6 +98,19 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
               <span>SIGN OUT</span>
             </button>
           </div>
+
+          {/* Edit Profile & Avatar on ElseSourav */}
+          <button
+            type="button"
+            onClick={() => {
+              soundManager.play('click');
+              window.open('https://elsesourav.com/settings', '_blank');
+            }}
+            className="w-full mt-1.5 py-2 px-3 rounded-lg border border-cyan-500/40 bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-300 font-tech font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-[0_0_10px_rgba(0,247,255,0.2)]"
+          >
+            <ExternalLink className="w-3.5 h-3.5 text-cyan-400" />
+            <span>EDIT PROFILE ICON ON ELSESOURAV</span>
+          </button>
         </div>
       ) : (
         <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
@@ -137,34 +152,36 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
         </div>
       )}
 
-      {/* Backend Control & Coupon Management Card */}
-      <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-cyan-400 text-xs font-display font-bold uppercase tracking-wider">
-            <Database className="w-3.5 h-3.5" />
-            <span>Backend Ops Terminal</span>
+      {/* Backend Control & Coupon Management Card (Strictly for admin.elSourav only) */}
+      {isAdmin && (
+        <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2 shadow-lg backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-cyan-400 text-xs font-display font-bold uppercase tracking-wider">
+              <Database className="w-3.5 h-3.5" />
+              <span>Backend Ops Terminal</span>
+            </div>
+            <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              ADMIN ONLY
+            </span>
           </div>
-          <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-            ONLINE
-          </span>
+
+          <p className="text-xs font-ui leading-snug text-slate-300">
+            Manage cyber promo coupons (create, toggle, delete), inspect live player activity logs, and monitor database metrics.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              soundManager.play('click');
+              setIsAdminOpen(true);
+            }}
+            className="w-full py-2 px-3 rounded-lg bg-cyan-950/60 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-tech font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_10px_rgba(0,247,255,0.2)] mt-1"
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span>OPEN OPS TERMINAL</span>
+          </button>
         </div>
-
-        <p className="text-xs font-ui leading-snug text-slate-300">
-          Manage cyber promo coupons (create, toggle, delete), inspect live player activity logs, and monitor database metrics.
-        </p>
-
-        <button
-          type="button"
-          onClick={() => {
-            soundManager.play('click');
-            setIsAdminOpen(true);
-          }}
-          className="w-full py-2 px-3 rounded-lg bg-cyan-950/60 border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-tech font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_10px_rgba(0,247,255,0.2)] mt-1"
-        >
-          <Database className="w-3.5 h-3.5" />
-          <span>OPEN OPS TERMINAL</span>
-        </button>
-      </div>
+      )}
 
       {/* Sound, Haptics, Simulation Hardware & Data Storage Settings */}
       <ProfileSettingsGroup />

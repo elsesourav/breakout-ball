@@ -178,7 +178,7 @@ class CouponService {
 
     // ── 2.5. Dedicated Backend Microservice Validation & Redemption ──
     try {
-      const apiRes = await backendApi.redeemCoupon(code, username || 'pilot', expectedCores || 0);
+      const apiRes = await backendApi.redeemCoupon(code, username || 'player', expectedCores || 0);
       if (apiRes.success && apiRes.coresGranted) {
         currencyService.addCores(apiRes.coresGranted, 'shop_coupon');
         if (!isMultiUse) {

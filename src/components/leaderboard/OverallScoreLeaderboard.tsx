@@ -44,7 +44,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
               username: e.username,
               score: e.totalScore || e.score || 0,
               coresCleared: e.levelsCompleted || 0,
-              badgeTitle: (e.levelsCompleted || 0) >= 50 ? 'Apex Legend' : (e.levelsCompleted || 0) >= 30 ? 'Void Master' : (e.levelsCompleted || 0) >= 15 ? 'Core Crusher' : 'Sector Pilot',
+              badgeTitle: (e.levelsCompleted || 0) >= 50 ? 'Apex Legend' : (e.levelsCompleted || 0) >= 30 ? 'Void Master' : (e.levelsCompleted || 0) >= 15 ? 'Core Crusher' : 'Sector Player',
               avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
             }));
             setLivePilots(mapped);
@@ -59,7 +59,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
               username: e.username,
               score: e.totalScore || e.score || 0,
               coresCleared: e.levelsCompleted || e.coresCleared || 0,
-              badgeTitle: e.badgeTitle || ((e.levelsCompleted || 0) >= 30 ? 'Grandmaster' : 'Sector Pilot'),
+              badgeTitle: e.badgeTitle || ((e.levelsCompleted || 0) >= 30 ? 'Grandmaster' : 'Sector Player'),
               avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
             }));
             setLivePilots(mapped);
@@ -123,7 +123,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
       }
     });
 
-    const username = user.isLoggedIn ? (user.username || 'pilot') : 'you';
+    const username = user.isLoggedIn ? (user.username || 'player') : 'you';
     const avatarUrl = user.isLoggedIn && user.avatarUrl
       ? user.avatarUrl
       : getDemoAvatarUrl(username, 0);
@@ -152,8 +152,8 @@ export const OverallScoreLeaderboard: React.FC = () => {
           : userStats.completedCores >= 30
           ? 'Void Master'
           : userStats.completedCores >= 15
-          ? 'Veteran Pilot'
-          : 'Cadet Pilot',
+          ? 'Veteran Player'
+          : 'Cadet Player',
       avatarUrl: userStats.avatarUrl,
       isCurrentUser: true,
       rank: 999,
@@ -190,7 +190,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
           </div>
           <div className="flex flex-col min-w-0 truncate">
             <h3 className="font-display font-bold text-xs text-white tracking-wider truncate leading-tight">
-              TOP PILOTS
+              TOP PLAYERS
             </h3>
             <span className="font-ui text-[9px] text-slate-400 tracking-normal leading-none mt-0.5 truncate">
               Global Database Rankings
@@ -247,7 +247,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Column Headers: RANK | PILOT | CORES | SCORE */}
+      {/* 2. Column Headers: RANK | PLAYER | CORES | SCORE */}
       <div
         style={{
           display: 'grid',
@@ -258,7 +258,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
         className="px-3.5 py-2 text-[10px] font-tech text-slate-400 border-b border-cyan-500/15 uppercase tracking-wider flex-shrink-0"
       >
         <span className="text-center font-bold">RANK</span>
-        <span className="text-left pl-1 font-bold">PILOT</span>
+        <span className="text-left pl-1 font-bold">PLAYER</span>
         <span className="text-center font-bold flex items-center justify-center gap-0.5">
           <CoreIcon size={10} glow variant="cyan" />
           CORES

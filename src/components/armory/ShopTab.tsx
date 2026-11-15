@@ -6,6 +6,7 @@ import { currencyService, DailyCollectStatus } from '../../services/currency';
 import { soundManager } from '../../utils/audio';
 import { CoreIcon } from '../CoreIcon';
 import { BackendAdminModal } from '../admin/BackendAdminModal';
+import { authService, isUserAdmin } from '../../services/auth';
 
 const getPackVariant = (id: string): 'emerald' | 'purple' | 'gold' | 'rose' | 'cyan' => {
   switch (id) {
@@ -190,15 +191,17 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           <Ticket className="w-3.5 h-3.5" />
           SHOP COUPON VAULT
         </span>
-        <button
-          type="button"
-          onClick={() => setIsAdminOpen(true)}
-          className="flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)] transition-all"
-          title="Open Backend Operations Terminal"
-        >
-          <Database className="w-2.5 h-2.5 text-cyan-400" />
-          <span>OPS TERMINAL</span>
-        </button>
+        {isUserAdmin(authService.getCurrentUser()) && (
+          <button
+            type="button"
+            onClick={() => setIsAdminOpen(true)}
+            className="flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)] transition-all"
+            title="Open Backend Operations Terminal"
+          >
+            <Database className="w-2.5 h-2.5 text-cyan-400" />
+            <span>OPS TERMINAL</span>
+          </button>
+        )}
       </div>
 
       {/* ── 2. Clean 2-Column Grid (Daily Free + Shop Packs) ─────────────── */}

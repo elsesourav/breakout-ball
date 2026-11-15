@@ -484,8 +484,8 @@ export const LevelMap: React.FC = () => {
         }}
       >
         <CyberSectionHeader
-          title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
-          subtitle={`@${user.username || 'pilot'}`}
+          title={user.fullName || user.username.toUpperCase() || 'CYBER PLAYER'}
+          subtitle={`@${user.username || 'player'}`}
           rightSlot={
             <button
               type="button"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserCheck, User as UserIcon, Settings, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck } from 'lucide-react';
+import { UserCheck, User as UserIcon, Settings, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck, Pencil } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 interface ProfileHeroCardProps {
@@ -48,7 +48,7 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
     >
       {/* Header: Avatar, Pilot Name, and Settings Component Button */}
       <div className="flex items-center gap-3.5">
-        <div className="relative flex-shrink-0">
+        <div className="relative flex-shrink-0 group">
           {user.isLoggedIn && user.avatarUrl ? (
             <img
               src={user.avatarUrl}
@@ -69,6 +69,22 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
               </div>
             </div>
           )}
+
+          {/* Quick Edit Profile Icon link to elsesourav.com */}
+          {user.isLoggedIn && (
+            <button
+              type="button"
+              onClick={() => {
+                soundManager.play('click');
+                window.open('https://elsesourav.com/settings', '_blank');
+              }}
+              title="Edit Profile Icon on ElseSourav.com"
+              className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-cyan-950 border border-cyan-400 flex items-center justify-center text-cyan-300 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.4)]"
+            >
+              <Pencil className="w-2.5 h-2.5" />
+            </button>
+          )}
+
           <span
             className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#090d24] ${
               user.isLoggedIn
@@ -88,7 +104,7 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
           {displayHandle ? (
             <p className="text-xs text-cyan-400 font-tech truncate mt-0.5">@{displayHandle}</p>
           ) : (
-            <p className="text-[11px] text-slate-400 font-ui truncate mt-0.5">Guest Pilot • Local Saves</p>
+            <p className="text-[11px] text-slate-400 font-ui truncate mt-0.5">Guest Player • Local Saves</p>
           )}
         </div>
 
