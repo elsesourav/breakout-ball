@@ -13,7 +13,6 @@ import {
   ShopTabIcon,
   GameBallIcon,
   GamePaddleIcon,
-  GamePowerShardIcon,
 } from './armory/InGameIcons';
 
 type ArmorySection = 'upgrade' | 'shop';
@@ -32,18 +31,6 @@ const SUB_SECTIONS: {
     id: 'paddle',
     label: 'PADDLE',
     renderIcon: () => <GamePaddleIcon size={20} />,
-  },
-  {
-    id: 'power',
-    label: 'POWER',
-    renderIcon: () => (
-      <GamePowerShardIcon
-        type="power"
-        symbol="⚡"
-        color="#b773ff"
-        size={18}
-      />
-    ),
   },
 ];
 
@@ -363,15 +350,11 @@ export const ArmoryView: React.FC = () => {
                         transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
                         style={{
                           background:
-                            sub.id === 'power'
-                              ? 'linear-gradient(135deg, #b773ff 0%, #7c3aed 100%)'
-                              : sub.id === 'paddle'
+                            sub.id === 'paddle'
                               ? 'linear-gradient(135deg, #06b6d4 0%, #0284c7 100%)'
                               : 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
                           boxShadow:
-                            sub.id === 'power'
-                              ? '0 0 14px rgba(183, 115, 255, 0.45)'
-                              : sub.id === 'paddle'
+                            sub.id === 'paddle'
                               ? '0 0 14px rgba(6, 182, 212, 0.45)'
                               : '0 0 14px rgba(0, 247, 255, 0.45)',
                         }}
@@ -389,29 +372,7 @@ export const ArmoryView: React.FC = () => {
       </div>
 
       {/* ── 3. CONTENT AREA (Scrolls under sticky switchers) ──────────────────── */}
-
-      {/* Visual Design Lab Banner / Access Pill (Placed immediately after navigation so it can easily be removed later) */}
-      <div className="w-full max-w-sm px-4 sm:px-5 mt-3 mb-1">
-        <button
-          type="button"
-          onClick={() => setScreen('design-lab')}
-          className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-950/70 via-indigo-950/70 to-purple-950/70 border border-cyan-500/40 hover:border-cyan-400 flex items-center justify-between text-xs font-mono font-bold text-cyan-300 hover:text-white transition-all cursor-pointer shadow-md group active:scale-[0.98]"
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-base group-hover:rotate-12 transition-transform">⚡</span>
-            <span>VISUAL DESIGN LAB</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
-              ASSET FORGE
-            </span>
-          </div>
-          <span className="text-[11px] text-slate-400 group-hover:text-cyan-200">
-            VIEW OPTIONS →
-          </span>
-        </button>
-      </div>
-
-      {/* Section Content with Smooth Animated Transitions */}
-      <div className="w-full max-w-sm px-4 sm:px-5 pb-8">
+      <div className="w-full max-w-sm px-4 sm:px-5 pb-8 pt-2">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}

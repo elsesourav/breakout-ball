@@ -10,6 +10,7 @@ interface UpgradeCardProps {
   cores: number;
   cost: number;
   onUpgrade: (id: string) => void;
+  onSelect?: (upgrade: UpgradeDef) => void;
   icon?: React.ReactNode;
 }
 
@@ -95,27 +96,30 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
   cores,
   cost,
   onUpgrade,
+  onSelect,
   icon,
 }) => {
   const isMax = level >= upgrade.maxLevel;
   const canAfford = !isMax && cores >= cost;
   const statBreakdown = getStatBreakdown(upgrade, level);
 
-  const handleUpgradeClick = () => {
-    if (!canAfford) return;
+  const handleCardClick = () => {
     soundManager.play('click');
-    onUpgrade(upgrade.id);
+    if (onSelect) {
+      onSelect(upgrade);
+    }
   };
 
   return (
     <div
+      onClick={handleCardClick}
       style={{
         backgroundColor: 'rgba(8, 13, 38, 0.94)',
         border: `1.2px solid ${upgrade.accentColor}45`,
         boxShadow: `0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px ${upgrade.accentColor}12`,
         borderRadius: '16px',
       }}
-      className="p-3 flex flex-col gap-2 relative overflow-hidden transition-all duration-200"
+      className="p-3 flex flex-col gap-2 relative overflow-hidden transition-all duration-200 cursor-pointer hover:border-cyan-400/50 hover:shadow-[0_4px_22px_rgba(0,247,255,0.2)] active:scale-[0.99] group"
     >
       {/* Top Row: Symbol Icon + Name + Stat Breakdown (+ green boost) */}
       <div className="flex items-center justify-between">
@@ -238,7 +242,10 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
           <button
             type="button"
             disabled={!canAfford}
-            onClick={handleUpgradeClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCardClick();
+            }}
             style={{
               background: canAfford
                 ? `linear-gradient(135deg, ${upgrade.accentColor} 0%, #0284c7 100%)`

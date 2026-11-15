@@ -3,9 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { UpgradeState } from '../../constants/upgrades';
 import { BallTab } from './BallTab';
 import { PaddleTab } from './PaddleTab';
-import { PowerTab } from './PowerTab';
 
-export type UpgradeSubSection = 'ball' | 'paddle' | 'power';
+export type UpgradeSubSection = 'ball' | 'paddle';
 
 interface UpgradeTabProps {
   upgrades: UpgradeState;
@@ -37,9 +36,6 @@ export const UpgradeTab: React.FC<UpgradeTabProps> = ({
           )}
           {subSection === 'paddle' && (
             <PaddleTab upgrades={upgrades} cores={cores} onUpgrade={onUpgrade} />
-          )}
-          {subSection === 'power' && (
-            <PowerTab upgrades={upgrades} cores={cores} onUpgrade={onUpgrade} />
           )}
         </motion.div>
       </AnimatePresence>

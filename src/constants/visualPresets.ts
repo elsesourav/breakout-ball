@@ -1,24 +1,20 @@
 /**
- * VISUAL DESIGN PRESET CONFIGURATION
+ * FINAL LOCKED VISUAL DESIGN PRESET CONFIGURATION
  *
- * Streamlined Version Selection:
- *   - BLOCKS (3D & Less Glow):
- *       Option 1: Tactile 3D Ingot (Chiseled Arcade Bevels)
- *       Option 2: Armored 3D Slab (Dual-Tier Chamfered Armor)
- *       Option 3: Tactile 3D Wedge (Sculpted Arcade Keycap)
- *   - PADDLE (Selected Design):
- *       Mech Titan Dreadnought with Dynamic Upgrades (Tier 1 Base, Tier 2 Reinforced, Tier 3 Apex)
- *   - BALL (3D Internal Effects):
- *       Option 1: 3D Energy Core, Option 2: Cyber Gyro Core, Option 3: Apex Singularity
- *   - POWER-UPS (Orbital Core):
- *       Option 1: Orbital Core, Option 2: Gyro Singularity, Option 3: Apex Reactor
+ * Final Selected Assets Applied Across Whole Game:
+ *   - PADDLE: Mech Titan Dreadnought with Integrated Rail Turrets (Tiers 1-3).
+ *   - BALL: 3D Stardust Core with Internal Sparks & Zero Outside Particles (Tiers 1-3).
+ *   - BLOCKS: Armored 3D Slab with Tone-Matched 3D Bevels & Static Titanium.
+ *   - PORTAL BLOCK: Hex Cyber Aperture (Dimensional Iris Gate).
+ *   - POWER-UPS: Planar Delta Vortex (Transparent Rotating Triangle + Orbiting Sparks).
  */
 
-export type BlockPresetId = 1 | 2 | 3;
+export type BlockPresetId = 1;
 export type PaddlePresetId = 1;
 export type TopWeaponVariant = 1 | 2 | 3 | 4;
-export type PowerUpPresetId = 1 | 2 | 3;
-export type BallPresetId = 1 | 2 | 3;
+export type PowerUpPresetId = 1;
+export type BallPresetId = 1;
+export type PortalCenterStyle = 3;
 
 export type PaddleTier = 1 | 2 | 3;
 export type BallTier = 1 | 2 | 3;
@@ -26,47 +22,25 @@ export type BallTier = 1 | 2 | 3;
 export interface DesignPresetConfig {
   blockPreset: BlockPresetId;
   paddlePreset: PaddlePresetId;
-  paddleWeaponVariant: TopWeaponVariant;
+  paddleWeaponVariant?: TopWeaponVariant;
   powerUpPreset: PowerUpPresetId;
   ballPreset: BallPresetId;
+  portalCenterStyle: PortalCenterStyle;
   powerUpScale: number;
   paddleTierOverride?: PaddleTier;
   ballTierOverride?: BallTier;
 }
 
-// ── CODE DEFAULT CONFIG ──────────────────────────────────────────────────────
 export const CODE_DEFAULT_DESIGN_CONFIG: DesignPresetConfig = {
-  blockPreset: 1,           // Option 1: Armored 3D Slab (Tone-Matched Bevels, Full Cosmic Portal)
-  paddlePreset: 1,          // Selected Mech Titan Dreadnought
-  paddleWeaponVariant: 1,   // Integrated Rail Turrets
-  powerUpPreset: 1,         // Orbital Energy Core (Clean Spherical Aura, Custom Vector Icons)
-  ballPreset: 1,            // 3D Stardust Core (Drifting Internal Sparks, Zero Outside Particles)
+  blockPreset: 1,           // Armored 3D Slab
+  paddlePreset: 1,          // Mech Titan Dreadnought with Integrated Rail Turrets
+  powerUpPreset: 1,         // Planar Delta Vortex (Transparent Rotating Triangle)
+  ballPreset: 1,            // 3D Stardust Core (Internal Sparks, Zero Outside)
+  portalCenterStyle: 3,     // Hex Cyber Aperture
   powerUpScale: 1.35,       // 1.35x
 };
 
-// ── LOCAL STORAGE KEY FOR RUNTIME OVERRIDES ───────────────────────────────────
-const STORAGE_KEY = 'breakout_visual_presets_v4';
-
 export const getActiveDesignConfig = (): DesignPresetConfig => {
-  if (typeof window === 'undefined') return { ...CODE_DEFAULT_DESIGN_CONFIG };
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return {
-        blockPreset: ([1, 2, 3].includes(parsed.blockPreset) ? parsed.blockPreset : CODE_DEFAULT_DESIGN_CONFIG.blockPreset) as BlockPresetId,
-        paddlePreset: 1, // Only the selected Dreadnought is active
-        paddleWeaponVariant: ([1, 2, 3, 4].includes(parsed.paddleWeaponVariant) ? parsed.paddleWeaponVariant : CODE_DEFAULT_DESIGN_CONFIG.paddleWeaponVariant) as TopWeaponVariant,
-        powerUpPreset: ([1, 2, 3].includes(parsed.powerUpPreset) ? parsed.powerUpPreset : CODE_DEFAULT_DESIGN_CONFIG.powerUpPreset) as PowerUpPresetId,
-        ballPreset: ([1, 2, 3].includes(parsed.ballPreset) ? parsed.ballPreset : CODE_DEFAULT_DESIGN_CONFIG.ballPreset) as BallPresetId,
-        powerUpScale: typeof parsed.powerUpScale === 'number' ? parsed.powerUpScale : CODE_DEFAULT_DESIGN_CONFIG.powerUpScale,
-        paddleTierOverride: parsed.paddleTierOverride,
-        ballTierOverride: parsed.ballTierOverride,
-      };
-    }
-  } catch {
-    // fallback
-  }
   return { ...CODE_DEFAULT_DESIGN_CONFIG };
 };
 
@@ -75,7 +49,7 @@ export const setActiveDesignConfig = (config: Partial<DesignPresetConfig>): Desi
   const updated: DesignPresetConfig = { ...current, ...config, paddlePreset: 1 };
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      localStorage.setItem('breakout_visual_presets_v4', JSON.stringify(updated));
       window.dispatchEvent(new CustomEvent('visual-presets-changed', { detail: updated }));
     } catch {
       // ignore
@@ -87,7 +61,7 @@ export const setActiveDesignConfig = (config: Partial<DesignPresetConfig>): Desi
 export const resetDesignConfigToCodeDefault = (): DesignPresetConfig => {
   if (typeof window !== 'undefined') {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('breakout_visual_presets_v4');
       window.dispatchEvent(new CustomEvent('visual-presets-changed', { detail: CODE_DEFAULT_DESIGN_CONFIG }));
     } catch {
       // ignore
@@ -110,15 +84,16 @@ export const getBallTierFromUpgrades = (sizeLvl = 1, speedLvl = 1, impactLvl = 1
   return 1;
 };
 
-// ── MINIMAL CLEAN METADATA ───────────────────────────────────────────────────
 export const BLOCK_PRESET_METADATA: Record<BlockPresetId, { name: string; tag: string }> = {
-  1: { name: 'OPTION 1: ARMORED 3D SLAB', tag: 'TONE-MATCHED BEVELS · FULL PORTAL' },
-  2: { name: 'OPTION 2: PRECISION INGOT', tag: 'CHISELED 3D BEVELS · ZERO GLOW' },
-  3: { name: 'OPTION 3: REINFORCED ALLOY', tag: 'DUAL-TIER CHASSIS · TACTILE' },
+  1: { name: 'ARMORED 3D SLAB', tag: 'TONE-MATCHED BEVELS · 100% STATIC TITANIUM' },
+};
+
+export const PORTAL_CENTER_METADATA: Record<PortalCenterStyle, { name: string; tag: string }> = {
+  3: { name: 'HEX CYBER APERTURE', tag: 'DIMENSIONAL IRIS GATE' },
 };
 
 export const PADDLE_PRESET_METADATA: Record<PaddlePresetId, { name: string; tag: string }> = {
-  1: { name: 'MECH TITAN DREADNOUGHT', tag: 'SELECTED BASE (ACTIVE)' },
+  1: { name: 'MECH TITAN DREADNOUGHT', tag: 'INTEGRATED RAIL TURRETS' },
 };
 
 export const WEAPON_MOUNT_METADATA: Record<TopWeaponVariant, { name: string; tag: string }> = {
@@ -129,13 +104,9 @@ export const WEAPON_MOUNT_METADATA: Record<TopWeaponVariant, { name: string; tag
 };
 
 export const BALL_PRESET_METADATA: Record<BallPresetId, { name: string; tag: string }> = {
-  1: { name: 'OPTION 1: 3D STARDUST CORE', tag: 'INTERNAL SPARKS (ZERO OUTSIDE)' },
-  2: { name: 'OPTION 2: 3D PLASMA FLUX', tag: 'FLOATING ORB & FLUX SPARKS' },
-  3: { name: 'OPTION 3: 3D QUANTUM MOTES', tag: 'DEEP LENS & DRIFTING MOTES' },
+  1: { name: '3D STARDUST CORE', tag: 'INTERNAL SPARKS · ZERO OUTSIDE' },
 };
 
 export const POWERUP_PRESET_METADATA: Record<PowerUpPresetId, { name: string; tag: string }> = {
-  1: { name: 'OPTION 1: ORBITAL ENERGY CORE', tag: 'CLEAN AURA · CUSTOM ICONS' },
-  2: { name: 'OPTION 2: GYRO SINGULARITY', tag: 'CIRCULAR GIMBAL · CUSTOM ICONS' },
-  3: { name: 'OPTION 3: APEX REACTOR SPHERE', tag: 'CONTAINMENT FLUX · CUSTOM ICONS' },
+  1: { name: 'PLANAR DELTA VORTEX', tag: 'TRANSPARENT 2D ROTATING TRIANGLE + ORBITING COMETS' },
 };
