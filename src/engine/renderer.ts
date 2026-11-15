@@ -65,11 +65,27 @@ export class GameRenderer {
       if (this.shakeIntensity < 0.1) this.shakeIntensity = 0;
     }
 
-    const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 80, w / 2, h / 2, h);
-    bgGrad.addColorStop(0, 'rgba(10, 13, 44, 0.82)');
-    bgGrad.addColorStop(0.6, 'rgba(4, 6, 22, 0.90)');
-    bgGrad.addColorStop(1, 'rgba(1, 2, 10, 0.96)');
-    ctx.fillStyle = bgGrad;
+    // 1. Clear & Arcade Map Style Backdrop (Clean, 100% opaque #03040c matching level map)
+    ctx.fillStyle = '#03040c';
+    ctx.fillRect(0, 0, w, h);
+
+    // Subtle atmospheric arcade energy gradients matching the arcade map
+    const topGlow = ctx.createRadialGradient(w * 0.5, 0, 10, w * 0.5, 0, h * 0.45);
+    topGlow.addColorStop(0, 'rgba(255, 215, 0, 0.08)');
+    topGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = topGlow;
+    ctx.fillRect(0, 0, w, h);
+
+    const midGlow = ctx.createRadialGradient(w * 0.5, h * 0.45, 10, w * 0.5, h * 0.45, h * 0.5);
+    midGlow.addColorStop(0, 'rgba(183, 115, 255, 0.07)');
+    midGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = midGlow;
+    ctx.fillRect(0, 0, w, h);
+
+    const botGlow = ctx.createRadialGradient(w * 0.5, h, 10, w * 0.5, h, h * 0.4);
+    botGlow.addColorStop(0, 'rgba(0, 247, 255, 0.10)');
+    botGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = botGlow;
     ctx.fillRect(0, 0, w, h);
 
     // Perspective cyber grid lines

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { AnimatePresence } from 'motion/react';
 import { useGame } from './context/GameContext';
 import { MobileBottomNav } from './components/navigation/MobileBottomNav';
 import { LevelMap } from './components/LevelMap';
@@ -14,9 +15,10 @@ import { AlertModal } from './components/AlertModal';
 import { AuthModal } from './components/AuthModal';
 import { AchievementToast } from './components/AchievementToast';
 import { CyberToastContainer } from './components/common/CyberToast';
+import { GameLoadingScreen } from './components/common/GameLoadingScreen';
 
 export const AppContent: React.FC = () => {
-  const { screen, setScreen, activeTab, editingLevel } = useGame();
+  const { screen, setScreen, activeTab, editingLevel, isInitialLoading } = useGame();
 
   // Dynamic mobile-first responsive layout scaling (strictly using 100svh for height)
   useEffect(() => {
@@ -52,34 +54,48 @@ export const AppContent: React.FC = () => {
   }, []);
 
   return (
-    <main id="main">
-      {screen === 'playing' ? (
-        <GameCanvas />
-      ) : screen === 'designer' ? (
-        <LevelDesigner />
-      ) : (
-        <div id="gameMode">
-          <div id="modeType" className="w-full h-full relative overflow-hidden">
-            <div key={activeTab} className="cyber-page-transition w-full h-full">
-              {activeTab === 'local' && <LevelMap />}
-              {activeTab === 'online' && <OnlineMode />}
-              {activeTab === 'armory' && <ArmoryView />}
-              {activeTab === 'create' && <CreateMode />}
-              {activeTab === 'profile' && <ProfileView />}
-            </div>
-          </div>
-          <MobileBottomNav />
-        </div>
-      )}
+    <>
+      <AnimatePresence mode="wait">
+        {isInitialLoading && (
+          <GameLoadingScreen key="app-initial-loader" isLoaded={!isInitialLoading} />
+        )}
+      </AnimatePresence>
 
-      {/* Screen Modals & Overlays */}
-      {screen === 'preview' && <LevelPreviewModal />}
-      {editingLevel && <LevelModifierModal />}
-      <AlertModal />
-      <AuthModal />
-      <AchievementToast />
-      <CyberToastContainer />
-    </main>
+      <main
+        id="main"
+        style={{
+          opacity: isInitialLoading ? 0 : 1,
+          transition: 'opacity 0.45s ease-out',
+        }}
+      >
+        {screen === 'playing' ? (
+          <GameCanvas />
+        ) : screen === 'designer' ? (
+          <LevelDesigner />
+        ) : (
+          <div id="gameMode">
+            <div id="modeType" className="w-full h-full relative overflow-hidden">
+              <div key={activeTab} className="cyber-page-transition w-full h-full">
+                {activeTab === 'local' && <LevelMap />}
+                {activeTab === 'online' && <OnlineMode />}
+                {activeTab === 'armory' && <ArmoryView />}
+                {activeTab === 'create' && <CreateMode />}
+                {activeTab === 'profile' && <ProfileView />}
+              </div>
+            </div>
+            <MobileBottomNav />
+          </div>
+        )}
+
+        {/* Screen Modals & Overlays */}
+        {screen === 'preview' && <LevelPreviewModal />}
+        {editingLevel && <LevelModifierModal />}
+        <AlertModal />
+        <AuthModal />
+        <AchievementToast />
+        <CyberToastContainer />
+      </main>
+    </>
   );
 };
 

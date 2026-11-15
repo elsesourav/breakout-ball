@@ -454,12 +454,20 @@ export const GameCanvas: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full flex flex-col items-center justify-between bg-[#060714] overflow-hidden select-none"
-      style={{ width: '100%', height: '100%' }}
+      className="relative w-full h-full flex flex-col items-center justify-between bg-[#03040c] overflow-hidden select-none"
+      style={{
+        width: '100%',
+        height: '100%',
+        backgroundImage: `
+          radial-gradient(ellipse 95% 20% at 50% 0%,   rgba(255,215,0,0.12)   0%, transparent 75%),
+          radial-gradient(ellipse 90% 20% at 50% 30%,  rgba(244,63,94,0.10)   0%, transparent 75%),
+          radial-gradient(ellipse 90% 20% at 50% 65%,  rgba(183,115,255,0.10) 0%, transparent 75%),
+          radial-gradient(ellipse 95% 25% at 50% 100%, rgba(0,247,255,0.14)   0%, transparent 75%)
+        `,
+      }}
       onMouseMove={handlePointerMove}
       onTouchMove={handlePointerMove}
     >
-      <ParticleBackdrop />
       <GameHUD
         lives={lives}
         timeUsed={timeUsed}

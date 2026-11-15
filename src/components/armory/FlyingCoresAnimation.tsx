@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CoreIcon } from '../CoreIcon';
 import { soundManager } from '../../utils/audio';
@@ -29,49 +29,54 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
   const [targetPos, setTargetPos] = useState({ x: 320, y: 28 });
   const [startPos, setStartPos] = useState({ x: 200, y: 350 });
 
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  const originRef = useRef(origin);
+  originRef.current = origin;
+
+  const hasPlayedSoundRef = useRef(false);
+
   useEffect(() => {
     if (!active) {
       setParticles([]);
+      hasPlayedSoundRef.current = false;
       return;
     }
 
-    const calcPositions = () => {
-      if (typeof window === 'undefined') return;
+    hasPlayedSoundRef.current = false;
 
-      const sX = origin?.x ?? window.innerWidth / 2;
-      const sY = origin?.y ?? window.innerHeight * 0.55;
-      setStartPos({ x: sX, y: sY });
+    // 1. Calculate start & target positions once per active trigger
+    const currentOrigin = originRef.current;
+    const sX = currentOrigin?.x ?? (typeof window !== 'undefined' ? window.innerWidth / 2 : 200);
+    const sY = currentOrigin?.y ?? (typeof window !== 'undefined' ? window.innerHeight * 0.55 : 350);
+    setStartPos({ x: sX, y: sY });
 
-      const badge = document.getElementById('header-cores-badge');
-      if (badge) {
-        const rect = badge.getBoundingClientRect();
-        if (rect.width > 0 && rect.right > 0) {
-          setTargetPos({
-            x: rect.left + rect.width / 2,
-            y: rect.top >= 0 && rect.bottom <= 120 ? rect.top + rect.height / 2 : 28,
-          });
-          return;
-        }
+    const badge = typeof document !== 'undefined' ? document.getElementById('header-cores-badge') : null;
+    if (badge) {
+      const rect = badge.getBoundingClientRect();
+      if (rect.width > 0 && rect.right > 0) {
+        setTargetPos({
+          x: rect.left + rect.width / 2,
+          y: rect.top >= 0 && rect.bottom <= 120 ? rect.top + rect.height / 2 : 28,
+        });
       }
-
-      // Fallback: top right corner where cores counter sits
+    } else if (typeof window !== 'undefined') {
       setTargetPos({
         x: Math.min(window.innerWidth - 65, window.innerWidth / 2 + 130),
         y: 28,
       });
-    };
+    }
 
-    calcPositions();
-
-    // 8 sleek glowing core crystals with smooth graceful flight
+    // 2. Spawn 8 sleek glowing core crystals
     const count = 8;
     const items: Particle[] = Array.from({ length: count }).map((_, i) => {
       const angle = (i / count) * Math.PI * 2;
       const spread = 8 + (i % 3) * 6;
       return {
         id: i,
-        delay: 0.04 + i * 0.07, // Staggered stream: 0.04s to 0.53s
-        duration: 1.15 + (i % 3) * 0.06, // 1.15s to 1.27s smooth, gentle flight
+        delay: 0.04 + i * 0.07,
+        duration: 1.15 + (i % 3) * 0.06,
         offsetX: Math.cos(angle) * spread,
         offsetY: Math.sin(angle) * spread,
         curveOffset: (i % 2 === 0 ? 1 : -1) * (14 + (i % 3) * 8),
@@ -80,26 +85,25 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
     });
     setParticles(items);
 
-    // Staggered melodic crystal chimes as particles arrive at destination
-    const audioTimers: ReturnType<typeof setTimeout>[] = [];
-    [0.75, 0.95, 1.15, 1.35].forEach((timeSec, idx) => {
-      audioTimers.push(
-        setTimeout(() => {
-          soundManager.playCollectCore(idx + 1);
-        }, timeSec * 1000)
-      );
-    });
+    // 3. Play EXACTLY ONE crisp collection chime when cores land at destination
+    // (Protected by hasPlayedSoundRef to guarantee it never repeats or loops)
+    const soundTimer = setTimeout(() => {
+      if (!hasPlayedSoundRef.current) {
+        hasPlayedSoundRef.current = true;
+        soundManager.playCollectCore();
+      }
+    }, 750);
 
-    // Complete whole animation sequence smoothly (1.8s)
+    // 4. Complete whole animation sequence smoothly at 1.7s
     const completeTimer = setTimeout(() => {
-      onComplete();
-    }, 1800);
+      onCompleteRef.current();
+    }, 1700);
 
     return () => {
+      clearTimeout(soundTimer);
       clearTimeout(completeTimer);
-      audioTimers.forEach(clearTimeout);
     };
-  }, [active, origin, onComplete]);
+  }, [active]);
 
   if (!active || particles.length === 0) return null;
 
@@ -109,11 +113,9 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
       className="fixed inset-0 pointer-events-none select-none overflow-hidden"
     >
       <AnimatePresence>
-        {/* Sleek, Gentle Glowing Core Crystals Floating to the Core Counter */}
         {particles.map((p) => {
           const sX = startPos.x + p.offsetX;
           const sY = startPos.y + p.offsetY;
-          // Soft arc curving gracefully towards the top-right counter badge
           const midX = sX * 0.45 + targetPos.x * 0.55 + p.curveOffset;
           const midY = Math.min(sY, targetPos.y) - 30;
 
@@ -136,7 +138,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
                 duration: p.duration,
                 delay: p.delay,
                 times: [0, 0.15, 0.75, 1],
-                ease: [0.25, 0.1, 0.25, 1.0], // Silky smooth cubic ease
+                ease: [0.25, 0.1, 0.25, 1.0],
               }}
               style={{
                 position: 'fixed',

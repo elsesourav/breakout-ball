@@ -347,7 +347,7 @@ app.get('/api/admin/coupons', requireAdminAuth, (_req, res) => {
 
 app.post('/api/admin/coupons', requireAdminAuth, (req, res) => {
   try {
-    const { code, rewardCores, packCores, maxUses, expiresAt } = req.body;
+    const { code, rewardCores, packCores, maxUses, perUserLimit, isUnlimited, expiresAt } = req.body;
     if (!code || !rewardCores || !packCores) {
       return res.status(400).json({ error: 'Missing code, rewardCores, or packCores' });
     }
@@ -356,6 +356,8 @@ app.post('/api/admin/coupons', requireAdminAuth, (req, res) => {
       rewardCores: Number(rewardCores),
       packCores: Number(packCores),
       maxUses: Number(maxUses || 1000),
+      perUserLimit: perUserLimit !== undefined ? Number(perUserLimit) : 1,
+      isUnlimited: Boolean(isUnlimited),
       expiresAt: expiresAt || null
     });
     res.json({ success: true, coupon: created });

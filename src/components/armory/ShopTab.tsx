@@ -128,7 +128,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
   const handleClaimDaily = (e?: React.MouseEvent) => {
     if (!dailyStatus.canCollect || isClaimingDaily) return;
     setIsClaimingDaily(true);
-    soundManager.playUpgradeSuccess();
+    soundManager.playClick('cyber');
 
     let originPos: { x: number; y: number } | undefined;
     if (e?.currentTarget) {

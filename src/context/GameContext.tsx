@@ -59,6 +59,7 @@ interface GameContextType {
   saveUserLevel: (level: LevelData) => Promise<boolean>;
   deleteUserLevel: (id: string) => Promise<void>;
   updateLevelPrivacy: (id: string, isPublic: boolean) => Promise<void>;
+  isInitialLoading: boolean;
   recordLevelCompletion: (
     levelId: string,
     time: number,
@@ -128,58 +129,83 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [alertConfig, setAlertConfig] = useState<AlertConfig | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
 
   // Load from database on mount & synchronize initial URL route
   useEffect(() => {
+    let isDisposed = false;
     const loadInitialData = async () => {
-      scrubUrlParams();
-      const [locals, onlines, userProgress] = await Promise.all([
-        dbService.getLocalLevels(),
-        dbService.getOnlineLevels(),
-        dbService.getProgress(user.username),
-        currencyService.load(user.username),
-      ]);
+      const startTime = performance.now();
+      try {
+        scrubUrlParams();
+        const [locals, onlines, userProgress] = await Promise.all([
+          dbService.getLocalLevels(),
+          dbService.getOnlineLevels(),
+          dbService.getProgress(user.username),
+          currencyService.load(user.username),
+        ]);
 
-      const userLevels = await dbService.getUserCreatedLevels(user.username);
-      setLocalLevels(locals);
-      setOnlineLevels(onlines);
-      setLocalProgress(userProgress);
-      setUserCreatedLevels(userLevels);
+        if (isDisposed) return;
 
-      const allLevels = [...locals, ...onlines, ...userLevels];
-      const route = parseCurrentRoute();
+        const userLevels = await dbService.getUserCreatedLevels(user.username);
+        if (isDisposed) return;
 
-      if (route.type === 'level' && route.levelId) {
-        const found = allLevels.find((lvl) => lvl.id === route.levelId);
-        if (found) {
-          setSelectedLevel(found);
-          const board = await dbService.getLeaderboard(found.id);
-          setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
-          setScreenState('preview');
-          const isNumeric = !isNaN(Number(found.id));
-          setActiveTabState(isNumeric ? 'local' : 'online');
-          replaceAppRoute(`/level/${encodeURIComponent(found.id)}`);
-          return;
+        setLocalLevels(locals);
+        setOnlineLevels(onlines);
+        setLocalProgress(userProgress);
+        setUserCreatedLevels(userLevels);
+
+        const allLevels = [...locals, ...onlines, ...userLevels];
+        const route = parseCurrentRoute();
+
+        if (route.type === 'level' && route.levelId) {
+          const found = allLevels.find((lvl) => lvl.id === route.levelId);
+          if (found) {
+            setSelectedLevel(found);
+            const board = await dbService.getLeaderboard(found.id);
+            setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
+            setScreenState('preview');
+            const isNumeric = !isNaN(Number(found.id));
+            setActiveTabState(isNumeric ? 'local' : 'online');
+            replaceAppRoute(`/level/${encodeURIComponent(found.id)}`);
+            return;
+          }
+        } else if (route.type === 'play' && route.levelId) {
+          const found = allLevels.find((lvl) => lvl.id === route.levelId);
+          if (found) {
+            setSelectedLevel(found);
+            setScreenState('playing');
+            soundManager.startBgMusic();
+            dbService.incrementPlayCount(found.id);
+            replaceAppRoute(`/play/${encodeURIComponent(found.id)}`);
+            return;
+          }
         }
-      } else if (route.type === 'play' && route.levelId) {
-        const found = allLevels.find((lvl) => lvl.id === route.levelId);
-        if (found) {
-          setSelectedLevel(found);
-          setScreenState('playing');
-          soundManager.startBgMusic();
-          dbService.incrementPlayCount(found.id);
-          replaceAppRoute(`/play/${encodeURIComponent(found.id)}`);
-          return;
+
+        // Canonicalize tab route cleanly
+        const canonicalPath = getRoutePath(route.tab, 'menu');
+        replaceAppRoute(canonicalPath);
+        setSelectedLevel(locals[0] || null);
+      } catch (err) {
+        console.error('Error during initial data load:', err);
+      } finally {
+        if (!isDisposed) {
+          const elapsed = performance.now() - startTime;
+          const minDisplay = 1500; // Minimum 1.5s so user can enjoy the loading scene
+          const remaining = Math.max(0, minDisplay - elapsed);
+          setTimeout(() => {
+            if (!isDisposed) {
+              setIsInitialLoading(false);
+            }
+          }, remaining);
         }
       }
-
-      // Canonicalize tab route cleanly
-      const canonicalPath = getRoutePath(route.tab, 'menu');
-      replaceAppRoute(canonicalPath);
-      setSelectedLevel(locals[0] || null);
     };
 
     loadInitialData();
+    return () => {
+      isDisposed = true;
+    };
   }, [user.username]);
 
   // Synchronize browser Back / Forward (popstate) navigation
@@ -472,6 +498,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         saveUserLevel,
         deleteUserLevel,
         updateLevelPrivacy,
+        isInitialLoading,
         recordLevelCompletion,
       }}
     >

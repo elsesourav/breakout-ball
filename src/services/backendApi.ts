@@ -35,6 +35,8 @@ export interface BackendCoupon {
   is_active: number;
   max_uses: number;
   used_count: number;
+  per_user_limit?: number;
+  is_unlimited?: number;
   expires_at?: string;
   created_at: string;
 }
@@ -303,6 +305,8 @@ class BackendApiService {
     rewardCores: number;
     packCores: number;
     maxUses?: number;
+    perUserLimit?: number;
+    isUnlimited?: boolean;
     expiresAt?: string;
   }): Promise<{ success: boolean; coupon?: BackendCoupon; error?: string }> {
     try {
@@ -369,6 +373,8 @@ class BackendApiService {
     rewardCores: number;
     packCores: number;
     maxUses?: number;
+    perUserLimit?: number;
+    isUnlimited?: boolean;
     expiresAt?: string;
   }): Promise<{ success: boolean; coupon?: BackendCoupon; message?: string }> {
     const res = await this.createAdminCoupon(data);

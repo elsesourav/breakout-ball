@@ -64,6 +64,8 @@ db.exec(`
     is_active INTEGER DEFAULT 1,
     max_uses INTEGER DEFAULT 1000,
     used_count INTEGER DEFAULT 0,
+    per_user_limit INTEGER DEFAULT 1,
+    is_unlimited INTEGER DEFAULT 0,
     expires_at TEXT,
     created_at TEXT NOT NULL
   );
@@ -74,8 +76,7 @@ db.exec(`
     username TEXT NOT NULL,
     cores_granted INTEGER NOT NULL,
     ip_address TEXT,
-    redeemed_at TEXT NOT NULL,
-    UNIQUE(coupon_code, username)
+    redeemed_at TEXT NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS activity_logs (
@@ -91,7 +92,33 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_completions_level ON level_completions(level_id, time_used ASC);
   CREATE INDEX IF NOT EXISTS idx_trophies_user ON user_trophies(username);
   CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_logs(created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_coupon_redemptions_user ON coupon_redemptions(coupon_code, username);
 `);
+
+// Database migrations for coupons & redemptions
+try { db.exec('ALTER TABLE coupons ADD COLUMN per_user_limit INTEGER DEFAULT 1;'); } catch {}
+try { db.exec('ALTER TABLE coupons ADD COLUMN is_unlimited INTEGER DEFAULT 0;'); } catch {}
+try {
+  const redIndexes = db.prepare('PRAGMA index_list(coupon_redemptions)').all();
+  if (redIndexes.some(i => i.origin === 'u' && i.unique === 1)) {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS coupon_redemptions_temp (
+        id TEXT PRIMARY KEY,
+        coupon_code TEXT NOT NULL,
+        username TEXT NOT NULL,
+        cores_granted INTEGER NOT NULL,
+        ip_address TEXT,
+        redeemed_at TEXT NOT NULL
+      );
+      INSERT OR IGNORE INTO coupon_redemptions_temp SELECT id, coupon_code, username, cores_granted, ip_address, redeemed_at FROM coupon_redemptions;
+      DROP TABLE coupon_redemptions;
+      ALTER TABLE coupon_redemptions_temp RENAME TO coupon_redemptions;
+      CREATE INDEX IF NOT EXISTS idx_coupon_redemptions_user ON coupon_redemptions(coupon_code, username);
+    `);
+  }
+} catch (e) {
+  // Ignored if already migrated
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // REPOSITORY METHODS
@@ -269,20 +296,26 @@ export const couponRepository = {
     return stmt.get(code);
   },
 
-  create({ code, rewardCores, packCores, maxUses = 1000, expiresAt = null }) {
+  create({ code, rewardCores, packCores, maxUses = 1000, perUserLimit = 1, isUnlimited = false, expiresAt = null }) {
     const upperCode = code.trim().toUpperCase();
     const now = new Date().toISOString();
+    const unlimitedVal = isUnlimited ? 1 : 0;
+    const perUserVal = Number.isInteger(Number(perUserLimit)) ? Number(perUserLimit) : 1;
     const stmt = db.prepare(`
-      INSERT INTO coupons (code, reward_cores, pack_cores, is_active, max_uses, used_count, expires_at, created_at)
-      VALUES (?, ?, ?, 1, ?, 0, ?, ?)
+      INSERT INTO coupons (code, reward_cores, pack_cores, is_active, max_uses, used_count, per_user_limit, is_unlimited, expires_at, created_at)
+      VALUES (?, ?, ?, 1, ?, 0, ?, ?, ?, ?)
       ON CONFLICT(code) DO UPDATE SET
         reward_cores = excluded.reward_cores,
         pack_cores = excluded.pack_cores,
         is_active = 1,
-        max_uses = excluded.max_uses
+        max_uses = excluded.max_uses,
+        per_user_limit = excluded.per_user_limit,
+        is_unlimited = excluded.is_unlimited
     `);
-    stmt.run(upperCode, rewardCores, packCores, maxUses, expiresAt, now);
-    activityRepository.log('coupon_created', 'admin', `Created coupon ${upperCode} (+${rewardCores} Cores for ${packCores} pack)`);
+    stmt.run(upperCode, rewardCores, packCores, maxUses, perUserVal, unlimitedVal, expiresAt, now);
+    const ruleDesc = perUserVal === 0 ? 'Unlimited/user' : `${perUserVal}x/user`;
+    const capDesc = unlimitedVal ? '∞ Total' : `${maxUses} max`;
+    activityRepository.log('coupon_created', 'admin', `Created coupon ${upperCode} (+${rewardCores} Cores for ${packCores} pack, [${ruleDesc}, ${capDesc}])`);
     return this.get(upperCode);
   },
 
@@ -305,15 +338,29 @@ export const couponRepository = {
 
     if (!coupon) return { success: false, message: 'Invalid coupon code.' };
     if (!coupon.is_active) return { success: false, message: 'Coupon has expired or is inactive.' };
-    if (coupon.used_count >= coupon.max_uses) return { success: false, message: 'Coupon redemption limit reached.' };
+
+    const isGlobalUnlimited = coupon.is_unlimited === 1 || coupon.max_uses <= 0;
+    if (!isGlobalUnlimited && coupon.used_count >= coupon.max_uses) {
+      return { success: false, message: 'Coupon global redemption limit reached.' };
+    }
+
     if (coupon.pack_cores && expectedPackCores && coupon.pack_cores !== expectedPackCores) {
       return { success: false, message: `This coupon is calibrated for ${coupon.pack_cores} Cores packs.` };
     }
 
-    // Single-use check per user
-    const checkStmt = db.prepare('SELECT id FROM coupon_redemptions WHERE coupon_code = ? AND LOWER(username) = LOWER(?)');
-    const existing = checkStmt.get(upperCode, username);
-    if (existing) return { success: false, message: 'Coupon already redeemed on this account.' };
+    // Per-user limit validation: 1-time (default), multiple (N), or unlimited (0)
+    const perUserLimit = coupon.per_user_limit !== undefined && coupon.per_user_limit !== null ? Number(coupon.per_user_limit) : 1;
+    if (perUserLimit > 0) {
+      const checkStmt = db.prepare('SELECT count(*) as count FROM coupon_redemptions WHERE UPPER(coupon_code) = UPPER(?) AND LOWER(username) = LOWER(?)');
+      const countRes = checkStmt.get(upperCode, username);
+      const usedTimes = countRes ? countRes.count : 0;
+      if (usedTimes >= perUserLimit) {
+        if (perUserLimit === 1) {
+          return { success: false, message: 'Coupon already redeemed on this account (1-time use only).' };
+        }
+        return { success: false, message: `Redemption limit reached for this account (${perUserLimit} uses max).` };
+      }
+    }
 
     const now = new Date().toISOString();
     const id = `rd_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;

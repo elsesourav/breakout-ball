@@ -23,7 +23,6 @@ import { LevelPathSvg } from './roadmap/LevelPathSvg';
 import { RoadmapObstacles } from './roadmap/RoadmapObstacles';
 import { RoadmapSectorBanner } from './roadmap/RoadmapSectorBanner';
 import { RoadmapNodeItem } from './roadmap/RoadmapNodeItem';
-import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
 
 // ─── Scroll-linked perspective scale ─────────────────────────────────────────
 // Screen-linked perspective depth with strict foreground size ceiling:
@@ -54,9 +53,6 @@ export const LevelMap: React.FC = () => {
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() => currencyService.getDailyCollectStatus());
   const [remainingMs, setRemainingMs] = useState<number>(() => currencyService.getDailyCollectStatus().remainingMs);
-  const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
-  const [claimAmount, setClaimAmount] = useState<number>(50);
-  const [flyOrigin, setFlyOrigin] = useState<{ x: number; y: number } | null>(null);
   const [isPulsing, setIsPulsing] = useState<boolean>(false);
   const scrollRef    = useRef<HTMLDivElement>(null);
   const activeRef    = useRef<HTMLDivElement | null>(null);
@@ -133,53 +129,13 @@ export const LevelMap: React.FC = () => {
     };
   }, [user.username]);
 
-  const handleDailyCollect = (e?: React.MouseEvent) => {
-    if (!dailyStatus.canCollect) {
-      showAlert({
-        title: 'DAILY REWARD',
-        message: `Next free reward available in ${formatRemainingTime(remainingMs)}`,
-        singleBtn: true,
-      });
-      return;
-    }
-    if (isClaimLockedRef.current || isFlyingCores) return;
-    isClaimLockedRef.current = true;
-    setTimeout(() => {
-      isClaimLockedRef.current = false;
-    }, 1800);
-
-    if (e && e.currentTarget) {
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      setFlyOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
-    } else {
-      const btn = document.getElementById('daily-free-collect-button');
-      if (btn) {
-        const rect = btn.getBoundingClientRect();
-        setFlyOrigin({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
-      } else {
-        setFlyOrigin({ x: 50, y: 90 });
-      }
-    }
-
-    const res = currencyService.claimDailyCores(user.username);
-    if (res.success) {
-      setCores(res.newBalance);
-      setClaimAmount(res.amount);
-      setIsFlyingCores(true);
-      const updated = currencyService.getDailyCollectStatus();
-      setDailyStatus(updated);
-      setRemainingMs(updated.remainingMs);
-      soundManager.playUpgradeSuccess();
-
-      // Subtle glow and smooth count-up timed with crystal arrivals (~650ms)
-      setTimeout(() => {
-        setIsPulsing(true);
-        startCountUp(res.newBalance);
-      }, 650);
-
-      setTimeout(() => {
-        setIsPulsing(false);
-      }, 1650);
+  // When FREE button is clicked on Level Map, redirect directly to Core Shop
+  const handleDailyFreeClick = () => {
+    soundManager.playClick('cyber');
+    setActiveTab('armory');
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/shop');
+      window.dispatchEvent(new CustomEvent('open-core-shop'));
     }
   };
 
@@ -479,14 +435,6 @@ export const LevelMap: React.FC = () => {
         `,
       }}
     >
-      {/* Flying Cores Animation from Collected Button to Top-Right Badge */}
-      <FlyingCoresAnimation
-        active={isFlyingCores}
-        amount={claimAmount}
-        origin={flyOrigin}
-        onComplete={() => setIsFlyingCores(false)}
-      />
-
       {/* ── Top Cyber Section Header (Profile & Cores) ──────────────────── */}
       <div
         className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg"
@@ -541,12 +489,12 @@ export const LevelMap: React.FC = () => {
       {/* ── Floating Controls Layer: Left (FREE Round Button) & Right (STAR Fixed Badge) ─ */}
       <div className="absolute top-[58px] inset-x-0 z-50 pointer-events-none flex justify-center">
         <div className="w-full max-w-[440px] px-3 sm:px-4 flex items-center justify-between">
-          {/* Left: Floating Round FREE Button (Core Cyan Color Theme) */}
+          {/* Left: Floating Round FREE Button (Redirects to Core Shop) */}
           {dailyStatus.canCollect ? (
             <motion.button
               type="button"
               id="daily-free-collect-button"
-              onClick={(e) => handleDailyCollect(e)}
+              onClick={handleDailyFreeClick}
               animate={{ y: [0, -4, 0] }}
               transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
               whileHover={{ scale: 1.1 }}
