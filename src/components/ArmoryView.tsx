@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '../context/GameContext';
-import { Zap, Flame, ShoppingBag, Gauge, Palette } from 'lucide-react';
+import { Sparkles, Flame, ShoppingBag, Gauge, Palette } from 'lucide-react';
 import { currencyService } from '../services/currency';
 import { UpgradeState } from '../constants/upgrades';
 import { BallTab } from './armory/BallTab';
@@ -11,11 +11,11 @@ import { BallSkinSelector } from './profile/BallSkinSelector';
 import { CyberSectionHeader } from './CyberSectionHeader';
 import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
 
-type ArmoryTab = 'skins' | 'upgrades' | 'drops' | 'shop';
+type ArmoryTab = 'hangar' | 'kinetics' | 'augments' | 'vault';
 
 export const ArmoryView: React.FC = () => {
   const { user } = useGame();
-  const [activeTab, setActiveTab] = useState<ArmoryTab>('skins');
+  const [activeTab, setActiveTab] = useState<ArmoryTab>('hangar');
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [upgrades, setUpgrades] = useState<UpgradeState>(() => currencyService.getUpgrades());
@@ -50,7 +50,6 @@ export const ArmoryView: React.FC = () => {
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = Math.round(startVal + diff * eased);
       setDisplayCores(current);
@@ -85,7 +84,6 @@ export const ArmoryView: React.FC = () => {
       setCores(newBalance);
       setUpgrades(currencyService.getUpgrades());
 
-      // Delayed count-up as crystals fly toward the badge
       setTimeout(() => {
         setIsPulsing(true);
         startCountUp(newBalance);
@@ -96,10 +94,10 @@ export const ArmoryView: React.FC = () => {
   );
 
   const TABS: { id: ArmoryTab; label: string; icon: React.ElementType }[] = [
-    { id: 'skins', label: 'SKINS', icon: Palette },
-    { id: 'upgrades', label: 'UPGRADES', icon: Gauge },
-    { id: 'drops', label: 'DROPS', icon: Flame },
-    { id: 'shop', label: 'SHOP', icon: ShoppingBag },
+    { id: 'hangar', label: 'HANGAR', icon: Palette },
+    { id: 'kinetics', label: 'KINETICS', icon: Gauge },
+    { id: 'augments', label: 'AUGMENTS', icon: Flame },
+    { id: 'vault', label: 'VAULT', icon: ShoppingBag },
   ];
 
   return (
@@ -116,7 +114,7 @@ export const ArmoryView: React.FC = () => {
         onComplete={() => setIsFlyingCores(false)}
       />
 
-      {/* 1. Reusable Top Cyber Section Header (No left icon, clean small text, proper top padding) */}
+      {/* 1. Top Cyber Section Header with Cores Badge on the Right */}
       <CyberSectionHeader
         title="CYBER ARMORY"
         subtitle="KINETIC UPGRADES & WORKSHOP"
@@ -135,7 +133,7 @@ export const ArmoryView: React.FC = () => {
             }}
             className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-default"
           >
-            <Zap className="w-3.5 h-3.5 text-cyan-300" />
+            <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
             <span className="font-tech font-bold text-xs text-cyan-200">
               {displayCores.toLocaleString()}
             </span>
@@ -146,7 +144,7 @@ export const ArmoryView: React.FC = () => {
         }
       />
 
-      {/* 2. Fluid Animated Tab Switcher matching Cyber Hangar theme */}
+      {/* 2. Fluid Animated Tab Switcher with Modern Cyberpunk Terminology */}
       <div className="w-full max-w-sm px-3.5 mt-1 mb-3">
         <div className="flex items-center gap-1 p-1 rounded-2xl bg-[#080d26]/90 border border-cyan-500/20 shadow-lg relative">
           {TABS.map((tab) => {
@@ -168,15 +166,15 @@ export const ArmoryView: React.FC = () => {
                     transition={{ type: 'spring', bounce: 0.18, duration: 0.45 }}
                     style={{
                       background:
-                        tab.id === 'shop'
+                        tab.id === 'vault'
                           ? 'linear-gradient(135deg, #ffd700 0%, #f59e0b 100%)'
-                          : tab.id === 'drops'
+                          : tab.id === 'augments'
                           ? 'linear-gradient(135deg, #b773ff 0%, #7c3aed 100%)'
                           : 'linear-gradient(135deg, #00f7ff 0%, #0088cc 100%)',
                       boxShadow:
-                        tab.id === 'shop'
+                        tab.id === 'vault'
                           ? '0 0 14px rgba(255, 215, 0, 0.4)'
-                          : tab.id === 'drops'
+                          : tab.id === 'augments'
                           ? '0 0 14px rgba(183, 115, 255, 0.4)'
                           : '0 0 14px rgba(0, 247, 255, 0.45)',
                     }}
@@ -202,14 +200,14 @@ export const ArmoryView: React.FC = () => {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             className="w-full"
           >
-            {activeTab === 'skins' && <BallSkinSelector />}
-            {activeTab === 'upgrades' && (
+            {activeTab === 'hangar' && <BallSkinSelector />}
+            {activeTab === 'kinetics' && (
               <BallTab upgrades={upgrades} cores={cores} onUpgrade={handleUpgrade} />
             )}
-            {activeTab === 'drops' && (
+            {activeTab === 'augments' && (
               <PowerTab upgrades={upgrades} cores={cores} onUpgrade={handleUpgrade} />
             )}
-            {activeTab === 'shop' && (
+            {activeTab === 'vault' && (
               <ShopTab
                 cores={cores}
                 username={user.username}

@@ -76,11 +76,6 @@ export const OnlineMode: React.FC = () => {
       <CyberSectionHeader
         title="GLOBAL ARENA"
         subtitle="COMMUNITY STAGES & GLOBAL RANKINGS"
-        rightSlot={
-          <span className="font-tech text-[10px] font-bold text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded-full border border-cyan-500/30">
-            {filteredLevels.length} STAGES
-          </span>
-        }
       />
 
       {/* Sticky Full-Width High-Blur Search & Filter Controls */}
