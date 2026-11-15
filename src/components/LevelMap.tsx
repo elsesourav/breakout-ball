@@ -344,7 +344,7 @@ export const LevelMap: React.FC = () => {
     >
       {/* ── Top Floating Cyber Section Header ────────────────────────────── */}
       <div
-        className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg pt-1.5 sm:pt-2"
+        className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg"
         style={{
           borderBottom: '1px solid rgba(0, 247, 255, 0.22)',
           boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
@@ -398,7 +398,7 @@ export const LevelMap: React.FC = () => {
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
           overscrollBehaviorY: 'contain',
-          paddingTop: '80px',
+          paddingTop: '64px',
           paddingBottom: '140px',
           backgroundImage: `
             radial-gradient(ellipse 95% 18% at 50% 1%,   rgba(255,215,0,0.16)   0%, transparent 75%),

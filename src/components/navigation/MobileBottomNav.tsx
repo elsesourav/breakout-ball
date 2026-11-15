@@ -26,7 +26,7 @@ export const MobileBottomNav: React.FC = () => {
 
   return (
     <nav
-      className="relative w-full bg-[#050716]/95 backdrop-blur-2xl border-t border-cyan-500/20 rounded-t-[20px] z-40 flex-shrink-0 select-none shadow-[0_-10px_30px_rgba(0,0,0,0.85)]"
+      className="relative w-full bg-[#050716]/95 backdrop-blur-2xl border-t border-cyan-500/20 rounded-t-[20px] z-40 flex-shrink-0 select-none shadow-lg"
       style={{
         paddingBottom: 'max(8px, env(safe-area-inset-bottom, 8px))',
       }}
@@ -48,25 +48,17 @@ export const MobileBottomNav: React.FC = () => {
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
-              className="relative flex-1 py-1.5 px-0.5 flex flex-col items-center justify-center transition-all duration-200 outline-none rounded-xl group cursor-pointer"
+              className="relative flex-1 py-1.5 px-0.5 flex flex-col items-center justify-center transition-all duration-200 outline-none group cursor-pointer"
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Soft luminous ambient aura (NO harsh border box outline) */}
+              {/* Top glowing laser blade indicator */}
               {isActive && (
-                <>
-                  <motion.div
-                    layoutId="mobileBottomNavActiveAura"
-                    className="absolute inset-0 bg-gradient-to-b from-cyan-500/18 via-indigo-500/10 to-transparent rounded-xl pointer-events-none shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]"
-                    transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-                  />
-                  {/* Top glowing laser blade indicator */}
-                  <motion.div
-                    layoutId="bottomNavActiveBlade"
-                    className="absolute -top-2 left-4 right-4 h-[2px] bg-cyan-400 rounded-full shadow-[0_0_10px_#00f7ff] pointer-events-none"
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                </>
+                <motion.div
+                  layoutId="bottomNavActiveBlade"
+                  className="absolute -top-2 left-4 right-4 h-[2px] bg-cyan-400 rounded-full shadow-[0_0_8px_#00f7ff] pointer-events-none"
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
               )}
 
               {/* Icon / Avatar with spring scale */}
@@ -94,25 +86,17 @@ export const MobileBottomNav: React.FC = () => {
                 )}
               </motion.div>
 
-              {/* Cyber Styled Badge Shape for Footer Label */}
-              <div
-                className={`relative z-10 px-2 py-0.5 rounded-full mt-1 transition-all duration-200 ${
-                  isActive
-                    ? 'bg-cyan-500/15 border border-cyan-400/40 shadow-[0_0_8px_rgba(0,247,255,0.3)]'
-                    : 'bg-transparent border border-transparent'
-                }`}
+              {/* Clean Footer Label (Normalized without harsh box border/background) */}
+              <span
+                className="relative z-10 font-tech text-[10.5px] tracking-wider uppercase truncate max-w-[76px] block mt-1 transition-colors duration-200"
+                style={{
+                  color: isActive ? '#00f7ff' : '#94a3b8',
+                  fontWeight: isActive ? 700 : 500,
+                  textShadow: isActive ? '0 0 6px rgba(0,247,255,0.5)' : 'none',
+                }}
               >
-                <span
-                  className="font-tech text-[10px] tracking-wider uppercase truncate max-w-[70px] block"
-                  style={{
-                    color: isActive ? '#00f7ff' : '#94a3b8',
-                    fontWeight: isActive ? 800 : 600,
-                    textShadow: isActive ? '0 0 8px rgba(0,247,255,0.8)' : 'none',
-                  }}
-                >
-                  {item.label}
-                </span>
-              </div>
+                {item.label}
+              </span>
             </button>
           );
         })}

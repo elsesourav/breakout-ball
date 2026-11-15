@@ -12,7 +12,7 @@ export const CyberSectionHeader: React.FC<CyberSectionHeaderProps> = ({
   rightSlot,
 }) => {
   return (
-    <div className="w-full max-w-sm px-4 pt-7 pb-3 sm:px-5 sm:pt-8 sm:pb-3.5 flex items-center justify-between select-none">
+    <div className="w-full max-w-sm px-4 py-2.5 sm:px-5 sm:py-2.5 flex items-center justify-between select-none">
       {/* Category Kicker & Single-line Subtext */}
       <div className="flex-1 min-w-0 pr-2 flex flex-col overflow-hidden">
         <span
