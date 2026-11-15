@@ -86,54 +86,39 @@ export const ProfileView: React.FC = () => {
   // Accurately compute sticky lock threshold (distance needed to scroll away hero card)
   useEffect(() => {
     const updateMaxOuter = () => {
-      const switcher = switcherRef.current;
-      if (switcher && switcher.offsetTop > 50) {
-        maxOuterRef.current = switcher.offsetTop;
-      } else if (heroCardRef.current) {
-        maxOuterRef.current = heroCardRef.current.offsetHeight + 10;
+      if (heroCardRef.current) {
+        maxOuterRef.current = heroCardRef.current.offsetHeight + 12;
       }
     };
     updateMaxOuter();
     const raf = requestAnimationFrame(updateMaxOuter);
-    if (activeSection === 'leaderboard' && outerContainerRef.current) {
-      const target = switcherRef.current && switcherRef.current.offsetTop > 50
-        ? switcherRef.current.offsetTop
-        : maxOuterRef.current;
-      outerContainerRef.current.scrollTop = target;
-    }
     window.addEventListener('resize', updateMaxOuter);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', updateMaxOuter);
     };
-  }, [isSettingsOpen, activeSection]);
+  }, [isSettingsOpen]);
 
-  // Coordinated Nested Scroll: Collapses header first when scrolling down, scrolls table first when scrolling up
+  // Desktop Mouse Wheel Coordinator: smooth transition between hero collapse and internal card scroll
   useEffect(() => {
     if (isSettingsOpen) return;
 
     const outer = outerContainerRef.current;
     if (!outer) return;
 
-    let touchStartY = 0;
-    let touchStartX = 0;
-    let isTrackingTouch = false;
-
     const getInner = () => outer.querySelector<HTMLElement>('[data-inner-scroll="true"]');
-    const getMaxOuter = () => (switcherRef.current && switcherRef.current.offsetTop > 50 ? switcherRef.current.offsetTop : maxOuterRef.current);
 
-    // 1. WHEEL COORDINATOR (Desktop mouse wheel & trackpad)
     const handleWheel = (e: WheelEvent) => {
       const deltaY = e.deltaY;
       if (!deltaY) return;
 
       const inner = getInner();
-      const maxOuter = getMaxOuter();
+      const maxOuter = maxOuterRef.current;
 
       if (deltaY > 0) {
         // Scrolling DOWN (page moves up)
         if (outer.scrollTop < maxOuter - 0.5) {
-          // Body must scroll first until sticky header hits the top!
+          // Body scrolls first until sticky header hits the top!
           e.preventDefault();
           outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
         } else if (inner) {
@@ -155,83 +140,17 @@ export const ProfileView: React.FC = () => {
       }
     };
 
-    // 2. TOUCH COORDINATOR (Mobile touch gestures, even when dragging outside the table)
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      touchStartY = e.touches[0].clientY;
-      touchStartX = e.touches[0].clientX;
-      isTrackingTouch = true;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isTrackingTouch || e.touches.length !== 1) return;
-      const currentY = e.touches[0].clientY;
-      const currentX = e.touches[0].clientX;
-      const deltaY = touchStartY - currentY; // positive = dragging finger UP (scrolling DOWN)
-      const deltaX = touchStartX - currentX;
-
-      // Ignore predominantly horizontal swipes
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-        return;
-      }
-
-      touchStartY = currentY;
-      touchStartX = currentX;
-
-      const inner = getInner();
-      const maxOuter = getMaxOuter();
-
-      if (deltaY > 0) {
-        // Scrolling DOWN
-        if (outer.scrollTop < maxOuter - 0.5) {
-          // Body must scroll first!
-          e.preventDefault();
-          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
-        } else if (inner) {
-          // Body has finished scrolling, now table scrolls inside!
-          e.preventDefault();
-          inner.scrollTop += deltaY;
-        }
-      } else if (deltaY < 0) {
-        // Scrolling UP
-        if (inner && inner.scrollTop > 0.5) {
-          // Table inside must finish scrolling first!
-          e.preventDefault();
-          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
-        } else if (outer.scrollTop > 0) {
-          // Table is at row 1, now page scrolls up!
-          e.preventDefault();
-          outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      isTrackingTouch = false;
-    };
-
     outer.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
-
     return () => {
       outer.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('touchcancel', handleTouchEnd);
     };
   }, [isSettingsOpen]);
 
   const handleOuterScroll = () => {
     const outer = outerContainerRef.current;
     if (!outer) return;
-    const max = switcherRef.current && switcherRef.current.offsetTop > 50
-      ? switcherRef.current.offsetTop
-      : maxOuterRef.current;
-    if (outer.scrollTop > max) {
+    const max = maxOuterRef.current;
+    if (max > 0 && outer.scrollTop > max) {
       outer.scrollTop = max;
     }
   };
@@ -337,7 +256,7 @@ export const ProfileView: React.FC = () => {
               zIndex: 30,
               backgroundColor: 'rgba(5, 7, 22, 0.98)',
             }}
-            className="w-full pt-1.5 pb-1 backdrop-blur-md"
+            className="w-full pt-1.5 pb-2.5 backdrop-blur-md"
           >
             {/* Category Switcher: 1st BADGES, 2nd LEADERBOARD (Both use Yellow Button) */}
             <div
@@ -402,14 +321,14 @@ export const ProfileView: React.FC = () => {
             </div>
           </div>
 
-          {/* 3. CONTENT CARD: Fills screen below sticky switcher with internal scrolling */}
+          {/* 3. CONTENT CARD: Fills screen below sticky switcher with internal scrolling and clean gap */}
           <div
             style={{
-              height: 'calc(100dvh - 148px)',
-              minHeight: '420px',
-              maxHeight: '680px',
+              height: 'calc(100dvh - 150px)',
+              minHeight: '400px',
+              maxHeight: '660px',
             }}
-            className="w-full flex flex-col min-h-0 mt-2.5 mb-2.5"
+            className="w-full flex flex-col min-h-0 mt-3 mb-2"
           >
             <AnimatePresence mode="wait">
               {activeSection === 'badges' ? (
@@ -419,7 +338,7 @@ export const ProfileView: React.FC = () => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.99 }}
                   transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="w-full h-full"
+                  className="w-full h-full flex flex-col min-h-0"
                 >
                   <AchievementsList />
                 </motion.div>
@@ -430,7 +349,7 @@ export const ProfileView: React.FC = () => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.99 }}
                   transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="w-full h-full"
+                  className="w-full h-full flex flex-col min-h-0"
                 >
                   <OverallScoreLeaderboard />
                 </motion.div>
