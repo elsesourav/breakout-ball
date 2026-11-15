@@ -16,7 +16,7 @@ import { synthAudio } from '../utils/synthAudio';
 
 class SoundManager {
   private ctx: AudioContext | null = null;
-  private soundEnabled: boolean = false; // Master audio OFF by default
+  private soundEnabled: boolean = true; // Master audio ON by default
   private volume: number = 0.5; // Master volume 50% by default
   private musicEnabled: boolean = false; // Background music OFF by default
   private sfxEnabled: boolean = true; // Action sounds active when sound is ON

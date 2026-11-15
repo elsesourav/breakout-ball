@@ -55,7 +55,7 @@ export interface Achievement {
 }
 
 export interface GameSettings {
-  soundEnabled: boolean; // Master Audio On/Off (default: false)
+  soundEnabled: boolean; // Master Audio On/Off (default: true)
   volume: number; // Master Volume 0.0 to 1.0 (default: 0.5)
   musicEnabled: boolean; // Background music On/Off (default: false)
   sfxEnabled: boolean; // Gameplay Action Sounds On/Off (default: true)

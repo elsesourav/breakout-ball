@@ -6,7 +6,7 @@
 class SynthAudioEngine {
   private ctx: AudioContext | null = null;
   private volume: number = 0.5;
-  private enabled: boolean = false; // Audio disabled by default
+  private enabled: boolean = true; // Audio enabled by default
 
   private initContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;

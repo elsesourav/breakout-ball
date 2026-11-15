@@ -71,7 +71,7 @@ export const ProfileSettingsGroup: React.FC = () => {
                 MASTER AUDIO
               </span>
               <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
-                {settings.soundEnabled ? 'All audio streams active' : 'All audio streams muted (Default OFF)'}
+                {settings.soundEnabled ? 'All audio streams active (Default ON)' : 'All audio streams muted'}
               </span>
             </div>
           </div>
