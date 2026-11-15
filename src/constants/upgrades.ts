@@ -118,8 +118,8 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
     accentColor: '#fbbf24',
     glowColor: 'rgba(251, 191, 36, 0.4)',
     symbol: '',
-    statLabel: (lvl) => `+${(lvl - 1) * 10}% Speed`,
-    nextLabel: (lvl) => `+${lvl * 10}% Speed`,
+    statLabel: (lvl) => `+${(lvl - 1) * 12}% Speed`,
+    nextLabel: (lvl) => `+${lvl * 12}% Speed`,
   },
 ];
 

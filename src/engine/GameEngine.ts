@@ -154,7 +154,7 @@ export class GameEngine {
 
   public movePaddleRelative(deltaX: number) {
     const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
-    const speedMultiplier = 1 + (padSpeedLvl - 1) * 0.10;
+    const speedMultiplier = 1 + (padSpeedLvl - 1) * 0.12;
     const currentTarget = this.tsPhysics.paddle.targetX + deltaX * speedMultiplier;
     this.setPaddleTarget(currentTarget);
   }
@@ -264,6 +264,12 @@ export class GameEngine {
     const expandLvl = currencyService.getUpgradeLevel('expand_power');
     const expandMultiplier = 1.30 + (expandLvl - 1) * 0.04;
     this.tsPhysics.paddle.width = isExpand ? basePadW * expandMultiplier : basePadW;
+
+    // Paddle Speed Upgrade: Dynamically scales max physical tracking speed across all controls
+    const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
+    const speedMultiplier = 1 + (padSpeedLvl - 1) * 0.12;
+    this.tsPhysics.paddle.maxSpeed = 1600 * speedMultiplier;
+
     this.tsPhysics.isMegaBall = this.powerUps.buffs.megaBall > 0;
     this.tsPhysics.hasShield = this.powerUps.buffs.hasShield;
     this.tsPhysics.ballImpactLevel = currencyService.getUpgradeLevel('ball_impact');

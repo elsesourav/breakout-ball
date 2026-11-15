@@ -24,6 +24,7 @@ export interface PaddleState {
   height: number;
   vx: number;
   targetX: number;
+  maxSpeed?: number; // Physical maximum tracking speed in px/sec
 }
 
 export interface BlockEngineState {

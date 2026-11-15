@@ -43,6 +43,7 @@ export class PhysicsWorld {
       height: config.paddleHeight,
       vx: 0,
       targetX: initialPadX,
+      maxSpeed: 1600,
     };
 
     this.defaultBall = {
@@ -208,9 +209,25 @@ export class PhysicsWorld {
       }
     }
 
-    // Smooth paddle interpolation
-    this.paddle.vx = (this.paddle.targetX - this.paddle.x) * 0.35;
-    this.paddle.x += this.paddle.vx;
+    // Physically accurate paddle speed control:
+    // Paddle tracks targetX strictly capped by its maximum physical speed (px/sec)
+    const dt = 1 / 60;
+    const maxSpeed = this.paddle.maxSpeed ?? 1600;
+    const maxStep = maxSpeed * dt;
+    const dx = this.paddle.targetX - this.paddle.x;
+    const dist = Math.abs(dx);
+
+    if (dist > 0.01) {
+      // Direct tracking capped by current upgrade max speed:
+      // If distance exceeds maxStep, travel at maximum physical speed;
+      // If distance is within reach, smoothly snap into target without overshooting
+      const step = dist >= maxStep ? Math.sign(dx) * maxStep : dx * 0.55;
+      this.paddle.vx = step / dt;
+      this.paddle.x += step;
+    } else {
+      this.paddle.x = this.paddle.targetX;
+      this.paddle.vx = 0;
+    }
 
     const halfPadW = this.paddle.width / 2;
     if (this.paddle.x < halfPadW) {
