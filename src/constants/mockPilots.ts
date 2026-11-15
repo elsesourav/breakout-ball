@@ -1,25 +1,26 @@
 // Offline fallback pilot profiles in case backend API and Firestore are both offline
 export interface MockPilot {
   username: string;
-  coresCleared: number;
+  coresCleared?: number;
+  stagesCleared?: number;
   score: number;
   badgeTitle: string;
   avatarUrl?: string;
 }
 
 export const FALLBACK_GLOBAL_PILOTS: MockPilot[] = [
-  { username: 'sourav', coresCleared: 50, score: 385800, badgeTitle: 'Grandmaster Champion' },
-  { username: 'speedy_sam', coresCleared: 50, score: 374400, badgeTitle: 'Speedrun Ace' },
-  { username: 'arcade_queen', coresCleared: 50, score: 362600, badgeTitle: 'Arcade Monarch' },
-  { username: 'cyber_ninja', coresCleared: 50, score: 351200, badgeTitle: 'Shadow Striker' },
-  { username: 'breakout_pro', coresCleared: 50, score: 342500, badgeTitle: 'Core Crusher' },
-  { username: 'pixel_guy', coresCleared: 50, score: 334400, badgeTitle: 'Pixel Veteran' },
-  { username: 'neon_striker', coresCleared: 50, score: 326800, badgeTitle: 'Neon Phantom' },
-  { username: 'quantum_ace', coresCleared: 50, score: 318100, badgeTitle: 'Warp Navigator' },
-  { username: 'hyper_dash', coresCleared: 49, score: 308500, badgeTitle: 'Hyperion Player' },
-  { username: 'retro_pilot', coresCleared: 48, score: 298200, badgeTitle: 'Old-School Breaker' },
-  { username: 'nova_cadet', coresCleared: 47, score: 289400, badgeTitle: 'Nova Specialist' },
-  { username: 'laser_runner', coresCleared: 46, score: 281600, badgeTitle: 'Beam Specialist' },
+  { username: 'sourav', stagesCleared: 50, score: 385800, badgeTitle: 'Grandmaster Champion' },
+  { username: 'speedy_sam', stagesCleared: 49, score: 374400, badgeTitle: 'Speedrun Ace' },
+  { username: 'arcade_queen', stagesCleared: 48, score: 362600, badgeTitle: 'Arcade Monarch' },
+  { username: 'cyber_ninja', stagesCleared: 47, score: 351200, badgeTitle: 'Shadow Striker' },
+  { username: 'breakout_pro', stagesCleared: 45, score: 342500, badgeTitle: 'Core Crusher' },
+  { username: 'pixel_guy', stagesCleared: 44, score: 334400, badgeTitle: 'Pixel Veteran' },
+  { username: 'neon_striker', stagesCleared: 43, score: 326800, badgeTitle: 'Neon Phantom' },
+  { username: 'quantum_ace', stagesCleared: 41, score: 318100, badgeTitle: 'Warp Navigator' },
+  { username: 'hyper_dash', stagesCleared: 40, score: 308500, badgeTitle: 'Hyperion Player' },
+  { username: 'retro_pilot', stagesCleared: 38, score: 298200, badgeTitle: 'Old-School Breaker' },
+  { username: 'nova_cadet', stagesCleared: 37, score: 289400, badgeTitle: 'Nova Specialist' },
+  { username: 'laser_runner', stagesCleared: 35, score: 281600, badgeTitle: 'Beam Specialist' },
   { username: 'solar_flare', coresCleared: 45, score: 272500, badgeTitle: 'Solar Vanguard' },
   { username: 'void_walker', coresCleared: 44, score: 263200, badgeTitle: 'Abyssal Nomad' },
   { username: 'crypto_striker', coresCleared: 43, score: 254400, badgeTitle: 'Cipher Specialist' },

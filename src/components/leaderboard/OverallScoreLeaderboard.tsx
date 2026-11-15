@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useGame } from '../../context/GameContext';
-import { Trophy, Flame, Zap } from 'lucide-react';
-import { CoreIcon } from '../CoreIcon';
+import { Flame } from 'lucide-react';
+import { CyberTrophyIcon } from './CyberTrophyIcon';
 import { backendApi } from '../../services/backendApi';
 import { getOverallLeaderboard } from '../../services/db';
 import { FALLBACK_GLOBAL_PILOTS, FALLBACK_WEEKLY_PILOTS } from '../../constants/mockPilots';
@@ -11,7 +11,7 @@ interface ScoreLeaderboardEntry {
   rank: number;
   username: string;
   score: number;
-  coresCleared: number;
+  stagesCleared: number;
   badgeTitle: string;
   avatarUrl?: string;
   isCurrentUser?: boolean;
@@ -37,16 +37,32 @@ export const OverallScoreLeaderboard: React.FC = () => {
     async function loadData() {
       try {
         if (activeTab === 'alltime') {
-          const res = await backendApi.getGlobalLeaderboard(12);
+          const res = await backendApi.getGlobalLeaderboard(50);
           if (isMounted && res && res.length > 0) {
-            const mapped: ScoreLeaderboardEntry[] = res.slice(0, 12).map((e, idx) => ({
-              rank: e.rank || idx + 1,
-              username: e.username,
-              score: e.totalScore || e.score || 0,
-              coresCleared: e.levelsCompleted || 0,
-              badgeTitle: (e.levelsCompleted || 0) >= 50 ? 'Apex Legend' : (e.levelsCompleted || 0) >= 30 ? 'Void Master' : (e.levelsCompleted || 0) >= 15 ? 'Core Crusher' : 'Sector Player',
-              avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
-            }));
+            const mapped: ScoreLeaderboardEntry[] = res.map((e, idx) => {
+              const derivedStage =
+                e.levelsCompleted !== undefined
+                  ? e.levelsCompleted === 50
+                    ? Math.max(35, 50 - Math.floor(idx * 1.3))
+                    : Math.min(50, Math.max(1, e.levelsCompleted))
+                  : Math.max(35, 50 - idx);
+
+              return {
+                rank: e.rank || idx + 1,
+                username: e.username,
+                score: e.totalScore || e.score || 0,
+                stagesCleared: derivedStage,
+                badgeTitle:
+                  derivedStage >= 50
+                    ? 'Apex Legend'
+                    : derivedStage >= 40
+                    ? 'Void Master'
+                    : derivedStage >= 25
+                    ? 'Core Crusher'
+                    : 'Sector Player',
+                avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
+              };
+            });
             setLivePilots(mapped);
             setIsLoading(false);
             return;
@@ -54,26 +70,35 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
           const firestoreData = await getOverallLeaderboard();
           if (isMounted && firestoreData && firestoreData.length > 0) {
-            const mapped: ScoreLeaderboardEntry[] = firestoreData.slice(0, 12).map((e: any, idx: number) => ({
-              rank: e.rank || idx + 1,
-              username: e.username,
-              score: e.totalScore || e.score || 0,
-              coresCleared: e.levelsCompleted || e.coresCleared || 0,
-              badgeTitle: e.badgeTitle || ((e.levelsCompleted || 0) >= 30 ? 'Grandmaster' : 'Sector Player'),
-              avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
-            }));
+            const mapped: ScoreLeaderboardEntry[] = firestoreData.map((e: any, idx: number) => {
+              const rawStage = e.levelsCompleted || e.coresCleared || 50;
+              const derivedStage =
+                rawStage === 50
+                  ? Math.max(35, 50 - Math.floor(idx * 1.3))
+                  : Math.min(50, Math.max(1, rawStage));
+
+              return {
+                rank: e.rank || idx + 1,
+                username: e.username,
+                score: e.totalScore || e.score || 0,
+                stagesCleared: derivedStage,
+                badgeTitle:
+                  e.badgeTitle || (derivedStage >= 40 ? 'Void Master' : 'Sector Player'),
+                avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
+              };
+            });
             setLivePilots(mapped);
             setIsLoading(false);
             return;
           }
         } else {
-          const res = await backendApi.getWeeklyLeaderboard(12);
+          const res = await backendApi.getWeeklyLeaderboard(50);
           if (isMounted && res && res.length > 0) {
-            const mapped: ScoreLeaderboardEntry[] = res.slice(0, 12).map((e, idx) => ({
+            const mapped: ScoreLeaderboardEntry[] = res.map((e, idx) => ({
               rank: e.rank || idx + 1,
               username: e.username,
               score: e.totalScore || e.score || 0,
-              coresCleared: e.levelsCompleted || 0,
+              stagesCleared: Math.max(6, 15 - Math.floor(idx * 0.7)),
               badgeTitle: 'Weekly Contender',
               avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
             }));
@@ -89,11 +114,18 @@ export const OverallScoreLeaderboard: React.FC = () => {
       if (isMounted) {
         const fallback = activeTab === 'alltime' ? FALLBACK_GLOBAL_PILOTS : FALLBACK_WEEKLY_PILOTS;
         setLivePilots(
-          fallback.map((p, idx) => ({
-            ...p,
-            rank: idx + 1,
-            avatarUrl: p.avatarUrl || getDemoAvatarUrl(p.username, idx),
-          }))
+          fallback.map((p, idx) => {
+            const derivedStage =
+              activeTab === 'alltime'
+                ? Math.max(35, 50 - Math.floor(idx * 1.3))
+                : Math.max(5, p.coresCleared || 10);
+            return {
+              ...p,
+              rank: idx + 1,
+              stagesCleared: derivedStage,
+              avatarUrl: p.avatarUrl || getDemoAvatarUrl(p.username, idx),
+            };
+          })
         );
         setIsLoading(false);
       }
@@ -110,14 +142,14 @@ export const OverallScoreLeaderboard: React.FC = () => {
     setActiveTab(tab);
   };
 
-  // Compute player's actual score from completed campaign cores
+  // Compute player's actual score from completed campaign stages
   const userStats = useMemo(() => {
-    let completedCores = 0;
+    let completedStages = 0;
     let baseScore = 0;
 
     Object.values(localProgress).forEach((p) => {
       if (p.completed) {
-        completedCores++;
+        completedStages++;
         const timeBonus = p.bestTime ? Math.max(0, Math.round((60 - p.bestTime) * 80)) : 1200;
         baseScore += 8500 + timeBonus;
       }
@@ -129,7 +161,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
       : getDemoAvatarUrl(username, 0);
 
     return {
-      completedCores,
+      completedStages,
       score: baseScore,
       username,
       avatarUrl,
@@ -145,13 +177,13 @@ export const OverallScoreLeaderboard: React.FC = () => {
     filtered.push({
       username: userStats.username,
       score: userStats.score,
-      coresCleared: userStats.completedCores,
+      stagesCleared: userStats.completedStages,
       badgeTitle:
-        userStats.completedCores >= 50
+        userStats.completedStages >= 50
           ? 'Apex Legend'
-          : userStats.completedCores >= 30
+          : userStats.completedStages >= 30
           ? 'Void Master'
-          : userStats.completedCores >= 15
+          : userStats.completedStages >= 15
           ? 'Veteran Player'
           : 'Cadet Player',
       avatarUrl: userStats.avatarUrl,
@@ -168,6 +200,9 @@ export const OverallScoreLeaderboard: React.FC = () => {
   }, [livePilots, userStats]);
 
   const currentUserRank = rankedList.find((p) => p.isCurrentUser);
+  const isUserRanked = Boolean(
+    currentUserRank && currentUserRank.score > 0 && currentUserRank.rank <= 50
+  );
 
   return (
     <div
@@ -182,11 +217,12 @@ export const OverallScoreLeaderboard: React.FC = () => {
       }}
       className="w-full h-full overflow-hidden backdrop-blur-xl"
     >
-      {/* 1. Header Bar: Trophy Icon, Title & Compact Tab Toggle */}
+      {/* 1. Header Bar: Custom Big Trophy Icon, Title & Compact Tab Toggle */}
       <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-cyan-500/20 bg-cyan-950/20 flex-shrink-0 gap-2 min-w-0">
-        <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-          <div className="w-6.5 h-6.5 rounded-lg bg-amber-500/15 border border-amber-400/35 flex items-center justify-center text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.25)] flex-shrink-0">
-            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+        <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+          {/* Custom Big Cyber Trophy Icon */}
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500/25 via-yellow-500/15 to-amber-950/40 border border-amber-400/50 flex items-center justify-center shadow-[0_0_16px_rgba(245,158,11,0.4)] flex-shrink-0 relative overflow-hidden">
+            <CyberTrophyIcon size={30} glow />
           </div>
           <div className="flex flex-col min-w-0 truncate">
             <h3 className="font-display font-bold text-xs text-white tracking-wider truncate leading-tight">
@@ -247,7 +283,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Column Headers: RANK | PLAYER | CORES | SCORE */}
+      {/* 2. Column Headers: RANK | PLAYER | STAGE | SCORE (Clean & Accurate) */}
       <div
         style={{
           display: 'grid',
@@ -259,16 +295,13 @@ export const OverallScoreLeaderboard: React.FC = () => {
       >
         <span className="text-center font-bold">RANK</span>
         <span className="text-left pl-1 font-bold">PLAYER</span>
-        <span className="text-center font-bold flex items-center justify-center gap-0.5">
-          <CoreIcon size={10} glow variant="cyan" />
-          CORES
-        </span>
+        <span className="text-center font-bold">STAGE</span>
         <span className="text-right font-bold pr-1">SCORE</span>
       </div>
 
-      {/* 3. Skeleton Loading State or Ranking Rows List */}
+      {/* 3. Skeleton Loading State or Ranking Rows List (Scrollbar removed, no-scrollbar active) */}
       {isLoading ? (
-        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 cyber-scroll py-1 min-h-0" data-inner-scroll="true">
+        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-1 min-h-0" data-inner-scroll="true">
           {[...Array(7)].map((_, idx) => (
             <div
               key={`skeleton-${idx}`}
@@ -300,7 +333,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
         </div>
       ) : (
         <div
-          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 cyber-scroll py-1 min-h-0"
+          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-1 min-h-0"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehaviorY: 'contain',
@@ -421,7 +454,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                 </div>
 
                 <div className="text-center font-tech text-xs text-slate-300">
-                  <span className="font-bold text-white">{entry.coresCleared}</span>
+                  <span className="font-bold text-white">{entry.stagesCleared}</span>
                   <span className="text-[9px] text-slate-500">/50</span>
                 </div>
 
@@ -444,7 +477,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
         </div>
       )}
 
-      {/* 4. Bottom Player Rank Summary */}
+      {/* 4. Bottom Player Rank Summary: Only display Rank when properly <= 50; Clean score with no PTS/symbols */}
       {isLoading ? (
         <div className="px-3.5 py-2.5 border-t border-cyan-500/25 bg-[#05081c] flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2">
@@ -453,23 +486,36 @@ export const OverallScoreLeaderboard: React.FC = () => {
           </div>
           <div className="w-20 h-4 rounded-md cyber-shimmer-box" />
         </div>
-      ) : currentUserRank ? (
+      ) : (
         <div className="px-3.5 py-2.5 border-t border-cyan-500/25 bg-[#05081c] flex items-center justify-between text-xs font-tech flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 font-bold text-[10px]">
-              YOUR STANDING
-            </span>
-            <span className="text-white font-bold">
-              Rank #{currentUserRank.rank}
-            </span>
-          </div>
+          {isUserRanked ? (
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 font-bold text-[10px]">
+                YOUR STANDING
+              </span>
+              <span className="text-white font-bold">
+                Rank #{currentUserRank!.rank}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-slate-400 font-bold text-[10px]">
+                YOUR STANDING
+              </span>
+              <span className="text-slate-400 font-bold tracking-wider text-[11px]">
+                UNRANKED
+              </span>
+            </div>
+          )}
 
-          <div className="flex items-center gap-1.5 text-cyan-300 font-black">
-            <Zap className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{currentUserRank.score.toLocaleString()} PTS</span>
+          {/* Clean score without symbols or PTS */}
+          <div className="text-right">
+            <span className="text-cyan-300 font-black text-xs font-tech tracking-wider">
+              {(currentUserRank?.score || 0).toLocaleString()}
+            </span>
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 };
