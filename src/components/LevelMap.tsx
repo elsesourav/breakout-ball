@@ -486,38 +486,37 @@ export const LevelMap: React.FC = () => {
         />
       </div>
 
-      {/* ── Floating Controls Layer: Left (FREE Round Button) & Right (STAR Fixed Badge) ─ */}
+      {/* ── Floating Controls Layer: Left (FREE Rounded Button) & Right (STAR Fixed Badge) ─ */}
       <div className="absolute top-[58px] inset-x-0 z-50 pointer-events-none flex justify-center">
         <div className="w-full max-w-[440px] px-3 sm:px-4 flex items-center justify-between">
-          {/* Left: Floating Round FREE Button (Big with continuous shine & ambient pulse) */}
-          {dailyStatus.canCollect ? (
+          {/* Left: Compact, stationary FREE Button with rounded-xl corners & continuous shine */}
+          {dailyStatus.canCollect ||
+          (typeof window !== 'undefined' &&
+            (window.location.search.includes('forceFree') ||
+              window.sessionStorage?.getItem('forceFree') === '1')) ? (
             <div className="relative pointer-events-auto">
               <motion.button
                 type="button"
                 id="daily-free-collect-button"
                 onClick={handleDailyFreeClick}
-                animate={{ y: [0, -4, 0] }}
-                transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.94 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 style={{
                   background:
-                    'radial-gradient(circle at 35% 35%, rgba(0, 247, 255, 0.5) 0%, rgba(6, 182, 212, 0.55) 45%, rgba(14, 25, 54, 0.98) 100%)',
+                    'linear-gradient(135deg, rgba(6, 182, 212, 0.28) 0%, rgba(14, 25, 54, 0.95) 100%)',
+                  border: '1.2px solid rgba(0, 247, 255, 0.65)',
+                  boxShadow:
+                    '0 0 14px rgba(0, 247, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
                 }}
-                className="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full border-2 border-cyan-300 flex flex-col items-center justify-center cursor-pointer select-none relative group btn-shine-sweep animate-pulse-cyan-glow"
-                title="Claim 50 Free Cores in Core Shop!"
+                className="h-8 sm:h-9 px-3 flex items-center gap-1.5 rounded-xl cursor-pointer select-none relative group overflow-hidden btn-shine-sweep"
+                title="Claim Free Cores in Core Shop!"
               >
-                <span className="text-2xl leading-none filter drop-shadow">🎁</span>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <CoreIcon size={14} variant="cyan" glow />
-                  <span className="font-tech font-black text-[11px] text-cyan-100 tracking-wider leading-none">
-                    FREE
-                  </span>
-                </div>
+                <span className="text-base leading-none filter drop-shadow select-none">🎁</span>
+                <span className="font-tech font-black text-xs text-cyan-100 tracking-wider leading-none">
+                  FREE
+                </span>
+                <CoreIcon size={12} variant="cyan" glow />
               </motion.button>
-              <span className="absolute -top-1 -right-1 px-1.5 h-5 min-w-[20px] rounded-full bg-cyan-300 border-2 border-[#03040c] text-[9.5px] font-black text-black flex items-center justify-center shadow-[0_0_12px_#00f7ff] animate-pulse font-tech pointer-events-none z-10">
-                +50
-              </span>
             </div>
           ) : (
             <div />

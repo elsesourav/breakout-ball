@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Ticket, X, CheckCircle, AlertCircle, Loader2, Sparkles, Lock, Database } from 'lucide-react';
+import { Ticket, X, CheckCircle, AlertCircle, Loader2, Sparkles, Lock, Database, Gift } from 'lucide-react';
 import { SHOP_PACKS, ShopPack } from '../../constants/upgrades';
 import { couponService } from '../../services/coupons';
 import { currencyService, DailyCollectStatus } from '../../services/currency';
@@ -8,19 +8,19 @@ import { CoreIcon } from '../CoreIcon';
 import { BackendAdminModal } from '../admin/BackendAdminModal';
 import { authService, isUserAdmin } from '../../services/auth';
 
-const getPackVariant = (id: string): 'gold' | 'emerald' | 'blue' | 'rose' | 'cyan' => {
+const getPackVariant = (id: string): 'gold' | 'emerald' | 'blue' | 'pink' | 'rose' | 'cyan' => {
   switch (id) {
     case 'starter':
-      return 'gold';
+      return 'emerald'; // 500: Green
     case 'power':
-      return 'emerald';
+      return 'gold'; // 1000: Yellow
     case 'mega':
-      return 'blue';
+      return 'blue'; // 2500: Blue
     case 'ultra':
-      return 'rose';
+      return 'pink'; // 5000: Pink
     case 'titan':
     default:
-      return 'cyan';
+      return 'rose'; // 10000: Reddish
   }
 };
 
@@ -39,26 +39,26 @@ interface PackMeta {
 
 const PACK_META: Record<string, PackMeta> = {
   starter: {
-    // 500: Yellow
+    // 500: Green
+    btnGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)',
+    btnTextColor: 'text-slate-950 font-black',
+    btnShadow: '0 0 14px rgba(16, 185, 129, 0.45)',
+    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(16, 185, 129, 0.12)',
+    cardBorder: '1.2px solid rgba(16, 185, 129, 0.4)',
+    iconBg: 'rgba(16, 185, 129, 0.15)',
+    iconBorder: '1.2px solid rgba(16, 185, 129, 0.5)',
+    iconGlow: '0 0 10px rgba(16, 185, 129, 0.25)',
+  },
+  power: {
+    // 1000: Yellow
     btnGradient: 'linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%)',
     btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 14px rgba(234, 179, 8, 0.45)',
-    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(234, 179, 8, 0.12)',
+    btnShadow: '0 0 16px rgba(234, 179, 8, 0.5)',
+    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(234, 179, 8, 0.14)',
     cardBorder: '1.2px solid rgba(234, 179, 8, 0.4)',
     iconBg: 'rgba(234, 179, 8, 0.15)',
     iconBorder: '1.2px solid rgba(234, 179, 8, 0.5)',
-    iconGlow: '0 0 10px rgba(234, 179, 8, 0.25)',
-  },
-  power: {
-    // 1000: Green
-    btnGradient: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)',
-    btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 16px rgba(16, 185, 129, 0.5)',
-    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(16, 185, 129, 0.14)',
-    cardBorder: '1.2px solid rgba(16, 185, 129, 0.38)',
-    iconBg: 'rgba(16, 185, 129, 0.15)',
-    iconBorder: '1.2px solid rgba(16, 185, 129, 0.5)',
-    iconGlow: '0 0 12px rgba(16, 185, 129, 0.3)',
+    iconGlow: '0 0 12px rgba(234, 179, 8, 0.3)',
   },
   mega: {
     // 2500: Blue
@@ -72,28 +72,26 @@ const PACK_META: Record<string, PackMeta> = {
     iconGlow: '0 0 14px rgba(59, 130, 246, 0.35)',
   },
   ultra: {
-    // 5000: Reddish
+    // 5000: Pink
+    btnGradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #db2777 100%)',
+    btnTextColor: 'text-white font-black drop-shadow-sm',
+    btnShadow: '0 0 18px rgba(236, 72, 153, 0.55)',
+    cardGlow: '0 4px 22px rgba(0, 0, 0, 0.7), 0 0 20px rgba(236, 72, 153, 0.22)',
+    cardBorder: '1.3px solid rgba(236, 72, 153, 0.45)',
+    iconBg: 'rgba(236, 72, 153, 0.16)',
+    iconBorder: '1.2px solid rgba(236, 72, 153, 0.55)',
+    iconGlow: '0 0 14px rgba(236, 72, 153, 0.35)',
+  },
+  titan: {
+    // 10000: Reddish (clean & normal, no heavy glow)
     btnGradient: 'linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%)',
     btnTextColor: 'text-white font-black drop-shadow-sm',
     btnShadow: '0 0 18px rgba(239, 68, 68, 0.55)',
-    cardGlow: '0 4px 22px rgba(0, 0, 0, 0.7), 0 0 20px rgba(239, 68, 68, 0.22)',
+    cardGlow: '0 4px 22px rgba(0, 0, 0, 0.7), 0 0 16px rgba(239, 68, 68, 0.18)',
     cardBorder: '1.3px solid rgba(239, 68, 68, 0.45)',
     iconBg: 'rgba(239, 68, 68, 0.16)',
     iconBorder: '1.2px solid rgba(239, 68, 68, 0.55)',
     iconGlow: '0 0 14px rgba(239, 68, 68, 0.35)',
-  },
-  titan: {
-    // 10000: Cyan Glory
-    btnGradient: 'linear-gradient(135deg, #a5f3fc 0%, #22d3ee 35%, #06b6d4 70%, #00f7ff 100%)',
-    btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 24px rgba(0, 247, 255, 0.8), 0 0 10px rgba(255, 215, 0, 0.4)',
-    cardGlow: '0 4px 26px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 247, 255, 0.42), 0 0 14px rgba(255, 215, 0, 0.3)',
-    cardBorder: '1.6px solid rgba(0, 247, 255, 0.85)',
-    cardBg: 'radial-gradient(circle at 50% 25%, rgba(0, 247, 255, 0.15) 0%, rgba(255, 215, 0, 0.06) 60%, rgba(8, 14, 42, 0.96) 100%)',
-    iconBg: 'rgba(0, 247, 255, 0.22)',
-    iconBorder: '1.4px solid rgba(0, 247, 255, 0.85)',
-    iconGlow: '0 0 20px rgba(0, 247, 255, 0.65), 0 0 10px rgba(255, 215, 0, 0.45)',
-    isGlory: true,
   },
 };
 
@@ -275,20 +273,20 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
             </span>
           </div>
 
-          {/* Action Button: Glowing White Button with "CLAIM" text and smooth continuous shine */}
+          {/* Action Button: Cyan Button (like Titan Vault) with "CLAIM" text, Gift icon (free reward) and smooth continuous shine */}
           {dailyStatus.canCollect ? (
             <button
               type="button"
               onClick={(e) => handleClaimDaily(e)}
               disabled={isClaimingDaily}
               style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #f1f5f9 100%)',
-                border: '1.5px solid #ffffff',
+                background: 'linear-gradient(135deg, #a5f3fc 0%, #22d3ee 35%, #06b6d4 70%, #00f7ff 100%)',
+                boxShadow: '0 2px 10px rgba(0, 247, 255, 0.35)',
               }}
-              className="w-full py-2 px-2 rounded-xl font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:brightness-105 flex items-center justify-center gap-1.5 shadow-md relative overflow-hidden btn-shine-sweep btn-white-glow select-none"
+              className="w-full py-2 px-2 rounded-xl text-slate-950 font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:brightness-105 flex items-center justify-center gap-1.5 shadow-md relative overflow-hidden btn-shine-sweep select-none"
             >
-              <Ticket className="w-3.5 h-3.5 stroke-[2.8] text-[#090d1f] relative z-10" />
-              <span className="tracking-widest font-black text-[#090d1f] relative z-10">CLAIM</span>
+              <Gift className="w-3.5 h-3.5 stroke-[2.8] text-slate-950 relative z-10" />
+              <span className="tracking-widest font-black text-slate-950 relative z-10">CLAIM</span>
             </button>
           ) : (
             <div
@@ -337,11 +335,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
 
               {/* Amount & Name */}
               <div className="flex flex-col items-center">
-                <span
-                  className={`font-display font-black text-base tracking-wide ${
-                    meta.isGlory ? 'text-white drop-shadow-[0_0_8px_rgba(0,247,255,0.6)]' : 'text-white'
-                  }`}
-                >
+                <span className="font-display font-black text-base tracking-wide text-white">
                   +{pack.cores.toLocaleString()}
                 </span>
                 <span className="font-tech text-[10px] text-slate-400 font-bold uppercase tracking-wider">
