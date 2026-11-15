@@ -119,19 +119,19 @@ export const OnlineMode: React.FC = () => {
         />
       </div>
 
-      {/* Sticky Full-Width High-Blur Search & Filter Controls */}
+      {/* Sticky Full-Width Search & Filter Controls */}
       <div
-        className="sticky top-0 z-30 w-full flex flex-col items-center pt-2.5 pb-3 mb-3.5"
+        className="sticky top-0 z-30 w-full flex flex-col items-center pt-3.5 pb-3.5 mb-4"
         style={{
           width: '100%',
-          backgroundColor: 'rgba(6, 7, 20, 0.65)',
+          backgroundColor: '#06081c',
           backdropFilter: 'blur(24px) saturate(180%)',
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           borderBottom: '1px solid rgba(0, 247, 255, 0.18)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.35)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
         }}
       >
-        <div className="w-full max-w-sm px-4 sm:px-5 flex flex-col gap-2.5">
+        <div className="w-full max-w-sm px-4 sm:px-5 flex flex-col gap-3">
           {/* Cyber Search Terminal Input */}
           <div className="relative w-full">
             <div
@@ -195,7 +195,7 @@ export const OnlineMode: React.FC = () => {
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full">
             <button
               type="button"
               onClick={() => {
@@ -218,7 +218,7 @@ export const OnlineMode: React.FC = () => {
                       borderRadius: '10px',
                     }
               }
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
             >
               <Boxes className="w-3.5 h-3.5" />
               <span>ALL STAGES</span>
@@ -245,7 +245,7 @@ export const OnlineMode: React.FC = () => {
                       borderRadius: '10px',
                     }
               }
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
             >
               <Flame className="w-3.5 h-3.5 fill-current" />
               <span>TOP PLAYED</span>
@@ -260,7 +260,7 @@ export const OnlineMode: React.FC = () => {
                 boxShadow: '0 0 12px rgba(168, 85, 247, 0.35)',
                 borderRadius: '10px',
               }}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95 hover:brightness-110 ml-auto whitespace-nowrap"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95 hover:brightness-110 ml-auto whitespace-nowrap shrink-0"
               title="Open Arena Studio to build custom community stages"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
