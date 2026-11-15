@@ -72,11 +72,13 @@ export const OnlineMode: React.FC = () => {
         color: '#ffffff',
       }}
     >
-      {/* Arena Header Bar */}
-      <CyberSectionHeader
-        title="GLOBAL ARENA"
-        subtitle="COMMUNITY STAGES & GLOBAL RANKINGS"
-      />
+      {/* 1. Top Cyber Section Header */}
+      <div className="w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md border-b border-cyan-500/15 shadow-lg">
+        <CyberSectionHeader
+          title="GLOBAL ARENA"
+          subtitle="COMMUNITY STAGES & GLOBAL RANKINGS"
+        />
+      </div>
 
       {/* Sticky Full-Width High-Blur Search & Filter Controls */}
       <div

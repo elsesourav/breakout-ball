@@ -55,7 +55,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
       onClaimSuccess(res.coresGranted);
       setTimeout(() => {
         handleCloseModal();
-      }, 2400);
+      }, 2700);
     } else {
       soundManager.play('damage');
       setStatus('error');
@@ -67,8 +67,11 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
     <div className="w-full flex flex-col gap-3">
       {/* Header */}
       <div className="flex items-center justify-between text-[11px] font-tech text-amber-400 uppercase tracking-wider px-1 pt-1">
-        <span>🎟 CURRENCY COUPON VAULT</span>
-        <span>REDEEM CODES</span>
+        <span className="flex items-center gap-1.5 font-bold">
+          <Ticket className="w-3.5 h-3.5" />
+          SHOP COUPON VAULT
+        </span>
+        <span className="text-[10px] text-slate-400">REDEEM CODES</span>
       </div>
 
       {/* 2-Column Grid */}
@@ -165,7 +168,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
                   +{selectedPack.cores.toLocaleString()} Cores
                 </h3>
                 <span className="font-tech text-[10px] text-slate-400 uppercase tracking-wider">
-                  {selectedPack.name}
+                  SHOP PACK • {selectedPack.name}
                 </span>
               </div>
             </div>
@@ -214,12 +217,12 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
                 style={{
                   backgroundColor: selectedPack.accentColor,
                 }}
-                className="w-full py-2 rounded-lg text-black font-tech font-bold text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5 mt-1"
+                className="w-full py-2.5 rounded-lg text-black font-tech font-bold text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5 mt-1"
               >
                 {status === 'loading' ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <span>REDEEM NOW</span>
+                  <span>CLAIM IN SHOP</span>
                 )}
               </button>
             </form>

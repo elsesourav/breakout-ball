@@ -45,7 +45,7 @@ export const ArmoryView: React.FC = () => {
       return;
     }
 
-    const duration = 1800; // ms
+    const duration = 2000; // ms - slow, smooth count-up
     const startTime = performance.now();
 
     const tick = (now: number) => {
@@ -87,12 +87,12 @@ export const ArmoryView: React.FC = () => {
       setCores(newBalance);
       setUpgrades(currencyService.getUpgrades());
 
-      // Delayed gradual count-up as crystals travel up
+      // Delayed gradual count-up timed with particles arriving at the top badge
       setTimeout(() => {
         setIsPulsing(true);
         startCountUp(newBalance);
-        setTimeout(() => setIsPulsing(false), 2000);
-      }, 450);
+        setTimeout(() => setIsPulsing(false), 2400);
+      }, 750);
     },
     [startCountUp]
   );
@@ -126,21 +126,24 @@ export const ArmoryView: React.FC = () => {
           subtitle="KINETIC UPGRADES & WORKSHOP"
           rightSlot={
             <div
+              id="header-cores-badge"
               style={{
-                background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
+                background: isPulsing
+                  ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.35) 0%, rgba(99, 102, 241, 0.4) 100%)'
+                  : 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
                 border: isPulsing
-                  ? '1.5px solid #00f7ff'
+                  ? '1.8px solid #00f7ff'
                   : '1.2px solid rgba(0, 247, 255, 0.45)',
                 boxShadow: isPulsing
-                  ? '0 0 25px rgba(0, 247, 255, 0.85), inset 0 0 10px rgba(0, 247, 255, 0.4)'
+                  ? '0 0 25px rgba(0, 247, 255, 0.95), inset 0 0 10px rgba(0, 247, 255, 0.5)'
                   : '0 0 12px rgba(0, 247, 255, 0.25)',
-                transform: isPulsing ? 'scale(1.16)' : 'scale(1)',
+                transform: isPulsing ? 'scale(1.15)' : 'scale(1)',
                 transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
               }}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-default"
             >
-              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-              <span className="font-tech font-bold text-xs text-cyan-200">
+              <Sparkles className={`w-3.5 h-3.5 transition-colors ${isPulsing ? 'text-white animate-spin' : 'text-cyan-300'}`} />
+              <span className={`font-tech font-bold text-xs transition-colors ${isPulsing ? 'text-white' : 'text-cyan-200'}`}>
                 {displayCores.toLocaleString()}
               </span>
               <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
