@@ -8,6 +8,7 @@ import {
 } from '../constants/game';
 import { soundManager } from '../utils/audio';
 import { GameHUD } from './GameHUD';
+import { ParticleBackdrop } from './ParticleBackdrop';
 import { GameEngine } from '../engine/GameEngine';
 import { ScoreState } from '../engine/types';
 
@@ -32,6 +33,7 @@ export const GameCanvas: React.FC = () => {
   const [countdownText, setCountdownText] = useState<string | null>('3');
   const [summaryState, setSummaryState] = useState<ScoreState | null>(null);
   const [liveScoreState, setLiveScoreState] = useState<ScoreState | null>(null);
+  const [attemptId, setAttemptId] = useState<number>(0);
 
   // Key tracking
   const keysPressed = useRef<{ ArrowLeft: boolean; ArrowRight: boolean; KeyA: boolean; KeyD: boolean }>({
@@ -77,7 +79,21 @@ export const GameCanvas: React.FC = () => {
     setSummaryState(finalScore);
   }, []);
 
-  // Initialize Engine & Level
+  const handleLevelWinRef = useRef(handleLevelWin);
+  handleLevelWinRef.current = handleLevelWin;
+
+  const handleGameOverRef = useRef(handleGameOver);
+  handleGameOverRef.current = handleGameOver;
+
+  // Sync runtime settings without tearing down the game
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.setVibrate(settings.vibrate);
+      engineRef.current.setBallSkin(settings.ballSkin);
+    }
+  }, [settings.vibrate, settings.ballSkin]);
+
+  // Initialize Engine & Level (strictly bound to selectedLevel.id and attemptId)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !selectedLevel) return;
@@ -110,11 +126,11 @@ export const GameCanvas: React.FC = () => {
       },
       onLevelWin: (st) => {
         if (isDisposed) return;
-        handleLevelWin(st);
+        handleLevelWinRef.current?.(st);
       },
       onGameOver: (st) => {
         if (isDisposed) return;
-        handleGameOver(st);
+        handleGameOverRef.current?.(st);
       },
     });
 
@@ -125,6 +141,7 @@ export const GameCanvas: React.FC = () => {
     let t1: ReturnType<typeof setTimeout> | undefined;
     let t2: ReturnType<typeof setTimeout> | undefined;
     let t3: ReturnType<typeof setTimeout> | undefined;
+    let t4: ReturnType<typeof setTimeout> | undefined;
 
     // Initialize WASM and start loop, then initiate countdown
     engine.initialize().then(() => {
@@ -132,29 +149,32 @@ export const GameCanvas: React.FC = () => {
       engine.startLevel(selectedLevel);
       engine.startLoop();
 
-      // Countdown sequence: 3 -> 2 -> 1 -> GO!
+      // Countdown sequence: 3 -> 2 -> 1 -> GO! with distinct cyber audio
+      setCountdownText('3');
+      soundManager.playCountdownTick(3);
+
       t1 = setTimeout(() => {
         if (isDisposed) return;
         setCountdownText('2');
-        soundManager.playClick();
-      }, 700);
+        soundManager.playCountdownTick(2);
+      }, 800);
 
       t2 = setTimeout(() => {
         if (isDisposed) return;
         setCountdownText('1');
-        soundManager.playClick();
-      }, 1400);
+        soundManager.playCountdownTick(1);
+      }, 1600);
 
       t3 = setTimeout(() => {
         if (isDisposed) return;
         setCountdownText('GO!');
-        soundManager.playSideHit();
+        soundManager.playCountdownGo();
         engine.launchBall();
 
-        setTimeout(() => {
+        t4 = setTimeout(() => {
           if (!isDisposed) setCountdownText(null);
-        }, 500);
-      }, 2100);
+        }, 800);
+      }, 2400);
     });
 
     return () => {
@@ -162,11 +182,12 @@ export const GameCanvas: React.FC = () => {
       if (t1) clearTimeout(t1);
       if (t2) clearTimeout(t2);
       if (t3) clearTimeout(t3);
+      if (t4) clearTimeout(t4);
       engine.destroy();
       engineRef.current = null;
       soundManager.stopBgMusic();
     };
-  }, [selectedLevel, settings.vibrate, handleLevelWin, handleGameOver]);
+  }, [selectedLevel?.id, attemptId]);
 
   // Keyboard navigation loop
   useEffect(() => {
@@ -248,8 +269,9 @@ export const GameCanvas: React.FC = () => {
   // Replay Current Level
   const handleRetry = () => {
     if (!selectedLevel) return;
+    soundManager.playClick();
     setSummaryState(null);
-    startPlayLevel(selectedLevel);
+    setAttemptId((prev) => prev + 1);
   };
 
   // Advance to Next Mission
@@ -267,6 +289,7 @@ export const GameCanvas: React.FC = () => {
       className="relative w-full h-full flex flex-col items-center justify-center bg-black overflow-hidden select-none"
       style={{ width: '100%', height: '100%' }}
     >
+      <ParticleBackdrop />
       <GameHUD
         lives={lives}
         timeUsed={timeUsed}

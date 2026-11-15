@@ -55,7 +55,7 @@ export class GameEngine {
 
   constructor(canvas: HTMLCanvasElement, callbacks: EngineCallbacks = {}) {
     this.canvas = canvas;
-    const context = canvas.getContext('2d', { alpha: false });
+    const context = canvas.getContext('2d', { alpha: true });
     if (!context) throw new Error('Could not get 2D canvas context');
     this.ctx = context;
 

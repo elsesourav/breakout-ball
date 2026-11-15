@@ -59,7 +59,7 @@ export interface GameSettings {
   ballSkin?: BallSkin;
 }
 
-export type ActiveTab = 'local' | 'online' | 'create' | 'profile';
+export type ActiveTab = 'local' | 'online' | 'armory' | 'create' | 'profile';
 
 export type GameScreen = 'menu' | 'preview' | 'playing' | 'designer';
 

@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { useGame } from '../../context/GameContext';
 import { ActiveTab } from '../../types/game';
 import { soundManager } from '../../utils/audio';
-import { NavArcadeIcon, NavArenaIcon, NavStudioIcon, NavProfileIcon } from './NavIcons';
+import { NavArcadeIcon, NavArenaIcon, NavArmoryIcon, NavProfileIcon } from './NavIcons';
 
 export const MobileBottomNav: React.FC = () => {
   const { activeTab, setActiveTab, settings, user } = useGame();
@@ -20,7 +20,7 @@ export const MobileBottomNav: React.FC = () => {
   const navItems = [
     { id: 'local' as ActiveTab, label: 'Arcade', icon: NavArcadeIcon },
     { id: 'online' as ActiveTab, label: 'Arena', icon: NavArenaIcon },
-    { id: 'create' as ActiveTab, label: 'Studio', icon: NavStudioIcon },
+    { id: 'armory' as ActiveTab, label: 'Armory', icon: NavArmoryIcon },
     { id: 'profile' as ActiveTab, label: user.isLoggedIn ? `@${user.username}` : 'Profile', icon: NavProfileIcon },
   ];
 
@@ -37,7 +37,10 @@ export const MobileBottomNav: React.FC = () => {
 
       <div className="flex items-center justify-around px-2 pt-2 pb-1 max-w-md mx-auto">
         {navItems.map((item) => {
-          const isActive = activeTab === item.id;
+          const isActive =
+            item.id === 'online'
+              ? activeTab === 'online' || activeTab === 'create'
+              : activeTab === item.id;
           const isProfile = item.id === 'profile';
           const Icon = item.icon;
 

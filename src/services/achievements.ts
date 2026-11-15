@@ -88,9 +88,23 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
 class AchievementManager {
   private unlockedIds: Set<string> = new Set();
   private listeners: ((achievement: Achievement) => void)[] = [];
+  private isRestrictedContext: boolean = false;
 
   constructor() {
     this.load();
+  }
+
+  /**
+   * Set restricted context mode:
+   * When true (e.g. testing in Studio or playing self-made levels),
+   * no achievements can be progressed or unlocked.
+   */
+  public setRestrictedContext(restricted: boolean) {
+    this.isRestrictedContext = restricted;
+  }
+
+  public isRestricted(): boolean {
+    return this.isRestrictedContext;
   }
 
   private load() {
@@ -123,6 +137,11 @@ class AchievementManager {
   }
 
   public unlock(id: string): Achievement | null {
+    // Strictly block achievement completion when testing or playing self-made levels
+    if (this.isRestrictedContext) {
+      return null;
+    }
+
     if (this.unlockedIds.has(id)) return null;
 
     const ach = INITIAL_ACHIEVEMENTS.find((a) => a.id === id);

@@ -8,9 +8,9 @@ export const Navigation: React.FC = () => {
   const { activeTab, setActiveTab } = useGame();
 
   const options = [
-    { value: 'local', label: 'Local' },
-    { value: 'online', label: 'Online' },
-    { value: 'create', label: 'Create' },
+    { value: 'local', label: 'Arcade' },
+    { value: 'online', label: 'Arena' },
+    { value: 'armory', label: 'Armory' },
     { value: 'profile', label: 'Profile' },
   ];
 

@@ -1,4 +1,5 @@
 import { AUDIO_PATHS } from '../constants/game';
+import { synthAudio } from './synthAudio';
 
 class SoundController {
   private volume: number = 1.0;
@@ -24,6 +25,7 @@ class SoundController {
 
   public setVolume(vol: number) {
     this.volume = Math.max(0, Math.min(1, vol));
+    synthAudio.setVolume(this.volume);
     if (this.bgAudio) {
       this.bgAudio.volume = this.volume * 0.4;
     }
@@ -55,6 +57,16 @@ class SoundController {
 
   public playSideHit() {
     this.play('sideHit', 0.7);
+  }
+
+  public playCountdownTick(count: number | string) {
+    synthAudio.playCountdownTick(count);
+    this.triggerVibrate(25);
+  }
+
+  public playCountdownGo() {
+    synthAudio.playCountdownGo();
+    this.triggerVibrate([50, 40, 100]);
   }
 
   public playDamage() {

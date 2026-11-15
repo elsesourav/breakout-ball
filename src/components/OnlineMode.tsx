@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useGame } from '../context/GameContext';
 import { levelSearchEngine } from '../services/search';
-import { Search, Flame, Globe, X, Boxes } from 'lucide-react';
+import { Search, Flame, Globe, X, Boxes, Plus } from 'lucide-react';
 import { ArenaLevelCard } from './arena/ArenaLevelCard';
 import { ArenaPagination } from './arena/ArenaPagination';
 import { DailyFeaturedBanner } from './arena/DailyFeaturedBanner';
@@ -15,7 +15,7 @@ const SEARCH_TARGETS = [
 ];
 
 export const OnlineMode: React.FC = () => {
-  const { onlineLevels, localLevels, openPreview } = useGame();
+  const { onlineLevels, localLevels, openPreview, setActiveTab } = useGame();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [filterMode, setFilterMode] = useState<'all' | 'popular'>('all');
@@ -65,14 +65,14 @@ export const OnlineMode: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 py-3.5 gap-3.5 pb-28 select-none cyber-grid-bg"
+      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pt-3.5 pb-28 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',
       }}
     >
       {/* Arena Header Bar */}
-      <div className="w-full max-w-sm flex flex-col gap-2.5">
+      <div className="w-full max-w-sm px-3.5 flex flex-col gap-2.5 mb-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img
@@ -104,24 +104,25 @@ export const OnlineMode: React.FC = () => {
         </p>
       </div>
 
-      {/* Sticky Search & Filter Controls */}
+      {/* Sticky Full-Width High-Blur Search & Filter Controls */}
       <div
-        className="sticky top-0 z-30 w-[calc(100%+1.75rem)] -mx-3.5 px-3.5 flex flex-col items-center pt-2 pb-2.5 -mt-2"
+        className="sticky top-0 z-30 w-full flex flex-col items-center pt-2 pb-2.5 mb-3"
         style={{
-          backgroundColor: 'rgba(6, 7, 20, 0.95)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(0, 247, 255, 0.12)',
-          boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.75)',
+          width: '100%',
+          backgroundColor: 'rgba(6, 7, 20, 0.45)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderBottom: '1px solid rgba(0, 247, 255, 0.15)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
         }}
       >
-        <div className="w-full max-w-sm flex flex-col gap-2.5">
+        <div className="w-full max-w-sm px-3.5 flex flex-col gap-2">
           {/* Cyber Search Terminal Input */}
           <div className="relative w-full">
             <div
               className="flex items-center gap-3 w-full h-11 px-4 rounded-xl transition-all duration-200"
               style={{
-                backgroundColor: 'rgba(8, 14, 38, 0.95)',
+                backgroundColor: 'rgba(8, 14, 38, 0.85)',
                 border: isSearchFocused
                   ? '1.5px solid #00f7ff'
                   : '1.5px solid rgba(0, 247, 255, 0.35)',
@@ -234,17 +235,35 @@ export const OnlineMode: React.FC = () => {
               <Flame className="w-3.5 h-3.5 fill-current" />
               <span>TOP PLAYED</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('create')}
+              style={{
+                backgroundColor: 'rgba(139, 92, 246, 0.22)',
+                border: '1.5px solid #a855f7',
+                color: '#d8b4fe',
+                boxShadow: '0 0 12px rgba(168, 85, 247, 0.35)',
+                borderRadius: '10px',
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-tech font-bold transition-all cursor-pointer active:scale-95 hover:brightness-110 ml-auto whitespace-nowrap"
+              title="Open Arena Studio to build custom community stages"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <span>ADD ARENA</span>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Daily Featured Challenge Banner (Active on All Stages Page 1) */}
       {!searchTerm && filterMode === 'all' && currentPage === 1 && (
-        <DailyFeaturedBanner levels={arenaLevels} />
+        <div className="w-full max-w-sm px-3.5 mb-3">
+          <DailyFeaturedBanner levels={arenaLevels} />
+        </div>
       )}
 
       {/* Arena Levels Grid */}
-      <div className="w-full max-w-sm grid grid-cols-2 gap-3 mt-1">
+      <div className="w-full max-w-sm px-3.5 grid grid-cols-2 gap-3 mb-4">
         {pageLevels.map((lvl) => (
           <ArenaLevelCard
             key={lvl.id}
@@ -256,52 +275,56 @@ export const OnlineMode: React.FC = () => {
 
       {/* No Results Fallback */}
       {pageLevels.length === 0 && (
-        <div
-          style={{
-            backgroundColor: 'rgba(8, 14, 38, 0.95)',
-            border: '1.5px solid rgba(0, 247, 255, 0.25)',
-            borderRadius: '16px',
-          }}
-          className="w-full max-w-sm p-6 flex flex-col items-center text-center gap-3 shadow-lg backdrop-blur-xl mt-4"
-        >
-          <div className="w-12 h-12 rounded-full bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center text-cyan-400 shadow-[0_0_12px_rgba(0,247,255,0.25)]">
-            <Search className="w-6 h-6" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <h3 className="font-display font-bold text-sm text-white">
-              NO STAGES FOUND
-            </h3>
-            <p className="font-ui text-xs text-slate-400">
-              No community levels match "{searchTerm}".
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchTerm('');
-              setCurrentPage(1);
-            }}
+        <div className="w-full max-w-sm px-3.5 mb-4">
+          <div
             style={{
-              backgroundColor: 'rgba(0, 247, 255, 0.15)',
-              border: '1.5px solid #00f7ff',
-              color: '#00f7ff',
-              borderRadius: '10px',
+              backgroundColor: 'rgba(8, 14, 38, 0.95)',
+              border: '1.5px solid rgba(0, 247, 255, 0.25)',
+              borderRadius: '16px',
             }}
-            className="px-4 py-1.5 text-xs font-tech font-bold hover:bg-cyan-500/25 transition-all cursor-pointer"
+            className="w-full p-6 flex flex-col items-center text-center gap-3 shadow-lg backdrop-blur-xl"
           >
-            CLEAR SEARCH
-          </button>
+            <div className="w-12 h-12 rounded-full bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center text-cyan-400 shadow-[0_0_12px_rgba(0,247,255,0.25)]">
+              <Search className="w-6 h-6" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-display font-bold text-sm text-white">
+                NO STAGES FOUND
+              </h3>
+              <p className="font-ui text-xs text-slate-400">
+                No community levels match "{searchTerm}".
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setCurrentPage(1);
+              }}
+              style={{
+                backgroundColor: 'rgba(0, 247, 255, 0.15)',
+                border: '1.5px solid #00f7ff',
+                color: '#00f7ff',
+                borderRadius: '10px',
+              }}
+              className="px-4 py-1.5 text-xs font-tech font-bold hover:bg-cyan-500/25 transition-all cursor-pointer"
+            >
+              CLEAR SEARCH
+            </button>
+          </div>
         </div>
       )}
 
       {/* Responsive Cyber Pagination Bar */}
-      <ArenaPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={filteredLevels.length}
-        itemsPerPage={ITEMS_PER_PAGE}
-        onPageChange={handlePageChange}
-      />
+      <div className="w-full max-w-sm px-3.5 flex justify-center">
+        <ArenaPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredLevels.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
   );
 };

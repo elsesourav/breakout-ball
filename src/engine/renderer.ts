@@ -60,9 +60,9 @@ export class GameRenderer {
     }
 
     const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 80, w / 2, h / 2, h);
-    bgGrad.addColorStop(0, '#0a0d2c');
-    bgGrad.addColorStop(0.6, '#040616');
-    bgGrad.addColorStop(1, '#01020a');
+    bgGrad.addColorStop(0, 'rgba(10, 13, 44, 0.82)');
+    bgGrad.addColorStop(0.6, 'rgba(4, 6, 22, 0.90)');
+    bgGrad.addColorStop(1, 'rgba(1, 2, 10, 0.96)');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
 

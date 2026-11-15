@@ -196,6 +196,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setScreen = useCallback(
     (newScreen: GameScreen) => {
+      if (newScreen !== 'playing') {
+        achievementManager.setRestrictedContext(false);
+      }
       setScreenState(newScreen);
       if (newScreen === 'menu') {
         pushAppRoute(getRoutePath(activeTab, 'menu'));
@@ -232,19 +235,45 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAlertConfig(null);
   };
 
+  const isLevelSelfMadeOrTest = useCallback(
+    (level: LevelData | null): boolean => {
+      if (!level) return false;
+      if (level.id === 'TEST' || level.id.startsWith('test_') || level.id.startsWith('test-')) {
+        return true;
+      }
+      if (
+        level.creator &&
+        user?.username &&
+        level.creator.trim().toLowerCase() === user.username.trim().toLowerCase()
+      ) {
+        return true;
+      }
+      return false;
+    },
+    [user?.username]
+  );
+
   const startPlayLevel = useCallback(
     (level: LevelData) => {
       soundManager.playClick();
       setSelectedLevel(level);
       setScreenState('playing');
       soundManager.startBgMusic();
-      dbService.incrementPlayCount(level.id);
-      pushAppRoute(getRoutePath(activeTab, 'playing', level.id));
-      if (level.isPublic || isNaN(parseInt(level.id, 10))) {
-        achievementManager.unlock('arena_challenger');
+
+      const isRestricted = isLevelSelfMadeOrTest(level);
+      achievementManager.setRestrictedContext(isRestricted);
+
+      // Only increment play count and unlock arena_challenger for official or other players' stages
+      if (!isRestricted) {
+        dbService.incrementPlayCount(level.id);
+        if (level.isPublic || isNaN(parseInt(level.id, 10))) {
+          achievementManager.unlock('arena_challenger');
+        }
       }
+
+      pushAppRoute(getRoutePath(activeTab, 'playing', level.id));
     },
-    [activeTab]
+    [activeTab, isLevelSelfMadeOrTest]
   );
 
   const openPreview = useCallback(
@@ -311,54 +340,62 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setOnlineLevels(onlines);
   };
 
-  const recordLevelCompletion = async (levelId: string, time: number) => {
-    const { rank, isNewBest, updatedLeaderboard } = await dbService.submitScore(
-      levelId,
-      user.username,
-      time
-    );
+  const recordLevelCompletion = useCallback(
+    async (levelId: string, time: number) => {
+      const isRestricted = isLevelSelfMadeOrTest(selectedLevel);
 
-    setLeaderboards((prev) => ({ ...prev, [levelId]: updatedLeaderboard }));
+      let rank = 1;
+      let isNewBest = false;
 
-    if (time < 30) {
-      achievementManager.unlock('speed_demon');
-    }
+      // Only submit score and unlock speed_demon for non-restricted stages
+      if (!isRestricted) {
+        const result = await dbService.submitScore(levelId, user.username, time);
+        rank = result.rank;
+        isNewBest = result.isNewBest;
+        setLeaderboards((prev) => ({ ...prev, [levelId]: result.updatedLeaderboard }));
 
-    const levelNum = parseInt(levelId, 10);
-    if (!isNaN(levelNum)) {
-      setLocalProgress((prev) => {
-        const current = prev[levelId];
-        const isBetter = !current?.bestTime || time < current.bestTime;
-        const nextLevelId = String(levelNum + 1);
-        const nextUnlocked = prev[nextLevelId] || {
-          levelNumber: levelNum + 1,
-          completed: false,
-          rank: null,
-          bestTime: null,
-        };
+        if (time < 30) {
+          achievementManager.unlock('speed_demon');
+        }
+      }
 
-        const updatedProgress = {
-          ...prev,
-          [levelId]: {
-            levelNumber: levelNum,
-            completed: true,
-            bestTime: isBetter ? time : current.bestTime,
-            rank,
-          },
-          [nextLevelId]: nextUnlocked,
-        };
+      const levelNum = parseInt(levelId, 10);
+      if (!isNaN(levelNum) && !isRestricted) {
+        setLocalProgress((prev) => {
+          const current = prev[levelId];
+          const isBetter = !current?.bestTime || time < current.bestTime;
+          const nextLevelId = String(levelNum + 1);
+          const nextUnlocked = prev[nextLevelId] || {
+            levelNumber: levelNum + 1,
+            completed: false,
+            rank: null,
+            bestTime: null,
+          };
 
-        const totalCompleted = Object.values(updatedProgress).filter((p) => p.completed).length;
-        if (totalCompleted >= 10) achievementManager.unlock('campaign_10');
-        if (totalCompleted >= 30) achievementManager.unlock('apex_champion');
+          const updatedProgress = {
+            ...prev,
+            [levelId]: {
+              levelNumber: levelNum,
+              completed: true,
+              bestTime: isBetter ? time : current.bestTime,
+              rank,
+            },
+            [nextLevelId]: nextUnlocked,
+          };
 
-        dbService.saveProgress(updatedProgress, user.username);
-        return updatedProgress;
-      });
-    }
+          const totalCompleted = Object.values(updatedProgress).filter((p) => p.completed).length;
+          if (totalCompleted >= 10) achievementManager.unlock('campaign_10');
+          if (totalCompleted >= 30) achievementManager.unlock('apex_champion');
 
-    return { rank, isNewBest };
-  };
+          dbService.saveProgress(updatedProgress, user.username);
+          return updatedProgress;
+        });
+      }
+
+      return { rank, isNewBest };
+    },
+    [user.username, selectedLevel, isLevelSelfMadeOrTest]
+  );
 
   return (
     <GameContext.Provider

@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { LevelData } from '../types/game';
 import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../utils/helpers';
-import { Plus, Settings2, Play, Eye, EyeOff, Layers, Sparkles } from 'lucide-react';
+import { Plus, Settings2, Play, Eye, EyeOff, Layers, ArrowLeft } from 'lucide-react';
+import { StudioMatrixForgeIcon } from './navigation/NavIcons';
 
 export const CreateMode: React.FC = () => {
-  const { userCreatedLevels, openDesigner, openPreview, openModifier } = useGame();
+  const { userCreatedLevels, openDesigner, openPreview, openModifier, setActiveTab } = useGame();
 
   return (
     <div
@@ -17,6 +18,16 @@ export const CreateMode: React.FC = () => {
     >
       {/* Studio Header Bar */}
       <div className="w-full max-w-sm flex flex-col gap-2">
+        {/* Back to Arena Button */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('online')}
+          className="flex items-center gap-1.5 text-xs font-tech font-bold text-cyan-400 hover:text-white transition-all cursor-pointer self-start -ml-1 py-1 px-2 rounded-lg hover:bg-cyan-500/10 active:scale-95"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>BACK TO ARENA</span>
+        </button>
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img
@@ -28,19 +39,19 @@ export const CreateMode: React.FC = () => {
               className="font-display font-black text-sm tracking-wider text-cyan-300"
               style={{ color: '#00f7ff' }}
             >
-              LEVEL STUDIO
+              ARENA STUDIO
             </span>
           </div>
           <span className="font-tech text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">
-            {userCreatedLevels.length} DESIGNS
+            {userCreatedLevels.length} ARENAS
           </span>
         </div>
 
         <p className="text-xs text-slate-400 font-ui">
-          Design, test, and publish custom Breakout block matrices.
+          Design, test, and publish custom Breakout arenas for the community.
         </p>
 
-        {/* Primary CTA: Design New Level */}
+        {/* Primary CTA: Design New Arena */}
         <button
           type="button"
           onClick={openDesigner}
@@ -54,7 +65,7 @@ export const CreateMode: React.FC = () => {
           className="w-full h-11 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider text-black active:scale-[0.98] transition-all cursor-pointer mt-1"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
-          <span>DESIGN NEW LEVEL</span>
+          <span>DESIGN NEW ARENA</span>
         </button>
       </div>
 
@@ -76,15 +87,15 @@ export const CreateMode: React.FC = () => {
       {/* Clean Empty State */}
       {userCreatedLevels.length === 0 && (
         <div className="w-full max-w-sm rounded-2xl bg-[#090d24]/90 border border-white/10 p-6 flex flex-col items-center text-center gap-3 shadow-lg backdrop-blur-xl mt-4">
-          <div className="w-14 h-14 rounded-full bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(0,247,255,0.3)]">
-            <Sparkles className="w-6 h-6" />
+          <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-400/35 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(0,247,255,0.25)] relative">
+            <StudioMatrixForgeIcon className="w-11 h-11" />
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="font-display font-bold text-sm text-white">
-              NO CUSTOM MATRICES YET
+            <h3 className="font-display font-bold text-sm text-white tracking-wide">
+              NO CUSTOM ARENAS YET
             </h3>
             <p className="font-ui text-xs text-slate-400 leading-relaxed max-w-[240px]">
-              Tap "DESIGN NEW LEVEL" to forge custom brick layouts, hit-points, and challenges!
+              Tap "DESIGN NEW ARENA" to forge custom brick layouts, hit-points, and challenges!
             </p>
           </div>
         </div>

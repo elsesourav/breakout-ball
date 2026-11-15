@@ -1,5 +1,21 @@
 import React from 'react';
-import { Home, RotateCcw, ChevronRight, Trophy, Zap, Heart, Shield, Boxes } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  Home,
+  RotateCcw,
+  ChevronRight,
+  Trophy,
+  Zap,
+  Heart,
+  Shield,
+  Boxes,
+  Award,
+  Star,
+  Flame,
+  Timer,
+  ShieldAlert,
+  Sparkles,
+} from 'lucide-react';
 import { ScoreState } from '../engine/types';
 
 interface GameHUDProps {
@@ -103,64 +119,97 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         </div>
       </header>
 
-      {/* Floating Center Countdown - High-Contrast Neon Overhaul */}
-      {countdown && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none bg-black/60 backdrop-blur-[3px] transition-all">
-          {(() => {
-            const cfg = countdownTheme[countdown] || countdownTheme['GO!'];
-            const isGo = countdown === 'GO!';
-            return (
-              <div className="relative flex flex-col items-center justify-center">
-                {/* Expanding shockwave pulse ring */}
-                <div
-                  key={`pulse-${countdown}`}
-                  className="absolute rounded-full animate-ping pointer-events-none"
-                  style={{
-                    width: isGo ? '220px' : '180px',
-                    height: isGo ? '220px' : '180px',
-                    border: `2px solid ${cfg.border}`,
-                    boxShadow: `0 0 35px ${cfg.glow}`,
-                  }}
-                />
+      {/* Floating Center Countdown - High-Contrast Neon Overhaul with Spring Transitions */}
+      <AnimatePresence mode="popLayout">
+        {countdown && (
+          <div
+            key="countdown-overlay"
+            className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none bg-black/65 backdrop-blur-[4px]"
+          >
+            {(() => {
+              const cfg = countdownTheme[countdown] || countdownTheme['GO!'];
+              const isGo = countdown === 'GO!';
+              return (
+                <div className="relative flex flex-col items-center justify-center">
+                  {/* Expanding Shockwave Wavefront */}
+                  <motion.div
+                    key={`wave-${countdown}`}
+                    initial={{ scale: 0.6, opacity: 0.95, borderWidth: '3px' }}
+                    animate={{ scale: isGo ? 2.5 : 2.0, opacity: 0, borderWidth: '1px' }}
+                    transition={{ duration: isGo ? 0.75 : 0.6, ease: 'easeOut' }}
+                    className="absolute rounded-full pointer-events-none"
+                    style={{
+                      width: isGo ? '210px' : '170px',
+                      height: isGo ? '210px' : '170px',
+                      borderColor: cfg.color,
+                      boxShadow: `0 0 40px ${cfg.glow}`,
+                    }}
+                  />
 
-                {/* Outer Holographic Cyber Dial */}
-                <div
-                  className="relative flex flex-col items-center justify-center rounded-full backdrop-blur-md"
-                  style={{
-                    width: isGo ? '170px' : '140px',
-                    height: isGo ? '170px' : '140px',
-                    backgroundColor: 'rgba(5, 8, 26, 0.95)',
-                    border: `3px solid ${cfg.color}`,
-                    boxShadow: `0 0 45px ${cfg.glow}, inset 0 0 30px ${cfg.glow}`,
-                  }}
-                >
-                  <span
+                  {/* Outer Tech HUD Reticle Ring with Rotating Crosshairs */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 8, ease: 'linear' }}
+                    className="absolute rounded-full pointer-events-none"
+                    style={{
+                      width: isGo ? '200px' : '160px',
+                      height: isGo ? '200px' : '160px',
+                      border: `1px dashed ${cfg.border}`,
+                      opacity: 0.6,
+                    }}
+                  />
+
+                  {/* Outer Holographic Cyber Dial with Spring Pop Transition */}
+                  <motion.div
                     key={countdown}
-                    className="font-display font-black leading-none select-none tracking-widest animate-bounce"
+                    initial={{ scale: 2.2, opacity: 0, filter: 'blur(10px)', rotate: isGo ? 0 : -6 }}
+                    animate={{ scale: 1, opacity: 1, filter: 'blur(0px)', rotate: 0 }}
+                    exit={{ scale: 0.65, opacity: 0, filter: 'blur(8px)', rotate: 6 }}
+                    transition={{ type: 'spring', stiffness: 380, damping: 20, mass: 0.55 }}
+                    className="relative flex flex-col items-center justify-center rounded-full backdrop-blur-xl"
                     style={{
-                      fontSize: isGo ? '46px' : '68px',
-                      color: '#ffffff',
-                      textShadow: `0 0 15px #ffffff, 0 0 30px ${cfg.color}, 0 0 60px ${cfg.color}`,
+                      width: isGo ? '170px' : '140px',
+                      height: isGo ? '170px' : '140px',
+                      backgroundColor: 'rgba(5, 8, 26, 0.94)',
+                      border: `3px solid ${cfg.color}`,
+                      boxShadow: `0 0 50px ${cfg.glow}, inset 0 0 35px ${cfg.glow}`,
                     }}
                   >
-                    {countdown}
-                  </span>
+                    {/* Radial Flare Glow Behind Text */}
+                    <div
+                      className="absolute inset-0 rounded-full pointer-events-none opacity-40"
+                      style={{
+                        background: `radial-gradient(circle, ${cfg.glow} 0%, transparent 70%)`,
+                      }}
+                    />
 
-                  <span
-                    className="font-tech font-bold text-[9px] uppercase tracking-widest mt-1.5 select-none text-center px-2"
-                    style={{
-                      color: cfg.color,
-                      textShadow: `0 0 8px ${cfg.color}`,
-                    }}
-                  >
-                    {cfg.sub}
-                  </span>
+                    <span
+                      className="font-display font-black leading-none select-none tracking-widest relative z-10"
+                      style={{
+                        fontSize: isGo ? '48px' : '68px',
+                        color: '#ffffff',
+                        textShadow: `0 0 16px #ffffff, 0 0 35px ${cfg.color}, 0 0 70px ${cfg.color}`,
+                      }}
+                    >
+                      {countdown}
+                    </span>
+
+                    <span
+                      className="font-tech font-bold text-[9px] uppercase tracking-widest mt-1.5 select-none text-center px-2 relative z-10"
+                      style={{
+                        color: cfg.color,
+                        textShadow: `0 0 10px ${cfg.color}`,
+                      }}
+                    >
+                      {cfg.sub}
+                    </span>
+                  </motion.div>
                 </div>
-              </div>
-            );
-          })()}
-        </div>
-      )}
+              );
+            })()}
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Cyber Status Bar */}
       <footer className="absolute bottom-2 left-0 right-0 z-30 px-3.5 flex items-center justify-between pointer-events-none">
@@ -294,6 +343,20 @@ export const GameHUD: React.FC<GameHUDProps> = ({
                   <span>NEXT MISSION</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
+              )}
+
+              {summaryState.status === 'win' && !hasNextLevel && (
+                <div className="flex flex-col items-center gap-1 p-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-emerald-500/20 border border-amber-400/50 shadow-[0_0_20px_rgba(255,200,0,0.3)] mb-1">
+                  <div className="flex items-center gap-1.5 text-amber-300">
+                    <Award className="w-4 h-4" />
+                    <span className="font-display font-black text-xs tracking-widest uppercase">
+                      ARCADE CAMPAIGN CONQUERED!
+                    </span>
+                  </div>
+                  <span className="font-tech text-[10px] text-slate-300 text-center">
+                    All arcade missions completed. You are the Apex Champion!
+                  </span>
+                </div>
               )}
 
               {onRetry && (

@@ -30,16 +30,20 @@ export class AudioBridge {
       case 'block_damage':
         soundManager.playBlockHit();
         synthAudio.playComboHit(combo);
-        achievementManager.unlock('first_blood');
+        if (!achievementManager.isRestricted()) {
+          achievementManager.unlock('first_blood');
+        }
         this.vibrate(40);
         break;
 
       case 'block_destroy':
         soundManager.playBlockHit();
         synthAudio.playComboHit(combo);
-        achievementManager.unlock('first_blood');
-        if (combo >= 5) achievementManager.unlock('combo_5');
-        if (combo >= 10) achievementManager.unlock('combo_10');
+        if (!achievementManager.isRestricted()) {
+          achievementManager.unlock('first_blood');
+          if (combo >= 5) achievementManager.unlock('combo_5');
+          if (combo >= 10) achievementManager.unlock('combo_10');
+        }
         this.vibrate(combo > 3 ? 80 : 50);
         break;
 
@@ -51,13 +55,17 @@ export class AudioBridge {
       case 'portal_warp':
         soundManager.playClick();
         synthAudio.playPortalWarp();
-        achievementManager.unlock('portal_hopper');
+        if (!achievementManager.isRestricted()) {
+          achievementManager.unlock('portal_hopper');
+        }
         this.vibrate([25, 40, 25]);
         break;
 
       case 'emp_explode':
         soundManager.playBlockHit();
-        achievementManager.unlock('emp_detonator');
+        if (!achievementManager.isRestricted()) {
+          achievementManager.unlock('emp_detonator');
+        }
         this.vibrate(120);
         break;
 

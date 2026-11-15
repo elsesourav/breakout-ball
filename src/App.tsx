@@ -3,6 +3,7 @@ import { useGame } from './context/GameContext';
 import { MobileBottomNav } from './components/navigation/MobileBottomNav';
 import { LevelMap } from './components/LevelMap';
 import { OnlineMode } from './components/OnlineMode';
+import { ArmoryView } from './components/ArmoryView';
 import { CreateMode } from './components/CreateMode';
 import { ProfileView } from './components/ProfileView';
 import { LevelPreviewModal } from './components/LevelPreviewModal';
@@ -61,6 +62,7 @@ export const AppContent: React.FC = () => {
             <div key={activeTab} className="cyber-page-transition w-full h-full">
               {activeTab === 'local' && <LevelMap />}
               {activeTab === 'online' && <OnlineMode />}
+              {activeTab === 'armory' && <ArmoryView />}
               {activeTab === 'create' && <CreateMode />}
               {activeTab === 'profile' && <ProfileView />}
             </div>
