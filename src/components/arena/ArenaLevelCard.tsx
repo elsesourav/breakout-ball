@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { LevelData } from '../../types/game';
 import { drawLevelPreviewOnCanvas } from '../../utils/helpers';
-import { User, Flame } from 'lucide-react';
+import { User, Flame, Check } from 'lucide-react';
 import { currencyService } from '../../services/currency';
 import { sanitizePortals } from '../../services/db';
 
@@ -65,12 +65,15 @@ export const ArenaLevelCard: React.FC<ArenaLevelCardProps> = ({ level, onClick }
           className="w-full h-full block"
           style={{ width: '100%', height: '96px' }}
         />
-        {/* Claimed Indicator (No +CORES badge) */}
+        {/* Completed Tick Icon Badge (No text) */}
         {isClaimed && (
-          <div className="absolute top-1.5 right-1.5 pointer-events-none">
-            <span className="px-1.5 py-0.5 rounded-full text-[8.5px] font-tech font-bold uppercase tracking-wider bg-emerald-950/85 text-emerald-300 border border-emerald-400/40 shadow-sm backdrop-blur-sm">
-              CLAIMED
-            </span>
+          <div className="absolute top-1.5 right-1.5 pointer-events-none z-10">
+            <div
+              className="w-5 h-5 rounded-full bg-emerald-950/90 border border-emerald-400/80 text-emerald-300 flex items-center justify-center shadow-[0_0_8px_rgba(16,185,129,0.5)] backdrop-blur-sm"
+              title="Level Completed"
+            >
+              <Check className="w-3 h-3 text-emerald-300 stroke-[3]" />
+            </div>
           </div>
         )}
       </div>

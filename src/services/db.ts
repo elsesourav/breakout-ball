@@ -1,19 +1,7 @@
-/**
- * Cloud Database Service (Cloud Firestore Native)
- *
- * Connects directly to Google Cloud Firestore (Project: breakout-ball)
- * replacing the legacy Firebase Realtime Database.
- *
- * Implements:
- * - Community & Custom Levels (Firestore 'online_levels' & 'user_levels')
- * - Global Level Leaderboards (Firestore 'leaderboards')
- * - User Progress & Cloud Sync (Firestore 'users')
- * - High-speed Local Cache & Offline Resilience
- */
-
 import { LevelData, LeaderboardEntry, LocalLevelProgress } from '../types/game';
 import { INITIAL_LOCAL_LEVELS, INITIAL_ONLINE_LEVELS, MOCK_LEADERBOARDS } from '../constants/game';
 import { firestoreDb } from './firebase';
+import { backendApi } from './backendApi';
 import {
   collection,
   doc,
@@ -354,7 +342,19 @@ class CloudDatabaseService {
   // ==========================================
 
   public async getLeaderboard(levelId: string): Promise<LeaderboardEntry[]> {
-    // 1. Read live leaderboard document from Cloud Firestore
+    // 1. Live Backend Microservice
+    try {
+      const apiEntries = await backendApi.getLevelLeaderboard(levelId);
+      if (apiEntries && apiEntries.length > 0) {
+        return apiEntries.map((e) => ({
+          rank: e.rank,
+          username: e.username,
+          time: e.time ?? 30,
+        }));
+      }
+    } catch {}
+
+    // 2. Cloud Firestore
     try {
       const snap = await getDoc(doc(firestoreDb, 'leaderboards', String(levelId)));
       if (snap.exists()) {
@@ -365,7 +365,7 @@ class CloudDatabaseService {
       }
     } catch {}
 
-    // 2. Local fallback
+    // 3. Local fallback
     const raw = localStorage.getItem(this.leaderboardsKey);
     const all: Record<string, LeaderboardEntry[]> = raw ? JSON.parse(raw) : MOCK_LEADERBOARDS;
     return all[levelId] || all.default || [];
@@ -374,7 +374,8 @@ class CloudDatabaseService {
   public async submitScore(
     levelId: string,
     username: string,
-    time: number
+    time: number,
+    livesRemaining: number = 3
   ): Promise<{ rank: number; isNewBest: boolean; updatedLeaderboard: LeaderboardEntry[] }> {
     const existingList: LeaderboardEntry[] = await this.getLeaderboard(levelId);
 
@@ -413,6 +414,15 @@ class CloudDatabaseService {
       all[levelId] = finalLeaderboard;
       localStorage.setItem(this.leaderboardsKey, JSON.stringify(all));
     } catch {}
+
+    // Background sync to backend microservice
+    backendApi.recordLevelCompletion(username, {
+      levelId,
+      timeUsed: time,
+      livesRemaining,
+      score: Math.max(1000, Math.floor(10000 - time * 120)),
+      stars: Math.min(3, Math.max(1, livesRemaining)),
+    }).catch(() => {});
 
     const userEntry = finalLeaderboard.find((e) => e.username.toLowerCase() === username.toLowerCase());
     const rank = userEntry ? userEntry.rank : finalLeaderboard.length + 1;
@@ -464,8 +474,6 @@ class CloudDatabaseService {
     const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
     if (userKey) {
       localStorage.setItem(`breakout_db_progress_${userKey}`, JSON.stringify(progress));
-
-      // Sync progress to Cloud Firestore
       try {
         await setDoc(doc(firestoreDb, 'users', userKey), {
           levelsRecord: progress,
@@ -477,3 +485,11 @@ class CloudDatabaseService {
 }
 
 export const dbService = new CloudDatabaseService();
+
+export async function getOverallLeaderboard() {
+  try {
+    const snap = await getDoc(doc(firestoreDb, 'leaderboards', 'overall'));
+    if (snap.exists() && Array.isArray(snap.data()?.entries)) return snap.data()?.entries;
+  } catch {}
+  return [];
+}

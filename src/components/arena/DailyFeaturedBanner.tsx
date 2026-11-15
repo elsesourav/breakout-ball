@@ -57,7 +57,7 @@ export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels
     e.stopPropagation();
     if (isCompleted) {
       soundManager.playLockTap();
-      cyberToast.info(`Daily Mission Claimed • Next mission in ${formatDailyCountdown(timeLeft)}`);
+      cyberToast.info(`Daily Mission Completed • Next mission in ${formatDailyCountdown(timeLeft)}`);
       return;
     }
     soundManager.playClick();
@@ -67,7 +67,7 @@ export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels
   const handleCardClick = () => {
     if (isCompleted) {
       soundManager.playLockTap();
-      cyberToast.info(`Daily Mission Claimed • Next mission in ${formatDailyCountdown(timeLeft)}`);
+      cyberToast.info(`Daily Mission Completed • Next mission in ${formatDailyCountdown(timeLeft)}`);
       return;
     }
     if (onPreview) {
@@ -123,12 +123,6 @@ export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels
             <h3 className="font-display font-black text-[15px] sm:text-base text-white truncate tracking-wide leading-tight group-hover:text-amber-300 transition-colors">
               {featuredLevel.name || `Core #${featuredLevel.id}`}
             </h3>
-            {isCompleted && (
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/60 text-emerald-300 font-tech text-[9.5px] font-bold flex items-center gap-1 shadow-[0_0_8px_rgba(16,185,129,0.3)] flex-shrink-0">
-                <Check className="w-2.5 h-2.5 stroke-[3]" />
-                <span>CLAIMED</span>
-              </span>
-            )}
           </div>
 
           <div className="font-ui text-xs text-slate-300 flex items-center gap-2 truncate mt-1">
@@ -152,7 +146,7 @@ export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels
         </div>
       </div>
 
-      {/* 3. Bottom Row: Reward Bounties & Launch Button (Strictly Single Line, Never Wraps) */}
+      {/* 3. Bottom Row: Reward Bounties & Action Button (Play / Completed) */}
       <div className="flex items-center justify-between gap-2 z-10 pt-2 border-t border-white/[0.08] min-w-0">
         {/* Bounty Badges */}
         <div className="flex items-center gap-1.5 min-w-0 flex-shrink-0">
@@ -166,8 +160,24 @@ export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels
           </span>
         </div>
 
-        {/* Launch / Play Button (Only shown when mission is active and not yet claimed) */}
-        {!isCompleted && (
+        {/* Action Button: PLAY when available, COMPLETED badge with tick icon when completed */}
+        {isCompleted ? (
+          <button
+            type="button"
+            onClick={handleLaunch}
+            style={{
+              borderRadius: '10px',
+              backgroundColor: 'rgba(16, 185, 129, 0.16)',
+              border: '1.2px solid rgba(52, 211, 153, 0.6)',
+              boxShadow: '0 0 14px rgba(16, 185, 129, 0.25)',
+            }}
+            className="px-3 py-1.5 flex items-center justify-center gap-1.5 font-display font-black text-xs text-emerald-300 hover:brightness-110 active:scale-95 transition-all cursor-pointer flex-shrink-0 whitespace-nowrap select-none"
+            title={`Daily Apex Mission completed. Next reset in ${formatDailyCountdown(timeLeft)}`}
+          >
+            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+            <span className="tracking-wider">COMPLETED</span>
+          </button>
+        ) : (
           <button
             type="button"
             onClick={handleLaunch}

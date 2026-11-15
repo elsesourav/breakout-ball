@@ -18,7 +18,8 @@ import {
 } from 'lucide-react';
 import { OverallScoreLeaderboard } from './leaderboard/OverallScoreLeaderboard';
 import { AchievementsList } from './profile/AchievementsList';
-import { ProfileSettingsGroup } from './profile/ProfileSettingsGroup';
+import { ProfileSettingsView } from './profile/ProfileSettingsView';
+import { ProfileHeroCard } from './profile/ProfileHeroCard';
 import { achievementManager } from '../services/achievements';
 import { soundManager } from '../utils/audio';
 
@@ -38,15 +39,29 @@ export const ProfileView: React.FC = () => {
     }
     return false;
   });
-  const [activeSection, setActiveSection] = useState<'badges' | 'leaderboard'>('badges');
+  const [activeSection, setActiveSection] = useState<'badges' | 'leaderboard'>(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('section') === 'leaderboard' || sp.get('tab') === 'leaderboard') {
+        return 'leaderboard';
+      }
+    }
+    return 'badges';
+  });
   const [unlockedBadgesCount, setUnlockedBadgesCount] = useState(() => {
     return achievementManager.getAll().filter((a) => a.unlocked).length;
   });
   const totalBadgesCount = achievementManager.getAll().length || 8;
 
   const outerContainerRef = useRef<HTMLDivElement>(null);
+  const heroCardRef = useRef<HTMLDivElement>(null);
   const switcherRef = useRef<HTMLDivElement>(null);
   const maxOuterRef = useRef<number>(320);
+
+  useEffect(() => {
+    achievementManager.loadForUser(user.username);
+    setUnlockedBadgesCount(achievementManager.getAll().filter((a) => a.unlocked).length);
+  }, [user.username]);
 
   useEffect(() => {
     const unsub = achievementManager.onUnlock(() => {
@@ -71,20 +86,26 @@ export const ProfileView: React.FC = () => {
   // Accurately compute sticky lock threshold (distance needed to scroll away hero card)
   useEffect(() => {
     const updateMaxOuter = () => {
-      const outer = outerContainerRef.current;
       const switcher = switcherRef.current;
-      if (outer && switcher) {
-        const outerRect = outer.getBoundingClientRect();
-        const switcherRect = switcher.getBoundingClientRect();
-        const dist = Math.round(outer.scrollTop + (switcherRect.top - outerRect.top));
-        if (dist > 50) {
-          maxOuterRef.current = dist;
-        }
+      if (switcher && switcher.offsetTop > 50) {
+        maxOuterRef.current = switcher.offsetTop;
+      } else if (heroCardRef.current) {
+        maxOuterRef.current = heroCardRef.current.offsetHeight + 10;
       }
     };
     updateMaxOuter();
+    const raf = requestAnimationFrame(updateMaxOuter);
+    if (activeSection === 'leaderboard' && outerContainerRef.current) {
+      const target = switcherRef.current && switcherRef.current.offsetTop > 50
+        ? switcherRef.current.offsetTop
+        : maxOuterRef.current;
+      outerContainerRef.current.scrollTop = target;
+    }
     window.addEventListener('resize', updateMaxOuter);
-    return () => window.removeEventListener('resize', updateMaxOuter);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', updateMaxOuter);
+    };
   }, [isSettingsOpen, activeSection]);
 
   // Coordinated Nested Scroll: Collapses header first when scrolling down, scrolls table first when scrolling up
@@ -99,6 +120,7 @@ export const ProfileView: React.FC = () => {
     let isTrackingTouch = false;
 
     const getInner = () => outer.querySelector<HTMLElement>('[data-inner-scroll="true"]');
+    const getMaxOuter = () => (switcherRef.current && switcherRef.current.offsetTop > 50 ? switcherRef.current.offsetTop : maxOuterRef.current);
 
     // 1. WHEEL COORDINATOR (Desktop mouse wheel & trackpad)
     const handleWheel = (e: WheelEvent) => {
@@ -106,7 +128,7 @@ export const ProfileView: React.FC = () => {
       if (!deltaY) return;
 
       const inner = getInner();
-      const maxOuter = maxOuterRef.current;
+      const maxOuter = getMaxOuter();
 
       if (deltaY > 0) {
         // Scrolling DOWN (page moves up)
@@ -157,7 +179,7 @@ export const ProfileView: React.FC = () => {
       touchStartX = currentX;
 
       const inner = getInner();
-      const maxOuter = maxOuterRef.current;
+      const maxOuter = getMaxOuter();
 
       if (deltaY > 0) {
         // Scrolling DOWN
@@ -206,7 +228,9 @@ export const ProfileView: React.FC = () => {
   const handleOuterScroll = () => {
     const outer = outerContainerRef.current;
     if (!outer) return;
-    const max = maxOuterRef.current;
+    const max = switcherRef.current && switcherRef.current.offsetTop > 50
+      ? switcherRef.current.offsetTop
+      : maxOuterRef.current;
     if (outer.scrollTop > max) {
       outer.scrollTop = max;
     }
@@ -271,328 +295,37 @@ export const ProfileView: React.FC = () => {
           VIEW 1: DEDICATED SETTINGS PAGE (Opened only when Settings button clicked)
           ========================================================================= */}
       {isSettingsOpen ? (
-        <div className="w-full max-w-sm flex flex-col gap-3.5 animate-in fade-in slide-in-from-right-4 duration-200">
-          {/* Header Bar with Back Button */}
-          <div className="w-full flex items-center justify-between pb-1">
-            <button
-              type="button"
-              onClick={() => {
-                soundManager.play('click');
-                setIsSettingsOpen(false);
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 font-tech font-bold text-xs hover:bg-cyan-500/20 active:scale-95 transition-all cursor-pointer shadow-[0_0_10px_rgba(0,247,255,0.2)]"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>BACK</span>
-            </button>
-
-            <div className="flex items-center gap-2">
-              <Settings className="w-4 h-4 text-purple-400" />
-              <span className="font-display font-black text-sm text-white tracking-wider">
-                SYSTEM SETTINGS
-              </span>
-            </div>
-          </div>
-
-          {/* Account Status Card in Settings */}
-          {user.isLoggedIn ? (
-            <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-emerald-400" />
-                  <span className="font-display font-bold text-xs text-white">
-                    {displayName}
-                  </span>
-                  {displayHandle && (
-                    <span className="text-[11px] font-tech text-cyan-400">
-                      @{displayHandle}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[10px] font-tech font-bold px-2 py-0.5 rounded-full border border-emerald-500/50 text-emerald-300 bg-emerald-950/60">
-                  ONLINE
-                </span>
-              </div>
-
-              {user.email && (
-                <div className="flex items-center gap-2 text-slate-300 text-xs truncate">
-                  <Mail className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                  <span className="truncate">{user.email}</span>
-                </div>
-              )}
-
-              <div className="pt-2 border-t border-cyan-500/15 flex items-center justify-between">
-                <span className="text-[10px] text-slate-400 font-ui flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>{providerLabel}</span>
-                </span>
-
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="px-3 py-1 rounded-lg border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-300 font-display font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-                >
-                  <LogOut className="w-3 h-3 text-red-400" />
-                  <span>SIGN OUT</span>
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-xl">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-cyan-400 text-xs font-display font-bold uppercase tracking-wider">
-                  <Cloud className="w-3.5 h-3.5" />
-                  <span>ElseSourav Cloud Sync</span>
-                </div>
-                <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                  LOCAL SAVE
-                </span>
-              </div>
-
-              <p className="text-xs font-ui leading-snug text-slate-300">
-                Connect your account to sync saves across devices and compete on global leaderboards.
-              </p>
-
-              <div className="grid grid-cols-2 gap-2 mt-0.5">
-                <button
-                  type="button"
-                  onClick={handleSignIn}
-                  className="cyber-btn-glass"
-                  style={{ width: '100%' }}
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>SIGN IN</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleCreateAccount}
-                  className="cyber-btn-primary"
-                  style={{ width: '100%' }}
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>SIGN UP</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Sound, Haptics, Simulation Hardware & Data Storage Settings */}
-          <ProfileSettingsGroup />
-        </div>
+        <ProfileSettingsView
+          onBack={() => setIsSettingsOpen(false)}
+          user={user}
+          displayName={displayName}
+          displayHandle={displayHandle}
+          providerLabel={providerLabel}
+          onSignOut={handleSignOut}
+          onSignIn={handleSignIn}
+          onCreateAccount={handleCreateAccount}
+        />
       ) : (
         /* =========================================================================
             VIEW 2: MAIN PROFILE PAGE (Profile card, Stats, Sign-In/Up & Leaderboard/Badges)
             ========================================================================= */
         <div className="w-full max-w-sm flex flex-col gap-2.5">
           {/* 1. Hero Player Profile Card */}
-          <div
-            style={{
-              backgroundColor: 'rgba(9, 13, 36, 0.92)',
-              border: '1.5px solid rgba(0, 247, 255, 0.28)',
-              borderRadius: '20px',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.6), 0 0 20px rgba(0,247,255,0.1)',
-            }}
-            className="w-full p-4 backdrop-blur-xl flex flex-col"
-          >
-            {/* Header: Avatar, Pilot Name, and Settings Component Button */}
-            <div className="flex items-center gap-3.5">
-              {/* Glowing Avatar */}
-              <div className="relative flex-shrink-0">
-                {user.isLoggedIn && user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={displayName}
-                    className="w-13 h-13 rounded-full object-cover border-2 border-cyan-400 shadow-[0_0_16px_rgba(0,247,255,0.5)]"
-                  />
-                ) : user.isLoggedIn ? (
-                  <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-cyan-500 via-indigo-600 to-purple-600 p-[2px] shadow-[0_0_16px_rgba(0,247,255,0.45)]">
-                    <div className="w-full h-full rounded-full bg-[#070a1a] flex items-center justify-center text-cyan-300 font-tech font-bold text-base tracking-wider">
-                      {(user.username || 'P').slice(0, 2).toUpperCase()}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-cyan-500/50 via-slate-600 to-slate-800 p-[2px] shadow-[0_0_12px_rgba(0,247,255,0.3)]">
-                    <div className="w-full h-full rounded-full bg-[#070a1a] flex items-center justify-center text-cyan-400">
-                      <UserIcon className="w-6 h-6 stroke-[2]" />
-                    </div>
-                  </div>
-                )}
-
-                {/* Status Indicator Dot */}
-                <span
-                  className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#090d24] ${
-                    user.isLoggedIn
-                      ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]'
-                      : 'bg-cyan-400/80 shadow-[0_0_6px_#00f7ff]'
-                  }`}
-                />
-              </div>
-
-              {/* User Details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <h2 className="text-base font-bold text-white truncate font-display tracking-wide">
-                    {displayName}
-                  </h2>
-                  {user.isLoggedIn && (
-                    <UserCheck className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                  )}
-                </div>
-                {displayHandle ? (
-                  <p className="text-xs text-cyan-400 font-tech truncate mt-0.5">
-                    @{displayHandle}
-                  </p>
-                ) : (
-                  <p className="text-[11px] text-slate-400 font-ui truncate mt-0.5">
-                    Guest Pilot • Local Saves
-                  </p>
-                )}
-              </div>
-
-              {/* Header Actions: Online status (if logged in) & Enhanced Cyber Settings Button */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {user.isLoggedIn && (
-                  <span className="text-[10px] font-tech font-bold px-2 py-0.5 rounded-full border border-emerald-500/50 text-emerald-300 bg-emerald-950/60 shadow-[0_0_8px_rgba(16,185,129,0.3)]">
-                    ONLINE
-                  </span>
-                )}
-
-                {/* Dedicated Cyber Settings Button Component */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundManager.play('click');
-                    setIsSettingsOpen(true);
-                  }}
-                  className="cyber-btn-settings"
-                  title="System Settings"
-                  aria-label="Open System Settings"
-                >
-                  <Settings className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>SETTINGS</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Account Details & Quick Stats: Cores, Badges, Created */}
-            <div className="grid grid-cols-3 gap-2 mt-3.5 pt-3 border-t border-cyan-500/15 text-center">
-              <div
-                onClick={() => handleSectionSwitch('leaderboard')}
-                className="bg-black/40 rounded-xl p-2 border border-cyan-500/20 cursor-pointer hover:border-cyan-400/50 hover:bg-cyan-950/30 transition-all active:scale-95"
-                title="View Overall Score Leaderboard"
-              >
-                <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
-                  <Trophy className="w-3.5 h-3.5 text-yellow-400" />
-                  <span>Cores</span>
-                </div>
-                <p className="text-sm font-bold text-white mt-0.5 font-tech">
-                  {completedCount} <span className="text-slate-400 text-[10px]">/ 50</span>
-                </p>
-              </div>
-
-              <div
-                onClick={() => handleSectionSwitch('badges')}
-                className="bg-black/40 rounded-xl p-2 border border-cyan-500/20 cursor-pointer hover:border-amber-400/50 hover:bg-amber-950/20 transition-all active:scale-95"
-                title="View Badges Showcase"
-              >
-                <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
-                  <Award className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Badges</span>
-                </div>
-                <p className="text-sm font-bold text-amber-300 mt-0.5 font-tech">
-                  {unlockedBadgesCount} <span className="text-slate-400 text-[10px]">/ {totalBadgesCount}</span>
-                </p>
-              </div>
-
-              <div className="bg-black/40 rounded-xl p-2 border border-cyan-500/20">
-                <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
-                  <Layers className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Created</span>
-                </div>
-                <p className="text-sm font-bold text-purple-300 mt-0.5 font-tech">
-                  {userCreatedLevels.length}
-                </p>
-              </div>
-            </div>
-
-            {/* AFTER ACCOUNT DETAILS: High-Impact Sign-In & Sign-Up Buttons for Unauthenticated Users */}
-            {!user.isLoggedIn ? (
-              <div className="mt-3.5 pt-3 border-t border-cyan-500/15 flex flex-col gap-2.5">
-                <div className="flex items-center justify-between text-[11px] font-ui">
-                  <span className="text-slate-300 flex items-center gap-1.5">
-                    <Cloud className="w-3.5 h-3.5 text-cyan-400" />
-                    <span className="text-cyan-100 font-medium">Save progress to cloud & compete</span>
-                  </span>
-                  <span className="text-[9px] font-tech font-bold px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-500/30">
-                    LOCAL SAVE
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2.5">
-                  {/* Cyber Sign In Button */}
-                  <button
-                    type="button"
-                    onClick={handleSignIn}
-                    className="cyber-btn-glass"
-                    style={{ width: '100%' }}
-                  >
-                    <LogIn className="w-4 h-4 text-cyan-400" />
-                    <span>SIGN IN</span>
-                  </button>
-
-                  {/* Cyber Sign Up Button */}
-                  <button
-                    type="button"
-                    onClick={handleCreateAccount}
-                    className="cyber-btn-primary"
-                    style={{ width: '100%' }}
-                  >
-                    <UserPlus className="w-4 h-4 text-slate-950 stroke-[2.5]" />
-                    <span>SIGN UP</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* Logged-In User Details */
-              <div className="mt-3 pt-2.5 border-t border-cyan-500/15 flex flex-col gap-1.5 text-[11px] font-ui">
-                {user.email && (
-                  <div className="flex items-center gap-2 text-slate-300 truncate">
-                    <Mail className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                    <span className="truncate" style={{ color: '#cbd5e1' }}>
-                      {user.email}
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between text-slate-400 text-[10px]">
-                  <span className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span style={{ color: '#94a3b8' }}>{providerLabel}</span>
-                  </span>
-                  <span className="text-emerald-400 font-tech font-bold">
-                    CLOUD SYNC ACTIVE
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Subtle Ecosystem Credit inside Hero Card (scrolls away cleanly with Hero) */}
-            <div className="mt-3 pt-2.5 border-t border-cyan-500/15 flex items-center justify-center gap-1.5 text-[11px] text-slate-400 font-mono">
-              <img
-                src="/logo.png"
-                alt="Breakout Ball"
-                className="w-3.5 h-3.5 rounded-full object-cover shadow-[0_0_6px_#ff4500]"
-              />
-              <span>Breakout Ball V2 • Ecosystem by </span>
-              <a
-                href="https://elsesourav.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-cyan-400 font-bold hover:underline"
-              >
-                ElseSourav
-              </a>
-            </div>
+          <div ref={heroCardRef} className="w-full">
+            <ProfileHeroCard
+              user={user}
+              displayName={displayName}
+              displayHandle={displayHandle}
+              providerLabel={providerLabel}
+              completedCount={completedCount}
+              unlockedBadgesCount={unlockedBadgesCount}
+              totalBadgesCount={totalBadgesCount}
+              userCreatedLevelsCount={userCreatedLevels.length}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              onSectionSwitch={handleSectionSwitch}
+              onSignIn={handleSignIn}
+              onCreateAccount={handleCreateAccount}
+            />
           </div>
 
           {/* 2. STICKY CATEGORY SWITCHER BAR (Locks smoothly at top: 0px without clipping) */}

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Ticket, X, CheckCircle, AlertCircle, Loader2, Sparkles, Lock } from 'lucide-react';
+import { Ticket, X, CheckCircle, AlertCircle, Loader2, Sparkles, Lock, Database } from 'lucide-react';
 import { SHOP_PACKS, ShopPack } from '../../constants/upgrades';
 import { couponService } from '../../services/coupons';
 import { currencyService, DailyCollectStatus } from '../../services/currency';
 import { soundManager } from '../../utils/audio';
 import { CoreIcon } from '../CoreIcon';
+import { BackendAdminModal } from '../admin/BackendAdminModal';
 
 const getPackVariant = (id: string): 'emerald' | 'purple' | 'gold' | 'rose' | 'cyan' => {
   switch (id) {
@@ -109,6 +110,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
   const [couponCode, setCouponCode] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMsg, setStatusMsg] = useState('');
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() =>
     currencyService.getDailyCollectStatus()
   );
@@ -188,7 +190,15 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           <Ticket className="w-3.5 h-3.5" />
           SHOP COUPON VAULT
         </span>
-        <span className="text-[10px] text-slate-400">DAILY FREE & REDEEM CODES</span>
+        <button
+          type="button"
+          onClick={() => setIsAdminOpen(true)}
+          className="flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)] transition-all"
+          title="Open Backend Operations Terminal"
+        >
+          <Database className="w-2.5 h-2.5 text-cyan-400" />
+          <span>OPS TERMINAL</span>
+        </button>
       </div>
 
       {/* ── 2. Clean 2-Column Grid (Daily Free + Shop Packs) ─────────────── */}
@@ -460,6 +470,9 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           </div>
         </div>
       )}
+
+      {/* Backend Control & Operations Modal */}
+      <BackendAdminModal isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
     </div>
   );
 };

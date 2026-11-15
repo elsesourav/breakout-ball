@@ -51,15 +51,20 @@ export const PRE_PLAYERS = [
   { username: 'nano_striker', fullName: 'Cedric Roy', title: 'Micro Breaker', baseSkill: 0.46 },
   { username: 'beacon_prime', fullName: 'Orion Vale', title: 'Beacon Sentinel', baseSkill: 0.45 },
   { username: 'vanguard_zero', fullName: 'Zephyr Cole', title: 'Origin Pioneer', baseSkill: 0.44 },
+  { username: 'demo_pilot', fullName: 'Demo Cyber Pilot', title: 'Tactical Trainee', baseSkill: 0.72 },
 ];
 
 const BASE_LEVEL_TIMES = [
-  16.2, 18.5, 21.0, 24.3, 27.8, // Levels 1 - 5 (Sector 1)
-  22.4, 25.1, 28.6, 31.2, 35.0, // Levels 6 - 10 (Sector 2)
-  26.0, 29.5, 33.2, 36.8, 41.5, // Levels 11 - 15 (Sector 3)
-  28.2, 32.0, 36.5, 40.1, 45.8, // Levels 16 - 20 (Sector 4)
-  31.5, 35.2, 39.8, 44.0, 49.5, // Levels 21 - 25 (Sector 5)
-  34.0, 38.5, 43.2, 47.9, 53.6, // Levels 26 - 30 (Sector 6)
+  16.2, 18.5, 21.0, 24.3, 27.8, // Levels 1 - 5 (Sector 1: Neon Alley)
+  22.4, 25.1, 28.6, 31.2, 35.0, // Levels 6 - 10
+  26.0, 29.5, 33.2, 36.8, 41.5, // Levels 11 - 15 (Sector 2: Pulse Grid)
+  28.2, 32.0, 36.5, 40.1, 45.8, // Levels 16 - 20
+  31.5, 35.2, 39.8, 44.0, 49.5, // Levels 21 - 25 (Sector 3: Quantum Void)
+  34.0, 38.5, 43.2, 47.9, 53.6, // Levels 26 - 30
+  36.5, 41.2, 45.8, 50.1, 55.4, // Levels 31 - 35 (Sector 4: Cyber Bastion)
+  39.0, 43.5, 48.0, 52.8, 58.2, // Levels 36 - 40
+  42.5, 47.0, 51.8, 56.5, 62.1, // Levels 41 - 45 (Sector 5: Hyper Core Overdrive)
+  45.0, 49.8, 55.2, 61.0, 67.5, // Levels 46 - 50 (Apex Climax Summit)
 ];
 
 const AVAILABLE_TROPHIES = [
@@ -71,12 +76,23 @@ const AVAILABLE_TROPHIES = [
   { trophyId: 'speed_demon', title: 'Supersonic', description: 'Clear any level in under 30 seconds', category: 'speed' },
   { trophyId: 'campaign_10', title: 'Sector Veteran', description: 'Conquer 10 arcade campaign stages', category: 'mastery' },
   { trophyId: 'campaign_25', title: 'Cyber Warlord', description: 'Conquer 25 arcade campaign stages', category: 'mastery' },
+  { trophyId: 'apex_champion', title: 'Apex Legend', description: 'Conquer all 50 arcade campaign stages', category: 'mastery' },
   { trophyId: 'level_architect', title: 'Master Architect', description: 'Create and save a custom stage in the Studio', category: 'creative' },
   { trophyId: 'arena_challenger', title: 'Global Contender', description: 'Challenge a community stage in Global Arena', category: 'mastery' },
 ];
 
 export function seedDatabase() {
-  console.log('[Seed] Seeding 50 real pre-players with 30-level activity history...');
+  console.log('[Seed] Seeding 50 real pre-players with 30-level progressive activity history...');
+
+  // Reset existing data cleanly
+  db.exec(`
+    DELETE FROM coupon_redemptions;
+    DELETE FROM activity_logs;
+    DELETE FROM level_completions;
+    DELETE FROM user_trophies;
+    DELETE FROM users;
+    DELETE FROM coupons;
+  `);
 
   // 1. Seed Official Promo Coupons
   const promoCoupons = [
@@ -91,17 +107,26 @@ export function seedDatabase() {
     couponRepository.create(c);
   }
 
-  // 2. Seed Each Player with Progressive 30-Level Completions
+  // 2. Seed Each Player with Progressive 30-Level Completions & Individual Activity Logs
   const now = Date.now();
 
   PRE_PLAYERS.forEach((player, pIdx) => {
     const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(player.username)}&size=64`;
     
-    // Skill determine how many levels they have completed (Top players have all 30 completed)
-    let levelsToComplete = 30;
-    if (pIdx > 5 && pIdx <= 15) levelsToComplete = Math.floor(25 + Math.random() * 5);
-    else if (pIdx > 15 && pIdx <= 30) levelsToComplete = Math.floor(18 + Math.random() * 8);
-    else if (pIdx > 30) levelsToComplete = Math.floor(10 + Math.random() * 12);
+    // Top 12 players have conquered all 50 campaign levels
+    let levelsToComplete = 50;
+    if (player.username === 'demo_pilot') {
+      levelsToComplete = 15;
+    } else if (pIdx >= 12 && pIdx < 27) {
+      levelsToComplete = 38 + (pIdx % 11); // 38 to 48 levels
+    } else if (pIdx >= 27 && pIdx < 42) {
+      levelsToComplete = 24 + (pIdx % 12); // 24 to 35 levels
+    } else if (pIdx >= 42) {
+      levelsToComplete = 12 + (pIdx % 10); // 12 to 21 levels
+    }
+
+    const joinOffsetDays = 35 + (50 - pIdx) * 0.4;
+    const joinTime = new Date(now - joinOffsetDays * 24 * 3600 * 1000).toISOString();
 
     // Initial user record
     userRepository.upsert({
@@ -112,29 +137,37 @@ export function seedDatabase() {
       avatarUrl,
       trophyCount: 0,
       totalScore: 0,
-      coresBalance: Math.floor(player.baseSkill * 3500),
+      coresBalance: player.username === 'demo_pilot' ? 2500 : Math.floor(player.baseSkill * 3500),
       levelsCompleted: 0
     });
 
+    // Record initial profile join activity
+    activityRepository.log(
+      'user_joined',
+      player.username,
+      `${player.fullName} (@${player.username}) initialized pilot profile credentials`,
+      { rank: pIdx + 1, skill: player.baseSkill },
+      joinTime
+    );
+
     let cumulativeScore = 0;
 
-    // Simulate completion of levels 1 through levelsToComplete
+    // Simulate completion of levels 1 through levelsToComplete one by one
     for (let lvl = 1; lvl <= levelsToComplete; lvl++) {
       const baseTime = BASE_LEVEL_TIMES[lvl - 1] || (30 + lvl);
-      // Realistic variance based on player skill
-      const timeVariance = (1.05 - player.baseSkill * 0.2) + (Math.random() * 0.12 - 0.06);
-      const timeUsed = Math.max(10.5, Math.round(baseTime * timeVariance * 10) / 10);
+      const timeVariance = (1.05 - player.baseSkill * 0.2) + ((pIdx * 7 + lvl * 13) % 17 - 8) * 0.008;
+      const timeUsed = Math.max(9.8, Math.round(baseTime * timeVariance * 10) / 10);
       
-      const lives = player.baseSkill > 0.8 || Math.random() > 0.3 ? 3 : (Math.random() > 0.5 ? 2 : 1);
+      const lives = player.baseSkill > 0.75 || (lvl + pIdx) % 3 !== 0 ? 3 : ((lvl + pIdx) % 2 === 0 ? 2 : 1);
       const stars = lives === 3 ? 3 : (lives === 2 ? 2 : 1);
-      const basePts = 2000 + lvl * 350;
-      const timeBonus = Math.max(200, Math.floor(1000 - timeUsed * 18));
-      const score = Math.floor((basePts + timeBonus + lives * 250) * (0.9 + player.baseSkill * 0.25));
+      const basePts = 2000 + lvl * 380;
+      const timeBonus = Math.max(250, Math.floor(1100 - timeUsed * 19));
+      const score = Math.floor((basePts + timeBonus + lives * 260) * (0.92 + player.baseSkill * 0.26));
 
       cumulativeScore += score;
 
-      // Completion timestamp staggered over the past 30 days
-      const daysAgo = (31 - lvl) * 0.8 + (pIdx * 0.05);
+      // Completion timestamp staggered chronologically
+      const daysAgo = Math.max(0.2, (31 - lvl) * 0.95 + (pIdx * 0.06));
       const completionTime = new Date(now - daysAgo * 24 * 3600 * 1000).toISOString();
 
       // Insert level completion directly
@@ -147,6 +180,15 @@ export function seedDatabase() {
           score = excluded.score,
           stars = excluded.stars
       `).run(lcId, player.username, String(lvl), timeUsed, lives, score, stars, completionTime);
+
+      // Record activity log one by one for each level completion
+      activityRepository.log(
+        'level_completed',
+        player.username,
+        `Cleared Sector ${lvl} with ${score.toLocaleString()} PTS in ${timeUsed.toFixed(1)}s (${stars}⭐)`,
+        { levelId: String(lvl), timeUsed, score, stars },
+        completionTime
+      );
     }
 
     // Assign appropriate trophies based on achievements
@@ -159,16 +201,51 @@ export function seedDatabase() {
     if (player.baseSkill > 0.85) trophiesToAward.push(AVAILABLE_TROPHIES[5]); // speed_demon
     if (levelsToComplete >= 10) trophiesToAward.push(AVAILABLE_TROPHIES[6]); // campaign_10
     if (levelsToComplete >= 25) trophiesToAward.push(AVAILABLE_TROPHIES[7]); // campaign_25
-    if (pIdx % 3 === 0) trophiesToAward.push(AVAILABLE_TROPHIES[8]); // level_architect
-    if (pIdx % 2 === 0) trophiesToAward.push(AVAILABLE_TROPHIES[9]); // arena_challenger
+    if (levelsToComplete >= 50) trophiesToAward.push(AVAILABLE_TROPHIES[8]); // apex_champion
+    if (pIdx % 3 === 0) trophiesToAward.push(AVAILABLE_TROPHIES[9]); // level_architect
+    if (pIdx % 2 === 0) trophiesToAward.push(AVAILABLE_TROPHIES[10]); // arena_challenger
 
-    for (const tr of trophiesToAward) {
+    for (let tIdx = 0; tIdx < trophiesToAward.length; tIdx++) {
+      const tr = trophiesToAward[tIdx];
       const trId = `tr_${player.username}_${tr.trophyId}`;
-      const unlockTime = new Date(now - (30 - trophiesToAward.length) * 24 * 3600 * 1000).toISOString();
+      const unlockDaysAgo = Math.max(0.5, 28 - tIdx * 2.5 + (pIdx * 0.05));
+      const unlockTime = new Date(now - unlockDaysAgo * 24 * 3600 * 1000).toISOString();
       db.prepare(`
         INSERT OR IGNORE INTO user_trophies (id, user_id, username, trophy_id, title, description, category, unlocked_at)
         VALUES (?, (SELECT id FROM users WHERE username = ?), ?, ?, ?, ?, ?, ?)
       `).run(trId, player.username, player.username, tr.trophyId, tr.title, tr.description, tr.category, unlockTime);
+
+      // Record activity log for each trophy unlocked
+      activityRepository.log(
+        'trophy_unlocked',
+        player.username,
+        `Unlocked Trophy [${tr.title}]: ${tr.description}`,
+        { trophyId: tr.trophyId, title: tr.title, category: tr.category },
+        unlockTime
+      );
+    }
+
+    // Simulate coupon redemption for selected active pilots
+    if (pIdx % 4 === 0) {
+      const couponCode = pIdx % 8 === 0 ? 'CORE500' : 'CORE100';
+      const c = promoCoupons.find(pc => pc.code === couponCode);
+      if (c) {
+        const redeemTime = new Date(now - (12 + pIdx * 0.2) * 24 * 3600 * 1000).toISOString();
+        const rId = `rd_seed_${player.username}_${couponCode}`;
+        db.prepare(`
+          INSERT OR IGNORE INTO coupon_redemptions (id, coupon_code, username, cores_granted, ip_address, redeemed_at)
+          VALUES (?, ?, ?, ?, '127.0.0.1', ?)
+        `).run(rId, couponCode, player.username, c.rewardCores, redeemTime);
+        db.prepare('UPDATE coupons SET used_count = used_count + 1 WHERE code = ?').run(couponCode);
+        
+        activityRepository.log(
+          'coupon_redeemed',
+          player.username,
+          `Redeemed cyber promo code ${couponCode} (+${c.rewardCores} Cores)`,
+          { code: couponCode, cores: c.rewardCores },
+          redeemTime
+        );
+      }
     }
 
     // Update aggregate stats on user
@@ -179,13 +256,16 @@ export function seedDatabase() {
           levels_completed = ?,
           last_active_at = ?
       WHERE username = ?
-    `).run(cumulativeScore, trophiesToAward.length, levelsToComplete, new Date(now - pIdx * 1800 * 1000).toISOString(), player.username);
-
-    // Initial join activity log
-    activityRepository.log('user_joined', player.username, `${player.fullName} (@${player.username}) initialized pilot profile`);
+    `).run(
+      cumulativeScore,
+      trophiesToAward.length,
+      levelsToComplete,
+      new Date(now - pIdx * 1800 * 1000).toISOString(),
+      player.username
+    );
   });
 
-  console.log(`[Seed] Successfully populated ${PRE_PLAYERS.length} cyber pre-players across 30 campaign levels with real database records!`);
+  console.log(`[Seed] Successfully populated ${PRE_PLAYERS.length} cyber pre-players across 30 campaign levels with real individual user activities!`);
 }
 
 // Auto-run if executed directly via node

@@ -71,6 +71,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSwitchToLog
         <img
           src="/logo.png"
           alt="Breakout Ball"
+          style={{ width: '40px', height: '40px' }}
           className="w-10 h-10 mb-2 rounded-full object-cover shadow-[0_0_14px_#ff4500]"
         />
         <h2 className="font-display font-black text-base md:text-lg tracking-wider text-[#00f7ff] [text-shadow:0_0_12px_rgba(0,247,255,0.4)]">

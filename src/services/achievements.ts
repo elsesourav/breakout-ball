@@ -1,4 +1,5 @@
 import { Achievement } from '../types/game';
+import { backendApi } from './backendApi';
 
 const STORAGE_KEY = 'breakout_achievements_v1';
 const VIEWED_STORAGE_KEY = 'breakout_viewed_achievements_v1';
@@ -96,6 +97,28 @@ class AchievementManager {
     this.load();
   }
 
+  public loadForUser(username?: string) {
+    const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
+    const key = userKey ? `breakout_achievements_${userKey}` : STORAGE_KEY;
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const arr: string[] = JSON.parse(raw);
+        this.unlockedIds = new Set(arr);
+        this.viewedIds = new Set(arr);
+        return;
+      }
+      if (userKey === 'demo_pilot') {
+        const demoBadges = ['first_blood', 'speed_demon', 'campaign_10', 'combo_master', 'level_architect'];
+        this.unlockedIds = new Set(demoBadges);
+        this.viewedIds = new Set(demoBadges);
+        localStorage.setItem(key, JSON.stringify(demoBadges));
+        return;
+      }
+    } catch {}
+    this.load();
+  }
+
   /**
    * Set restricted context mode:
    * When true (e.g. testing in Studio or playing self-made levels),
@@ -187,6 +210,19 @@ class AchievementManager {
         new CustomEvent('achievement_unlocked', { detail: unlockedAch })
       );
     }
+
+    // Background sync to backend service & table
+    try {
+      const rawUser = typeof localStorage !== 'undefined' ? localStorage.getItem('breakout_auth_user') : null;
+      const parsed = rawUser ? JSON.parse(rawUser) : null;
+      const username = parsed?.username || 'sourav';
+      backendApi.unlockTrophy(username, {
+        trophyId: id,
+        title: ach.title,
+        description: ach.description,
+        category: ach.category,
+      }).catch(() => {});
+    } catch {}
 
     return unlockedAch;
   }

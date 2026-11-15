@@ -11,6 +11,7 @@
 import { doc, getDoc, setDoc, runTransaction, increment } from 'firebase/firestore';
 import { firestoreDb } from './firebase';
 import { currencyService } from './currency';
+import { backendApi } from './backendApi';
 
 export interface CouponRedeemResult {
   success: boolean;
@@ -174,6 +175,28 @@ class CouponService {
         return { success: false, coresGranted: 0, message: 'Coupon already redeemed on this device' };
       }
     }
+
+    // ── 2.5. Dedicated Backend Microservice Validation & Redemption ──
+    try {
+      const apiRes = await backendApi.redeemCoupon(code, username || 'pilot', expectedCores || 0);
+      if (apiRes.success && apiRes.coresGranted) {
+        currencyService.addCores(apiRes.coresGranted, 'shop_coupon');
+        if (!isMultiUse) {
+          this.markCodeRedeemed(code);
+        }
+        return {
+          success: true,
+          coresGranted: apiRes.coresGranted,
+          message: apiRes.message || `Coupon Claimed! +${apiRes.coresGranted.toLocaleString()} Cores`,
+        };
+      } else if (!apiRes.success && apiRes.message && !apiRes.message.includes('Server unavailable') && !apiRes.message.includes('Network error')) {
+        return {
+          success: false,
+          coresGranted: 0,
+          message: apiRes.message,
+        };
+      }
+    } catch {}
 
     // ── 3. Cloud Firestore Validation (queries 'redemption_codes' & 'coupons') ──
     try {

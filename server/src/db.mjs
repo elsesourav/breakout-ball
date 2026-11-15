@@ -245,6 +245,16 @@ export const completionRepository = {
       LIMIT ?
     `);
     return stmt.all(String(levelId), limit);
+  },
+
+  getUserCompletions(username) {
+    const stmt = db.prepare(`
+      SELECT level_id, time_used, lives_remaining, score, stars, completed_at
+      FROM level_completions
+      WHERE LOWER(username) = LOWER(?)
+      ORDER BY CAST(level_id AS INTEGER) ASC
+    `);
+    return stmt.all(username);
   }
 };
 
@@ -334,9 +344,9 @@ export const couponRepository = {
 };
 
 export const activityRepository = {
-  log(type, username, message, metadata = null) {
+  log(type, username, message, metadata = null, timestamp = null) {
     const id = `act_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const now = new Date().toISOString();
+    const now = timestamp || new Date().toISOString();
     const metaStr = metadata ? JSON.stringify(metadata) : null;
     const stmt = db.prepare(`
       INSERT INTO activity_logs (id, type, username, message, metadata, created_at)

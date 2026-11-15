@@ -22,7 +22,7 @@ import {
   replaceAppRoute,
   scrubUrlParams,
 } from '../services/router';
-import { isTodayDailyMission, recordDailyMissionCompletion } from '../services/dailyApex';
+import { processLevelCompletion } from './gameCompletionHelper';
 import { INITIAL_LOCAL_LEVELS } from '../constants/levels';
 import { INITIAL_ONLINE_LEVELS } from '../constants/onlineLevels';
 
@@ -132,6 +132,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dbService.getLocalLevels(),
         dbService.getOnlineLevels(),
         dbService.getProgress(user.username),
+        currencyService.load(user.username),
       ]);
 
       const userLevels = await dbService.getUserCreatedLevels(user.username);
@@ -373,60 +374,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const recordLevelCompletion = useCallback(
     async (levelId: string, time: number, livesRemaining: number = 3) => {
       const isRestricted = isLevelSelfMadeOrTest(selectedLevel);
-
-      let rank = 1;
-      let isNewBest = false;
-      let coresEarned = 0;
-      let isFirstClear = false;
-      let starsEarned = Math.min(3, Math.max(1, livesRemaining));
-      let previousStars = 0;
-      let newBestStars = starsEarned;
-      let totalClaimedForLevel = 0;
-      let maxCoresForLevel = 0;
-      let remainingCoresForLevel = 0;
-
-      // Only submit score and award currency for non-restricted stages
-      if (!isRestricted) {
-        const result = await dbService.submitScore(levelId, user.username, time);
-        rank = result.rank;
-        isNewBest = result.isNewBest;
-        setLeaderboards((prev) => ({ ...prev, [levelId]: result.updatedLeaderboard }));
-
-        if (time < 30) {
-          achievementManager.unlock('speed_demon');
-        }
-
-        const levelNum = parseInt(levelId, 10);
-        if (!isNaN(levelNum)) {
-          // ARCADE MODE: Star system based on hearts completed (1, 2, or 3)
-          const starReward = currencyService.earnLevelRewardWithStars(
-            levelId,
-            levelNum,
-            livesRemaining,
-            user.username
-          );
-          coresEarned = starReward.coresEarned;
-          starsEarned = starReward.starsEarned;
-          previousStars = starReward.previousStars;
-          newBestStars = starReward.newBestStars;
-          totalClaimedForLevel = starReward.totalClaimedForLevel;
-          maxCoresForLevel = starReward.maxCoresForLevel;
-          remainingCoresForLevel = starReward.remainingCoresForLevel;
-          isFirstClear = starReward.isFirstClear;
-        } else {
-          // ARENA MODE: One-time reward per arena level
-          coresEarned = currencyService.earnArenaReward(levelId, 1.0, user.username);
-          isFirstClear = coresEarned > 0;
-        }
-
-        // Check if this level is today's Daily Apex Mission
-        if (isTodayDailyMission(levelId, onlineLevels)) {
-          const dailyResult = recordDailyMissionCompletion(levelId, onlineLevels, user.username);
-          if (dailyResult.success) {
-            coresEarned += dailyResult.bonusCores;
-          }
-        }
-      }
+      const outcome = await processLevelCompletion(
+        levelId,
+        time,
+        livesRemaining,
+        user.username,
+        onlineLevels,
+        isRestricted,
+        (lvlId, board) => setLeaderboards((prev) => ({ ...prev, [lvlId]: board }))
+      );
 
       const levelNum = parseInt(levelId, 10);
       if (!isNaN(levelNum) && !isRestricted) {
@@ -441,7 +397,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             bestTime: null,
             stars: 0,
             claimedCores: 0,
-            maxCores: maxCoresForLevel,
+            maxCores: outcome.maxCoresForLevel,
           };
 
           const updatedProgress = {
@@ -450,10 +406,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
               levelNumber: levelNum,
               completed: true,
               bestTime: isBetter ? time : current.bestTime,
-              rank,
-              stars: newBestStars,
-              claimedCores: totalClaimedForLevel,
-              maxCores: maxCoresForLevel,
+              rank: outcome.rank,
+              stars: outcome.newBestStars,
+              claimedCores: outcome.totalClaimedForLevel,
+              maxCores: outcome.maxCoresForLevel,
             },
             [nextLevelId]: nextUnlocked,
           };
@@ -467,18 +423,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
 
-      return {
-        rank,
-        isNewBest,
-        coresEarned,
-        isFirstClear,
-        starsEarned,
-        previousStars,
-        newBestStars,
-        totalClaimedForLevel,
-        maxCoresForLevel,
-        remainingCoresForLevel,
-      };
+      return outcome;
     },
     [user.username, selectedLevel, isLevelSelfMadeOrTest, onlineLevels]
   );

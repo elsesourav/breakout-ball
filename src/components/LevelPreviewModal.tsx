@@ -288,7 +288,7 @@ export const LevelPreviewModal: React.FC = () => {
                 isArenaClaimed ? 'text-slate-400' : 'text-emerald-400'
               }`}
             >
-              {isArenaClaimed ? 'CLAIMED (1-TIME ONLY)' : 'UNCLAIMED (1-TIME ONLY)'}
+              {isArenaClaimed ? 'COMPLETED (1-TIME ONLY)' : 'UNPLAYED'}
             </span>
           </div>
         )}
@@ -302,7 +302,7 @@ export const LevelPreviewModal: React.FC = () => {
               onClick={() => {
                 soundManager.playLockTap();
                 cyberToast.info(
-                  `Daily Mission Claimed • Next mission in ${formatDailyCountdown(getSecondsUntilMidnight())}`
+                  `Daily Mission Completed • Next mission in ${formatDailyCountdown(getSecondsUntilMidnight())}`
                 );
               }}
               style={{
@@ -316,7 +316,7 @@ export const LevelPreviewModal: React.FC = () => {
             >
               <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
               <span style={{ color: '#34d399', fontWeight: 900, letterSpacing: '0.06em' }}>
-                CLAIMED FOR TODAY
+                COMPLETED TODAY
               </span>
             </button>
           ) : (
