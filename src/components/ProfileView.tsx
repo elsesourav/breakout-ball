@@ -97,18 +97,6 @@ export const ProfileView: React.FC = () => {
     return () => window.removeEventListener('profile-switch-section', handleSwitch);
   }, []);
 
-  // Ensure category switcher is docked when viewing leaderboard so table is fully in view
-  useEffect(() => {
-    if (activeSection === 'leaderboard' && !isSettingsOpen) {
-      const raf = requestAnimationFrame(() => {
-        if (outerContainerRef.current && switcherRef.current) {
-          outerContainerRef.current.scrollTop = switcherRef.current.offsetTop;
-        }
-      });
-      return () => cancelAnimationFrame(raf);
-    }
-  }, [activeSection, isSettingsOpen]);
-
   // Dynamically compute exact card height and scroll threshold so top and bottom gaps are pixel-perfect symmetrical
   useEffect(() => {
     const updateLayout = () => {
@@ -139,7 +127,7 @@ export const ProfileView: React.FC = () => {
     };
   }, [isSettingsOpen, activeSection]);
 
-  // Universal Wheel & Touch Coordinator: seamless scrolling on desktop and mobile without glitches
+  // Universal Wheel & Touch Coordinator: Body scrolls first, then table scrolls starting at docking point
   useEffect(() => {
     if (isSettingsOpen) return;
 
@@ -148,99 +136,147 @@ export const ProfileView: React.FC = () => {
 
     const getInner = () => outer.querySelector<HTMLElement>('[data-inner-scroll="true"]');
 
-    // 1. Wheel Coordinator (Mouse Wheel & Trackpad)
+    // 1. Wheel Coordinator (Mouse Wheel & Trackpad): Body first, then table
     const handleWheel = (e: WheelEvent) => {
       const deltaY = e.deltaY;
       if (!deltaY) return;
 
       const inner = getInner();
       const maxOuter = maxOuterRef.current;
-      const isOverInner = Boolean(inner && e.target && inner.contains(e.target as Node));
 
-      if (isOverInner && inner) {
-        const maxInner = inner.scrollHeight - inner.clientHeight;
-        if (deltaY > 0) {
-          if (inner.scrollTop < maxInner) {
-            inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
-          }
-          // Prevent default to contain wheel inside inner table, completely stopping outer glitching
-          e.preventDefault();
-        } else if (deltaY < 0) {
-          if (inner.scrollTop > 0) {
-            inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
-          }
-          // Prevent default to prevent unpinning the sticky category header while viewing the table
-          e.preventDefault();
-        }
-        return;
-      }
-
-      // Wheel over Hero card or Switcher
       if (deltaY > 0) {
-        if (outer.scrollTop < maxOuter) {
-          e.preventDefault();
+        // Scrolling DOWN
+        if (outer.scrollTop < maxOuter - 0.5) {
+          // Phase 1: Scroll body first until switcher is docked at top
           outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
+        } else if (inner) {
+          // Phase 2: Switcher is docked, now scroll table down
+          const maxInner = inner.scrollHeight - inner.clientHeight;
+          inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
         }
+        e.preventDefault();
       } else if (deltaY < 0) {
-        if (outer.scrollTop > 0) {
-          e.preventDefault();
+        // Scrolling UP
+        if (inner && inner.scrollTop > 0.5) {
+          // Phase 1: Scroll table back up to player #1 first
+          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
+        } else if (outer.scrollTop > 0) {
+          // Phase 2: Table is at top, now scroll body back down to reveal Hero card
           outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
         }
+        e.preventDefault();
       }
     };
 
-    // 2. Touch Coordinator (Mobile Phone & Tablet Touch Swiping)
+    // 2. Touch Coordinator (Mobile Phone & Tablet Touch Swiping with Momentum): Body first, then table
     let touchStartY = 0;
-    let touchStartedInInner = false;
+    let lastTouchY = 0;
+    let lastTouchTime = 0;
+    let touchVelocity = 0;
+    let momentumRaf: number | null = null;
+
+    const stopMomentum = () => {
+      if (momentumRaf !== null) {
+        cancelAnimationFrame(momentumRaf);
+        momentumRaf = null;
+      }
+    };
 
     const handleTouchStart = (e: TouchEvent) => {
+      stopMomentum();
       if (e.touches.length === 1) {
         touchStartY = e.touches[0].clientY;
-        const inner = getInner();
-        touchStartedInInner = Boolean(inner && e.target && inner.contains(e.target as Node));
+        lastTouchY = touchStartY;
+        lastTouchTime = performance.now();
+        touchVelocity = 0;
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const currentY = e.touches[0].clientY;
+      const now = performance.now();
       const deltaY = touchStartY - currentY;
       touchStartY = currentY;
 
+      // Track touch velocity for momentum
+      const dt = Math.max(1, now - lastTouchTime);
+      const dy = lastTouchY - currentY;
+      touchVelocity = (dy / dt) * 16;
+      lastTouchY = currentY;
+      lastTouchTime = now;
+
       if (Math.abs(deltaY) < 0.5) return;
 
+      const inner = getInner();
       const maxOuter = maxOuterRef.current;
 
-      // When category switcher is docked at top and user is touching inside the table:
-      // Leave touch completely to native inner scrolling with overscroll-behavior: contain
-      // This eliminates momentum killing, boundary jitter, and snap glitches!
-      if (touchStartedInInner && outer.scrollTop >= maxOuter - 1) {
-        return;
-      }
-
-      // When hero card is visible and user swipes up inside the table, smoothly dock the switcher
-      if (deltaY > 0 && outer.scrollTop < maxOuter - 1) {
-        outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
+      if (deltaY > 0) {
+        // Dragging content UP / scrolling DOWN: Body first, then table
+        if (outer.scrollTop < maxOuter - 0.5) {
+          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
+        } else if (inner) {
+          const maxInner = inner.scrollHeight - inner.clientHeight;
+          inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
+        }
         if (e.cancelable) e.preventDefault();
-        return;
-      }
-
-      // When user touches the switcher or hero card and drags down, reveal the hero card
-      if (!touchStartedInInner && deltaY < 0 && outer.scrollTop > 0) {
-        outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
+      } else if (deltaY < 0) {
+        // Dragging content DOWN / scrolling UP: Table first, then body
+        if (inner && inner.scrollTop > 0.5) {
+          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
+        } else if (outer.scrollTop > 0) {
+          outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
+        }
         if (e.cancelable) e.preventDefault();
-        return;
       }
+    };
+
+    const handleTouchEnd = () => {
+      if (Math.abs(touchVelocity) < 1.2) return;
+
+      let v = touchVelocity;
+      const step = () => {
+        v *= 0.94; // Decay friction
+        if (Math.abs(v) < 0.5) {
+          momentumRaf = null;
+          return;
+        }
+
+        const inner = getInner();
+        const maxOuter = maxOuterRef.current;
+
+        if (v > 0) {
+          if (outer.scrollTop < maxOuter - 0.5) {
+            outer.scrollTop = Math.min(maxOuter, outer.scrollTop + v);
+          } else if (inner) {
+            const maxInner = inner.scrollHeight - inner.clientHeight;
+            inner.scrollTop = Math.min(maxInner, inner.scrollTop + v);
+          }
+        } else if (v < 0) {
+          if (inner && inner.scrollTop > 0.5) {
+            inner.scrollTop = Math.max(0, inner.scrollTop + v);
+          } else if (outer.scrollTop > 0) {
+            outer.scrollTop = Math.max(0, outer.scrollTop + v);
+          }
+        }
+
+        momentumRaf = requestAnimationFrame(step);
+      };
+
+      momentumRaf = requestAnimationFrame(step);
     };
 
     outer.addEventListener('wheel', handleWheel, { passive: false });
     outer.addEventListener('touchstart', handleTouchStart, { passive: true });
     outer.addEventListener('touchmove', handleTouchMove, { passive: false });
+    outer.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
+      stopMomentum();
       outer.removeEventListener('wheel', handleWheel);
       outer.removeEventListener('touchstart', handleTouchStart);
       outer.removeEventListener('touchmove', handleTouchMove);
+      outer.removeEventListener('touchend', handleTouchEnd);
     };
   }, [isSettingsOpen]);
 
@@ -269,16 +305,6 @@ export const ProfileView: React.FC = () => {
   const handleSectionSwitch = (section: 'badges' | 'leaderboard') => {
     soundManager.play('click');
     setActiveSection(section);
-    if (section === 'leaderboard') {
-      requestAnimationFrame(() => {
-        if (outerContainerRef.current && switcherRef.current) {
-          outerContainerRef.current.scrollTo({
-            top: switcherRef.current.offsetTop,
-            behavior: 'smooth',
-          });
-        }
-      });
-    }
   };
 
   // Calculate player progress stats

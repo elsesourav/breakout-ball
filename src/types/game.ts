@@ -29,7 +29,10 @@ export interface LocalLevelProgress {
 export interface LeaderboardEntry {
   rank: number;
   username: string;
+  displayName?: string;
+  avatarUrl?: string;
   time: number;
+  score?: number;
 }
 
 export interface UserProfile {

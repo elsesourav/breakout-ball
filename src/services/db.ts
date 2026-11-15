@@ -2,18 +2,9 @@ import { LevelData, LeaderboardEntry, LocalLevelProgress } from '../types/game';
 import { INITIAL_LOCAL_LEVELS, INITIAL_ONLINE_LEVELS, MOCK_LEADERBOARDS } from '../constants/game';
 import { firestoreDb } from './firebase';
 import { backendApi } from './backendApi';
+import { authService } from './auth';
 import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  deleteDoc,
-  updateDoc,
-  increment,
-  query,
-  orderBy,
-  limit,
+  collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc, increment, query, orderBy, limit
 } from 'firebase/firestore';
 
 /**
@@ -312,6 +303,9 @@ class CloudDatabaseService {
         return apiEntries.map((e) => ({
           rank: e.rank,
           username: e.username,
+          displayName: e.fullName || e.username,
+          avatarUrl: e.avatarUrl,
+          score: e.score,
           time: e.time ?? 30,
         }));
       }
@@ -341,14 +335,19 @@ class CloudDatabaseService {
     livesRemaining: number = 3
   ): Promise<{ rank: number; isNewBest: boolean; updatedLeaderboard: LeaderboardEntry[] }> {
     const existingList: LeaderboardEntry[] = await this.getLeaderboard(levelId);
-
     const currentEntry = existingList.find((e) => e.username.toLowerCase() === username.toLowerCase());
     const isNewBest = !currentEntry || time < currentEntry.time;
-
     const filtered = existingList.filter((e) => e.username.toLowerCase() !== username.toLowerCase());
     const bestScoreTime = currentEntry && currentEntry.time < time ? currentEntry.time : time;
+    const userProfile = authService.getCurrentUser();
 
-    filtered.push({ rank: 0, username, time: bestScoreTime });
+    filtered.push({
+      rank: 0,
+      username,
+      displayName: userProfile.fullName || currentEntry?.displayName || username,
+      avatarUrl: userProfile.avatarUrl || currentEntry?.avatarUrl,
+      time: bestScoreTime,
+    });
     filtered.sort((a, b) => a.time - b.time);
     filtered.forEach((item, idx) => { item.rank = idx + 1; });
     const finalLeaderboard = filtered.slice(0, 10);
@@ -381,7 +380,6 @@ class CloudDatabaseService {
 
     const userEntry = finalLeaderboard.find((e) => e.username.toLowerCase() === username.toLowerCase());
     const rank = userEntry ? userEntry.rank : finalLeaderboard.length + 1;
-
     return { rank, isNewBest, updatedLeaderboard: finalLeaderboard };
   }
 
@@ -456,13 +454,11 @@ class CloudDatabaseService {
       localStorage.setItem(`breakout_db_progress_${userKey}`, JSON.stringify(progress));
       localStorage.setItem(this.progressKey, JSON.stringify(progress));
     } catch {}
-
     return progress;
   }
 
   public async saveProgress(progress: Record<string, LocalLevelProgress>, username?: string): Promise<void> {
     localStorage.setItem(this.progressKey, JSON.stringify(progress));
-
     const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
     if (userKey) {
       localStorage.setItem(`breakout_db_progress_${userKey}`, JSON.stringify(progress));

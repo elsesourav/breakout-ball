@@ -31,7 +31,7 @@ export const PilotAvatar: React.FC<PilotAvatarProps> = ({
 }) => {
   const [imgError, setImgError] = useState(false);
   const lowQualitySrc = useMemo(() => getLowQualityAvatarUrl(avatarUrl), [avatarUrl]);
-  const initials = isUser ? 'Y' : username.slice(0, 2).toUpperCase();
+  const initials = username ? username.slice(0, 2).toUpperCase() : 'ME';
 
   let borderStyle: React.CSSProperties = {
     background: '#0a0f29',
@@ -88,6 +88,7 @@ export const PilotAvatar: React.FC<PilotAvatarProps> = ({
           alt={username}
           loading="lazy"
           decoding="async"
+          referrerPolicy="no-referrer"
           width={30}
           height={30}
           onError={() => setImgError(true)}

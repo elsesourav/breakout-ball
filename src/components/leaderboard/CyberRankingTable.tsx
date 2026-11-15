@@ -1,10 +1,12 @@
 import React from 'react';
 import { Trophy, Flame } from 'lucide-react';
 import { PilotAvatar } from './PilotAvatar';
+import { formatPilotDisplayName } from '../../constants/mockPilots';
 
 export interface RankingEntry {
   rank: number;
   username: string;
+  displayName?: string;
   score: number;
   time: number | string;
   isCurrentUser?: boolean;
@@ -172,6 +174,8 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
               rowBorderClass = 'border-l-2 border-amber-500/60';
             }
 
+            const displayName = entry.displayName || formatPilotDisplayName(entry.username);
+
             return (
               <div
                 key={`rank-${entry.rank}-${entry.username}`}
@@ -188,8 +192,8 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                   {rankBadge}
                 </div>
 
-                {/* Pilot Username & Avatar */}
-                <div className="flex items-center gap-1.5 min-w-0 pl-1 overflow-hidden">
+                {/* Pilot User Name, Username & User Profile */}
+                <div className="flex items-center gap-2 min-w-0 pl-1 overflow-hidden">
                   <PilotAvatar
                     username={entry.username}
                     avatarUrl={entry.avatarUrl}
@@ -198,21 +202,30 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                     isRank2={isRank2}
                     isRank3={isRank3}
                   />
-                  {isUser ? (
+                  <div className="flex flex-col min-w-0 truncate">
                     <div className="flex items-center gap-1 min-w-0">
                       <span
-                        className="font-ui font-black text-xs tracking-wide"
-                        style={{ color: '#00f7ff', textShadow: '0 0 8px rgba(0, 247, 255, 0.6)' }}
+                        className={`font-ui text-xs truncate leading-tight ${
+                          isUser
+                            ? 'font-black text-cyan-300'
+                            : isRank1
+                            ? 'font-bold text-yellow-300'
+                            : 'font-semibold text-slate-100'
+                        }`}
+                        style={isUser ? { textShadow: '0 0 8px rgba(0, 247, 255, 0.5)' } : undefined}
                       >
-                        You
+                        {displayName}
                       </span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block animate-pulse flex-shrink-0" />
+                      {isUser && (
+                        <span className="text-[8px] px-1 py-0.2 rounded bg-cyan-500/25 border border-cyan-400/40 text-cyan-300 font-tech font-bold uppercase tracking-wider flex-shrink-0">
+                          You
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <span className="font-ui text-xs truncate font-semibold text-slate-200">
+                    <span className="text-[9.5px] font-tech text-slate-400 truncate leading-none mt-0.5">
                       @{entry.username}
                     </span>
-                  )}
+                  </div>
                 </div>
 
                 {/* Score */}

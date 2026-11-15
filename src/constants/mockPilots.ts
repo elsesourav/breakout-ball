@@ -1,6 +1,7 @@
 // Offline fallback pilot profiles in case backend API and Firestore are both offline
 export interface MockPilot {
   username: string;
+  fullName?: string;
   coresCleared?: number;
   stagesCleared?: number;
   score: number;
@@ -8,36 +9,54 @@ export interface MockPilot {
   avatarUrl?: string;
 }
 
+export const formatPilotDisplayName = (username: string, fullName?: string): string => {
+  if (fullName && fullName.trim() && fullName.trim().toLowerCase() !== username.toLowerCase()) {
+    return fullName.trim();
+  }
+  return username
+    .split(/[._-]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+};
+
+export const getPilotAvatarUrl = (username: string, avatarUrl?: string, index: number = 0): string => {
+  if (avatarUrl && avatarUrl.trim()) return avatarUrl.trim();
+  const styles = ['bottts', 'pixel-art', 'bottts', 'identicon', 'pixel-art'];
+  const style = styles[index % styles.length];
+  return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(username)}&size=64`;
+};
+
 export const FALLBACK_GLOBAL_PILOTS: MockPilot[] = [
-  { username: 'sourav', stagesCleared: 50, score: 385800, badgeTitle: 'Grandmaster Champion' },
-  { username: 'speedy_sam', stagesCleared: 49, score: 374400, badgeTitle: 'Speedrun Ace' },
-  { username: 'arcade_queen', stagesCleared: 48, score: 362600, badgeTitle: 'Arcade Monarch' },
-  { username: 'cyber_ninja', stagesCleared: 47, score: 351200, badgeTitle: 'Shadow Striker' },
-  { username: 'breakout_pro', stagesCleared: 45, score: 342500, badgeTitle: 'Core Crusher' },
-  { username: 'pixel_guy', stagesCleared: 44, score: 334400, badgeTitle: 'Pixel Veteran' },
-  { username: 'neon_striker', stagesCleared: 43, score: 326800, badgeTitle: 'Neon Phantom' },
-  { username: 'quantum_ace', stagesCleared: 41, score: 318100, badgeTitle: 'Warp Navigator' },
-  { username: 'hyper_dash', stagesCleared: 40, score: 308500, badgeTitle: 'Hyperion Player' },
-  { username: 'retro_pilot', stagesCleared: 38, score: 298200, badgeTitle: 'Old-School Breaker' },
-  { username: 'nova_cadet', stagesCleared: 37, score: 289400, badgeTitle: 'Nova Specialist' },
-  { username: 'laser_runner', stagesCleared: 35, score: 281600, badgeTitle: 'Beam Specialist' },
-  { username: 'solar_flare', coresCleared: 45, score: 272500, badgeTitle: 'Solar Vanguard' },
-  { username: 'void_walker', coresCleared: 44, score: 263200, badgeTitle: 'Abyssal Nomad' },
-  { username: 'crypto_striker', coresCleared: 43, score: 254400, badgeTitle: 'Cipher Specialist' },
-  { username: 'echo_pulse', coresCleared: 42, score: 246100, badgeTitle: 'Resonance Player' },
-  { username: 'zero_gravity', coresCleared: 41, score: 238400, badgeTitle: 'Float Specialist' },
-  { username: 'plasma_storm', coresCleared: 40, score: 231200, badgeTitle: 'Ion Disruptor' },
-  { username: 'nebula_rider', coresCleared: 39, score: 224500, badgeTitle: 'Starlight Drifter' },
-  { username: 'omega_cadet', coresCleared: 38, score: 216800, badgeTitle: 'Sector Recruit' },
-  { username: 'titan_vanguard', coresCleared: 37, score: 209200, badgeTitle: 'Heavy Sentinel' },
-  { username: 'blaze_core', coresCleared: 36, score: 201500, badgeTitle: 'Inferno Player' },
-  { username: 'shadow_pulse', coresCleared: 35, score: 194400, badgeTitle: 'Stealth Breaker' },
-  { username: 'flux_runner', coresCleared: 34, score: 187900, badgeTitle: 'Kinetic Courier' },
-  { username: 'vortex_pilot', coresCleared: 33, score: 180500, badgeTitle: 'Graviton Striker' },
-  { username: 'stellar_hawk', coresCleared: 32, score: 174000, badgeTitle: 'Celestial Scout' },
-  { username: 'glitch_hunter', coresCleared: 31, score: 167200, badgeTitle: 'Bug Detonator' },
-  { username: 'byte_striker', coresCleared: 30, score: 160400, badgeTitle: 'Data Striker' },
-  { username: 'warp_driver', coresCleared: 29, score: 153800, badgeTitle: 'Tesseract Player' },
+  { username: 'sourav', fullName: 'Sourav Elsesourav', stagesCleared: 50, score: 385800, badgeTitle: 'Grandmaster Champion' },
+  { username: 'speedy_sam', fullName: 'Samantha Speed', stagesCleared: 49, score: 374400, badgeTitle: 'Speedrun Ace' },
+  { username: 'arcade_queen', fullName: 'Elena Rostova', stagesCleared: 48, score: 362600, badgeTitle: 'Arcade Monarch' },
+  { username: 'cyber_ninja', fullName: 'Kenji Takahashi', stagesCleared: 47, score: 351200, badgeTitle: 'Shadow Striker' },
+  { username: 'breakout_pro', fullName: 'Marcus Vance', stagesCleared: 45, score: 342500, badgeTitle: 'Core Crusher' },
+  { username: 'pixel_guy', fullName: 'Leo Martinez', stagesCleared: 44, score: 334400, badgeTitle: 'Pixel Veteran' },
+  { username: 'neon_striker', fullName: 'Chloe Bennett', stagesCleared: 43, score: 326800, badgeTitle: 'Neon Phantom' },
+  { username: 'quantum_ace', fullName: 'Devon Ward', stagesCleared: 41, score: 318100, badgeTitle: 'Warp Navigator' },
+  { username: 'hyper_dash', fullName: 'Lucas Thorne', stagesCleared: 40, score: 308500, badgeTitle: 'Hyperion Player' },
+  { username: 'retro_pilot', fullName: 'Viktor Novak', stagesCleared: 38, score: 298200, badgeTitle: 'Old-School Breaker' },
+  { username: 'nova_cadet', fullName: 'Aria Chen', stagesCleared: 37, score: 289400, badgeTitle: 'Nova Specialist' },
+  { username: 'laser_runner', fullName: 'Zack Miller', stagesCleared: 35, score: 281600, badgeTitle: 'Beam Specialist' },
+  { username: 'solar_flare', fullName: 'Maya Patel', coresCleared: 45, score: 272500, badgeTitle: 'Solar Vanguard' },
+  { username: 'void_walker', fullName: 'Dante Cross', coresCleared: 44, score: 263200, badgeTitle: 'Abyssal Nomad' },
+  { username: 'crypto_striker', fullName: "Finn O'Connor", coresCleared: 43, score: 254400, badgeTitle: 'Cipher Specialist' },
+  { username: 'echo_pulse', fullName: 'Sora Tanaka', coresCleared: 42, score: 246100, badgeTitle: 'Resonance Player' },
+  { username: 'zero_gravity', fullName: 'Aiden Brooks', coresCleared: 41, score: 238400, badgeTitle: 'Float Specialist' },
+  { username: 'plasma_storm', fullName: 'Garrick Thorne', coresCleared: 40, score: 231200, badgeTitle: 'Ion Disruptor' },
+  { username: 'nebula_rider', fullName: 'Talia Reyes', coresCleared: 39, score: 224500, badgeTitle: 'Starlight Drifter' },
+  { username: 'omega_cadet', fullName: 'Felix Moreau', coresCleared: 38, score: 216800, badgeTitle: 'Sector Recruit' },
+  { username: 'titan_vanguard', fullName: 'Kaelen Drake', coresCleared: 37, score: 209200, badgeTitle: 'Heavy Sentinel' },
+  { username: 'blaze_core', fullName: 'Ruby Gallagher', coresCleared: 36, score: 201500, badgeTitle: 'Inferno Player' },
+  { username: 'shadow_pulse', fullName: 'Zane Mercer', coresCleared: 35, score: 194400, badgeTitle: 'Stealth Breaker' },
+  { username: 'flux_runner', fullName: 'Nadia Vos', coresCleared: 34, score: 187900, badgeTitle: 'Kinetic Courier' },
+  { username: 'vortex_pilot', fullName: 'Rowan Sterling', coresCleared: 33, score: 180500, badgeTitle: 'Graviton Striker' },
+  { username: 'stellar_hawk', fullName: 'Jaxson Reed', coresCleared: 32, score: 174000, badgeTitle: 'Celestial Scout' },
+  { username: 'glitch_hunter', fullName: 'Kira Jensen', coresCleared: 31, score: 167200, badgeTitle: 'Bug Detonator' },
+  { username: 'byte_striker', fullName: 'Milo Hoffman', coresCleared: 30, score: 160400, badgeTitle: 'Data Striker' },
+  { username: 'warp_driver', fullName: 'Selene Ruiz', coresCleared: 29, score: 153800, badgeTitle: 'Tesseract Player' },
   { username: 'chrono_speeder', coresCleared: 28, score: 147200, badgeTitle: 'Time Manipulator' },
   { username: 'drift_master', coresCleared: 27, score: 140500, badgeTitle: 'Apex Slider' },
   { username: 'aero_blade', coresCleared: 26, score: 134700, badgeTitle: 'Edge Runner' },

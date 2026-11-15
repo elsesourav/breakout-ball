@@ -3,6 +3,7 @@ import { useGame } from '../context/GameContext';
 import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../utils/helpers';
 import { sanitizePortals } from '../services/db';
 import { CyberRankingTable, RankingEntry } from './leaderboard/CyberRankingTable';
+import { formatPilotDisplayName, getPilotAvatarUrl } from '../constants/mockPilots';
 import {
   Play,
   ChevronsRight,
@@ -80,29 +81,38 @@ export const LevelPreviewModal: React.FC = () => {
     }
   };
 
-  // Prepare clean ranking items
+  // Prepare clean ranking items with User Name, Username, and User Profile
   const rankingList = leaderboards[selectedLevel.id] || leaderboards.default || [];
   const leaderboardEntries: RankingEntry[] = useMemo(() => {
-    const list: RankingEntry[] = rankingList.map((entry, idx) => ({
-      rank: entry.rank || idx + 1,
-      username: entry.username,
-      score: Math.round(10000 / Math.max(1, entry.time)),
-      time: entry.time,
-      isCurrentUser: entry.username === user.username,
-      avatarUrl: (entry as any).avatarUrl,
-    }));
+    const list: RankingEntry[] = rankingList.map((entry, idx) => {
+      const isCurr = user.isLoggedIn && entry.username.toLowerCase() === user.username.toLowerCase();
+      const userAvatar = isCurr && user.avatarUrl ? user.avatarUrl : entry.avatarUrl;
+      const userDisplayName = isCurr && user.fullName ? user.fullName : (entry.displayName || formatPilotDisplayName(entry.username));
+      return {
+        rank: entry.rank || idx + 1,
+        username: entry.username,
+        displayName: userDisplayName,
+        score: entry.score || Math.round(10000 / Math.max(1, entry.time)),
+        time: entry.time,
+        isCurrentUser: isCurr,
+        avatarUrl: getPilotAvatarUrl(entry.username, userAvatar, idx),
+      };
+    });
 
     // If current user has completed this level, ensure user appears in ranking
     if (isCompleted && progress?.bestTime) {
       const userAlreadyInList = list.some((e) => e.isCurrentUser);
       if (!userAlreadyInList) {
+        const currentDisplayName = user.isLoggedIn ? (user.fullName || user.username) : 'Anonymous Player';
+        const currentUsername = user.isLoggedIn ? user.username : 'Anonymous';
         list.push({
           rank: progress.rank || list.length + 1,
-          username: user.isLoggedIn ? user.username : 'Anonymous',
+          username: currentUsername,
+          displayName: currentDisplayName,
           score: Math.round(10000 / Math.max(1, progress.bestTime)),
           time: progress.bestTime,
           isCurrentUser: true,
-          avatarUrl: user.isLoggedIn && user.avatarUrl ? user.avatarUrl : undefined,
+          avatarUrl: user.isLoggedIn && user.avatarUrl ? user.avatarUrl : getPilotAvatarUrl(currentUsername, undefined, 0),
         });
         list.sort((a, b) => (typeof a.time === 'number' && typeof b.time === 'number' ? a.time - b.time : 0));
         list.forEach((item, i) => { item.rank = i + 1; });

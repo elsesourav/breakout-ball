@@ -4,24 +4,20 @@ import { Flame } from 'lucide-react';
 import { CyberTrophyIcon } from './CyberTrophyIcon';
 import { backendApi } from '../../services/backendApi';
 import { getOverallLeaderboard } from '../../services/db';
-import { FALLBACK_GLOBAL_PILOTS, FALLBACK_WEEKLY_PILOTS } from '../../constants/mockPilots';
+import { FALLBACK_GLOBAL_PILOTS, FALLBACK_WEEKLY_PILOTS, formatPilotDisplayName, getPilotAvatarUrl } from '../../constants/mockPilots';
 import { PilotAvatar } from './PilotAvatar';
 
 interface ScoreLeaderboardEntry {
   rank: number;
   username: string;
+  fullName?: string;
+  displayName?: string;
   score: number;
   stagesCleared: number;
   badgeTitle: string;
   avatarUrl?: string;
   isCurrentUser?: boolean;
 }
-
-const getDemoAvatarUrl = (username: string, index: number): string => {
-  const styles = ['bottts', 'pixel-art', 'bottts', 'identicon', 'pixel-art'];
-  const style = styles[index % styles.length];
-  return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(username)}&size=32`;
-};
 
 export const OverallScoreLeaderboard: React.FC = () => {
   const { user, localProgress } = useGame();
@@ -50,6 +46,8 @@ export const OverallScoreLeaderboard: React.FC = () => {
               return {
                 rank: e.rank || idx + 1,
                 username: e.username,
+                fullName: e.fullName,
+                displayName: formatPilotDisplayName(e.username, e.fullName),
                 score: e.totalScore || e.score || 0,
                 stagesCleared: derivedStage,
                 badgeTitle:
@@ -60,7 +58,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                     : derivedStage >= 25
                     ? 'Core Crusher'
                     : 'Sector Player',
-                avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
+                avatarUrl: getPilotAvatarUrl(e.username, e.avatarUrl, idx),
               };
             });
             setLivePilots(mapped);
@@ -80,11 +78,13 @@ export const OverallScoreLeaderboard: React.FC = () => {
               return {
                 rank: e.rank || idx + 1,
                 username: e.username,
+                fullName: e.fullName,
+                displayName: formatPilotDisplayName(e.username, e.fullName),
                 score: e.totalScore || e.score || 0,
                 stagesCleared: derivedStage,
                 badgeTitle:
                   e.badgeTitle || (derivedStage >= 40 ? 'Void Master' : 'Sector Player'),
-                avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
+                avatarUrl: getPilotAvatarUrl(e.username, e.avatarUrl, idx),
               };
             });
             setLivePilots(mapped);
@@ -97,10 +97,12 @@ export const OverallScoreLeaderboard: React.FC = () => {
             const mapped: ScoreLeaderboardEntry[] = res.map((e, idx) => ({
               rank: e.rank || idx + 1,
               username: e.username,
+              fullName: e.fullName,
+              displayName: formatPilotDisplayName(e.username, e.fullName),
               score: e.totalScore || e.score || 0,
               stagesCleared: Math.max(6, 15 - Math.floor(idx * 0.7)),
               badgeTitle: 'Weekly Contender',
-              avatarUrl: e.avatarUrl || getDemoAvatarUrl(e.username, idx),
+              avatarUrl: getPilotAvatarUrl(e.username, e.avatarUrl, idx),
             }));
             setLivePilots(mapped);
             setIsLoading(false);
@@ -122,8 +124,10 @@ export const OverallScoreLeaderboard: React.FC = () => {
             return {
               ...p,
               rank: idx + 1,
+              fullName: p.fullName,
+              displayName: formatPilotDisplayName(p.username, p.fullName),
               stagesCleared: derivedStage,
-              avatarUrl: p.avatarUrl || getDemoAvatarUrl(p.username, idx),
+              avatarUrl: getPilotAvatarUrl(p.username, p.avatarUrl, idx),
             };
           })
         );
@@ -155,17 +159,12 @@ export const OverallScoreLeaderboard: React.FC = () => {
       }
     });
 
-    const username = user.isLoggedIn ? (user.username || 'player') : 'you';
-    const avatarUrl = user.isLoggedIn && user.avatarUrl
-      ? user.avatarUrl
-      : getDemoAvatarUrl(username, 0);
+    const isLogged = Boolean(user.isLoggedIn);
+    const username = isLogged ? (user.username || 'player') : 'you';
+    const displayName = isLogged ? (user.fullName || user.username) : 'Player';
+    const avatarUrl = isLogged && user.avatarUrl ? user.avatarUrl : getPilotAvatarUrl(username, undefined, 0);
 
-    return {
-      completedStages,
-      score: baseScore,
-      username,
-      avatarUrl,
-    };
+    return { completedStages, score: baseScore, username, displayName, avatarUrl };
   }, [localProgress, user]);
 
   // Merge current user into rankings sorted strictly by Score
@@ -176,6 +175,8 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
     filtered.push({
       username: userStats.username,
+      displayName: userStats.displayName,
+      fullName: userStats.displayName,
       score: userStats.score,
       stagesCleared: userStats.completedStages,
       badgeTitle:
@@ -236,50 +237,25 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
         {/* Tab Toggle: All-Time vs Weekly */}
         <div className="flex items-center p-0.5 rounded-lg bg-black/60 border border-cyan-500/30 flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => handleTabChange('alltime')}
-            style={{
-              whiteSpace: 'nowrap',
-              ...(activeTab === 'alltime'
-                ? {
-                    background: 'linear-gradient(135deg, rgba(0, 247, 255, 0.28) 0%, rgba(0, 136, 204, 0.38) 100%)',
-                    border: '1px solid #00f7ff',
-                    color: '#00f7ff',
-                    boxShadow: '0 0 10px rgba(0, 247, 255, 0.35)',
-                  }
-                : {
-                    color: '#94a3b8',
-                    border: '1px solid transparent',
-                    background: 'transparent',
-                  }),
-            }}
-            className="px-2 py-0.5 rounded-md font-tech font-bold text-[9px] tracking-wider transition-all cursor-pointer whitespace-nowrap"
-          >
-            ALL-TIME
-          </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange('weekly')}
-            style={{
-              whiteSpace: 'nowrap',
-              ...(activeTab === 'weekly'
-                ? {
-                    background: 'linear-gradient(135deg, rgba(0, 247, 255, 0.28) 0%, rgba(0, 136, 204, 0.38) 100%)',
-                    border: '1px solid #00f7ff',
-                    color: '#00f7ff',
-                    boxShadow: '0 0 10px rgba(0, 247, 255, 0.35)',
-                  }
-                : {
-                    color: '#94a3b8',
-                    border: '1px solid transparent',
-                    background: 'transparent',
-                  }),
-            }}
-            className="px-2 py-0.5 rounded-md font-tech font-bold text-[9px] tracking-wider transition-all cursor-pointer whitespace-nowrap"
-          >
-            WEEKLY
-          </button>
+          {(['alltime', 'weekly'] as const).map((tab) => {
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => handleTabChange(tab)}
+                style={{
+                  background: isActive ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.28) 0%, rgba(0, 136, 204, 0.38) 100%)' : 'transparent',
+                  border: isActive ? '1px solid #00f7ff' : '1px solid transparent',
+                  color: isActive ? '#00f7ff' : '#94a3b8',
+                  boxShadow: isActive ? '0 0 10px rgba(0, 247, 255, 0.35)' : 'none',
+                }}
+                className="px-2 py-0.5 rounded-md font-tech font-bold text-[9px] tracking-wider transition-all cursor-pointer whitespace-nowrap"
+              >
+                {tab === 'alltime' ? 'ALL-TIME' : 'WEEKLY'}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -398,7 +374,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
               >
                 <div className="flex items-center justify-center">{rankBadge}</div>
 
-                <div className="flex items-center gap-1.5 pl-0.5 min-w-0">
+                <div className="flex items-center gap-2 pl-0.5 min-w-0">
                   <PilotAvatar
                     username={entry.username}
                     avatarUrl={entry.avatarUrl}
@@ -408,26 +384,34 @@ export const OverallScoreLeaderboard: React.FC = () => {
                     isRank3={isRank3}
                   />
                   <div className="flex flex-col min-w-0 truncate">
-                    {isUser ? (
+                    <div className="flex items-center gap-1 min-w-0">
                       <span
-                        className="font-tech font-black text-xs tracking-wider text-cyan-300 flex items-center gap-1 leading-tight"
-                        style={{ textShadow: '0 0 8px rgba(0, 247, 255, 0.6)' }}
-                      >
-                        <span>You</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block animate-pulse" />
-                      </span>
-                    ) : (
-                      <span
-                        className={`font-tech text-xs truncate leading-tight ${
-                          isRank1 ? 'font-bold text-yellow-300' : 'font-medium text-white'
+                        className={`font-ui text-xs truncate leading-tight ${
+                          isUser
+                            ? 'font-black text-cyan-300'
+                            : isRank1
+                            ? 'font-bold text-yellow-300'
+                            : 'font-semibold text-white'
                         }`}
+                        style={isUser ? { textShadow: '0 0 8px rgba(0, 247, 255, 0.5)' } : undefined}
                       >
+                        {entry.displayName || formatPilotDisplayName(entry.username, entry.fullName)}
+                      </span>
+                      {isUser && (
+                        <span className="text-[8px] px-1 py-0.2 rounded bg-cyan-500/25 border border-cyan-400/40 text-cyan-300 font-tech font-bold uppercase tracking-wider flex-shrink-0">
+                          You
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 text-[9.5px] leading-none mt-0.5 truncate">
+                      <span className="font-tech text-slate-400 truncate">
                         @{entry.username}
                       </span>
-                    )}
-                    <span className="text-[9px] font-ui text-slate-400 truncate leading-none mt-0.5">
-                      {entry.badgeTitle}
-                    </span>
+                      <span className="text-slate-600 font-bold">•</span>
+                      <span className="font-ui text-slate-400 truncate">
+                        {entry.badgeTitle}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
