@@ -72,15 +72,15 @@ export const PilotAvatar: React.FC<PilotAvatarProps> = ({
   return (
     <div
       style={{
-        width: '20px',
-        height: '20px',
-        minWidth: '20px',
-        minHeight: '20px',
-        maxWidth: '20px',
-        maxHeight: '20px',
+        width: '30px',
+        height: '30px',
+        minWidth: '30px',
+        minHeight: '30px',
+        maxWidth: '30px',
+        maxHeight: '30px',
         ...borderStyle,
       }}
-      className="w-5 h-5 rounded-full flex items-center justify-center text-[8.5px] font-tech font-bold flex-shrink-0 overflow-hidden relative select-none"
+      className="rounded-full flex items-center justify-center text-[10.5px] font-tech font-bold flex-shrink-0 overflow-hidden relative select-none"
     >
       {lowQualitySrc && !imgError ? (
         <img
@@ -88,8 +88,8 @@ export const PilotAvatar: React.FC<PilotAvatarProps> = ({
           alt={username}
           loading="lazy"
           decoding="async"
-          width={20}
-          height={20}
+          width={30}
+          height={30}
           onError={() => setImgError(true)}
           className="w-full h-full object-cover rounded-full"
         />

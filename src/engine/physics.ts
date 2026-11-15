@@ -359,34 +359,65 @@ export class PhysicsWorld {
             const hitCenterY = block.y + block.h / 2;
 
             // SPECIAL A: Quantum Portal Warp (Type 7)
-            if (block.health === 7 && (!ball.warpCooldown || ball.warpCooldown <= 0)) {
-              if (
-                block.portalPairIndex !== undefined &&
-                this.blocks[block.portalPairIndex] &&
-                this.blocks[block.portalPairIndex].health === 7 &&
-                !this.blocks[block.portalPairIndex].isDead
-              ) {
-                const targetPortal = this.blocks[block.portalPairIndex];
-                if (typeof targetPortal.x === 'number' && typeof targetPortal.y === 'number') {
-                  const exitDown = targetPortal.y < this.config.blockHeight * 2 || ball.vy > 0;
-                  ball.x = Math.max(
-                    ball.radius + 4,
-                    Math.min(this.config.width - ball.radius - 4, targetPortal.x + targetPortal.w / 2)
-                  );
-                  ball.y = exitDown 
-                    ? targetPortal.y + targetPortal.h + ball.radius + 4 
-                    : targetPortal.y - ball.radius - 4;
-                  ball.vy = exitDown ? Math.abs(ball.vy) : -Math.abs(ball.vy);
-                  ball.warpCooldown = 22;
-                  this.events.push({
-                    type: 'portal_warp',
-                    blockIndex: b,
-                    hitX: hitCenterX,
-                    hitY: hitCenterY,
-                    combo: this.combo,
-                  });
-                  break;
+            if (block.health === 7) {
+              // Post-warp transit: allow ball to move freely away from portals without re-triggering or getting snagged
+              if (ball.warpCooldown && ball.warpCooldown > 0) {
+                continue;
+              }
+
+              // 50% Penetration Rule: Ball must be at least 50% inside the portal block rectangle
+              // (Ball center (ball.x, ball.y) has crossed inside [block.x, block.x + block.w] x [block.y, block.y + block.h])
+              const isCenterInside =
+                ball.x >= block.x &&
+                ball.x <= block.x + block.w &&
+                ball.y >= block.y &&
+                ball.y <= block.y + block.h;
+
+              if (isCenterInside) {
+                if (
+                  block.portalPairIndex !== undefined &&
+                  this.blocks[block.portalPairIndex] &&
+                  this.blocks[block.portalPairIndex].health === 7 &&
+                  !this.blocks[block.portalPairIndex].isDead
+                ) {
+                  const targetPortal = this.blocks[block.portalPairIndex];
+                  if (typeof targetPortal.x === 'number' && typeof targetPortal.y === 'number') {
+                    // Safe exit placement completely clear of destination portal block
+                    const clearance = ball.radius + 8;
+                    const exitDown = targetPortal.y < this.config.blockHeight * 2 || ball.vy > 0;
+                    ball.x = Math.max(
+                      ball.radius + 6,
+                      Math.min(this.config.width - ball.radius - 6, targetPortal.x + targetPortal.w / 2)
+                    );
+                    ball.y = exitDown 
+                      ? targetPortal.y + targetPortal.h + clearance 
+                      : targetPortal.y - clearance;
+                    ball.vy = exitDown ? Math.abs(ball.vy) : -Math.abs(ball.vy);
+                    
+                    // Anti-looping cooldown: 35 ticks (~0.58s) guarantees ball escapes portal zone
+                    ball.warpCooldown = 35;
+                    this.events.push({
+                      type: 'portal_warp',
+                      blockIndex: b,
+                      hitX: hitCenterX,
+                      hitY: hitCenterY,
+                      combo: this.combo,
+                    });
+                    break;
+                  }
                 }
+              } else {
+                // Ball touches outer edge of portal (< 50% inside):
+                // Transportation does NOT apply yet.
+                // If the ball is moving inward toward the portal center, allow it to enter without outer perimeter bounce
+                const toCenterX = (block.x + block.w / 2) - ball.x;
+                const toCenterY = (block.y + block.h / 2) - ball.y;
+                const isMovingInward = (ball.vx * toCenterX + ball.vy * toCenterY) > 0;
+
+                if (isMovingInward && block.portalPairIndex !== undefined) {
+                  continue; // Permit smooth entrance into event horizon so center reaches 50%
+                }
+                // Otherwise (glancing away or lone portal): reflect normally below
               }
             }
 

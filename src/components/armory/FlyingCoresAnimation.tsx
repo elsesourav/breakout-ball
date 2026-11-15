@@ -63,25 +63,25 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
 
     calcPositions();
 
-    // 14 glowing core crystals with rapid radial burst & tight stream delays (like old one)
+    // 14 glowing core crystals with smooth graceful flight
     const items: Particle[] = Array.from({ length: 14 }).map((_, i) => {
       const angle = (i / 14) * Math.PI * 2 + (i % 2 === 0 ? 0.2 : -0.2);
-      const radius = 35 + (i % 4) * 16;
+      const radius = 28 + (i % 4) * 12;
       return {
         id: i,
-        delay: 0.05 + i * 0.026, // Fast staggered stream: 0.05s to 0.40s
-        duration: 0.46 + (i % 3) * 0.03, // 0.46s to 0.52s fast flight
+        delay: 0.12 + i * 0.045, // Staggered stream: 0.12s to 0.70s
+        duration: 0.85 + (i % 3) * 0.08, // 0.85s to 1.01s smooth, gentle flight
         offsetX: Math.cos(angle) * radius,
         offsetY: Math.sin(angle) * radius * 0.75,
-        curveOffset: (i % 2 === 0 ? 1 : -1) * (20 + (i % 3) * 15),
-        scaleMod: 0.95 + (i % 3) * 0.12,
+        curveOffset: (i % 2 === 0 ? 1 : -1) * (18 + (i % 3) * 12),
+        scaleMod: 0.95 + (i % 3) * 0.1,
       };
     });
     setParticles(items);
 
     // Staggered impact wave rings & melodic crystal chimes as particles land at top-right
     const impactTimers: ReturnType<typeof setTimeout>[] = [];
-    [0.40, 0.52, 0.65, 0.78].forEach((timeSec, idx) => {
+    [0.90, 1.10, 1.30, 1.50].forEach((timeSec, idx) => {
       impactTimers.push(
         setTimeout(() => {
           setImpacts((prev) => [...prev.slice(-3), { id: Date.now() + idx, key: idx }]);
@@ -90,10 +90,10 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
       );
     });
 
-    // Complete whole animation sequence rapidly (1.45s)
+    // Complete whole animation sequence smoothly (1.9s)
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 1450);
+    }, 1900);
 
     return () => {
       clearTimeout(completeTimer);
@@ -117,15 +117,15 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
         >
           <motion.div
             key="reward-banner"
-            initial={{ opacity: 0, scale: 0.65, y: 18 }}
+            initial={{ opacity: 0, scale: 0.7, y: 16 }}
             animate={{
               opacity: [0, 1, 1, 1, 0],
-              scale: [0.65, 1.05, 1, 1, 0.88],
-              y: [18, -6, 0, 0, -28],
+              scale: [0.7, 1.04, 1, 1, 0.9],
+              y: [16, -4, 0, 0, -22],
             }}
             transition={{
-              duration: 1.35,
-              times: [0, 0.15, 0.3, 0.82, 1],
+              duration: 1.8,
+              times: [0, 0.12, 0.28, 0.85, 1],
               ease: 'easeOut',
             }}
             style={{
@@ -156,7 +156,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
             key={imp.id}
             initial={{ scale: 0.3, opacity: 1 }}
             animate={{ scale: 2.2, opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
             style={{
               position: 'fixed',
               top: targetPos.y - 18,
@@ -179,8 +179,8 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
           const burstX = sX + p.offsetX;
           const burstY = sY + p.offsetY;
           // Mid-point arched control point for swooping trajectory into top-right
-          const midX = burstX * 0.52 + targetPos.x * 0.48 + p.curveOffset;
-          const midY = Math.min(burstY, targetPos.y) - 35;
+          const midX = burstX * 0.5 + targetPos.x * 0.5 + p.curveOffset;
+          const midY = Math.min(burstY, targetPos.y) - 40;
 
           return (
             <motion.div
@@ -193,17 +193,17 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
                 rotate: 0,
               }}
               animate={{
-                // 1) Rapid burst -> 2) Swooping mid arc -> 3) Snap into target top-right badge
+                // 1) Gentle radial burst -> 2) Swooping mid arc -> 3) Smooth glide into top-right badge
                 x: [sX, burstX, midX, targetPos.x],
                 y: [sY, burstY, midY, targetPos.y],
-                scale: [0.3, 1.25 * p.scaleMod, 1.05, 0.35],
+                scale: [0.3, 1.05 * p.scaleMod, 0.95, 0.35],
                 opacity: [0, 1, 1, 0],
-                rotate: [0, p.id % 2 === 0 ? 120 : -120, p.id % 2 === 0 ? 280 : -280],
+                rotate: [0, p.id % 2 === 0 ? 90 : -90, p.id % 2 === 0 ? 220 : -220],
               }}
               transition={{
                 duration: p.duration,
                 delay: p.delay,
-                ease: [0.32, 0, 0.67, 0], // Energetic accelerating cubic bezier into target
+                ease: [0.25, 0.1, 0.25, 1.0], // Silky smooth cubic ease-in-out
               }}
               style={{
                 position: 'fixed',
@@ -211,9 +211,9 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
                 left: 0,
                 zIndex: 1000002,
               }}
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-[#080d26]/95 shadow-[0_0_20px_#00f7ff,0_0_32px_rgba(0,247,255,0.85)] border-2 border-cyan-300"
+              className="flex items-center justify-center w-5 h-5 rounded-full bg-[#080d26]/95 shadow-[0_0_14px_#00f7ff,0_0_24px_rgba(0,247,255,0.75)] border border-cyan-300"
             >
-              <CoreIcon size={16} glow variant="cyan" />
+              <CoreIcon size={12} glow variant="cyan" />
             </motion.div>
           );
         })}

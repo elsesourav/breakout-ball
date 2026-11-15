@@ -126,7 +126,7 @@ export const ArmoryView: React.FC = () => {
       return;
     }
 
-    const duration = 750; // ms - fast, punchy arcade count-up
+    const duration = 900; // ms - smooth count-up timed with graceful particle arrivals
     const startTime = performance.now();
 
     const tick = (now: number) => {
@@ -171,7 +171,7 @@ export const ArmoryView: React.FC = () => {
     isClaimLockedRef.current = true;
     setTimeout(() => {
       isClaimLockedRef.current = false;
-    }, 1500);
+    }, 1900);
 
     const newBalance = currencyService.getBalance();
     setCores(newBalance);
@@ -187,16 +187,16 @@ export const ArmoryView: React.FC = () => {
     // Pulse the top header badge with radiant cyan glow as cores arrive
     setTimeout(() => {
       setIsPulsing(true);
-    }, 380);
+    }, 550);
 
     setTimeout(() => {
       setIsPulsing(false);
-    }, 1450);
+    }, 1800);
 
-    // Fast count-up as cores land into badge
+    // Smooth count-up as cores land into badge
     setTimeout(() => {
       startCountUp(newBalance);
-    }, 380);
+    }, 550);
   }, [startCountUp]);
 
   const handleAnimationComplete = useCallback(() => {

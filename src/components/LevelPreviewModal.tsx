@@ -89,6 +89,7 @@ export const LevelPreviewModal: React.FC = () => {
       score: Math.round(10000 / Math.max(1, entry.time)),
       time: entry.time,
       isCurrentUser: entry.username === user.username,
+      avatarUrl: (entry as any).avatarUrl,
     }));
 
     // If current user has completed this level, ensure user appears in ranking
@@ -101,6 +102,7 @@ export const LevelPreviewModal: React.FC = () => {
           score: Math.round(10000 / Math.max(1, progress.bestTime)),
           time: progress.bestTime,
           isCurrentUser: true,
+          avatarUrl: user.isLoggedIn && user.avatarUrl ? user.avatarUrl : undefined,
         });
         list.sort((a, b) => (typeof a.time === 'number' && typeof b.time === 'number' ? a.time - b.time : 0));
         list.forEach((item, i) => { item.rank = i + 1; });

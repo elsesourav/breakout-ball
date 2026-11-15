@@ -1,5 +1,6 @@
 import React from 'react';
 import { Trophy, Flame } from 'lucide-react';
+import { PilotAvatar } from './PilotAvatar';
 
 export interface RankingEntry {
   rank: number;
@@ -7,6 +8,7 @@ export interface RankingEntry {
   score: number;
   time: number | string;
   isCurrentUser?: boolean;
+  avatarUrl?: string;
 }
 
 interface CyberRankingTableProps {
@@ -79,9 +81,10 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
           </div>
         ) : (
           entries.slice(0, 10).map((entry) => {
-            const isUser =
+            const isUser = Boolean(
               entry.isCurrentUser ||
-              (currentUser && currentUser !== 'anonymous' && entry.username === currentUser);
+              (currentUser && currentUser !== 'anonymous' && entry.username === currentUser)
+            );
 
             const isRank1 = entry.rank === 1;
             const isRank2 = entry.rank === 2;
@@ -185,26 +188,16 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                   {rankBadge}
                 </div>
 
-                {/* Pilot Username & Initials */}
+                {/* Pilot Username & Avatar */}
                 <div className="flex items-center gap-1.5 min-w-0 pl-1 overflow-hidden">
-                  <div
-                    style={
-                      isUser
-                        ? {
-                            background: 'linear-gradient(135deg, #00f7ff 0%, #3b82f6 100%)',
-                            boxShadow: '0 0 8px rgba(0, 247, 255, 0.45)',
-                            color: '#000000',
-                          }
-                        : undefined
-                    }
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold font-tech flex-shrink-0 ${
-                      isUser
-                        ? 'font-black'
-                        : 'bg-gradient-to-tr from-cyan-600 to-indigo-600 text-white'
-                    }`}
-                  >
-                    {isUser ? 'Y' : entry.username.slice(0, 1).toUpperCase()}
-                  </div>
+                  <PilotAvatar
+                    username={entry.username}
+                    avatarUrl={entry.avatarUrl}
+                    isUser={isUser}
+                    isRank1={isRank1}
+                    isRank2={isRank2}
+                    isRank3={isRank3}
+                  />
                   {isUser ? (
                     <div className="flex items-center gap-1 min-w-0">
                       <span

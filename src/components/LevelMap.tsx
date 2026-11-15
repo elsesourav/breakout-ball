@@ -23,6 +23,7 @@ import { LevelPathSvg } from './roadmap/LevelPathSvg';
 import { RoadmapObstacles } from './roadmap/RoadmapObstacles';
 import { RoadmapSectorBanner } from './roadmap/RoadmapSectorBanner';
 import { RoadmapNodeItem } from './roadmap/RoadmapNodeItem';
+import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
 
 // ─── Scroll-linked perspective scale ─────────────────────────────────────────
 // Screen-linked perspective depth with strict foreground size ceiling:
@@ -50,12 +51,51 @@ const formatRemainingTime = (ms: number): string => {
 export const LevelMap: React.FC = () => {
   const { localLevels, localProgress, openPreview, showAlert, user, setActiveTab } = useGame();
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
+  const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() => currencyService.getDailyCollectStatus());
   const [remainingMs, setRemainingMs] = useState<number>(() => currencyService.getDailyCollectStatus().remainingMs);
+  const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
+  const [claimAmount, setClaimAmount] = useState<number>(50);
+  const [isPulsing, setIsPulsing] = useState<boolean>(false);
   const scrollRef    = useRef<HTMLDivElement>(null);
   const activeRef    = useRef<HTMLDivElement | null>(null);
   const hazeRef      = useRef<HTMLDivElement>(null);
   const rafRef       = useRef<number>(0);
+  const countUpRef   = useRef<number | null>(null);
+  const isClaimLockedRef = useRef<boolean>(false);
+
+  // Smooth count-up counter timed with flying particle arrivals
+  const startCountUp = useCallback((target: number) => {
+    if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
+
+    const startVal = displayCores;
+    const diff = target - startVal;
+    if (diff <= 0) {
+      setDisplayCores(target);
+      return;
+    }
+
+    const duration = 900; // ms
+    const startTime = performance.now();
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(startVal + diff * ease);
+
+      setDisplayCores(current);
+
+      if (progress < 1) {
+        countUpRef.current = requestAnimationFrame(tick);
+      } else {
+        setDisplayCores(target);
+        countUpRef.current = null;
+      }
+    };
+
+    countUpRef.current = requestAnimationFrame(tick);
+  }, [displayCores]);
 
   // Sync available cores and live daily bonus ticker
   useEffect(() => {
@@ -68,13 +108,17 @@ export const LevelMap: React.FC = () => {
     updateDaily();
 
     const handleCurrencyChange = () => {
-      setCores(currencyService.getBalance());
+      const b = currencyService.getBalance();
+      setCores(b);
+      setDisplayCores(b);
       updateDaily();
     };
     window.addEventListener('currency_balance_changed', handleCurrencyChange);
 
     currencyService.load(user.username).then(() => {
-      setCores(currencyService.getBalance());
+      const b = currencyService.getBalance();
+      setCores(b);
+      setDisplayCores(b);
       updateDaily();
     });
 
@@ -97,18 +141,34 @@ export const LevelMap: React.FC = () => {
       });
       return;
     }
+    if (isClaimLockedRef.current || isFlyingCores) return;
+    isClaimLockedRef.current = true;
+    setTimeout(() => {
+      isClaimLockedRef.current = false;
+    }, 1900);
+
     const res = currencyService.claimDailyCores(user.username);
     if (res.success) {
       setCores(res.newBalance);
+      setClaimAmount(res.amount);
+      setIsFlyingCores(true);
       const updated = currencyService.getDailyCollectStatus();
       setDailyStatus(updated);
       setRemainingMs(updated.remainingMs);
-      soundManager.playCollectCore();
-      showAlert({
-        title: 'REWARD CLAIMED!',
-        message: `+${res.amount} FREE CORES CLAIMED!`,
-        singleBtn: true,
-      });
+      soundManager.playUpgradeSuccess();
+
+      // Pulse top-right badge and start smooth count-up timed with crystal arrivals
+      setTimeout(() => {
+        setIsPulsing(true);
+      }, 550);
+
+      setTimeout(() => {
+        startCountUp(res.newBalance);
+      }, 550);
+
+      setTimeout(() => {
+        setIsPulsing(false);
+      }, 1800);
     }
   };
 
@@ -408,6 +468,13 @@ export const LevelMap: React.FC = () => {
         `,
       }}
     >
+      {/* Flying Cores Animation from Center Claim to Top-Right Badge */}
+      <FlyingCoresAnimation
+        active={isFlyingCores}
+        amount={claimAmount}
+        onComplete={() => setIsFlyingCores(false)}
+      />
+
       {/* ── Top Cyber Section Header (Profile & Cores) ──────────────────── */}
       <div
         className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg"
@@ -422,19 +489,32 @@ export const LevelMap: React.FC = () => {
           rightSlot={
             <button
               type="button"
+              id="header-cores-badge"
               onClick={() => { setActiveTab('armory'); if (typeof window !== 'undefined') { window.history.pushState(null, '', '/shop'); window.dispatchEvent(new CustomEvent('open-core-shop')); } }}
               title="View Cores & Shop"
               style={{
-                background:
-                  'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
-                border: '1.2px solid rgba(0, 247, 255, 0.45)',
-                boxShadow: '0 0 12px rgba(0, 247, 255, 0.25)',
+                background: isPulsing
+                  ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.35) 0%, rgba(99, 102, 241, 0.4) 100%)'
+                  : 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
+                border: isPulsing
+                  ? '1.8px solid #00f7ff'
+                  : '1.2px solid rgba(0, 247, 255, 0.45)',
+                boxShadow: isPulsing
+                  ? '0 0 25px rgba(0, 247, 255, 0.95), inset 0 0 10px rgba(0, 247, 255, 0.5)'
+                  : '0 0 12px rgba(0, 247, 255, 0.25)',
+                transform: isPulsing ? 'scale(1.15)' : 'scale(1)',
+                transition: 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
               }}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.4)] active:scale-95 group transition-all"
             >
-              <CoreIcon size={15} glow variant="cyan" className="group-hover:rotate-12 transition-transform" />
-              <span className="font-tech font-bold text-xs text-cyan-200">
-                {cores.toLocaleString()}
+              <CoreIcon
+                size={15}
+                glow
+                variant="cyan"
+                className={`transition-transform duration-300 ${isPulsing ? 'scale-125' : 'group-hover:rotate-12'}`}
+              />
+              <span className={`font-tech font-bold text-xs transition-colors ${isPulsing ? 'text-white' : 'text-cyan-200'}`}>
+                {displayCores.toLocaleString()}
               </span>
               <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
                 CORES

@@ -268,7 +268,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
       {/* 3. Skeleton Loading State or Ranking Rows List */}
       {isLoading ? (
-        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-2" data-inner-scroll="true">
+        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 cyber-scroll py-1 min-h-0" data-inner-scroll="true">
           {[...Array(7)].map((_, idx) => (
             <div
               key={`skeleton-${idx}`}
@@ -277,13 +277,13 @@ export const OverallScoreLeaderboard: React.FC = () => {
                 gridTemplateColumns: '32px 1fr 44px 54px',
                 alignItems: 'center',
               }}
-              className="px-3.5 py-2 transition-colors"
+              className="px-3.5 py-2.5 transition-colors"
             >
               <div className="flex items-center justify-center">
                 <div className="w-4 h-4 rounded-md cyber-shimmer-box" />
               </div>
               <div className="flex items-center gap-1.5 pl-0.5 min-w-0">
-                <div className="w-5 h-5 rounded-full cyber-shimmer-box flex-shrink-0" style={{ width: '20px', height: '20px' }} />
+                <div className="rounded-full cyber-shimmer-box flex-shrink-0" style={{ width: '30px', height: '30px' }} />
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <div className="h-2.5 rounded cyber-shimmer-box" style={{ width: `${60 + (idx % 3) * 15}%` }} />
                   <div className="h-2 w-16 rounded cyber-shimmer-box opacity-60" />
@@ -300,10 +300,11 @@ export const OverallScoreLeaderboard: React.FC = () => {
         </div>
       ) : (
         <div
-          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-1.5 min-h-0"
+          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 cyber-scroll py-1 min-h-0"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehaviorY: 'contain',
+            touchAction: 'pan-y',
           }}
           data-inner-scroll="true"
         >
@@ -382,7 +383,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                     ? '3px solid #ffd700'
                     : '3px solid transparent',
                 }}
-                className="px-3.5 py-1.5 transition-colors hover:bg-white/[0.03]"
+                className="px-3.5 py-2.5 transition-colors hover:bg-white/[0.03]"
               >
                 <div className="flex items-center justify-center">{rankBadge}</div>
 
