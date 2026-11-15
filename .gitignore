@@ -6,3 +6,6 @@ all-build.sh
 *.local
 *.db-shm
 *.db-wal
+.env
+.env.*
+*.env

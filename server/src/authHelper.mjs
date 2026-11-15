@@ -1,7 +1,13 @@
 import crypto from 'crypto';
 
+if (typeof process.loadEnvFile === 'function') {
+  try { process.loadEnvFile(); } catch {}
+  try { process.loadEnvFile('server/.env'); } catch {}
+}
+
 export const SUPABASE_URL = process.env.SUPABASE_URL || 'https://srfevooktrqjzjuddmko.supabase.co';
 export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_h7Di5k8Rn9op1XjDwpnyXQ_4kuXnmNV';
+export const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export const ADMIN_EMAILS = new Set([
   'elsesourav@gmail.com',
@@ -46,16 +52,17 @@ export async function verifySupabaseToken(token) {
 
 export async function fetchElseSouravUserProfile(identifier) {
   if (!identifier) return null;
-  const isEmail = identifier.includes('@');
+  const clean = identifier.trim().toLowerCase().replace(/^@/, '');
+  const isEmail = clean.includes('@');
   const queryParam = isEmail
-    ? `email=eq.${encodeURIComponent(identifier.toLowerCase())}`
-    : `username=eq.${encodeURIComponent(identifier.toLowerCase())}`;
+    ? `email=eq.${encodeURIComponent(clean)}`
+    : `username=eq.${encodeURIComponent(clean)}`;
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/User?${queryParam}&select=*`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/User?${queryParam}&select=id,email,username,displayName,photoUrl,role`, {
       headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
       },
       signal: AbortSignal.timeout(4000),
     });

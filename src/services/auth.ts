@@ -15,6 +15,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as 
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { createDemoPilotUser } from './demoPilotHelper';
 import { handleRequestPasswordOtp, handleVerifyOtpAndResetPassword } from './authRecoveryHelper';
+import { backendApi } from './backendApi';
 
 export interface AuthUser {
   id: string;
@@ -162,25 +163,24 @@ class AuthService {
     try {
       let targetEmail = cleanIdentifier;
 
-      // 1. If identifier is a username, resolve its email from the ElseSourav platform database
+      // 1. Resolve @username to email using ElseSourav Platform API
       if (!cleanIdentifier.includes('@')) {
-        const { data: userRecord } = await supabase
-          .from('User')
-          .select('email, displayName, username')
-          .eq('username', cleanIdentifier.toLowerCase())
-          .maybeSingle();
-
-        if (userRecord && userRecord.email) {
-          targetEmail = userRecord.email;
-        } else {
-          // Check if user has an account in Firestore
-          const firestoreUserDoc = await getDoc(doc(firestoreDb, 'users', cleanIdentifier.toLowerCase()));
-          if (firestoreUserDoc.exists()) {
-            const data = firestoreUserDoc.data();
-            if (data?.email) {
-              targetEmail = data.email;
-            }
+        try {
+          const resRes = await fetch('https://elsesourav.com/api/auth/resolve-identifier', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: cleanIdentifier }),
+            signal: AbortSignal.timeout(3500),
+          });
+          if (resRes.ok) {
+            const resData = await resRes.json();
+            if (resData.email) targetEmail = resData.email;
           }
+        } catch {}
+
+        if (!targetEmail.includes('@')) {
+          const pRes = await backendApi.fetchUserProfile(cleanIdentifier);
+          if (pRes.profile?.email) targetEmail = pRes.profile.email;
         }
       }
 
@@ -192,17 +192,22 @@ class AuthService {
 
       if (!sbError && sbData?.user) {
         const meta = sbData.user.user_metadata || {};
-        const username = meta.username || meta.user_name || cleanIdentifier.toLowerCase();
-        const fullName = meta.full_name || meta.name || cleanIdentifier;
+        let username = meta.username || meta.user_name || cleanIdentifier.toLowerCase();
+        let fullName = meta.full_name || meta.name || cleanIdentifier;
         const email = sbData.user.email || targetEmail;
-        const isAdmin = isUserAdmin({ username, email });
         let avatarUrl = meta.avatar_url || meta.picture || meta.photoUrl;
-        if (!avatarUrl) {
-          try {
-            const { data: uRow } = await supabase.from('User').select('photoUrl').eq('email', email).maybeSingle();
-            if (uRow?.photoUrl) avatarUrl = uRow.photoUrl;
-          } catch {}
-        }
+
+        // Fetch verified ElseSourav profile to guarantee accurate photoUrl & displayName
+        try {
+          const pRes = await backendApi.fetchUserProfile(cleanIdentifier);
+          if (pRes.profile) {
+            if (pRes.profile.photoUrl) avatarUrl = pRes.profile.photoUrl;
+            if (pRes.profile.displayName) fullName = pRes.profile.displayName;
+            if (pRes.profile.username) username = pRes.profile.username;
+          }
+        } catch {}
+
+        const isAdmin = isUserAdmin({ username, email });
 
         const user: AuthUser = {
           id: sbData.user.id,
@@ -422,25 +427,18 @@ class AuthService {
     const current = this.getCurrentUser();
     if (!current.isLoggedIn) return null;
     try {
-      const { data } = await supabase.auth.getUser();
-      if (data?.user) {
-        const meta = data.user.user_metadata || {};
-        let newAvatar = meta.avatar_url || meta.picture || meta.photoUrl;
-        if (!newAvatar && current.email) {
-          try {
-            const { data: uRow } = await supabase.from('User').select('photoUrl').eq('email', current.email).maybeSingle();
-            if (uRow?.photoUrl) newAvatar = uRow.photoUrl;
-          } catch {}
-        }
-        if (newAvatar && newAvatar !== current.avatarUrl) {
-          const updated: AuthUser = {
-            ...current,
-            avatarUrl: newAvatar,
-            fullName: meta.full_name || meta.name || current.fullName,
-          };
-          this.setCurrentUser(updated);
-          return updated;
-        }
+      const lookupId = current.username || current.email;
+      const pRes = await backendApi.fetchUserProfile(lookupId);
+      const newAvatar = pRes.profile?.photoUrl;
+      const newName = pRes.profile?.displayName;
+      if (newAvatar || newName) {
+        const updated: AuthUser = {
+          ...current,
+          avatarUrl: newAvatar || current.avatarUrl,
+          fullName: newName || current.fullName,
+        };
+        this.setCurrentUser(updated);
+        return updated;
       }
     } catch {}
     return current;
