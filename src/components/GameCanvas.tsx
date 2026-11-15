@@ -7,6 +7,7 @@ import {
   PADDLE_WIDTH,
 } from '../constants/game';
 import { soundManager } from '../utils/audio';
+import { currencyService } from '../services/currency';
 import { GameHUD } from './GameHUD';
 import { ParticleBackdrop } from './ParticleBackdrop';
 import { GameEngine } from '../engine/GameEngine';
@@ -51,6 +52,9 @@ export const GameCanvas: React.FC = () => {
     currentLevelIndex >= 0 && currentLevelIndex < localLevels.length - 1;
   const levelNumber = currentLevelIndex >= 0 ? currentLevelIndex + 1 : 1;
 
+  const [coresEarned, setCoresEarned] = useState<number>(0);
+  const [isFirstClear, setIsFirstClear] = useState<boolean>(false);
+
   // Handle Level Victory
   const handleLevelWin = useCallback(
     async (finalScore: ScoreState) => {
@@ -66,7 +70,9 @@ export const GameCanvas: React.FC = () => {
       setSummaryState(finalScore);
 
       try {
-        await recordLevelCompletion(selectedLevel.id, finalScore.timeUsed);
+        const result = await recordLevelCompletion(selectedLevel.id, finalScore.timeUsed);
+        setCoresEarned(result?.coresEarned ?? 0);
+        setIsFirstClear(result?.isFirstClear ?? false);
       } catch (err) {
         console.error('Error saving score:', err);
       }
@@ -307,6 +313,9 @@ export const GameCanvas: React.FC = () => {
         levelNumber={levelNumber}
         totalBreakable={liveScoreState?.totalBreakable ?? 0}
         blocksDestroyed={liveScoreState?.blocksDestroyed ?? 0}
+        coresEarned={coresEarned}
+        isFirstClear={isFirstClear}
+        totalCores={currencyService.getBalance()}
       />
       <canvas
         ref={canvasRef}

@@ -1,0 +1,218 @@
+import React, { useState } from 'react';
+import { Zap, Ticket, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { SHOP_PACKS, ShopPack } from '../../constants/upgrades';
+import { couponService } from '../../services/coupons';
+import { soundManager } from '../../utils/audio';
+
+interface ShopTabProps {
+  cores: number;
+  username?: string;
+  onCoresUpdated: () => void;
+}
+
+export const ShopTab: React.FC<ShopTabProps> = ({ username, onCoresUpdated }) => {
+  const [selectedPack, setSelectedPack] = useState<ShopPack | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [statusMsg, setStatusMsg] = useState('');
+
+  const handleOpenClaim = (pack: ShopPack) => {
+    soundManager.play('click');
+    setSelectedPack(pack);
+    setCouponCode('');
+    setStatus('idle');
+    setStatusMsg('');
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPack(null);
+    setCouponCode('');
+    setStatus('idle');
+    setStatusMsg('');
+  };
+
+  const handleRedeem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!couponCode.trim()) return;
+
+    setStatus('loading');
+    soundManager.play('click');
+
+    const res = await couponService.redeemCoupon(couponCode, username);
+
+    if (res.success) {
+      soundManager.play('win');
+      setStatus('success');
+      setStatusMsg(res.message);
+      onCoresUpdated();
+      setTimeout(() => {
+        handleCloseModal();
+      }, 1800);
+    } else {
+      soundManager.play('damage');
+      setStatus('error');
+      setStatusMsg(res.message);
+    }
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-3">
+      {/* Header */}
+      <div className="flex items-center justify-between text-[11px] font-tech text-amber-400 uppercase tracking-wider px-1 pt-1">
+        <span>🎟 CURRENCY COUPON VAULT</span>
+        <span>REDEEM CODES</span>
+      </div>
+
+      {/* 2-Column Grid */}
+      <div className="grid grid-cols-2 gap-2.5">
+        {SHOP_PACKS.map((pack) => (
+          <div
+            key={pack.id}
+            style={{
+              backgroundColor: 'rgba(8, 14, 38, 0.95)',
+              border: `1.5px solid ${pack.borderColor}`,
+              boxShadow: `0 4px 16px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.06)`,
+              borderRadius: '14px',
+            }}
+            className="p-3 flex flex-col items-center justify-between text-center gap-2 relative overflow-hidden"
+          >
+            <div
+              style={{
+                backgroundColor: `${pack.accentColor}15`,
+                border: `1px solid ${pack.accentColor}50`,
+                boxShadow: `0 0 12px ${pack.accentColor}30`,
+              }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center mt-1"
+            >
+              <Zap style={{ color: pack.accentColor }} className="w-5 h-5 fill-current" />
+            </div>
+
+            <div className="flex flex-col items-center">
+              <span className="font-display font-black text-sm text-white tracking-wide">
+                +{pack.cores.toLocaleString()}
+              </span>
+              <span className="font-tech text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                {pack.name}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleOpenClaim(pack)}
+              style={{
+                backgroundColor: pack.accentColor,
+                boxShadow: `0 0 10px ${pack.accentColor}50`,
+              }}
+              className="w-full py-1.5 rounded-lg text-black font-tech font-bold text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+            >
+              <Ticket className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>CLAIM</span>
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Info Card */}
+      <div className="p-3 rounded-xl bg-black/40 border border-white/5 flex items-center gap-2.5 mt-1">
+        <Ticket className="w-5 h-5 text-amber-400 shrink-0" />
+        <p className="text-[11px] text-slate-400 font-ui leading-tight">
+          Enter official promo coupons or community challenge codes to unlock Cores. Available promo: <span className="text-amber-300 font-mono">START500</span>
+        </p>
+      </div>
+
+      {/* Coupon Modal */}
+      {selectedPack && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+          <div
+            style={{
+              backgroundColor: '#0a0f2c',
+              border: `1.5px solid ${selectedPack.accentColor}`,
+              boxShadow: `0 0 30px ${selectedPack.accentColor}40`,
+              borderRadius: '16px',
+            }}
+            className="w-full max-w-xs p-4 flex flex-col gap-3 relative"
+          >
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Pack Header */}
+            <div className="flex items-center gap-2.5">
+              <div
+                style={{
+                  backgroundColor: `${selectedPack.accentColor}20`,
+                  border: `1px solid ${selectedPack.accentColor}`,
+                }}
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+              >
+                <Zap style={{ color: selectedPack.accentColor }} className="w-5 h-5 fill-current" />
+              </div>
+              <div>
+                <h3 className="font-display font-black text-sm text-white">
+                  +{selectedPack.cores.toLocaleString()} Cores
+                </h3>
+                <span className="font-tech text-[10px] text-slate-400 uppercase tracking-wider">
+                  {selectedPack.name}
+                </span>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleRedeem} className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-1">
+                <label className="font-tech text-[10px] text-slate-400 uppercase tracking-wider">
+                  ENTER COUPON CODE:
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. START500"
+                  className="w-full px-3 py-2 rounded-lg bg-black/60 border border-white/20 text-white font-mono text-xs uppercase tracking-widest focus:outline-none focus:border-amber-400 transition-colors"
+                />
+              </div>
+
+              {statusMsg && (
+                <div
+                  className={`flex items-center gap-1.5 text-xs font-tech p-2 rounded-md ${
+                    status === 'success'
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                      : 'bg-red-500/20 text-red-400 border border-red-500/40'
+                  }`}
+                >
+                  {status === 'success' ? (
+                    <CheckCircle className="w-4 h-4 shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                  )}
+                  <span>{statusMsg}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={status === 'loading' || !couponCode.trim()}
+                style={{
+                  backgroundColor: selectedPack.accentColor,
+                }}
+                className="w-full py-2 rounded-lg text-black font-tech font-bold text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5 mt-1"
+              >
+                {status === 'loading' ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <span>REDEEM NOW</span>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

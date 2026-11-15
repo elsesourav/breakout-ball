@@ -4,6 +4,7 @@ import { ParticleSystem } from './particles';
 import { GameRenderer } from './renderer';
 import { AudioBridge } from './audioBridge';
 import { PowerUpManager } from './powerUps';
+import { currencyService } from '../services/currency';
 import { LevelData, BlockData } from '../types/game';
 import {
   CANVAS_WIDTH,
@@ -106,8 +107,15 @@ export class GameEngine {
       status: 'countdown',
     };
 
+    const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
+    const basePadW = PADDLE_WIDTH * (1 + (padWidthLvl - 1) * 0.08);
+    this.tsPhysics.paddle.width = basePadW;
+
+    const ballSizeLvl = currencyService.getUpgradeLevel('ball_size');
+    const ballRad = BALL_RADIUS * (1 + (ballSizeLvl - 1) * 0.05);
+
     const initialBallX = CANVAS_WIDTH / 2;
-    const initialBallY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - BALL_RADIUS - 5;
+    const initialBallY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - ballRad - 5;
 
     this.tsPhysics.loadBlocks(level.blocks);
     this.tsPhysics.resetBall(initialBallX, initialBallY, 0, 0);
@@ -122,12 +130,18 @@ export class GameEngine {
 
     this.state.status = 'playing';
 
+    const ballSpeedLvl = currencyService.getUpgradeLevel('ball_speed');
+    const currentSpeed = BALL_SPEED * (1 + (ballSpeedLvl - 1) * 0.08);
+
     const angle = (Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1) + (Math.random() * 0.2 - 0.1);
-    const vx = Math.sin(angle) * BALL_SPEED;
-    const vy = -Math.cos(angle) * BALL_SPEED;
+    const vx = Math.sin(angle) * currentSpeed;
+    const vy = -Math.cos(angle) * currentSpeed;
+
+    const ballSizeLvl = currencyService.getUpgradeLevel('ball_size');
+    const ballRad = BALL_RADIUS * (1 + (ballSizeLvl - 1) * 0.05);
 
     const ballX = CANVAS_WIDTH / 2;
-    const ballY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - BALL_RADIUS - 5;
+    const ballY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - ballRad - 5;
 
     this.tsPhysics.resetBall(ballX, ballY, vx, vy);
   }
@@ -137,7 +151,9 @@ export class GameEngine {
   }
 
   public movePaddleRelative(deltaX: number) {
-    const currentTarget = this.tsPhysics.paddle.targetX + deltaX;
+    const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
+    const speedMultiplier = 1 + (padSpeedLvl - 1) * 0.10;
+    const currentTarget = this.tsPhysics.paddle.targetX + deltaX * speedMultiplier;
     this.setPaddleTarget(currentTarget);
   }
 
@@ -212,7 +228,11 @@ export class GameEngine {
     }
 
     const isExpand = this.powerUps.buffs.expand > 0;
-    this.tsPhysics.paddle.width = isExpand ? PADDLE_WIDTH * 1.4 : PADDLE_WIDTH;
+    const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
+    const basePadW = PADDLE_WIDTH * (1 + (padWidthLvl - 1) * 0.08);
+    const expandLvl = currencyService.getUpgradeLevel('expand_power');
+    const expandMultiplier = 1.30 + (expandLvl - 1) * 0.04;
+    this.tsPhysics.paddle.width = isExpand ? basePadW * expandMultiplier : basePadW;
     this.tsPhysics.isMegaBall = this.powerUps.buffs.megaBall > 0;
     this.tsPhysics.hasShield = this.powerUps.buffs.hasShield;
 

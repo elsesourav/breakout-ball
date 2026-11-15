@@ -1,91 +1,15 @@
 import { BlockEngineState, PaddleState } from './types';
+import { currencyService } from '../services/currency';
+import {
+  PowerUpType,
+  PowerUpMeta,
+  POWER_UP_CONFIGS,
+  PowerUpDrop,
+  ActiveBuffs,
+  LaserBolt,
+} from './powerUpTypes';
 
-export type PowerUpType = 'multiball' | 'megaball' | 'laser' | 'slowmo' | 'shield' | 'expand';
-
-export interface PowerUpMeta {
-  type: PowerUpType;
-  label: string;
-  symbol: string;
-  color: string;
-  glow: string;
-  duration: number; // in seconds (0 = instant)
-}
-
-export const POWER_UP_CONFIGS: Record<PowerUpType, PowerUpMeta> = {
-  multiball: {
-    type: 'multiball',
-    label: 'MULTI-BALL',
-    symbol: '●●',
-    color: '#00f7ff',
-    glow: 'rgba(0, 247, 255, 0.8)',
-    duration: 0,
-  },
-  megaball: {
-    type: 'megaball',
-    label: 'MEGA CORE',
-    symbol: '✹',
-    color: '#ffd700',
-    glow: 'rgba(255, 215, 0, 0.85)',
-    duration: 7.0,
-  },
-  laser: {
-    type: 'laser',
-    label: 'PLASMA CANNON',
-    symbol: '▲',
-    color: '#ff0055',
-    glow: 'rgba(255, 0, 85, 0.85)',
-    duration: 8.0,
-  },
-  slowmo: {
-    type: 'slowmo',
-    label: 'CHRONOS WARP',
-    symbol: '⏱',
-    color: '#b773ff',
-    glow: 'rgba(183, 115, 255, 0.85)',
-    duration: 5.5,
-  },
-  shield: {
-    type: 'shield',
-    label: 'FORCEFIELD',
-    symbol: '🛡',
-    color: '#10b981',
-    glow: 'rgba(16, 185, 129, 0.85)',
-    duration: 0,
-  },
-  expand: {
-    type: 'expand',
-    label: 'TITAN PADDLE',
-    symbol: '◀▶',
-    color: '#06b6d4',
-    glow: 'rgba(6, 182, 212, 0.85)',
-    duration: 8.0,
-  },
-};
-
-export interface PowerUpDrop {
-  id: number;
-  x: number;
-  y: number;
-  vy: number; // px/sec
-  meta: PowerUpMeta;
-  collected: boolean;
-  angle: number;
-}
-
-export interface ActiveBuffs {
-  megaBall: number;
-  laser: number;
-  slowMo: number;
-  expand: number;
-  hasShield: boolean;
-}
-
-export interface LaserBolt {
-  id: number;
-  x: number;
-  y: number;
-  vy: number;
-}
+export * from './powerUpTypes';
 
 export class PowerUpManager {
   public drops: PowerUpDrop[] = [];
@@ -96,12 +20,19 @@ export class PowerUpManager {
     slowMo: 0,
     expand: 0,
     hasShield: false,
+    shieldCharges: 0,
+  };
+
+  public maxDurations: Record<string, number> = {
+    megaball: 5.0,
+    laser: 6.0,
+    slowmo: 4.0,
+    expand: 6.0,
   };
 
   private nextId = 1;
   private laserFireTimer = 0;
-  private readonly LASER_INTERVAL = 0.35; // fire every 350ms
-  private readonly FALL_SPEED = 240; // px/sec device-independent
+  private readonly FALL_SPEED = 240;
 
   public reset() {
     this.drops = [];
@@ -112,13 +43,11 @@ export class PowerUpManager {
       slowMo: 0,
       expand: 0,
       hasShield: false,
+      shieldCharges: 0,
     };
     this.laserFireTimer = 0;
   }
 
-  /**
-   * Spawns a power shard at the block destruction coords (35% probability)
-   */
   public spawnDrop(x: number, y: number, probability = 0.35): PowerUpDrop | null {
     if (Math.random() > probability) return null;
 
@@ -140,9 +69,6 @@ export class PowerUpManager {
     return drop;
   }
 
-  /**
-   * Device-independent tick update
-   */
   public update(
     paddle: PaddleState,
     dt: number,
@@ -166,7 +92,6 @@ export class PowerUpManager {
       drop.y += drop.vy * dt;
       drop.angle += dt * 2.5;
 
-      // Check paddle catch
       if (drop.x >= padL && drop.x <= padR && drop.y >= padT && drop.y <= padB) {
         drop.collected = true;
         this.activateBuff(drop.meta.type);
@@ -175,7 +100,6 @@ export class PowerUpManager {
         continue;
       }
 
-      // Check screen bottom out
       if (drop.y > paddle.y + 250) {
         this.drops.splice(i, 1);
       }
@@ -186,18 +110,36 @@ export class PowerUpManager {
     if (this.buffs.slowMo > 0) this.buffs.slowMo = Math.max(0, this.buffs.slowMo - dt);
     if (this.buffs.expand > 0) this.buffs.expand = Math.max(0, this.buffs.expand - dt);
 
-    // 3. Laser cannons handling
+    // 3. Laser cannons handling (scales with upgrade level)
     if (this.buffs.laser > 0) {
       this.buffs.laser = Math.max(0, this.buffs.laser - dt);
       this.laserFireTimer += dt;
-      if (this.laserFireTimer >= this.LASER_INTERVAL) {
+
+      const laserLvl = currencyService.getUpgradeLevel('laser_power');
+      const fireInterval = laserLvl >= 5 ? 0.30 : 0.38;
+      const boltW = laserLvl >= 4 ? 6 : 4;
+      const boltH = laserLvl >= 4 ? 26 : 18;
+
+      if (this.laserFireTimer >= fireInterval) {
         this.laserFireTimer = 0;
-        // Twin cannons
-        const cannonOffset = halfPadW * 0.75;
-        this.lasers.push(
-          { id: this.nextId++, x: paddle.x - cannonOffset, y: paddle.y - 5, vy: -950 },
-          { id: this.nextId++, x: paddle.x + cannonOffset, y: paddle.y - 5, vy: -950 }
-        );
+        if (laserLvl <= 2) {
+          // Single central blaster
+          this.lasers.push({
+            id: this.nextId++,
+            x: paddle.x,
+            y: paddle.y - 6,
+            vy: -950,
+            w: boltW,
+            h: boltH,
+          });
+        } else {
+          // Twin plasma cannons
+          const cannonOffset = halfPadW * 0.75;
+          this.lasers.push(
+            { id: this.nextId++, x: paddle.x - cannonOffset, y: paddle.y - 6, vy: -950, w: boltW, h: boltH },
+            { id: this.nextId++, x: paddle.x + cannonOffset, y: paddle.y - 6, vy: -950, w: boltW, h: boltH }
+          );
+        }
       }
     }
 
@@ -211,7 +153,6 @@ export class PowerUpManager {
         continue;
       }
 
-      // Hit test against active blocks
       let hit = false;
       for (let b = 0; b < blocks.length; b++) {
         const block = blocks[b];
@@ -237,40 +178,60 @@ export class PowerUpManager {
   }
 
   public activateBuff(type: PowerUpType) {
-    const meta = POWER_UP_CONFIGS[type];
+    const laserLvl = currencyService.getUpgradeLevel('laser_power');
+    const megaLvl = currencyService.getUpgradeLevel('mega_power');
+    const slowmoLvl = currencyService.getUpgradeLevel('slowmo_power');
+    const expandLvl = currencyService.getUpgradeLevel('expand_power');
+    const shieldLvl = currencyService.getUpgradeLevel('shield_power');
+
     switch (type) {
-      case 'megaball':
-        this.buffs.megaBall = meta.duration;
+      case 'megaball': {
+        const dur = 5.0 + (megaLvl - 1) * 1.0;
+        this.maxDurations.megaball = dur;
+        this.buffs.megaBall = dur; // Reset to full duration
         break;
-      case 'laser':
-        this.buffs.laser = meta.duration;
+      }
+      case 'laser': {
+        const dur = 6.0 + (laserLvl - 1) * 1.14;
+        this.maxDurations.laser = dur;
+        this.buffs.laser = dur; // Reset to full duration
         break;
-      case 'slowmo':
-        this.buffs.slowMo = meta.duration;
+      }
+      case 'slowmo': {
+        const dur = 4.0 + (slowmoLvl - 1) * 0.86;
+        this.maxDurations.slowmo = dur;
+        this.buffs.slowMo = dur; // Reset to full duration
         break;
-      case 'expand':
-        this.buffs.expand = meta.duration;
+      }
+      case 'expand': {
+        const dur = 6.0 + (expandLvl - 1) * 1.14;
+        this.maxDurations.expand = dur;
+        this.buffs.expand = dur; // Reset to full duration
         break;
-      case 'shield':
+      }
+      case 'shield': {
         this.buffs.hasShield = true;
+        this.buffs.shieldCharges = Math.min(3, (this.buffs.shieldCharges || 0) + shieldLvl);
         break;
+      }
       case 'multiball':
-        // Handled directly by physics / gameEngine
         break;
     }
   }
 
   public consumeShield(): boolean {
-    if (this.buffs.hasShield) {
+    if (this.buffs.shieldCharges > 1) {
+      this.buffs.shieldCharges--;
+      return true;
+    }
+    if (this.buffs.hasShield || this.buffs.shieldCharges === 1) {
       this.buffs.hasShield = false;
+      this.buffs.shieldCharges = 0;
       return true;
     }
     return false;
   }
 
-  /**
-   * Renders all active power-up visual elements
-   */
   public render(
     ctx: CanvasRenderingContext2D,
     paddle: PaddleState,
@@ -278,7 +239,7 @@ export class PowerUpManager {
     canvasHeight: number
   ) {
     // 1. Bottom Forcefield Laser Barrier
-    if (this.buffs.hasShield) {
+    if (this.buffs.hasShield || this.buffs.shieldCharges > 0) {
       const shieldY = canvasHeight - 35;
       ctx.save();
       ctx.shadowColor = '#10b981';
@@ -290,7 +251,6 @@ export class PowerUpManager {
       ctx.lineTo(canvasWidth, shieldY);
       ctx.stroke();
 
-      // Cyber hazard hash marks
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
       ctx.lineWidth = 1.5;
       for (let x = 10; x < canvasWidth; x += 30) {
@@ -309,7 +269,6 @@ export class PowerUpManager {
       ctx.translate(drop.x, drop.y);
       ctx.rotate(drop.angle);
 
-      // Glow & Shard Diamond
       ctx.shadowColor = drop.meta.glow;
       ctx.shadowBlur = 14;
       ctx.fillStyle = drop.meta.color;
@@ -317,31 +276,26 @@ export class PowerUpManager {
       ctx.beginPath();
       ctx.moveTo(0, -size);
       ctx.lineTo(size * 0.7, 0);
-      ctx.moveTo(0, -size);
-      ctx.lineTo(size * 0.7, 0);
       ctx.lineTo(0, size);
       ctx.lineTo(-size * 0.7, 0);
       ctx.closePath();
       ctx.fill();
 
-      // Inner Core
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(0, 0, size * 0.35, 0, Math.PI * 2);
       ctx.fill();
 
-      // Symbol
       ctx.rotate(-drop.angle);
       ctx.fillStyle = '#050716';
       ctx.font = 'bold 12px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(drop.meta.symbol, 0, 1);
-
       ctx.restore();
     }
 
-    // 3. Laser Blasters on Paddle & Bolts
+    // 3. Laser Blasters on Paddle
     if (this.buffs.laser > 0) {
       const halfPadW = paddle.width / 2;
       const cannonOffset = halfPadW * 0.75;
@@ -349,23 +303,143 @@ export class PowerUpManager {
       ctx.fillStyle = '#ff0055';
       ctx.shadowColor = '#ff0055';
       ctx.shadowBlur = 12;
-
-      // Left & right blaster turrets
       ctx.fillRect(paddle.x - cannonOffset - 4, paddle.y - 10, 8, 12);
       ctx.fillRect(paddle.x + cannonOffset - 4, paddle.y - 10, 8, 12);
       ctx.restore();
     }
 
-    // Active Laser Bolts
+    // 4. Laser Bolts
     for (const bolt of this.lasers) {
       ctx.save();
       ctx.shadowColor = '#ff0055';
       ctx.shadowBlur = 10;
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(bolt.x - 3, bolt.y - 14, 6, 28);
+      ctx.fillRect(bolt.x - bolt.w / 2, bolt.y - bolt.h / 2, bolt.w, bolt.h);
       ctx.fillStyle = '#ff0055';
-      ctx.fillRect(bolt.x - 1.5, bolt.y - 12, 3, 24);
+      ctx.fillRect(bolt.x - bolt.w / 4, bolt.y - bolt.h / 2 + 2, bolt.w / 2, bolt.h - 4);
       ctx.restore();
     }
+
+    // 5. In-Game Circular Ring Timers for Active Buffs
+    this.renderActiveBuffRings(ctx, canvasWidth, canvasHeight);
+  }
+
+  private renderActiveBuffRings(
+    ctx: CanvasRenderingContext2D,
+    canvasWidth: number,
+    canvasHeight: number
+  ) {
+    const activeItems: {
+      type: PowerUpType;
+      current: number;
+      max: number;
+      meta: PowerUpMeta;
+      isShield?: boolean;
+    }[] = [];
+
+    if (this.buffs.laser > 0) {
+      activeItems.push({
+        type: 'laser',
+        current: this.buffs.laser,
+        max: this.maxDurations.laser || 6.0,
+        meta: POWER_UP_CONFIGS.laser,
+      });
+    }
+    if (this.buffs.megaBall > 0) {
+      activeItems.push({
+        type: 'megaball',
+        current: this.buffs.megaBall,
+        max: this.maxDurations.megaball || 5.0,
+        meta: POWER_UP_CONFIGS.megaball,
+      });
+    }
+    if (this.buffs.slowMo > 0) {
+      activeItems.push({
+        type: 'slowmo',
+        current: this.buffs.slowMo,
+        max: this.maxDurations.slowmo || 4.0,
+        meta: POWER_UP_CONFIGS.slowmo,
+      });
+    }
+    if (this.buffs.expand > 0) {
+      activeItems.push({
+        type: 'expand',
+        current: this.buffs.expand,
+        max: this.maxDurations.expand || 6.0,
+        meta: POWER_UP_CONFIGS.expand,
+      });
+    }
+    if (this.buffs.shieldCharges > 0) {
+      activeItems.push({
+        type: 'shield',
+        current: this.buffs.shieldCharges,
+        max: 3,
+        meta: POWER_UP_CONFIGS.shield,
+        isShield: true,
+      });
+    }
+
+    if (activeItems.length === 0) return;
+
+    const ringRadius = 26;
+    const ringSpacing = 72;
+    const totalWidth = (activeItems.length - 1) * ringSpacing;
+    const startX = (canvasWidth - totalWidth) / 2;
+    const ringY = canvasHeight - 270;
+
+    ctx.save();
+
+    for (let i = 0; i < activeItems.length; i++) {
+      const item = activeItems[i];
+      const cx = startX + i * ringSpacing;
+      const cy = ringY;
+      const ratio = item.isShield ? item.current / item.max : Math.max(0, item.current / item.max);
+
+      // Urgency pulse if remaining time <= 2.5s
+      let alpha = 1.0;
+      if (!item.isShield && item.current <= 2.5) {
+        alpha = 0.4 + 0.6 * Math.abs(Math.sin(Date.now() * 0.012));
+      }
+      ctx.globalAlpha = alpha;
+
+      // Dark circular backing
+      ctx.fillStyle = 'rgba(6, 12, 34, 0.88)';
+      ctx.beginPath();
+      ctx.arc(cx, cy, ringRadius + 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Background Track
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.beginPath();
+      ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Depleting Progress Ring (clockwise starting from top -Math.PI / 2)
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = item.meta.color;
+      ctx.shadowColor = item.meta.glow;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(cx, cy, ringRadius, -Math.PI / 2, -Math.PI / 2 + ratio * Math.PI * 2, false);
+      ctx.stroke();
+
+      // Center Glyph/Symbol
+      ctx.shadowBlur = 6;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(item.meta.symbol, cx, cy - 1);
+
+      // Label below ring: e.g. "4.2s" or "2x"
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = item.meta.color;
+      ctx.font = 'bold 12px monospace';
+      const labelText = item.isShield ? `${item.current}x` : `${item.current.toFixed(1)}s`;
+      ctx.fillText(labelText, cx, cy + ringRadius + 14);
+    }
+
+    ctx.restore();
   }
 }

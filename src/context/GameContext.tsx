@@ -14,6 +14,7 @@ import { soundManager } from '../utils/audio';
 import { achievementManager } from '../services/achievements';
 import { dbService } from '../services/db';
 import { authService } from '../services/auth';
+import { currencyService } from '../services/currency';
 import {
   parseCurrentRoute,
   getRoutePath,
@@ -55,7 +56,10 @@ interface GameContextType {
   saveUserLevel: (level: LevelData) => Promise<boolean>;
   deleteUserLevel: (id: string) => Promise<void>;
   updateLevelPrivacy: (id: string, isPublic: boolean) => Promise<void>;
-  recordLevelCompletion: (levelId: string, time: number) => Promise<{ rank: number; isNewBest: boolean }>;
+  recordLevelCompletion: (
+    levelId: string,
+    time: number
+  ) => Promise<{ rank: number; isNewBest: boolean; coresEarned?: number; isFirstClear?: boolean }>;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -346,8 +350,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       let rank = 1;
       let isNewBest = false;
+      let coresEarned = 0;
+      let isFirstClear = false;
 
-      // Only submit score and unlock speed_demon for non-restricted stages
+      // Only submit score and award currency for non-restricted stages
       if (!isRestricted) {
         const result = await dbService.submitScore(levelId, user.username, time);
         rank = result.rank;
@@ -356,6 +362,15 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (time < 30) {
           achievementManager.unlock('speed_demon');
+        }
+
+        const levelNum = parseInt(levelId, 10);
+        if (!isNaN(levelNum)) {
+          isFirstClear = !currencyService.isLevelClaimed(levelId);
+          coresEarned = currencyService.earnLevelReward(levelId, levelNum, user.username);
+        } else {
+          coresEarned = currencyService.earnArenaReward(levelId, 1.0, user.username);
+          isFirstClear = true;
         }
       }
 
@@ -392,7 +407,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
 
-      return { rank, isNewBest };
+      return { rank, isNewBest, coresEarned, isFirstClear };
     },
     [user.username, selectedLevel, isLevelSelfMadeOrTest]
   );
