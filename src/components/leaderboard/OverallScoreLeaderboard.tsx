@@ -134,22 +134,17 @@ export const OverallScoreLeaderboard: React.FC = () => {
       className="w-full h-full overflow-hidden backdrop-blur-xl"
     >
       {/* 1. Header Bar: Trophy Icon, Title & Compact Tab Toggle */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-cyan-500/20 bg-cyan-950/20 flex-shrink-0 gap-2">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-400/35 flex items-center justify-center text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.25)] flex-shrink-0">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-cyan-500/20 bg-cyan-950/20 flex-shrink-0 gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+          <div className="w-6 h-6 rounded-md bg-amber-500/15 border border-amber-400/35 flex items-center justify-center text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.25)] flex-shrink-0">
             <Trophy className="w-3.5 h-3.5 text-amber-400" />
           </div>
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5 leading-none">
-              <span className="font-tech text-[9px] font-bold text-cyan-400 tracking-wider">
-                SCORE
-              </span>
-              <h3 className="font-display font-bold text-[11.5px] text-white tracking-wide whitespace-nowrap">
-                LEADERBOARD
-              </h3>
-            </div>
-            <span className="font-ui text-[9px] text-slate-400 tracking-normal leading-none mt-1 whitespace-nowrap">
-              Global Pilot Rankings
+          <div className="flex flex-col min-w-0 truncate">
+            <h3 className="font-display font-bold text-xs text-white tracking-wider truncate leading-tight">
+              TOP PILOTS
+            </h3>
+            <span className="font-ui text-[9px] text-slate-400 tracking-normal leading-none mt-0.5 truncate">
+              Global Rankings
             </span>
           </div>
         </div>
@@ -175,7 +170,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                     background: 'transparent',
                   }),
             }}
-            className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md font-tech font-bold text-[9px] sm:text-[9.5px] tracking-wider transition-all cursor-pointer whitespace-nowrap"
+            className="px-2 py-0.5 rounded-md font-tech font-bold text-[9px] tracking-wider transition-all cursor-pointer whitespace-nowrap"
           >
             ALL-TIME
           </button>
@@ -198,7 +193,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                     background: 'transparent',
                   }),
             }}
-            className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md font-tech font-bold text-[9px] sm:text-[9.5px] tracking-wider transition-all cursor-pointer whitespace-nowrap"
+            className="px-2 py-0.5 rounded-md font-tech font-bold text-[9px] tracking-wider transition-all cursor-pointer whitespace-nowrap"
           >
             WEEKLY
           </button>
@@ -209,19 +204,19 @@ export const OverallScoreLeaderboard: React.FC = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '40px 1fr 55px 75px',
+          gridTemplateColumns: '34px 1fr 46px 56px',
           alignItems: 'center',
           backgroundColor: 'rgba(5, 8, 22, 0.85)',
         }}
-        className="px-3.5 py-2 text-[10px] font-tech text-slate-400 border-b border-cyan-500/15 uppercase tracking-wider flex-shrink-0"
+        className="px-3 py-2 text-[10px] font-tech text-slate-400 border-b border-cyan-500/15 uppercase tracking-wider flex-shrink-0"
       >
         <span className="text-center font-bold">RANK</span>
         <span className="text-left pl-1 font-bold">PILOT</span>
-        <span className="text-center font-bold flex items-center justify-center gap-1">
-          <CoreIcon size={11} glow variant="cyan" />
+        <span className="text-center font-bold flex items-center justify-center gap-0.5">
+          <CoreIcon size={10} glow variant="cyan" />
           CORES
         </span>
-        <span className="text-right font-bold pr-2">SCORE</span>
+        <span className="text-right font-bold pr-1">SCORE</span>
       </div>
 
       {/* 3. Skeleton Loading State or Ranking Rows List */}
@@ -236,19 +231,19 @@ export const OverallScoreLeaderboard: React.FC = () => {
               key={`skeleton-${idx}`}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '40px 1fr 55px 75px',
+                gridTemplateColumns: '34px 1fr 46px 56px',
                 alignItems: 'center',
               }}
-              className="px-3.5 py-3 transition-colors"
+              className="px-3 py-2.5 transition-colors"
             >
               {/* Rank Placeholder */}
               <div className="flex items-center justify-center">
-                <div className="w-5 h-5 rounded-md cyber-shimmer-box" />
+                <div className="w-4 h-4 rounded-md cyber-shimmer-box" />
               </div>
 
               {/* Pilot Placeholder */}
-              <div className="flex items-center gap-2 pl-1 min-w-0">
-                <div className="w-6 h-6 rounded-full cyber-shimmer-box flex-shrink-0" />
+              <div className="flex items-center gap-1.5 pl-1 min-w-0">
+                <div className="w-5.5 h-5.5 rounded-full cyber-shimmer-box flex-shrink-0" />
                 <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                   <div
                     className="h-2.5 rounded cyber-shimmer-box"
@@ -260,12 +255,12 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
               {/* Cores Cleared Placeholder */}
               <div className="flex items-center justify-center">
-                <div className="h-2.5 w-7 rounded cyber-shimmer-box" />
+                <div className="h-2.5 w-6 rounded cyber-shimmer-box" />
               </div>
 
               {/* Score Placeholder (No PTS label box) */}
-              <div className="flex justify-end pr-2">
-                <div className="h-3 w-12 rounded cyber-shimmer-box" />
+              <div className="flex justify-end pr-1">
+                <div className="h-3 w-10 rounded cyber-shimmer-box" />
               </div>
             </div>
           ))}

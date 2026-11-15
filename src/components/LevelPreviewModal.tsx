@@ -6,7 +6,6 @@ import {
   Play,
   ChevronsRight,
   Home,
-  ArrowLeft,
   Boxes,
   RotateCcw,
   Shield,
@@ -16,6 +15,7 @@ import {
 export const LevelPreviewModal: React.FC = () => {
   const {
     selectedLevel,
+    setSelectedLevel,
     setScreen,
     startPlayLevel,
     localLevels,
@@ -31,8 +31,8 @@ export const LevelPreviewModal: React.FC = () => {
     if (selectedLevel && canvasRef.current) {
       const canvas = canvasRef.current;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const displayW = canvas.clientWidth || 320;
-      const displayH = canvas.clientHeight || 155;
+      const displayW = canvas.clientWidth || 340;
+      const displayH = canvas.clientHeight || 160;
       canvas.width = Math.round(displayW * dpr);
       canvas.height = Math.round(displayH * dpr);
       const reservedBottom = Math.round(36 * dpr);
@@ -100,59 +100,53 @@ export const LevelPreviewModal: React.FC = () => {
       className="active"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
+          setSelectedLevel(null);
           setScreen('menu');
         }
       }}
     >
       <div className="rapper">
-        {/* Top Header Bar: Back Button, Title, Mode Pill */}
-        <div className="flex items-center justify-between w-full pb-1 border-b border-white/10">
-          <button
-            type="button"
-            onClick={() => setScreen('menu')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 border border-white/15 text-slate-200 text-xs font-ui transition-all cursor-pointer"
-            aria-label="Back to Campaign"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" />
-            <span style={{ color: '#ffffff', fontWeight: 600 }}>Back</span>
-          </button>
-
-          <div className="flex items-center gap-2">
-            <img
-              src="/logo.png"
-              alt="Breakout Comet"
-              className="w-5 h-5 rounded-full object-cover shadow-[0_0_8px_#ff4500]"
-            />
-            <div className="flex flex-col items-start">
+        {/* Top Header Bar: Logo, Title, Creator & Thick Mode Badge (No Back button needed) */}
+        <div className="flex items-center justify-between w-full pb-2 border-b border-cyan-500/20">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="relative flex items-center justify-center flex-shrink-0">
+              <img
+                src="/logo.png"
+                alt="Breakout Comet"
+                className="w-6 h-6 rounded-full object-cover shadow-[0_0_10px_#ff4500]"
+              />
+              <div className="absolute inset-0 rounded-full border border-orange-400/40 pointer-events-none" />
+            </div>
+            <div className="flex flex-col min-w-0">
               <span
-                className="font-display font-black text-sm tracking-widest uppercase"
-                style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.5)' }}
+                className="font-display font-black text-sm tracking-wider uppercase truncate"
+                style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.45)' }}
               >
                 {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
               </span>
               {!isCampaign && selectedLevel.creator && (
-                <span className="font-ui text-[10px] text-slate-400 mt-0.5">
+                <span className="font-ui text-[11px] text-slate-400 truncate">
                   By @{selectedLevel.creator}
                 </span>
               )}
             </div>
           </div>
 
-          <span className="px-2 py-0.5 rounded-full text-[9px] font-tech font-bold uppercase tracking-wider bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">
+          <span className="px-3 py-1 rounded-full text-[10px] font-tech font-bold uppercase tracking-wider bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 shadow-[0_0_10px_rgba(0,247,255,0.25)] flex-shrink-0">
             {isCampaign ? 'Campaign' : 'Community'}
           </span>
         </div>
 
-        {/* Compact Game Canvas Preview Container */}
+        {/* Game Canvas Preview Container */}
         <div
           className="relative w-full rounded-xl overflow-hidden border border-cyan-500/30 bg-[#050716] shadow-[0_0_20px_rgba(0,0,0,0.8)] flex-shrink-0"
-          style={{ width: '100%', height: '155px', minHeight: '155px' }}
+          style={{ width: '100%', height: '160px', minHeight: '160px' }}
         >
           <canvas
             ref={canvasRef}
             id="preview"
             className="w-full h-full block"
-            style={{ width: '100%', height: '155px', display: 'block' }}
+            style={{ width: '100%', height: '160px', display: 'block' }}
           />
 
           {/* Bottom HUD Overlay on Canvas */}
@@ -198,8 +192,8 @@ export const LevelPreviewModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Controls: Compact, Moderate Radius (12px outer, matching inner) */}
-        <div className="flex items-center gap-2 w-full mt-1">
+        {/* Action Controls: START / REPLAY and HOME */}
+        <div className="flex items-center gap-2 w-full mt-0.5">
           {/* 1. START / REPLAY Button */}
           <button
             type="button"
@@ -211,7 +205,7 @@ export const LevelPreviewModal: React.FC = () => {
               boxShadow: '0 0 16px rgba(255, 8, 68, 0.45)',
               border: '1.5px solid #ff7ebd',
             }}
-            className="flex-1 h-11 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider text-white active:scale-[0.98] transition-all cursor-pointer"
+            className="flex-1 h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider text-white active:scale-[0.98] transition-all cursor-pointer"
           >
             {isCompleted ? (
               <>
@@ -239,16 +233,19 @@ export const LevelPreviewModal: React.FC = () => {
                 boxShadow: '0 0 16px rgba(0, 247, 255, 0.45)',
                 border: '1.5px solid #a5f3fc',
               }}
-              className="w-11 h-11 flex items-center justify-center text-black active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
+              className="w-12 h-12 flex items-center justify-center text-black active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
             >
               <ChevronsRight className="w-5 h-5 stroke-[2.8]" />
             </button>
           )}
 
-          {/* 3. HOME Button: Moderate Radius matching others */}
+          {/* 3. HOME Button: Clicking closes modal and returns to menu */}
           <button
             type="button"
-            onClick={() => setScreen('menu')}
+            onClick={() => {
+              setSelectedLevel(null);
+              setScreen('menu');
+            }}
             title="Return to Menu"
             style={{
               borderRadius: '12px',
@@ -257,14 +254,14 @@ export const LevelPreviewModal: React.FC = () => {
               border: '1.5px solid #475569',
               boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
             }}
-            className="w-11 h-11 flex items-center justify-center text-slate-200 hover:text-white active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
+            className="w-12 h-12 flex items-center justify-center text-slate-200 hover:text-white active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
           >
             <Home className="w-5 h-5 stroke-[2.2]" />
           </button>
         </div>
 
         {/* Players Ranking Component */}
-        <div className="w-full mt-1">
+        <div className="w-full mt-0.5">
           <CyberRankingTable
             entries={leaderboardEntries}
             title="CORE RANKINGS"

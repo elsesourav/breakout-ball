@@ -25,13 +25,16 @@ export const OnlineMode: React.FC = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchTargetIdx, setSearchTargetIdx] = useState(0);
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
+  const [dailyAvailable, setDailyAvailable] = useState<boolean>(() => currencyService.getDailyCollectStatus().canCollect);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Sync available cores from currencyService
   useEffect(() => {
     setCores(currencyService.getBalance());
+    setDailyAvailable(currencyService.getDailyCollectStatus().canCollect);
     currencyService.load(user.username).then(() => {
       setCores(currencyService.getBalance());
+      setDailyAvailable(currencyService.getDailyCollectStatus().canCollect);
     });
   }, [user.username]);
 
@@ -95,26 +98,55 @@ export const OnlineMode: React.FC = () => {
           title={user.fullName || user.username.toUpperCase() || 'CYBER PILOT'}
           subtitle={`@${user.username || 'pilot'}`}
           rightSlot={
-            <button
-              type="button"
-              onClick={() => setActiveTab('armory')}
-              title="View Cores in Armory"
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
-                border: '1.2px solid rgba(0, 247, 255, 0.45)',
-                boxShadow: '0 0 12px rgba(0, 247, 255, 0.25)',
-              }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-400 active:scale-95 transition-all"
-            >
-              <CoreIcon size={15} glow variant="cyan" />
-              <span className="font-tech font-bold text-xs text-cyan-200">
-                {cores.toLocaleString()}
-              </span>
-              <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
-                CORES
-              </span>
-            </button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {dailyAvailable && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('armory');
+                    if (typeof window !== 'undefined') {
+                      window.history.pushState(null, '', '/shop');
+                      window.dispatchEvent(new CustomEvent('open-core-shop'));
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/25 via-yellow-500/35 to-amber-500/25 border border-amber-400 text-amber-300 font-tech font-bold text-xs shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                  title="Claim 50 Free Cores in Armory Shop"
+                >
+                  <span className="text-xs">🎁</span>
+                  <span className="tracking-wider">FREE 50</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('armory');
+                  if (typeof window !== 'undefined') {
+                    window.history.pushState(null, '', '/shop');
+                    window.dispatchEvent(new CustomEvent('open-core-shop'));
+                  }
+                }}
+                title="View Cores & Shop"
+                style={{
+                  background:
+                    'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
+                  border: '1.2px solid rgba(0, 247, 255, 0.45)',
+                  boxShadow: '0 0 12px rgba(0, 247, 255, 0.25)',
+                }}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.4)] active:scale-95 group transition-all"
+              >
+                <CoreIcon size={15} glow variant="cyan" className="group-hover:rotate-12 transition-transform" />
+                <span className="font-tech font-bold text-xs text-cyan-200">
+                  {cores.toLocaleString()}
+                </span>
+                <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
+                  CORES
+                </span>
+                <span className="w-3.5 h-3.5 rounded-full bg-cyan-400/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center text-[10px] font-bold group-hover:bg-cyan-400 group-hover:text-black transition-colors ml-0.5">
+                  +
+                </span>
+              </button>
+            </div>
           }
         />
       </div>

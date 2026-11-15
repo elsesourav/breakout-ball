@@ -1,9 +1,5 @@
 import { PaddleState } from '../types';
-import {
-  PaddleTier,
-  TopWeaponVariant,
-  getPaddleTierFromUpgrades,
-} from '../../constants/visualPresets';
+import { PaddleTier, getPaddleTierFromUpgrades } from '../../constants/visualPresets';
 
 export interface PaddleRenderOptions {
   animTick?: number;
@@ -12,22 +8,16 @@ export interface PaddleRenderOptions {
   tier?: PaddleTier;
   widthLevel?: number;
   speedLevel?: number;
-  weaponVariant?: TopWeaponVariant;
 }
 
 /**
- * Universal Paddle Drawer (Chosen Design: Mech Titan Dreadnought)
- *
+ * Mech Titan Dreadnought Paddle
+ * Selected as the locked paddle design for the game.
+ * Features built-in Integrated Rail Turrets (active when laser buff is held).
  * Dynamically evolves across 3 progressive Armory Upgrade Tiers:
  *   - Tier 1: Base Heavy Gunmetal Plating, Dual Heat Vents, Hazard Chevron Plate
  *   - Tier 2: Reinforced Plating, Dual Ion Thrusters with Plasma Flames, Quad Vents
- *   - Tier 3: Apex Overdrive, Quad Thrusters, Reinforced Side Deflection Winglets, Deflector Forcefield
- *
- * Top Weapon Mount Options (Eliminates ugly red antenna stalks):
- *   - Variant 1: Integrated Rail Turrets (Angled low-profile accelerator rails)
- *   - Variant 2: Twin Hex Missile Pods (Honeycomb micro-launcher cells)
- *   - Variant 3: Aerodynamic Plasma Blasters (Forward-swept strike cowlings)
- *   - Variant 4: Concealed Stealth Emitters (Clean flush top silhouette)
+ *   - Tier 3: Apex Overdrive, Quad Thrusters with Sparks, Reinforced Winglets, Deflector Forcefield
  */
 export function drawPaddleWithPreset(
   ctx: CanvasRenderingContext2D,
@@ -46,9 +36,6 @@ export function drawPaddle(
   drawMechTitanPaddle(ctx, paddle, options);
 }
 
-/**
- * Mech Titan Dreadnought Paddle Implementation
- */
 export function drawMechTitanPaddle(
   ctx: CanvasRenderingContext2D,
   paddle: PaddleState,
@@ -60,9 +47,8 @@ export function drawMechTitanPaddle(
   const pw = paddle.width;
   const ph = paddle.height;
   const chamfer = 8;
-  const weaponVariant: TopWeaponVariant = options.weaponVariant || 1;
 
-  // Determine Progression Tier (1: Base, 2: Reinforced, 3: Apex Overdrive)
+  // Progression Tier (1: Base, 2: Reinforced, 3: Apex Overdrive)
   const tier: PaddleTier =
     options.tier !== undefined
       ? options.tier
@@ -183,7 +169,7 @@ export function drawMechTitanPaddle(
     ctx.shadowBlur = 0;
   });
 
-  // 5. Center Reinforced Titanium Bumper Plate & Hazard Stripes
+  // 5. Center Reinforced Titanium Bumper Plate & Hazard Chevrons
   const centerW = pw * (tier === 3 ? 0.32 : 0.36);
   const centerPlateX = paddle.x - centerW / 2;
   ctx.fillStyle = '#1e293b';
@@ -237,132 +223,13 @@ export function drawMechTitanPaddle(
     ctx.shadowBlur = 0;
   }
 
-  // 6. TOP SECTION ATTACHMENT / WEAPON MOUNT (Replaces crude red stalks)
+  // 6. INTEGRATED RAIL TURRETS (The user's chosen top weapon mounts)
   if (options.hasLaser) {
     const cannonOffset = (pw / 2) * 0.74;
     const cannonXPositions = [paddle.x - cannonOffset, paddle.x + cannonOffset];
 
     cannonXPositions.forEach((cx) => {
-      renderTopWeaponMount(ctx, cx, py, weaponVariant, tier, animTick);
-    });
-  }
-
-  ctx.restore();
-}
-
-/**
- * Top Weapon Mount Renderers (4 Clean High-Tech Variants)
- */
-function renderTopWeaponMount(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  py: number,
-  variant: TopWeaponVariant,
-  tier: PaddleTier,
-  animTick: number
-) {
-  ctx.save();
-
-  switch (variant) {
-    case 2: {
-      // ── VARIANT 2: TWIN HEX MISSILE PODS ──
-      // Angled low-profile hexagonal armor pods flush with top chamfer
-      const podW = 20;
-      const podH = 14;
-      const podY = py - 8;
-
-      ctx.fillStyle = '#0f172a';
-      ctx.strokeStyle = tier === 3 ? '#38bdf8' : '#94a3b8';
-      ctx.lineWidth = 1.6;
-      drawChamfer(ctx, cx - podW / 2, podY, podW, podH, 4);
-      ctx.fill();
-      ctx.stroke();
-
-      // 4 Micro-Missile Honeycomb Bores
-      const cellOffsets = [
-        [-5, -2],
-        [5, -2],
-        [-5, 3],
-        [5, 3],
-      ];
-      cellOffsets.forEach(([dx, dy]) => {
-        // Dark Bore
-        ctx.fillStyle = '#020617';
-        ctx.beginPath();
-        ctx.arc(cx + dx, podY + podH / 2 + dy, 2.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Amber/Red Targeting Glint
-        const pulse = Math.sin(animTick * 8 + dx) * 0.3 + 0.7;
-        ctx.fillStyle = `rgba(245, 158, 11, ${pulse})`;
-        ctx.beginPath();
-        ctx.arc(cx + dx, podY + podH / 2 + dy, 1.1, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      break;
-    }
-
-    case 3: {
-      // ── VARIANT 3: AERODYNAMIC PLASMA BLASTERS ──
-      // Forward-swept aerodynamic strike cowlings with high-energy plasma discharge aperture
-      const finW = 18;
-      const finH = 15;
-      const finY = py - 10;
-
-      ctx.fillStyle = '#1e293b';
-      ctx.strokeStyle = tier === 3 ? '#ff0055' : '#a855f7';
-      ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      ctx.moveTo(cx - finW / 2, py + 2);
-      ctx.lineTo(cx - finW * 0.3, finY);
-      ctx.lineTo(cx + finW * 0.3, finY);
-      ctx.lineTo(cx + finW / 2, py + 2);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // High-Energy Plasma Slit
-      const plasmaColor = tier === 3 ? '#ff0055' : '#c084fc';
-      ctx.fillStyle = plasmaColor;
-      ctx.shadowColor = plasmaColor;
-      ctx.shadowBlur = 10;
-      ctx.fillRect(cx - 3, finY + 2, 6, finH - 5);
-      ctx.shadowBlur = 0;
-
-      // Specular Emitter Tip
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(cx - 1.5, finY - 1, 3, 3);
-      break;
-    }
-
-    case 4: {
-      // ── VARIANT 4: CONCEALED STEALTH EMITTERS (CLEAN FLUSH TOP) ──
-      // Zero protruding geometry above the hull! Two recessed pulse-slits flush with upper armor plate
-      const slitW = 16;
-      const slitH = 4;
-      const slitY = py + 2;
-
-      ctx.fillStyle = '#020617';
-      ctx.fillRect(cx - slitW / 2, slitY, slitW, slitH);
-
-      const pulse = Math.sin(animTick * 12) * 0.3 + 0.7;
-      const beamColor = tier === 3 ? `rgba(255, 0, 85, ${pulse})` : `rgba(0, 247, 255, ${pulse})`;
-      ctx.fillStyle = beamColor;
-      ctx.shadowColor = tier === 3 ? '#ff0055' : '#00f7ff';
-      ctx.shadowBlur = 10;
-      ctx.fillRect(cx - slitW * 0.4, slitY + 1, slitW * 0.8, slitH - 2);
-
-      // Micro LED aperture glint
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(cx - 1.5, slitY, 3, slitH);
-      ctx.shadowBlur = 0;
-      break;
-    }
-
-    case 1:
-    default: {
-      // ── VARIANT 1 (DEFAULT): INTEGRATED RAIL TURRETS ──
-      // Low-profile angular gunmetal casing integrated into top chamfer
+      // Angular low-profile gunmetal casing integrated into top chamfer
       const casingW = 20;
       const casingH = 13;
       const casingY = py - 8;
@@ -379,19 +246,18 @@ function renderTopWeaponMount(
       ctx.fillRect(cx - 6, casingY - 3, 3.5, casingH + 1);
       ctx.fillRect(cx + 2.5, casingY - 3, 3.5, casingH + 1);
 
-      // Central Energy Arc Conduit
+      // Central High-Energy Plasma Conduit
       const railGlow = tier === 3 ? '#00f7ff' : '#38bdf8';
       ctx.fillStyle = railGlow;
       ctx.shadowColor = railGlow;
       ctx.shadowBlur = 10;
       ctx.fillRect(cx - 2, casingY - 2, 4, casingH - 3);
 
-      // Top Collimator Aperture
+      // Top Collimator Bore Tip
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(cx - 1.5, casingY - 5, 3, 3);
       ctx.shadowBlur = 0;
-      break;
-    }
+    });
   }
 
   ctx.restore();

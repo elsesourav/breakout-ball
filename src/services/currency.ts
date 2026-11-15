@@ -196,6 +196,56 @@ class CurrencyService {
     const currentLevel = this.upgrades[upgradeId] ?? 1;
     return getUpgradeCost(def.baseCost, currentLevel);
   }
+
+  // ─── Daily Free 50 Cores Reward System ────────────────────────
+  public getDailyCollectStatus(): DailyCollectStatus {
+    try {
+      const raw = localStorage.getItem(DAILY_COLLECT_KEY);
+      const lastCollected = raw ? parseInt(raw, 10) : null;
+      if (!lastCollected || isNaN(lastCollected)) {
+        return { canCollect: true, remainingMs: 0, lastCollected: null, amount: DAILY_COLLECT_AMOUNT };
+      }
+      const elapsed = Date.now() - lastCollected;
+      if (elapsed >= DAILY_COLLECT_COOLDOWN_MS) {
+        return { canCollect: true, remainingMs: 0, lastCollected, amount: DAILY_COLLECT_AMOUNT };
+      }
+      return {
+        canCollect: false,
+        remainingMs: Math.max(0, DAILY_COLLECT_COOLDOWN_MS - elapsed),
+        lastCollected,
+        amount: DAILY_COLLECT_AMOUNT,
+      };
+    } catch {
+      return { canCollect: true, remainingMs: 0, lastCollected: null, amount: DAILY_COLLECT_AMOUNT };
+    }
+  }
+
+  public claimDailyCores(username?: string): { success: boolean; amount: number; newBalance: number } {
+    const status = this.getDailyCollectStatus();
+    if (!status.canCollect) {
+      return { success: false, amount: 0, newBalance: this.balance };
+    }
+    const now = Date.now();
+    try {
+      localStorage.setItem(DAILY_COLLECT_KEY, now.toString());
+    } catch { /* storage full */ }
+    this.balance += DAILY_COLLECT_AMOUNT;
+    this.saveToLocal();
+    this.syncToCloud(username).catch(() => {});
+    return { success: true, amount: DAILY_COLLECT_AMOUNT, newBalance: this.balance };
+  }
+}
+
+// ─── Daily Reward Constants & Types ─────────────────────────────
+const DAILY_COLLECT_KEY = 'breakout_daily_collect_timestamp';
+export const DAILY_COLLECT_AMOUNT = 50;
+export const DAILY_COLLECT_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+export interface DailyCollectStatus {
+  canCollect: boolean;
+  remainingMs: number;
+  lastCollected: number | null;
+  amount: number;
 }
 
 export const currencyService = new CurrencyService();

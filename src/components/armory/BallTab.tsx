@@ -166,7 +166,7 @@ export const BallTab: React.FC<BallTabProps> = ({ upgrades, cores, onUpgrade }) 
 
         {/* Realtime 3-Column Stat Badges */}
         <div className="w-full grid grid-cols-3 gap-2 text-center">
-          <div className="p-2 rounded-xl bg-black/50 border border-purple-500 flex flex-col items-center">
+          <div className="p-2 rounded-xl bg-black/50 border border-purple-500/20 flex flex-col items-center">
             <span className="text-[8.5px] font-tech text-slate-400 uppercase">RADIUS</span>
             <span className="font-tech font-black text-xs text-purple-300">
               +{sizeLvl * 5}%

@@ -49,23 +49,23 @@ export const AchievementsList: React.FC = () => {
     >
       {/* 1. Fixed Header with Progress Bar & Filters */}
       <div className="flex flex-col gap-2.5 p-3.5 border-b border-cyan-500/15 bg-cyan-950/20 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.3)] flex-shrink-0">
               <Award className="w-4 h-4 text-amber-400" />
             </div>
-            <div className="flex flex-col">
-              <h3 className="font-display font-black text-xs text-white tracking-wider leading-tight">
+            <div className="flex flex-col min-w-0">
+              <h3 className="font-display font-black text-xs text-white tracking-wider leading-tight truncate">
                 BADGES SHOWCASE
               </h3>
-              <span className="font-tech text-[10px] text-amber-400 tracking-widest mt-0.5">
+              <span className="font-tech text-[10px] text-amber-400 tracking-widest mt-0.5 truncate">
                 PILOT ACCOMPLISHMENTS
               </span>
             </div>
           </div>
 
-          <span className="font-tech text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 shadow-[0_0_8px_rgba(255,215,0,0.2)]">
-            {unlockedCount} / {achievements.length} UNLOCKED
+          <span className="font-tech text-xs font-black px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 shadow-[0_0_8px_rgba(255,215,0,0.2)] tracking-wider flex-shrink-0 whitespace-nowrap">
+            {unlockedCount} / {achievements.length}
           </span>
         </div>
 
@@ -180,19 +180,6 @@ export const AchievementsList: React.FC = () => {
                 <p className="font-ui text-[11px] text-slate-300 leading-snug line-clamp-2 mt-0.5">
                   {ach.description}
                 </p>
-              </div>
-
-              {/* Status Badge */}
-              <div className="flex-shrink-0">
-                <span
-                  className={`font-tech font-bold text-[9px] px-2 py-0.5 rounded-full tracking-wider ${
-                    ach.unlocked
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40 shadow-[0_0_6px_rgba(255,215,0,0.25)]'
-                      : 'bg-slate-800/80 text-slate-400 border border-slate-700/50'
-                  }`}
-                >
-                  {ach.unlocked ? 'UNLOCKED' : 'LOCKED'}
-                </span>
               </div>
             </div>
           );

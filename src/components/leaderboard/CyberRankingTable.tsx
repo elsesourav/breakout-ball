@@ -52,7 +52,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '36px 1fr 60px 52px',
+          gridTemplateColumns: '40px 1fr 64px 54px',
           alignItems: 'center',
           backgroundColor: 'rgba(0, 0, 0, 0.45)',
         }}
@@ -64,14 +64,14 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
         <span className="text-right pr-1 font-bold">TIME</span>
       </div>
 
-      {/* Ranking Rows - Fixed compact scrollable height showing ~4 rows */}
+      {/* Ranking Rows - Expanded height comfortably showing ~6 rows */}
       <div
         style={{
-          maxHeight: '144px',
+          maxHeight: '215px',
           overflowY: 'auto',
           overscrollBehaviorY: 'contain',
         }}
-        className="flex flex-col divide-y divide-white/5 cyber-scroll pr-1"
+        className="flex flex-col divide-y divide-white/5 no-scrollbar"
       >
         {entries.length === 0 ? (
           <div className="py-3 text-center text-xs font-ui text-slate-400">
@@ -174,11 +174,11 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
                 key={`rank-${entry.rank}-${entry.username}`}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '36px 1fr 60px 52px',
+                  gridTemplateColumns: '40px 1fr 64px 54px',
                   alignItems: 'center',
                   ...rowBgStyle,
                 }}
-                className={`px-3 py-1.5 transition-colors ${rowBorderClass}`}
+                className={`px-3 py-2 transition-colors ${rowBorderClass}`}
               >
                 {/* Rank Badge */}
                 <div className="flex items-center justify-center">
@@ -248,7 +248,7 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
       </div>
 
       {/* Scrollable Indicator Pill for Top 10 Leaderboard */}
-      {entries.length > 4 && (
+      {entries.length > 6 && (
         <div className="py-1 px-3 bg-black/60 border-t border-white/5 flex items-center justify-between text-[9px] font-tech text-slate-400">
           <span>TOP 10 PILOTS</span>
           <span className="text-cyan-400/90 font-bold animate-pulse tracking-wider">SCROLL FOR MORE ▼</span>
