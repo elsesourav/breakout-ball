@@ -16,9 +16,6 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { createDemoPilotUser } from './demoPilotHelper';
 import { handleRequestPasswordOtp, handleVerifyOtpAndResetPassword } from './authRecoveryHelper';
 
-export const ADMIN_USERNAME = 'admin.elSourav';
-export const ADMIN_SECRET_PASSWORD = 'Apex#Titan2026!ElseSourav@VM3';
-
 export interface AuthUser {
   id: string;
   fullName: string;
@@ -36,13 +33,7 @@ export function isUserAdmin(user?: { username?: string; email?: string; isAdmin?
   if (user.isAdmin) return true;
   const uname = (user.username || '').toLowerCase();
   const email = (user.email || '').toLowerCase();
-  return (
-    uname === 'admin.elsourav' ||
-    uname === 'admin.elsourav' ||
-    uname === 'elsesourav' ||
-    email === 'admin@elsesourav.com' ||
-    email === 'elsesourav@gmail.com'
-  );
+  return uname === 'elsesourav' || email === 'elsesourav@gmail.com';
 }
 
 export interface AuthState {
@@ -101,16 +92,15 @@ class AuthService {
       if (event === 'SIGNED_IN' && session?.user) {
         const u = session.user;
         const meta = u.user_metadata || {};
-        const rawUsername = meta.username || meta.user_name || u.email?.split('@')[0] || 'player';
-        const fullName = meta.full_name || meta.name || rawUsername;
-        const isAdmin = isUserAdmin({ username: rawUsername, email: u.email || '' });
-        const username = isAdmin ? ADMIN_USERNAME : rawUsername;
+        const username = meta.username || meta.user_name || u.email?.split('@')[0] || 'player';
+        const fullName = meta.full_name || meta.name || username;
+        const isAdmin = isUserAdmin({ username, email: u.email || '' });
         const user: AuthUser = {
           id: u.id,
           fullName,
           username,
           email: u.email || '',
-          avatarUrl: meta.avatar_url,
+          avatarUrl: meta.avatar_url || meta.picture || meta.photoUrl,
           provider: 'credentials',
           isLoggedIn: true,
           isAdmin,
@@ -169,26 +159,6 @@ class AuthService {
       return { success: false, message: 'Please enter both identifier and password' };
     }
 
-    // Special Master Admin check (admin.elSourav)
-    const lower = cleanIdentifier.toLowerCase();
-    if (lower === 'admin.elsourav' || lower === 'admin@elsesourav.com') {
-      if (password === ADMIN_SECRET_PASSWORD) {
-        const adminUser: AuthUser = {
-          id: 'usr_admin_elsourav_master',
-          fullName: 'ElseSourav Command Center',
-          username: ADMIN_USERNAME,
-          email: 'admin@elsesourav.com',
-          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop',
-          provider: 'credentials',
-          isLoggedIn: true,
-          isAdmin: true,
-          token: `adm_sec_${Date.now()}`,
-        };
-        this.setCurrentUser(adminUser);
-        return { success: true, user: adminUser };
-      }
-    }
-
     try {
       let targetEmail = cleanIdentifier;
 
@@ -222,17 +192,24 @@ class AuthService {
 
       if (!sbError && sbData?.user) {
         const meta = sbData.user.user_metadata || {};
-        const rawUsername = meta.username || meta.user_name || cleanIdentifier.toLowerCase();
+        const username = meta.username || meta.user_name || cleanIdentifier.toLowerCase();
         const fullName = meta.full_name || meta.name || cleanIdentifier;
-        const isAdmin = isUserAdmin({ username: rawUsername, email: sbData.user.email || targetEmail });
-        const username = isAdmin ? ADMIN_USERNAME : rawUsername;
+        const email = sbData.user.email || targetEmail;
+        const isAdmin = isUserAdmin({ username, email });
+        let avatarUrl = meta.avatar_url || meta.picture || meta.photoUrl;
+        if (!avatarUrl) {
+          try {
+            const { data: uRow } = await supabase.from('User').select('photoUrl').eq('email', email).maybeSingle();
+            if (uRow?.photoUrl) avatarUrl = uRow.photoUrl;
+          } catch {}
+        }
 
         const user: AuthUser = {
           id: sbData.user.id,
           fullName,
           username,
-          email: sbData.user.email || targetEmail,
-          avatarUrl: meta.avatar_url,
+          email,
+          avatarUrl,
           provider: 'credentials',
           isLoggedIn: true,
           isAdmin,
@@ -448,7 +425,13 @@ class AuthService {
       const { data } = await supabase.auth.getUser();
       if (data?.user) {
         const meta = data.user.user_metadata || {};
-        const newAvatar = meta.avatar_url;
+        let newAvatar = meta.avatar_url || meta.picture || meta.photoUrl;
+        if (!newAvatar && current.email) {
+          try {
+            const { data: uRow } = await supabase.from('User').select('photoUrl').eq('email', current.email).maybeSingle();
+            if (uRow?.photoUrl) newAvatar = uRow.photoUrl;
+          } catch {}
+        }
         if (newAvatar && newAvatar !== current.avatarUrl) {
           const updated: AuthUser = {
             ...current,
@@ -472,6 +455,7 @@ class AuthService {
     } catch {}
     localStorage.removeItem(this.userKey);
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem('breakout_admin_token');
   }
 }
 

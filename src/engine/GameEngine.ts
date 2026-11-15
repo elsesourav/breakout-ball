@@ -36,6 +36,7 @@ export class GameEngine {
   private lastTime: number = 0;
   private accumulator: number = 0;
   private isPaused: boolean = false;
+  private buffsEmitTimer: number = 0;
 
   // Fixed 60Hz physics timestep (0.016667s) guarantees identical speed on all devices (60Hz, 120Hz, 144Hz, 240Hz, mobile, tablet)
   private readonly FIXED_STEP: number = 1 / 60;
@@ -276,6 +277,15 @@ export class GameEngine {
       dt,
       this.tsPhysics.blocks
     );
+
+    // Periodically sync active buffs to HUD Line 2 (~10Hz) or immediately upon collecting
+    if (this.callbacks.onBuffsChange) {
+      this.buffsEmitTimer = (this.buffsEmitTimer || 0) + 1;
+      if (this.buffsEmitTimer >= 6 || collected.length > 0) {
+        this.buffsEmitTimer = 0;
+        this.callbacks.onBuffsChange(this.powerUps.getActiveBuffs());
+      }
+    }
 
     // Handle Collected Power-Ups
     for (const powerType of collected) {

@@ -217,12 +217,12 @@ export const OverallScoreLeaderboard: React.FC = () => {
       }}
       className="w-full h-full overflow-hidden backdrop-blur-xl"
     >
-      {/* 1. Header Bar: Custom Big Trophy Icon, Title & Compact Tab Toggle */}
+      {/* 1. Header Bar: Simple Clean Trophy Icon, Title & Compact Tab Toggle */}
       <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-cyan-500/20 bg-cyan-950/20 flex-shrink-0 gap-2 min-w-0">
         <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
-          {/* Custom Big Cyber Trophy Icon */}
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500/25 via-yellow-500/15 to-amber-950/40 border border-amber-400/50 flex items-center justify-center shadow-[0_0_16px_rgba(245,158,11,0.4)] flex-shrink-0 relative overflow-hidden">
-            <CyberTrophyIcon size={30} glow />
+          {/* Simple Clean Trophy Icon (No blurry glow, no overflow) */}
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-400/30 flex items-center justify-center flex-shrink-0">
+            <CyberTrophyIcon size={20} />
           </div>
           <div className="flex flex-col min-w-0 truncate">
             <h3 className="font-display font-bold text-xs text-white tracking-wider truncate leading-tight">

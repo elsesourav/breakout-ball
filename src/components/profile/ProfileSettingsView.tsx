@@ -152,7 +152,7 @@ export const ProfileSettingsView: React.FC<ProfileSettingsViewProps> = ({
         </div>
       )}
 
-      {/* Backend Control & Coupon Management Card (Strictly for admin.elSourav only) */}
+      {/* Backend Control & Coupon Management Card (Strictly for verified ElseSourav Administrator only) */}
       {isAdmin && (
         <div className="w-full rounded-xl bg-[#080c24]/95 border border-cyan-500/25 p-3.5 flex flex-col gap-2 shadow-lg backdrop-blur-xl">
           <div className="flex items-center justify-between">

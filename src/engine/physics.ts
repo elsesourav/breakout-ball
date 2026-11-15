@@ -92,6 +92,7 @@ export class PhysicsWorld {
         hitAnim: 0,
         counter: b.h === 8 ? 3 : undefined,
         portalPairId: b.portalPairId,
+        portalRechargeTimer: 0,
       };
 
       if (b.h === 7) {
@@ -198,6 +199,14 @@ export class PhysicsWorld {
 
   public step(substeps: number = 6): CollisionEvent[] {
     this.events = [];
+
+    // Decrement portal recharge break timers once per physics frame
+    for (let b = 0; b < this.blocks.length; b++) {
+      const blk = this.blocks[b];
+      if (blk.portalRechargeTimer && blk.portalRechargeTimer > 0) {
+        blk.portalRechargeTimer--;
+      }
+    }
 
     // Smooth paddle interpolation
     this.paddle.vx = (this.paddle.targetX - this.paddle.x) * 0.35;
@@ -360,12 +369,17 @@ export class PhysicsWorld {
 
             // SPECIAL A: Quantum Portal Warp (Type 7)
             if (block.health === 7) {
-              // Post-warp transit: allow ball to move freely away from portals without re-triggering or getting snagged
+              // 1. Post-warp transit: allow ball to move freely away from portals without re-triggering or getting snagged
               if (ball.warpCooldown && ball.warpCooldown > 0) {
                 continue;
               }
 
-              // 50% Penetration Rule: Ball must be at least 50% inside the portal block rectangle
+              // 2. Recharge Break (3 seconds): Portal acts like "a normal nothing" (transparent pass-through) while cooling down
+              if (block.portalRechargeTimer && block.portalRechargeTimer > 0) {
+                continue;
+              }
+
+              // 3. 50% Penetration Rule: Ball must be at least 50% inside the portal block rectangle
               // (Ball center (ball.x, ball.y) has crossed inside [block.x, block.x + block.w] x [block.y, block.y + block.h])
               const isCenterInside =
                 ball.x >= block.x &&
@@ -396,6 +410,12 @@ export class PhysicsWorld {
                     
                     // Anti-looping cooldown: 35 ticks (~0.58s) guarantees ball escapes portal zone
                     ball.warpCooldown = 35;
+
+                    // 3-Second Recharge Break: Both input and output portals enter 3.0s recharge break (180 ticks)
+                    // They turn transparent and act like nothing, while any other connected portal pairs remain active!
+                    block.portalRechargeTimer = 180;
+                    targetPortal.portalRechargeTimer = 180;
+
                     this.events.push({
                       type: 'portal_warp',
                       blockIndex: b,

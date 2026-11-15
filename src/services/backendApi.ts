@@ -216,10 +216,64 @@ class BackendApiService {
     }
   }
 
+  public getAdminToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('breakout_admin_token');
+  }
+
+  public setAdminToken(token: string | null): void {
+    if (typeof window === 'undefined') return;
+    if (token) {
+      localStorage.setItem('breakout_admin_token', token);
+    } else {
+      localStorage.removeItem('breakout_admin_token');
+    }
+  }
+
+  public hasAdminToken(): boolean {
+    return Boolean(this.getAdminToken());
+  }
+
+  private getAdminHeaders(): Record<string, string> {
+    const adminToken = this.getAdminToken();
+    const token = adminToken || (typeof window !== 'undefined' ? localStorage.getItem('breakout_auth_token') : null);
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  }
+
+  /** Admin Authentication directly verified by the backend microservice */
+  public async adminLogin(identifierOrToken: string, password?: string): Promise<{ success: boolean; token?: string; user?: any; message?: string }> {
+    try {
+      const body = password
+        ? { identifier: identifierOrToken, password }
+        : { token: identifierOrToken };
+      const res = await fetch(`${this.baseUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(6000),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.token) {
+        this.setAdminToken(data.token);
+        return data;
+      }
+      return { success: false, message: data.message || 'Invalid admin credentials' };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Network error contacting backend';
+      return { success: false, message: msg };
+    }
+  }
+
   /** Admin: Fetch all coupons */
   public async getAdminCoupons(): Promise<BackendCoupon[]> {
     try {
-      const res = await fetch(`${this.baseUrl}/api/admin/coupons`, { signal: AbortSignal.timeout(4000) });
+      const res = await fetch(`${this.baseUrl}/api/admin/coupons`, {
+        headers: this.getAdminHeaders(),
+        signal: AbortSignal.timeout(4000),
+      });
       if (!res.ok) return [];
       const data = await res.json();
       return data.coupons || [];
@@ -239,7 +293,7 @@ class BackendApiService {
     try {
       const res = await fetch(`${this.baseUrl}/api/admin/coupons`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: this.getAdminHeaders(),
         body: JSON.stringify(data),
         signal: AbortSignal.timeout(4000),
       });
@@ -255,6 +309,7 @@ class BackendApiService {
     try {
       const res = await fetch(`${this.baseUrl}/api/admin/coupons/${encodeURIComponent(code)}`, {
         method: 'DELETE',
+        headers: this.getAdminHeaders(),
         signal: AbortSignal.timeout(4000),
       });
       return await res.json();
@@ -268,7 +323,7 @@ class BackendApiService {
     try {
       const res = await fetch(`${this.baseUrl}/api/admin/coupons/${encodeURIComponent(code)}/toggle`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: this.getAdminHeaders(),
         body: JSON.stringify({ isActive }),
         signal: AbortSignal.timeout(4000),
       });
@@ -281,7 +336,10 @@ class BackendApiService {
   /** Admin: Fetch Live Activity Logs */
   public async getAdminLogs(limit = 50): Promise<ActivityLogEntry[]> {
     try {
-      const res = await fetch(`${this.baseUrl}/api/admin/logs?limit=${limit}`, { signal: AbortSignal.timeout(4000) });
+      const res = await fetch(`${this.baseUrl}/api/admin/logs?limit=${limit}`, {
+        headers: this.getAdminHeaders(),
+        signal: AbortSignal.timeout(4000),
+      });
       if (!res.ok) return [];
       const data = await res.json();
       return data.logs || [];

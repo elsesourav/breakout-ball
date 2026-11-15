@@ -209,6 +209,15 @@ export function drawArmored3DSlabBlock(
     ctx.stroke();
   } else if (block.health === 7) {
     // ── PORTAL (HP 7): FULL-BLOCK MAGICAL COSMIC VORTEX WITH HIGH-TECH STARGATE CENTER ──
+    const isRecharging = (block.portalRechargeTimer ?? 0) > 0;
+    const prevAlpha = ctx.globalAlpha;
+    if (isRecharging) {
+      // 3-second recharge break: render with distinct transparency (acts like a normal nothing)
+      const ticksLeft = block.portalRechargeTimer ?? 0;
+      const dormantAlpha = ticksLeft < 30 ? 0.22 + ((30 - ticksLeft) / 30) * 0.78 : 0.22;
+      ctx.globalAlpha = prevAlpha * dormantAlpha;
+    }
+
     // Deep midnight nebula base
     const portalBaseGrad = ctx.createLinearGradient(bx, by, bx, by + topH);
     portalBaseGrad.addColorStop(0, '#13092c');
@@ -275,14 +284,14 @@ export function drawArmored3DSlabBlock(
     ctx.restore(); // Unclip
 
     // Shimmering dimensional event-horizon border around the chamfered rim in pair's distinct color
-    const borderPulse = Math.sin(animTick * 2.5) * 0.25 + 0.75;
     ctx.strokeStyle = pairTheme.primary;
     ctx.lineWidth = 1.6;
-    ctx.shadowColor = pairTheme.glow;
-    ctx.shadowBlur = 4;
     drawChamferRect(ctx, bx, by, bw, topH, chamfer);
     ctx.stroke();
-    ctx.shadowBlur = 0;
+
+    if (isRecharging) {
+      ctx.globalAlpha = prevAlpha;
+    }
   } else {
     // ── HP 1-5 & EMP 8: RICH VIBRANT METALLIC SLAB (NO DARK MUDDY BOTTOM) ──
     const tones = getBlockTones(block.health);
@@ -350,15 +359,17 @@ export function drawArmored3DSlabBlock(
     renderEngravedLabel(ctx, block, config, bx + bw / 2, by + topH / 2, topH);
   } else if (block.portalPairId !== undefined) {
     // Portal telemetry resonance node (Identified strictly by distinct pair color — NO NUMBERS)
+    const isRecharging = (block.portalRechargeTimer ?? 0) > 0;
     const pairTheme = PORTAL_PAIR_THEMES[block.portalPairId] || PORTAL_PAIR_THEMES[1];
     ctx.save();
+    if (isRecharging) {
+      const ticksLeft = block.portalRechargeTimer ?? 0;
+      const dormantAlpha = ticksLeft < 30 ? 0.22 + ((30 - ticksLeft) / 30) * 0.78 : 0.22;
+      ctx.globalAlpha = dormantAlpha;
+    }
     const tagR = Math.max(3.0, Math.min(6.5, topH * 0.20));
     const tagX = bx + bw - tagR - Math.max(2, bw * 0.05);
     const tagY = by + tagR + Math.max(2, topH * 0.08);
-
-    // Glowing outer aura
-    ctx.shadowColor = pairTheme.primary;
-    ctx.shadowBlur = tagR >= 5 ? 6 : 3;
 
     // Dark inset bezel
     ctx.fillStyle = 'rgba(5, 7, 20, 0.85)';

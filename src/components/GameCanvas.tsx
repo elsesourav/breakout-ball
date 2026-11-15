@@ -12,6 +12,7 @@ import { GameHUD } from './GameHUD';
 import { ParticleBackdrop } from './ParticleBackdrop';
 import { GameEngine } from '../engine/GameEngine';
 import { ScoreState } from '../engine/types';
+import type { ActiveBuffInfo } from '../engine/powerUps';
 import { isTodayDailyMission, isDailyMissionCompleted } from '../services/dailyApex';
 import { cyberToast } from './common/CyberToast';
 
@@ -105,6 +106,7 @@ export const GameCanvas: React.FC = () => {
   const [countdownText, setCountdownText] = useState<string | null>('3');
   const [summaryState, setSummaryState] = useState<ScoreState | null>(null);
   const [liveScoreState, setLiveScoreState] = useState<ScoreState | null>(null);
+  const [activeBuffs, setActiveBuffs] = useState<ActiveBuffInfo[]>([]);
   const [attemptId, setAttemptId] = useState<number>(0);
 
   // Key tracking
@@ -151,22 +153,32 @@ export const GameCanvas: React.FC = () => {
     async (finalScore: ScoreState) => {
       if (!selectedLevel) return;
 
-      // First celebratory confetti burst
+      const isMobile =
+        typeof window !== 'undefined' &&
+        (window.innerWidth <= 768 || 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0);
+
+      // Lightweight, localized celebratory blast with reduced spread for mobile & low-end devices
       confetti({
-        particleCount: 130,
-        spread: 80,
+        particleCount: isMobile ? 22 : 38,
+        spread: isMobile ? 32 : 46,
         origin: { y: 0.55 },
+        ticks: isMobile ? 120 : 180,
+        scalar: isMobile ? 0.8 : 0.95,
       });
 
-      // Second confetti burst to sustain celebration during canvas victory
-      if (confettiTimeoutRef.current) clearTimeout(confettiTimeoutRef.current);
-      confettiTimeoutRef.current = setTimeout(() => {
-        confetti({
-          particleCount: 150,
-          spread: 100,
-          origin: { y: 0.4 },
-        });
-      }, 750);
+      // Subtle second accent burst only on desktop devices
+      if (!isMobile) {
+        if (confettiTimeoutRef.current) clearTimeout(confettiTimeoutRef.current);
+        confettiTimeoutRef.current = setTimeout(() => {
+          confetti({
+            particleCount: 22,
+            spread: 38,
+            origin: { y: 0.45 },
+            ticks: 130,
+            scalar: 0.9,
+          });
+        }, 650);
+      }
 
       try {
         const result = await recordLevelCompletion(
@@ -237,6 +249,7 @@ export const GameCanvas: React.FC = () => {
     setCountdownText('3');
     setSummaryState(null);
     setLiveScoreState(null);
+    setActiveBuffs([]);
 
     const engine = new GameEngine(canvas, {
       onScoreUpdate: (st) => {
@@ -252,6 +265,10 @@ export const GameCanvas: React.FC = () => {
       onComboChange: (c) => {
         if (isDisposed) return;
         setCombo(c);
+      },
+      onBuffsChange: (b) => {
+        if (isDisposed) return;
+        setActiveBuffs(b);
       },
       onLevelWin: (st) => {
         if (isDisposed) return;
@@ -449,6 +466,7 @@ export const GameCanvas: React.FC = () => {
         countdown={countdownText}
         score={score}
         combo={combo}
+        activeBuffs={activeBuffs}
         onExit={handleExit}
         onPause={() => engineRef.current?.pause()}
         onResume={() => engineRef.current?.resume()}

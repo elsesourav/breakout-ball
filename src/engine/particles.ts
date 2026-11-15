@@ -6,19 +6,19 @@ export class ParticleSystem {
   public floatingTexts: FloatingText[] = [];
   private textCounter: number = 0;
 
-  constructor(width: number, height: number, starCount: number = 80) {
+  constructor(width: number, height: number, starCount: number = 130) {
     this.initStars(width, height, starCount);
   }
 
-  public initStars(width: number, height: number, count: number = 80) {
+  public initStars(width: number, height: number, count: number = 130) {
     this.stars = [];
     for (let i = 0; i < count; i++) {
       this.stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 3 + 1,
-        alpha: Math.random() * 0.8 + 0.2,
-        speed: Math.random() * 0.6 + 0.15,
+        size: Math.random() * 2.8 + 0.8,
+        alpha: Math.random() * 0.75 + 0.2,
+        speed: Math.random() * 0.55 + 0.15,
         twinkleSpeed: Math.random() * 0.03 + 0.01,
       });
     }
@@ -68,22 +68,26 @@ export class ParticleSystem {
   }
 
   public spawnVictoryConfetti(width: number, height: number) {
-    const colors = ['#00f7ff', '#ff0844', '#eeff01', '#04ef00', '#b773ff', '#ffffff'];
-    for (let i = 0; i < 60; i++) {
-      const x = Math.random() * width;
-      const y = height * 0.4 + Math.random() * (height * 0.3);
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 10 + 4;
+    const isMobile =
+      typeof window !== 'undefined' &&
+      (window.innerWidth <= 768 || 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0);
+    const count = isMobile ? 18 : 32;
+    const colors = ['#00f7ff', '#ff0844', '#eeff01', '#04ef00', '#b773ff'];
+    for (let i = 0; i < count; i++) {
+      const x = width * 0.35 + Math.random() * (width * 0.3);
+      const y = height * 0.45 + Math.random() * (height * 0.15);
+      const angle = -Math.PI / 2 + (Math.random() * 1.0 - 0.5);
+      const speed = Math.random() * 6 + 3;
       this.particles.push({
         x,
         y,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 5,
-        size: Math.random() * 10 + 5,
+        vy: Math.sin(angle) * speed,
+        size: Math.random() * 6 + 3,
         color: colors[Math.floor(Math.random() * colors.length)],
         alpha: 1.0,
-        life: 1.2,
-        maxLife: 1.2,
+        life: 0.9,
+        maxLife: 0.9,
         shape: 'square',
       });
     }
@@ -104,37 +108,38 @@ export class ParticleSystem {
   public update(width: number, height: number) {
     // 1. Update stars with Black Hole Gravitational Suction
     const bhX = width * 0.5;
-    const bhY = height - 18;
+    const bhY = height - 16;
 
     for (let i = 0; i < this.stars.length; i++) {
       const s = this.stars[i];
       // Baseline downward drift
-      s.y += s.speed * 0.8;
+      s.y += s.speed * 0.75;
 
-      // Only apply gravitational suction when star approaches the lower half
-      if (s.y > height * 0.48) {
+      // Gravitational suction begins in mid-lower arena and accelerates toward singularity
+      if (s.y > height * 0.35) {
         const dx = bhX - s.x;
         const dy = bhY - s.y;
         const distSq = dx * dx + dy * dy;
         const dist = Math.sqrt(distSq);
 
-        if (dist > 10) {
-          // Softened gravitational force scaled to arena dimensions
-          const pullForce = Math.min(6.5, 52000 / (distSq + 20000));
+        if (dist > 8) {
+          // Graceful suction spiral
+          const pullForce = Math.min(5.5, 68000 / (distSq + 16000));
           const dirX = dx / dist;
           const dirY = dy / dist;
-          const tanX = -dirY;
-          const tanY = dirX;
+          const swirlDir = i % 2 === 0 ? 1 : -1;
+          const tanX = -dirY * swirlDir;
+          const tanY = dirX * swirlDir;
 
-          s.x += dirX * pullForce * 1.6 + tanX * pullForce * 0.75;
-          s.y += dirY * pullForce * 1.6 + tanY * pullForce * 0.75;
+          s.x += dirX * pullForce * 1.4 + tanX * pullForce * 0.6;
+          s.y += dirY * pullForce * 1.4 + tanY * pullForce * 0.6;
         }
 
-        // Event horizon swallow condition: star plunges into singularity
-        if (dist < 65 || s.y > height + 25) {
+        // Singularity swallow condition: plunged into black hole event horizon
+        if (dist < 55 || s.y > height + 20) {
           s.y = -10 - Math.random() * 30;
           s.x = Math.random() * width;
-          s.alpha = Math.random() * 0.7 + 0.2;
+          s.alpha = Math.random() * 0.65 + 0.25;
         } else {
           s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.01;
           s.alpha = Math.max(0.15, Math.min(0.9, s.alpha));
@@ -179,7 +184,7 @@ export class ParticleSystem {
   }
 
   public render(ctx: CanvasRenderingContext2D) {
-    // 1. Render Stars
+    // 1. Render Stars (Crisp, zero-shadow micro-stars for locked 60 FPS)
     ctx.save();
     for (let i = 0; i < this.stars.length; i++) {
       const s = this.stars[i];
@@ -188,14 +193,12 @@ export class ParticleSystem {
     }
     ctx.restore();
 
-    // 2. Render Particles
+    // 2. Render Particles (NO heavy shadowBlur for ultra-fast GPU rasterization)
     ctx.save();
     for (let i = 0; i < this.particles.length; i++) {
       const p = this.particles[i];
       ctx.globalAlpha = p.alpha;
       ctx.fillStyle = p.color;
-      ctx.shadowColor = p.color;
-      ctx.shadowBlur = 8;
 
       if (p.shape === 'spark') {
         ctx.fillRect(p.x - p.size / 2, p.y - 1, p.size * 1.5, 2);
@@ -215,8 +218,6 @@ export class ParticleSystem {
         ctx.globalAlpha = ft.alpha;
         ctx.font = `900 ${Math.floor(28 * ft.scale)}px 'Orbitron', 'Chakra Petch', monospace`;
         ctx.fillStyle = ft.color;
-        ctx.shadowColor = ft.color;
-        ctx.shadowBlur = 12;
         ctx.fillText(ft.text, ft.x, ft.y);
       }
       ctx.restore();

@@ -24,7 +24,11 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
   const [newMaxUses, setNewMaxUses] = useState('1000');
 
   const fetchAll = async () => {
-    if (!isUserAdmin(authService.getCurrentUser())) return;
+    const user = authService.getCurrentUser();
+    if (!isUserAdmin(user)) return;
+    if (!backendApi.hasAdminToken() && user.token) {
+      await backendApi.adminLogin(user.token);
+    }
     setIsLoading(true);
     try {
       const [h, l, c, d] = await Promise.all([
@@ -99,7 +103,7 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
             ACCESS RESTRICTED // ADMIN ONLY
           </h3>
           <p className="text-xs text-slate-300">
-            This terminal requires authorization as @admin.elSourav. Please log in with your admin credentials to access backend controls.
+            This terminal requires authorization with your elsesourav.com administrator account. Please log in with your ElseSourav account to access backend controls.
           </p>
           <button
             onClick={onClose}

@@ -11,6 +11,16 @@ import {
   LaserBolt,
 } from './powerUpTypes';
 
+export interface ActiveBuffInfo {
+  type: PowerUpType;
+  name: string;
+  current: number;
+  max: number;
+  color: string;
+  glow: string;
+  isShield?: boolean;
+}
+
 export * from './powerUpTypes';
 
 export class PowerUpManager {
@@ -276,8 +286,6 @@ export class PowerUpManager {
     // 3. Laser Bolts
     for (const bolt of this.lasers) {
       ctx.save();
-      ctx.shadowColor = '#ff0055';
-      ctx.shadowBlur = 10;
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(bolt.x - bolt.w / 2, bolt.y - bolt.h / 2, bolt.w, bolt.h);
       ctx.fillStyle = '#ff0055';
@@ -285,8 +293,65 @@ export class PowerUpManager {
       ctx.restore();
     }
 
-    // 5. In-Game Circular Ring Timers for Active Buffs (Tracks paddle smoothly)
-    this.renderActiveBuffRings(ctx, paddle, canvasWidth, canvasHeight);
+    // Power timers are now cleanly displayed in HUD Line 2 at the top instead of hovering over the paddle/barrel!
+  }
+
+  public getActiveBuffs(): ActiveBuffInfo[] {
+    const list: ActiveBuffInfo[] = [];
+
+    if (this.buffs.laser > 0) {
+      list.push({
+        type: 'laser',
+        name: 'LASER',
+        current: Math.round(this.buffs.laser * 10) / 10,
+        max: this.maxDurations.laser || 6.0,
+        color: POWER_UP_CONFIGS.laser.color,
+        glow: POWER_UP_CONFIGS.laser.glow,
+      });
+    }
+    if (this.buffs.megaBall > 0) {
+      list.push({
+        type: 'megaball',
+        name: 'MEGA',
+        current: Math.round(this.buffs.megaBall * 10) / 10,
+        max: this.maxDurations.megaball || 5.0,
+        color: POWER_UP_CONFIGS.megaball.color,
+        glow: POWER_UP_CONFIGS.megaball.glow,
+      });
+    }
+    if (this.buffs.slowMo > 0) {
+      list.push({
+        type: 'slowmo',
+        name: 'CHRONO',
+        current: Math.round(this.buffs.slowMo * 10) / 10,
+        max: this.maxDurations.slowmo || 4.0,
+        color: POWER_UP_CONFIGS.slowmo.color,
+        glow: POWER_UP_CONFIGS.slowmo.glow,
+      });
+    }
+    if (this.buffs.expand > 0) {
+      list.push({
+        type: 'expand',
+        name: 'EXPAND',
+        current: Math.round(this.buffs.expand * 10) / 10,
+        max: this.maxDurations.expand || 6.0,
+        color: POWER_UP_CONFIGS.expand.color,
+        glow: POWER_UP_CONFIGS.expand.glow,
+      });
+    }
+    if (this.buffs.shieldCharges > 0) {
+      list.push({
+        type: 'shield',
+        name: 'SHIELD',
+        current: this.buffs.shieldCharges,
+        max: 3,
+        color: POWER_UP_CONFIGS.shield.color,
+        glow: POWER_UP_CONFIGS.shield.glow,
+        isShield: true,
+      });
+    }
+
+    return list;
   }
 
   private renderActiveBuffRings(

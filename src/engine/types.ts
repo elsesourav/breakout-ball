@@ -41,6 +41,7 @@ export interface BlockEngineState {
   counter?: number; // for type 8 EMP counter
   portalPairIndex?: number; // for type 7 Quantum Portal (target block index in physics.blocks)
   portalPairId?: number; // for type 7 Quantum Portal (1, 2, 3, 4)
+  portalRechargeTimer?: number; // for type 7 Quantum Portal (ticks remaining in 3s recharge break)
 }
 
 export type CollisionEventType =
@@ -106,6 +107,8 @@ export interface ScoreState {
   status: 'countdown' | 'playing' | 'win' | 'gameover' | 'paused';
 }
 
+import type { ActiveBuffInfo } from './powerUps';
+
 export interface EngineCallbacks {
   onScoreUpdate?: (scoreState: ScoreState) => void;
   onLivesChange?: (lives: number) => void;
@@ -113,4 +116,5 @@ export interface EngineCallbacks {
   onLevelWin?: (finalScore: ScoreState) => void;
   onGameOver?: (finalScore: ScoreState) => void;
   onEventAudio?: (eventType: CollisionEventType, combo: number) => void;
+  onBuffsChange?: (buffs: ActiveBuffInfo[]) => void;
 }

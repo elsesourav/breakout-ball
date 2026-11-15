@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import crypto from 'crypto';
 import {
   db,
   userRepository,
@@ -11,6 +12,81 @@ import {
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Security & Authentication Configuration (Direct ElseSourav Supabase Integration)
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://srfevooktrqjzjuddmko.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_h7Di5k8Rn9op1XjDwpnyXQ_4kuXnmNV';
+const ADMIN_EMAILS = new Set([
+  'elsesourav@gmail.com',
+  'admin@elsesourav.com',
+  (process.env.ADMIN_EMAIL || '').toLowerCase(),
+].filter(Boolean));
+const ADMIN_USERNAMES = new Set([
+  'elsesourav',
+  (process.env.ADMIN_USERNAME || '').toLowerCase(),
+].filter(Boolean));
+const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY || 'breakout_master_admin_secret_key_9870_vm3';
+
+// In-Memory Active Admin Sessions Store (token -> { username, email, expiresAt })
+const activeAdminSessions = new Map();
+
+function generateAdminToken(username, email) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.createHmac('sha256', ADMIN_SECRET_KEY).update(`${username}:${email}:${salt}:${Date.now()}`).digest('hex');
+  const token = `adm_${hash}`;
+  const expiresAt = Date.now() + 7 * 24 * 3600 * 1000; // 7 days valid
+  activeAdminSessions.set(token, { username, email, expiresAt });
+  return { token, expiresAt };
+}
+
+async function verifySupabaseToken(token) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${token}`,
+      },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+async function requireAdminAuth(req, res, next) {
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim() || req.headers['x-admin-key'];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized: Master Admin authorization required.' });
+  }
+
+  // 1. Check in-memory active admin sessions
+  const session = activeAdminSessions.get(token);
+  if (session && Date.now() <= session.expiresAt) {
+    req.adminUser = session.username;
+    return next();
+  }
+
+  // 2. Check if token is a direct Supabase JWT from ElseSourav Auth
+  const sbUser = await verifySupabaseToken(token);
+  if (sbUser) {
+    const email = (sbUser.email || '').toLowerCase();
+    const meta = sbUser.user_metadata || {};
+    const uname = (meta.username || meta.user_name || '').toLowerCase();
+
+    if (ADMIN_EMAILS.has(email) || ADMIN_USERNAMES.has(uname) || meta.role === 'ADMIN' || sbUser.role === 'ADMIN') {
+      const adminName = uname || email || 'elsesourav';
+      activeAdminSessions.set(token, { username: adminName, email, expiresAt: Date.now() + 3600 * 1000 });
+      req.adminUser = adminName;
+      return next();
+    }
+  }
+
+  return res.status(403).json({ error: 'Forbidden: Invalid or unauthorized admin credentials.' });
+}
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
@@ -221,9 +297,113 @@ app.post('/api/coupons/redeem', (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 6. ADMIN CONTROL & LOGS
+// 6. ADMIN AUTHENTICATION & ACCESS CONTROL
 // ─────────────────────────────────────────────────────────────────────────────
-app.get('/api/admin/coupons', (_req, res) => {
+function makeAdminUserPayload(id, username, email, meta) {
+  return {
+    id,
+    username,
+    fullName: meta?.full_name || meta?.name || 'ElseSourav Admin',
+    email,
+    avatarUrl: meta?.avatar_url || meta?.picture || meta?.photoUrl,
+    isAdmin: true,
+  };
+}
+
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { token, identifier, username, email, password } = req.body;
+
+    // A. Direct Supabase JWT Token Verification
+    if (token) {
+      const sbUser = await verifySupabaseToken(token);
+      if (!sbUser) return res.status(401).json({ success: false, message: 'Invalid or expired Supabase session.' });
+
+      const userEmail = (sbUser.email || '').toLowerCase();
+      const meta = sbUser.user_metadata || {};
+      const uname = (meta.username || meta.user_name || '').toLowerCase();
+
+      if (!ADMIN_EMAILS.has(userEmail) && !ADMIN_USERNAMES.has(uname) && meta.role !== 'ADMIN' && sbUser.role !== 'ADMIN') {
+        activityRepository.log('admin_login_denied', userEmail || uname, 'Non-admin user attempted admin access');
+        return res.status(403).json({ success: false, message: 'Account is not an authorized administrator.' });
+      }
+
+      const adminUser = uname || userEmail || 'elsesourav';
+      const { token: sessionToken, expiresAt } = generateAdminToken(adminUser, userEmail);
+      activityRepository.log('admin_login_success', adminUser, 'Admin verified via ElseSourav Supabase session');
+
+      return res.json({
+        success: true,
+        token: sessionToken,
+        expiresAt,
+        user: makeAdminUserPayload(sbUser.id, adminUser, userEmail, meta),
+      });
+    }
+
+    // B. ElseSourav Credentials (email or @username + password)
+    const rawId = (identifier || username || email || '').trim().replace(/^@/, '');
+    if (!rawId || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide identifier/email and password.' });
+    }
+
+    let targetEmail = rawId;
+    if (!rawId.includes('@')) {
+      try {
+        const uRes = await fetch(`${SUPABASE_URL}/rest/v1/User?username=eq.${encodeURIComponent(rawId.toLowerCase())}&select=email`, {
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+          signal: AbortSignal.timeout(4000),
+        });
+        if (uRes.ok) {
+          const list = await uRes.json();
+          if (list && list[0]?.email) targetEmail = list[0].email;
+        }
+      } catch {}
+    }
+
+    const sbAuthRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: targetEmail, password }),
+      signal: AbortSignal.timeout(5000),
+    });
+
+    const sbData = await sbAuthRes.json();
+    if (!sbAuthRes.ok || !sbData.user) {
+      activityRepository.log('admin_login_failed', rawId, 'Invalid credentials against ElseSourav Auth');
+      return res.status(401).json({ success: false, message: sbData.error_description || sbData.message || 'Invalid ElseSourav credentials.' });
+    }
+
+    const verifiedEmail = (sbData.user.email || targetEmail).toLowerCase();
+    const meta = sbData.user.user_metadata || {};
+    const verifiedUsername = (meta.username || meta.user_name || rawId).toLowerCase();
+
+    if (!ADMIN_EMAILS.has(verifiedEmail) && !ADMIN_USERNAMES.has(verifiedUsername) && meta.role !== 'ADMIN') {
+      activityRepository.log('admin_login_denied', verifiedEmail, 'Authenticated user is not an administrator');
+      return res.status(403).json({ success: false, message: 'Your ElseSourav account does not have administrator privileges.' });
+    }
+
+    const { token: sessionToken, expiresAt } = generateAdminToken(verifiedUsername, verifiedEmail);
+    activityRepository.log('admin_login_success', verifiedUsername, 'Master admin authenticated via ElseSourav credentials');
+
+    return res.json({
+      success: true,
+      token: sessionToken,
+      expiresAt,
+      user: makeAdminUserPayload(sbData.user.id, verifiedUsername, verifiedEmail, meta),
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/verify', requireAdminAuth, (req, res) => {
+  res.json({ success: true, valid: true, admin: req.adminUser });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. PROTECTED ADMIN CONTROL & LOGS (Require Verified Admin Token)
+// ─────────────────────────────────────────────────────────────────────────────
+app.get('/api/admin/coupons', requireAdminAuth, (_req, res) => {
   try {
     const coupons = couponRepository.getAll();
     res.json({ coupons });
@@ -232,7 +412,7 @@ app.get('/api/admin/coupons', (_req, res) => {
   }
 });
 
-app.post('/api/admin/coupons', (req, res) => {
+app.post('/api/admin/coupons', requireAdminAuth, (req, res) => {
   try {
     const { code, rewardCores, packCores, maxUses, expiresAt } = req.body;
     if (!code || !rewardCores || !packCores) {
@@ -251,7 +431,7 @@ app.post('/api/admin/coupons', (req, res) => {
   }
 });
 
-app.delete('/api/admin/coupons/:code', (req, res) => {
+app.delete('/api/admin/coupons/:code', requireAdminAuth, (req, res) => {
   try {
     const { code } = req.params;
     const result = couponRepository.delete(code);
@@ -261,7 +441,7 @@ app.delete('/api/admin/coupons/:code', (req, res) => {
   }
 });
 
-app.patch('/api/admin/coupons/:code/toggle', (req, res) => {
+app.patch('/api/admin/coupons/:code/toggle', requireAdminAuth, (req, res) => {
   try {
     const { code } = req.params;
     const { isActive } = req.body;
@@ -272,7 +452,7 @@ app.patch('/api/admin/coupons/:code/toggle', (req, res) => {
   }
 });
 
-app.get('/api/admin/logs', (req, res) => {
+app.get('/api/admin/logs', requireAdminAuth, (req, res) => {
   try {
     const limit = Math.min(100, Number(req.query.limit) || 50);
     const logs = activityRepository.getRecent(limit);
@@ -282,7 +462,7 @@ app.get('/api/admin/logs', (req, res) => {
   }
 });
 
-app.get('/api/admin/dashboard', (_req, res) => {
+app.get('/api/admin/dashboard', requireAdminAuth, (_req, res) => {
   try {
     const totalUsers = db.prepare('SELECT count(*) as c FROM users').get().c;
     const totalCompletions = db.prepare('SELECT count(*) as c FROM level_completions').get().c;

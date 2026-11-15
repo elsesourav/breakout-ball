@@ -4,6 +4,7 @@ import { Home, Zap, Heart, Boxes } from 'lucide-react';
 import { ScoreState } from '../engine/types';
 import { GameSummaryModal } from './GameSummaryModal';
 import { CoreIcon } from './CoreIcon';
+import type { ActiveBuffInfo } from '../engine/powerUps';
 
 interface GameHUDProps {
   lives: number;
@@ -11,6 +12,7 @@ interface GameHUDProps {
   countdown: string | null; // "3", "2", "1", "GO!"
   score: number;
   combo: number;
+  activeBuffs?: ActiveBuffInfo[];
   onExit: () => void;
   onPause?: () => void;
   onResume?: () => void;
@@ -76,6 +78,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   levelNumber = 1,
   totalBreakable = 0,
   blocksDestroyed = 0,
+  activeBuffs = [],
   coresEarned = 0,
   isFirstClear = false,
   starsEarned = 3,
@@ -107,78 +110,115 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
   return (
     <>
-      {/* Sleek, Balanced Top Cyber HUD Bar (No Time Display) */}
-      <header className="absolute top-2 left-0 right-0 z-30 px-3 flex items-center justify-between pointer-events-none gap-2 max-w-[480px] mx-auto">
-        {/* Left Section: Compact Exit Button + Micro-Hearts */}
-        <div className="flex items-center gap-1.5 pointer-events-auto shrink-0">
-          <button
-            onClick={handleHomeClick}
-            className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#090d24]/90 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all shadow-[0_0_10px_rgba(0,247,255,0.2)] backdrop-blur-md cursor-pointer"
-            title={gameMode === 'arena' ? 'Exit to Arena' : 'Exit to Arcade'}
-          >
-            <Home className="w-4 h-4" />
-          </button>
+      {/* Sleek, Two-Line Cyber HUD Header (No Time Display) */}
+      <header className="absolute top-2 left-0 right-0 z-30 px-3 flex flex-col gap-1.5 pointer-events-none max-w-[480px] mx-auto">
+        {/* LINE 1: Hearts, Level/Score, and Targets / Combo */}
+        <div className="w-full flex items-center justify-between gap-2">
+          {/* Left Section: Compact Exit Button + Micro-Hearts */}
+          <div className="flex items-center gap-1.5 pointer-events-auto shrink-0">
+            <button
+              onClick={handleHomeClick}
+              className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#090d24]/90 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all shadow-sm backdrop-blur-md cursor-pointer"
+              title={gameMode === 'arena' ? 'Exit to Arena' : 'Exit to Arcade'}
+            >
+              <Home className="w-4 h-4" />
+            </button>
 
-          {/* Micro-Hearts */}
-          <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#06091c]/85 border border-white/10 shadow-md backdrop-blur-md">
-            {[1, 2, 3].map((heartIndex) => {
-              const isAlive = heartIndex <= lives;
+            {/* Micro-Hearts (Reduced shadow for 60 FPS) */}
+            <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#06091c]/85 border border-white/10 shadow-sm backdrop-blur-md">
+              {[1, 2, 3].map((heartIndex) => {
+                const isAlive = heartIndex <= lives;
+                return (
+                  <div
+                    key={`life-${heartIndex}`}
+                    className={`transition-all duration-300 ${
+                      isAlive ? 'text-red-400 scale-100' : 'text-slate-600 scale-90 opacity-30'
+                    }`}
+                  >
+                    <Heart className={`w-3.5 h-3.5 ${isAlive ? 'fill-red-500' : ''}`} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Center Section: Compact Cyber Score Display */}
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#06091c]/85 border border-white/10 shadow-sm backdrop-blur-md shrink-0">
+            <span className="font-tech text-[10px] font-bold text-slate-400 tracking-wider">
+              LVL {levelNumber}
+            </span>
+            <span className="text-slate-600 text-[10px]">•</span>
+            <span className="font-display font-black text-sm tracking-wider text-cyan-300">
+              {score.toLocaleString()}
+            </span>
+          </div>
+
+          {/* Right Section: Compact Targets & Cores / Combo */}
+          <div className="flex items-center gap-1.5 justify-end shrink-0 pointer-events-auto">
+            {totalBreakable > 0 && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c]/85 border border-cyan-500/30 shadow-sm backdrop-blur-md">
+                <Boxes className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="font-tech font-bold text-xs text-cyan-300">
+                  {remainingTargets}
+                </span>
+              </div>
+            )}
+
+            {/* Cores or Combo */}
+            {combo > 1 ? (
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/20 to-red-500/20 border border-amber-400/50 shadow-sm animate-pulse backdrop-blur-md">
+                <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                <span className="font-tech font-black text-xs text-amber-300">{combo}x</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c]/85 border border-cyan-500/30 shadow-sm backdrop-blur-md">
+                <CoreIcon size={12} variant="cyan" />
+                <span className="font-tech font-bold text-xs text-cyan-200">
+                  {totalCores.toLocaleString()}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* LINE 2: Active Power-Up Timers (One after another with countdown indicators) */}
+        {activeBuffs.length > 0 && (
+          <div className="w-full flex items-center justify-center gap-1.5 pointer-events-auto flex-wrap animate-fadeIn">
+            {activeBuffs.map((buff) => {
+              const ratio = buff.isShield
+                ? Math.min(1, buff.current / buff.max)
+                : Math.max(0, Math.min(1, buff.current / buff.max));
               return (
                 <div
-                  key={`life-${heartIndex}`}
-                  className={`transition-all duration-300 ${
-                    isAlive
-                      ? 'text-red-400 drop-shadow-[0_0_6px_rgba(255,8,68,0.7)] scale-100'
-                      : 'text-slate-600 scale-90 opacity-30'
-                  }`}
+                  key={buff.type}
+                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#06091c]/90 border backdrop-blur-md transition-all text-[10px] font-tech font-bold shadow-sm"
+                  style={{
+                    borderColor: buff.color,
+                  }}
                 >
-                  <Heart className={`w-3.5 h-3.5 ${isAlive ? 'fill-red-500' : ''}`} />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full animate-pulse"
+                    style={{ backgroundColor: buff.color }}
+                  />
+                  <span className="text-white tracking-wider">{buff.name}</span>
+                  <span className="text-cyan-200">
+                    {buff.isShield ? `${buff.current}x` : `${buff.current.toFixed(1)}s`}
+                  </span>
+                  {/* Depleting progress track */}
+                  <div className="w-7 h-1 rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-100"
+                      style={{
+                        width: `${Math.round(ratio * 100)}%`,
+                        backgroundColor: buff.color,
+                      }}
+                    />
+                  </div>
                 </div>
               );
             })}
           </div>
-        </div>
-
-        {/* Center Section: Compact Cyber Score Display */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#06091c]/85 border border-white/10 shadow-[0_0_12px_rgba(0,0,0,0.5)] backdrop-blur-md shrink-0">
-          <span className="font-tech text-[10px] font-bold text-slate-400 tracking-wider">
-            LVL {levelNumber}
-          </span>
-          <span className="text-slate-600 text-[10px]">•</span>
-          <span
-            className="font-display font-black text-sm tracking-wider text-cyan-300"
-            style={{ textShadow: '0 0 8px rgba(0,247,255,0.5)' }}
-          >
-            {score.toLocaleString()}
-          </span>
-        </div>
-
-        {/* Right Section: Compact Targets & Cores / Combo */}
-        <div className="flex items-center gap-1.5 justify-end shrink-0 pointer-events-auto">
-          {totalBreakable > 0 && (
-            <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c]/85 border border-cyan-500/30 shadow-[0_0_8px_rgba(0,247,255,0.15)] backdrop-blur-md">
-              <Boxes className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-tech font-bold text-xs text-cyan-300">
-                {remainingTargets}
-              </span>
-            </div>
-          )}
-
-          {/* Cores or Combo */}
-          {combo > 1 ? (
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/20 to-red-500/20 border border-amber-400/50 shadow-[0_0_10px_rgba(255,180,0,0.4)] animate-pulse backdrop-blur-md">
-              <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-              <span className="font-tech font-black text-xs text-amber-300">{combo}x</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c]/85 border border-cyan-500/30 shadow-[0_0_8px_rgba(0,247,255,0.15)] backdrop-blur-md">
-              <CoreIcon size={12} glow variant="cyan" />
-              <span className="font-tech font-bold text-xs text-cyan-200">
-                {totalCores.toLocaleString()}
-              </span>
-            </div>
-          )}
-        </div>
+        )}
       </header>
 
       {/* Exit Confirmation Dialog (Pauses Gameplay) */}
