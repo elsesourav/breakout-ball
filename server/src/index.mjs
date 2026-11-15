@@ -6,7 +6,8 @@ import {
   trophyRepository,
   completionRepository,
   couponRepository,
-  activityRepository
+  activityRepository,
+  dailyApexRepository
 } from './db.mjs';
 import {
   SUPABASE_URL,
@@ -120,6 +121,33 @@ app.get('/api/levels/user/:username', (req, res) => {
     const completions = completionRepository.getUserCompletions(username);
     const user = userRepository.get(username);
     res.json({ success: true, username, completions, user: user || null });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DAILY APEX MISSIONS (SYNCHRONIZED SCHEDULE WITH PRE-PREPARED NEXT DAY)
+// ─────────────────────────────────────────────────────────────────────────────
+app.get('/api/daily-apex', (_req, res) => {
+  try {
+    const mission = dailyApexRepository.getCurrentMission();
+    res.json({ success: true, ...mission });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/daily-apex/complete', (req, res) => {
+  try {
+    const { username, levelId } = req.body;
+    const mission = dailyApexRepository.getCurrentMission();
+    const bonusCores = mission?.today?.bonusCores || 100;
+    if (username && username.toLowerCase() !== 'anonymous') {
+      userRepository.updateStats(username, { coresDelta: bonusCores });
+      activityRepository.log('apex_cleared', username, `Completed Daily Apex: ${mission?.today?.name || levelId} (+${bonusCores} Cores)`);
+    }
+    res.json({ success: true, bonusCores });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

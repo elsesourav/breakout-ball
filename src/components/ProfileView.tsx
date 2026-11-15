@@ -127,7 +127,7 @@ export const ProfileView: React.FC = () => {
     };
   }, [isSettingsOpen, activeSection]);
 
-  // Universal Wheel & Touch Coordinator: seamless scrolling on desktop and mobile
+  // Universal Wheel & Touch Coordinator: seamless scrolling on desktop and mobile without glitches
   useEffect(() => {
     if (isSettingsOpen) return;
 
@@ -143,25 +143,34 @@ export const ProfileView: React.FC = () => {
 
       const inner = getInner();
       const maxOuter = maxOuterRef.current;
+      const isOverInner = Boolean(inner && e.target && inner.contains(e.target as Node));
 
-      if (deltaY > 0) {
-        // Scrolling DOWN (moving content UP)
-        if (outer.scrollTop < maxOuter - 0.5) {
-          e.preventDefault();
-          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
-        } else if (inner) {
-          const maxInner = inner.scrollHeight - inner.clientHeight;
-          if (inner.scrollTop < maxInner - 0.5) {
-            e.preventDefault();
+      if (isOverInner && inner) {
+        const maxInner = inner.scrollHeight - inner.clientHeight;
+        if (deltaY > 0) {
+          if (inner.scrollTop < maxInner) {
             inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
           }
+          // Prevent default to contain wheel inside inner table, completely stopping outer glitching
+          e.preventDefault();
+        } else if (deltaY < 0) {
+          if (inner.scrollTop > 0) {
+            inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
+          }
+          // Prevent default to prevent unpinning the sticky category header while viewing the table
+          e.preventDefault();
+        }
+        return;
+      }
+
+      // Wheel over Hero card or Switcher
+      if (deltaY > 0) {
+        if (outer.scrollTop < maxOuter) {
+          e.preventDefault();
+          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
         }
       } else if (deltaY < 0) {
-        // Scrolling UP (moving content DOWN)
-        if (inner && inner.scrollTop > 0.5) {
-          e.preventDefault();
-          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
-        } else if (outer.scrollTop > 0) {
+        if (outer.scrollTop > 0) {
           e.preventDefault();
           outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
         }
@@ -170,44 +179,45 @@ export const ProfileView: React.FC = () => {
 
     // 2. Touch Coordinator (Mobile Phone & Tablet Touch Swiping)
     let touchStartY = 0;
+    let touchStartedInInner = false;
+
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
         touchStartY = e.touches[0].clientY;
+        const inner = getInner();
+        touchStartedInInner = Boolean(inner && e.target && inner.contains(e.target as Node));
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       const currentY = e.touches[0].clientY;
-      const deltaY = touchStartY - currentY; // positive = dragging content up / scrolling down
+      const deltaY = touchStartY - currentY;
       touchStartY = currentY;
 
       if (Math.abs(deltaY) < 0.5) return;
 
-      const inner = getInner();
       const maxOuter = maxOuterRef.current;
 
-      if (deltaY > 0) {
-        // Dragging content UP
-        if (outer.scrollTop < maxOuter - 0.5) {
-          outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
-          if (e.cancelable) e.preventDefault();
-        } else if (inner) {
-          const maxInner = inner.scrollHeight - inner.clientHeight;
-          if (inner.scrollTop < maxInner - 0.5) {
-            inner.scrollTop = Math.min(maxInner, inner.scrollTop + deltaY);
-            if (e.cancelable) e.preventDefault();
-          }
-        }
-      } else if (deltaY < 0) {
-        // Dragging content DOWN
-        if (inner && inner.scrollTop > 0.5) {
-          inner.scrollTop = Math.max(0, inner.scrollTop + deltaY);
-          if (e.cancelable) e.preventDefault();
-        } else if (outer.scrollTop > 0) {
-          outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
-          if (e.cancelable) e.preventDefault();
-        }
+      // When category switcher is docked at top and user is touching inside the table:
+      // Leave touch completely to native inner scrolling with overscroll-behavior: contain
+      // This eliminates momentum killing, boundary jitter, and snap glitches!
+      if (touchStartedInInner && outer.scrollTop >= maxOuter - 1) {
+        return;
+      }
+
+      // When hero card is visible and user swipes up inside the table, smoothly dock the switcher
+      if (deltaY > 0 && outer.scrollTop < maxOuter - 1) {
+        outer.scrollTop = Math.min(maxOuter, outer.scrollTop + deltaY);
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
+      // When user touches the switcher or hero card and drags down, reveal the hero card
+      if (!touchStartedInInner && deltaY < 0 && outer.scrollTop > 0) {
+        outer.scrollTop = Math.max(0, outer.scrollTop + deltaY);
+        if (e.cancelable) e.preventDefault();
+        return;
       }
     };
 
@@ -274,9 +284,11 @@ export const ProfileView: React.FC = () => {
     <div
       ref={outerContainerRef}
       onScroll={handleOuterScroll}
-      className="w-full h-full relative overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 pt-0 pb-6 cyber-grid-bg no-scrollbar"
+      className="w-full h-full relative overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 pt-0 pb-0 cyber-grid-bg no-scrollbar"
       style={{
         WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        overscrollBehaviorY: 'contain',
         color: '#ffffff',
       }}
     >

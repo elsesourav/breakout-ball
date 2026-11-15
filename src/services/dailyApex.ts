@@ -1,53 +1,124 @@
 import { LevelData } from '../types/game';
 import { currencyService } from './currency';
+import { backendApi } from './backendApi';
+
+export interface DailyApexPayload {
+  today: {
+    date: string;
+    levelId: string;
+    name: string;
+    creator: string;
+    targetCount: number;
+    heatScore: number;
+    bonusCores: number;
+    repMultiplier: number;
+    level: LevelData;
+    expiresAt: string;
+    secondsRemaining: number;
+  };
+  tomorrow?: {
+    date: string;
+    levelId: string;
+    name: string;
+    creator: string;
+    targetCount: number;
+    heatScore: number;
+    bonusCores: number;
+    repMultiplier: number;
+  };
+  serverTime?: string;
+  fetchedAt?: number;
+}
+
+const STORAGE_CACHE_KEY = 'breakout_daily_apex_cache_v2';
+let cachedMission: DailyApexPayload | null = null;
+let isFetching = false;
+
+// Hydrate from localStorage immediately on module load
+try {
+  const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_CACHE_KEY) : null;
+  if (raw) cachedMission = JSON.parse(raw);
+} catch {}
 
 /**
- * Returns local YYYY-MM-DD date key
+ * Returns UTC YYYY-MM-DD date key
  */
 export function getDailyDateKey(date: Date = new Date()): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
+  if (cachedMission?.today?.date) return cachedMission.today.date;
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(date.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
 
 /**
- * Seconds remaining until next local midnight (00:00:00).
+ * Seconds remaining until next rotation (synced with backend or next UTC midnight).
  */
 export function getSecondsUntilMidnight(): number {
+  if (cachedMission?.today?.expiresAt) {
+    const expires = new Date(cachedMission.today.expiresAt).getTime();
+    return Math.max(0, Math.floor((expires - Date.now()) / 1000));
+  }
   const now = new Date();
-  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-  return Math.max(0, Math.floor((tomorrow.getTime() - now.getTime()) / 1000));
+  const nextUtcMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
+  return Math.max(0, Math.floor((nextUtcMidnight.getTime() - now.getTime()) / 1000));
 }
 
-/**
- * Formats seconds into compact countdown string: e.g. "10h 14m 22s"
- */
 export function formatDailyCountdown(totalSecs: number): string {
   const h = Math.floor(totalSecs / 3600);
   const m = Math.floor((totalSecs % 3600) / 60);
   const s = totalSecs % 60;
-  if (h > 0) {
-    return `${h}h ${m}m ${s}s`;
-  }
-  return `${m}m ${s}s`;
+  return h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
 }
 
 /**
- * Deterministic daily pseudo-random selection for Daily Apex Mission.
- * Generates a stable, high-entropy index for any given date string (YYYY-MM-DD).
- * Ensures all players see the exact same random Daily Apex Mission each day,
- * and automatically rotates to a new random stage at midnight without needing any admin panel.
+ * Fetch and synchronize Daily Apex Mission from authoritative backend scheduler.
+ */
+export async function fetchDailyApexMission(): Promise<DailyApexPayload | null> {
+  if (isFetching) return cachedMission;
+  isFetching = true;
+  try {
+    const data = await backendApi.getDailyApexMission();
+    if (data && data.success && data.today) {
+      cachedMission = { ...data, fetchedAt: Date.now() };
+      try {
+        localStorage.setItem(STORAGE_CACHE_KEY, JSON.stringify(cachedMission));
+      } catch {}
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('daily-apex-synced', { detail: cachedMission }));
+      }
+      return cachedMission;
+    }
+  } catch {} finally {
+    isFetching = false;
+  }
+  return cachedMission;
+}
+
+export function getCachedDailyMission(): DailyApexPayload | null {
+  return cachedMission;
+}
+
+/**
+ * Returns today's featured mission level (authoritative backend or deterministic fallback).
  */
 export function getDailyFeaturedLevel(
   levels: LevelData[],
   date: Date = new Date()
 ): { level: LevelData; dateKey: string; bonusCores: number } | null {
-  if (!levels || levels.length === 0) return null;
+  if (cachedMission?.today?.level) {
+    return {
+      level: cachedMission.today.level,
+      dateKey: cachedMission.today.date,
+      bonusCores: cachedMission.today.bonusCores || 100,
+    };
+  }
 
+  fetchDailyApexMission().catch(() => {});
+
+  if (!levels || levels.length === 0) return null;
   const dateKey = getDailyDateKey(date);
 
-  // Multiplicative & avalanche hash for high entropy daily pseudo-randomness
   let hash = 2166136261;
   for (let i = 0; i < dateKey.length; i++) {
     hash ^= dateKey.charCodeAt(i);
@@ -57,22 +128,14 @@ export function getDailyFeaturedLevel(
   hash = Math.imul(hash ^ (hash >>> 13), 3266489909);
   const finalSeed = (hash ^ (hash >>> 16)) >>> 0;
 
-  // Filter for playable arena levels (must have blocks)
   const validPool = levels.filter((lvl) => Array.isArray(lvl.blocks) && lvl.blocks.length > 0);
   const pool = validPool.length > 0 ? validPool : levels;
-
-  const selectedIndex = finalSeed % pool.length;
-  const level = pool[selectedIndex];
-
-  // Daily bounty: dynamically alternates between 100, 125, 150 cores based on daily seed
+  const level = pool[finalSeed % pool.length];
   const bonusCores = 100 + ((finalSeed % 3) * 25);
 
   return { level, dateKey, bonusCores };
 }
 
-/**
- * Checks whether today's Daily Apex Mission has been completed and claimed.
- */
 export function isDailyMissionCompleted(dateKey: string = getDailyDateKey()): boolean {
   if (typeof window === 'undefined') return false;
   try {
@@ -82,19 +145,14 @@ export function isDailyMissionCompleted(dateKey: string = getDailyDateKey()): bo
   }
 }
 
-/**
- * Checks if a given level ID matches today's Daily Apex Mission.
- */
 export function isTodayDailyMission(levelId: string | number, levels: LevelData[]): boolean {
+  if (cachedMission?.today?.levelId) {
+    return String(cachedMission.today.levelId) === String(levelId);
+  }
   const daily = getDailyFeaturedLevel(levels);
-  if (!daily || !daily.level) return false;
-  return String(daily.level.id) === String(levelId);
+  return !!(daily?.level && String(daily.level.id) === String(levelId));
 }
 
-/**
- * Records completion of today's Daily Apex Mission, awards bounty cores once,
- * and broadcasts an event to notify all components.
- */
 export function recordDailyMissionCompletion(
   levelId: string | number,
   levels: LevelData[],
@@ -102,23 +160,19 @@ export function recordDailyMissionCompletion(
 ): { success: boolean; bonusCores: number } {
   const daily = getDailyFeaturedLevel(levels);
   if (!daily || !daily.level) return { success: false, bonusCores: 0 };
-
-  if (String(daily.level.id) !== String(levelId)) {
-    return { success: false, bonusCores: 0 };
-  }
+  if (String(daily.level.id) !== String(levelId)) return { success: false, bonusCores: 0 };
 
   const { dateKey, bonusCores } = daily;
-  if (isDailyMissionCompleted(dateKey)) {
-    return { success: false, bonusCores: 0 };
-  }
+  if (isDailyMissionCompleted(dateKey)) return { success: false, bonusCores: 0 };
 
   try {
     localStorage.setItem(`breakout_apex_done_${dateKey}`, 'true');
     currencyService.addCores(bonusCores, username);
+    if (username && username.toLowerCase() !== 'anonymous') {
+      backendApi.completeDailyApex(username, String(levelId)).catch(() => {});
+    }
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(
-        new CustomEvent('daily-apex-completed', { detail: { dateKey, bonusCores } })
-      );
+      window.dispatchEvent(new CustomEvent('daily-apex-completed', { detail: { dateKey, bonusCores } }));
     }
     return { success: true, bonusCores };
   } catch {

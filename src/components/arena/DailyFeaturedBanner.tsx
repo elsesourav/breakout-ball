@@ -10,6 +10,9 @@ import {
   formatDailyCountdown,
   getDailyFeaturedLevel,
   isDailyMissionCompleted,
+  fetchDailyApexMission,
+  getCachedDailyMission,
+  DailyApexPayload,
 } from '../../services/dailyApex';
 
 interface DailyFeaturedBannerProps {
@@ -18,21 +21,36 @@ interface DailyFeaturedBannerProps {
 }
 
 export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels, onPreview }) => {
-  const { startPlayLevel, localProgress } = useGame();
+  const { startPlayLevel } = useGame();
+  const [syncedMission, setSyncedMission] = useState<DailyApexPayload | null>(() => getCachedDailyMission());
   const [timeLeft, setTimeLeft] = useState<number>(() => getSecondsUntilMidnight());
   const [isCompleted, setIsCompleted] = useState<boolean>(() => isDailyMissionCompleted());
 
-  // Real-time countdown timer ticking down to midnight reset
+  // Real-time countdown timer ticking down to server rotation
   useEffect(() => {
+    fetchDailyApexMission().then((data) => {
+      if (data) setSyncedMission(data);
+    });
+
+    const handleDailySynced = (e: any) => {
+      if (e.detail) setSyncedMission(e.detail);
+    };
+    window.addEventListener('daily-apex-synced', handleDailySynced);
+
     const timer = setInterval(() => {
       const remaining = getSecondsUntilMidnight();
       setTimeLeft(remaining);
-      // If midnight resets (cooldown resets to near 86400s), re-check completion
-      if (remaining >= 86390) {
-        setIsCompleted(isDailyMissionCompleted());
+      if (remaining <= 0) {
+        fetchDailyApexMission().then((d) => {
+          if (d) setSyncedMission(d);
+        });
       }
     }, 1000);
-    return () => clearInterval(timer);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('daily-apex-synced', handleDailySynced);
+    };
   }, []);
 
   // Listen for daily mission completion event dispatched upon clearing
@@ -46,8 +64,16 @@ export const DailyFeaturedBanner: React.FC<DailyFeaturedBannerProps> = ({ levels
 
   // Compute daily featured mission automatically
   const dailyData = useMemo(() => {
+    if (syncedMission?.today?.level) {
+      return {
+        level: syncedMission.today.level,
+        dateKey: syncedMission.today.date,
+        bonusCores: syncedMission.today.bonusCores || 100,
+        tomorrow: syncedMission.tomorrow,
+      };
+    }
     return getDailyFeaturedLevel(levels);
-  }, [levels]);
+  }, [syncedMission, levels]);
 
   if (!dailyData || !dailyData.level) return null;
 

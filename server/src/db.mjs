@@ -2,6 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { APEX_MISSION_POOL } from './dailyApexLevels.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,6 +89,19 @@ db.exec(`
     created_at TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS daily_apex_missions (
+    mission_date TEXT PRIMARY KEY,
+    level_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    creator TEXT NOT NULL,
+    target_count INTEGER NOT NULL,
+    heat_score INTEGER NOT NULL,
+    bonus_cores INTEGER NOT NULL,
+    rep_multiplier INTEGER DEFAULT 2,
+    level_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
   CREATE INDEX IF NOT EXISTS idx_completions_level ON level_completions(level_id, time_used ASC);
   CREATE INDEX IF NOT EXISTS idx_trophies_user ON user_trophies(username);
@@ -96,29 +110,7 @@ db.exec(`
 `);
 
 // Database migrations for coupons & redemptions
-try { db.exec('ALTER TABLE coupons ADD COLUMN per_user_limit INTEGER DEFAULT 1;'); } catch {}
-try { db.exec('ALTER TABLE coupons ADD COLUMN is_unlimited INTEGER DEFAULT 0;'); } catch {}
-try {
-  const redIndexes = db.prepare('PRAGMA index_list(coupon_redemptions)').all();
-  if (redIndexes.some(i => i.origin === 'u' && i.unique === 1)) {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS coupon_redemptions_temp (
-        id TEXT PRIMARY KEY,
-        coupon_code TEXT NOT NULL,
-        username TEXT NOT NULL,
-        cores_granted INTEGER NOT NULL,
-        ip_address TEXT,
-        redeemed_at TEXT NOT NULL
-      );
-      INSERT OR IGNORE INTO coupon_redemptions_temp SELECT id, coupon_code, username, cores_granted, ip_address, redeemed_at FROM coupon_redemptions;
-      DROP TABLE coupon_redemptions;
-      ALTER TABLE coupon_redemptions_temp RENAME TO coupon_redemptions;
-      CREATE INDEX IF NOT EXISTS idx_coupon_redemptions_user ON coupon_redemptions(coupon_code, username);
-    `);
-  }
-} catch (e) {
-  // Ignored if already migrated
-}
+try { db.exec('ALTER TABLE coupons ADD COLUMN per_user_limit INTEGER DEFAULT 1; ALTER TABLE coupons ADD COLUMN is_unlimited INTEGER DEFAULT 0;'); } catch {}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // REPOSITORY METHODS
@@ -408,5 +400,92 @@ export const activityRepository = {
       ...r,
       metadata: r.metadata ? JSON.parse(r.metadata) : null
     }));
+  }
+};
+
+export const dailyApexRepository = {
+  getMissionForDate(dateStr) {
+    const stmt = db.prepare('SELECT * FROM daily_apex_missions WHERE mission_date = ?');
+    return stmt.get(dateStr);
+  },
+
+  ensureSchedule(daysAhead = 7) {
+    const now = new Date();
+    const insertStmt = db.prepare(`
+      INSERT OR IGNORE INTO daily_apex_missions
+      (mission_date, level_id, name, creator, target_count, heat_score, bonus_cores, rep_multiplier, level_json, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    for (let i = 0; i <= daysAhead; i++) {
+      const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + i, 0, 0, 0));
+      const dateStr = d.toISOString().split('T')[0];
+      if (!this.getMissionForDate(dateStr)) {
+        let hash = 2166136261;
+        for (let j = 0; j < dateStr.length; j++) {
+          hash ^= dateStr.charCodeAt(j);
+          hash = Math.imul(hash, 16777619);
+        }
+        hash = Math.imul(hash ^ (hash >>> 16), 2246822507);
+        hash = Math.imul(hash ^ (hash >>> 13), 3266489909);
+        const seed = (hash ^ (hash >>> 16)) >>> 0;
+
+        const poolLevel = APEX_MISSION_POOL[seed % APEX_MISSION_POOL.length];
+        const bonusCores = 100 + ((seed % 3) * 25);
+        const targetCount = Array.isArray(poolLevel.blocks) ? poolLevel.blocks.length : 12;
+
+        insertStmt.run(
+          dateStr,
+          poolLevel.id,
+          poolLevel.name,
+          poolLevel.creator,
+          targetCount,
+          poolLevel.playCount || 680,
+          bonusCores,
+          2,
+          JSON.stringify(poolLevel),
+          now.toISOString()
+        );
+      }
+    }
+  },
+
+  getCurrentMission() {
+    this.ensureSchedule(7);
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const tomorrowDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
+    const tomorrowStr = tomorrowDate.toISOString().split('T')[0];
+
+    const todayRow = this.getMissionForDate(todayStr) || this.getMissionForDate(tomorrowStr);
+    const tomorrowRow = this.getMissionForDate(tomorrowStr);
+    const secondsRemaining = Math.max(0, Math.floor((tomorrowDate.getTime() - now.getTime()) / 1000));
+
+    return {
+      today: {
+        date: todayRow.mission_date,
+        levelId: todayRow.level_id,
+        name: todayRow.name,
+        creator: todayRow.creator,
+        targetCount: todayRow.target_count,
+        heatScore: todayRow.heat_score,
+        bonusCores: todayRow.bonus_cores,
+        repMultiplier: todayRow.rep_multiplier,
+        level: JSON.parse(todayRow.level_json),
+        expiresAt: tomorrowDate.toISOString(),
+        secondsRemaining,
+      },
+      tomorrow: tomorrowRow ? {
+        date: tomorrowRow.mission_date,
+        levelId: tomorrowRow.level_id,
+        name: tomorrowRow.name,
+        creator: tomorrowRow.creator,
+        targetCount: tomorrowRow.target_count,
+        heatScore: tomorrowRow.heat_score,
+        bonusCores: tomorrowRow.bonus_cores,
+        repMultiplier: tomorrowRow.rep_multiplier,
+      } : null,
+      serverTime: now.toISOString(),
+    };
   }
 };

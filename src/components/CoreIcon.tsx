@@ -22,9 +22,9 @@ const THEMES = {
     inner: '#eff6ff',
   },
   gold: {
-    primary: '#ffd700',
-    secondary: '#f59e0b',
-    glow: 'rgba(255, 215, 0, 0.7)',
+    primary: '#fbbf24',
+    secondary: '#d97706',
+    glow: 'rgba(245, 158, 11, 0.75)',
     inner: '#fffbeb',
   },
   purple: {

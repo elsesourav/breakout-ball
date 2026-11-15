@@ -408,28 +408,38 @@ class BackendApiService {
     }
   }
 
-  /** Admin: Create new coupon */
-  public async createCoupon(data: {
-    code: string;
-    rewardCores: number;
-    packCores: number;
-    maxUses?: number;
-    perUserLimit?: number;
-    isUnlimited?: boolean;
-    expiresAt?: string;
-  }): Promise<{ success: boolean; coupon?: BackendCoupon; message?: string }> {
-    const res = await this.createAdminCoupon(data);
-    return { success: res.success, coupon: res.coupon, message: res.error };
+  /** Admin: Coupon Actions */
+  public async createCoupon(data: any): Promise<{ success: boolean; coupon?: any; message?: string }> {
+    const r = await this.createAdminCoupon(data);
+    return { success: r.success, coupon: r.coupon, message: r.error };
+  }
+  public toggleCoupon = (code: string, isActive?: boolean) => this.toggleAdminCoupon(code, isActive ?? true);
+  public deleteCoupon = (code: string) => this.deleteAdminCoupon(code);
+
+  /** Synchronized Daily Apex Mission from Backend Scheduler */
+  public async getDailyApexMission(): Promise<any | null> {
+    try {
+      const res = await fetch(`${this.baseUrl}/api/daily-apex`, { signal: AbortSignal.timeout(3500) });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
   }
 
-  /** Admin: Toggle coupon */
-  public async toggleCoupon(code: string, isActive?: boolean): Promise<{ success: boolean }> {
-    return this.toggleAdminCoupon(code, isActive ?? true);
-  }
-
-  /** Admin: Delete coupon */
-  public async deleteCoupon(code: string): Promise<{ success: boolean }> {
-    return this.deleteAdminCoupon(code);
+  public async completeDailyApex(username: string, levelId: string): Promise<any | null> {
+    try {
+      const res = await fetch(`${this.baseUrl}/api/daily-apex/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, levelId }),
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
   }
 
   /** Admin: Dashboard Metrics */

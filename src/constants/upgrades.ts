@@ -268,7 +268,7 @@ export interface ShopPack {
 
 export const SHOP_PACKS: ShopPack[] = [
   { id: 'starter', name: 'Starter Pack', cores: 500, accentColor: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' },
-  { id: 'power', name: 'Power Bundle', cores: 1000, accentColor: '#facc15', borderColor: 'rgba(250, 204, 21, 0.4)' },
+  { id: 'power', name: 'Power Bundle', cores: 1000, accentColor: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.45)' },
   { id: 'mega', name: 'Mega Vault', cores: 2500, accentColor: '#3b82f6', borderColor: 'rgba(59, 130, 246, 0.4)' },
   { id: 'ultra', name: 'Ultra Core', cores: 5000, accentColor: '#ec4899', borderColor: 'rgba(236, 72, 153, 0.4)' },
   { id: 'titan', name: 'Titan Vault', cores: 10000, accentColor: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)' },

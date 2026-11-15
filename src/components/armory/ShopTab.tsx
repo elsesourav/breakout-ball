@@ -50,15 +50,15 @@ const PACK_META: Record<string, PackMeta> = {
     iconGlow: '0 0 10px rgba(16, 185, 129, 0.25)',
   },
   power: {
-    // 1000: Yellow
-    btnGradient: 'linear-gradient(135deg, #fef08a 0%, #facc15 50%, #eab308 100%)',
+    // 1000: Deep Yellow
+    btnGradient: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #d97706 100%)',
     btnTextColor: 'text-slate-950 font-black',
-    btnShadow: '0 0 16px rgba(234, 179, 8, 0.5)',
-    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(234, 179, 8, 0.14)',
-    cardBorder: '1.2px solid rgba(234, 179, 8, 0.4)',
-    iconBg: 'rgba(234, 179, 8, 0.15)',
-    iconBorder: '1.2px solid rgba(234, 179, 8, 0.5)',
-    iconGlow: '0 0 12px rgba(234, 179, 8, 0.3)',
+    btnShadow: '0 0 18px rgba(245, 158, 11, 0.55)',
+    cardGlow: '0 4px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(245, 158, 11, 0.18)',
+    cardBorder: '1.3px solid rgba(245, 158, 11, 0.45)',
+    iconBg: 'rgba(245, 158, 11, 0.16)',
+    iconBorder: '1.2px solid rgba(245, 158, 11, 0.55)',
+    iconGlow: '0 0 14px rgba(245, 158, 11, 0.35)',
   },
   mega: {
     // 2500: Blue

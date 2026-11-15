@@ -130,6 +130,8 @@ export const AchievementsList: React.FC = () => {
         style={{
           WebkitOverflowScrolling: 'touch',
           touchAction: 'pan-y',
+          overscrollBehavior: 'contain',
+          overscrollBehaviorY: 'contain',
         }}
         data-inner-scroll="true"
       >

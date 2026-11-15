@@ -301,7 +301,16 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
       {/* 3. Skeleton Loading State or Ranking Rows List (Scrollbar removed, no-scrollbar active) */}
       {isLoading ? (
-        <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-1 min-h-0" data-inner-scroll="true">
+        <div
+          className="flex-1 overflow-y-auto divide-y divide-cyan-500/10 no-scrollbar py-1 min-h-0"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+            overscrollBehavior: 'contain',
+            overscrollBehaviorY: 'contain',
+          }}
+          data-inner-scroll="true"
+        >
           {[...Array(7)].map((_, idx) => (
             <div
               key={`skeleton-${idx}`}
@@ -337,6 +346,8 @@ export const OverallScoreLeaderboard: React.FC = () => {
           style={{
             WebkitOverflowScrolling: 'touch',
             touchAction: 'pan-y',
+            overscrollBehavior: 'contain',
+            overscrollBehaviorY: 'contain',
           }}
           data-inner-scroll="true"
         >
