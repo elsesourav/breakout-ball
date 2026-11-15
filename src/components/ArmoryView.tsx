@@ -8,6 +8,7 @@ import { ShopTab } from './armory/ShopTab';
 import { CyberSectionHeader } from './CyberSectionHeader';
 import { FlyingCoresAnimation } from './armory/FlyingCoresAnimation';
 import { CoreIcon } from './CoreIcon';
+import { soundManager } from '../utils/audio';
 import {
   UpgradeTabIcon,
   ShopTabIcon,
@@ -294,6 +295,7 @@ export const ArmoryView: React.FC = () => {
                   key={sec.id}
                   type="button"
                   onClick={() => {
+                    soundManager.playClick('tab');
                     setActiveSection(sec.id);
                     if (typeof window !== 'undefined') {
                       window.history.pushState(null, '', sec.id === 'shop' ? '/shop' : '/armory');
@@ -339,7 +341,10 @@ export const ArmoryView: React.FC = () => {
                   <button
                     key={sub.id}
                     type="button"
-                    onClick={() => setSubSection(sub.id)}
+                    onClick={() => {
+                      soundManager.playClick('tab');
+                      setSubSection(sub.id);
+                    }}
                     className={`relative flex-1 py-1.5 flex items-center justify-center gap-1.5 rounded-xl font-tech font-bold text-xs transition-colors cursor-pointer z-10 ${
                       isActive ? 'text-black' : 'text-slate-400 hover:text-slate-200'
                     }`}

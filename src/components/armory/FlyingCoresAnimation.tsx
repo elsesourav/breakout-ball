@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CoreIcon } from '../CoreIcon';
-import { synthAudio } from '../../utils/synthAudio';
+import { soundManager } from '../../utils/audio';
 
 interface FlyingCoresAnimationProps {
   active: boolean;
@@ -183,9 +183,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
 
           // Play ascending melodic crystal chime
           soundIndex++;
-          if (soundIndex % 3 === 0) {
-            synthAudio.playComboHit(Math.min(soundIndex / 3, 5));
-          }
+          soundManager.playCollectCore(soundIndex);
         }
       }
 

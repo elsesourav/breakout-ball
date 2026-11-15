@@ -62,7 +62,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
   const handleClaimDaily = () => {
     if (!dailyStatus.canCollect || isClaimingDaily) return;
     setIsClaimingDaily(true);
-    soundManager.play('win');
+    soundManager.playUpgradeSuccess();
 
     const res = currencyService.claimDailyCores(username);
     if (res.success) {
@@ -74,7 +74,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
   };
 
   const handleOpenClaim = (pack: ShopPack) => {
-    soundManager.play('click');
+    soundManager.playClick('cyber');
     setSelectedPack(pack);
     setCouponCode('');
     setStatus('idle');
@@ -82,6 +82,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
   };
 
   const handleCloseModal = () => {
+    soundManager.playClick('close');
     setSelectedPack(null);
     setCouponCode('');
     setStatus('idle');
@@ -93,12 +94,12 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
     if (!couponCode.trim() || !selectedPack) return;
 
     setStatus('loading');
-    soundManager.play('click');
+    soundManager.playClick('cyber');
 
     const res = await couponService.redeemCoupon(couponCode, username, selectedPack.cores);
 
     if (res.success) {
-      soundManager.play('win');
+      soundManager.playUpgradeSuccess();
       setStatus('success');
       setStatusMsg(res.message);
 
@@ -108,7 +109,7 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
         onClaimSuccess(res.coresGranted);
       }, 350);
     } else {
-      soundManager.play('damage');
+      soundManager.playInsufficientFunds();
       setStatus('error');
       setStatusMsg(res.message);
     }

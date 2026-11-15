@@ -104,7 +104,7 @@ export const UpgradeCard: React.FC<UpgradeCardProps> = ({
   const statBreakdown = getStatBreakdown(upgrade, level);
 
   const handleCardClick = () => {
-    soundManager.play('click');
+    soundManager.playClick('cyber');
     if (onSelect) {
       onSelect(upgrade);
     }

@@ -1,11 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ChevronRight, Lock, Award, Sparkles } from 'lucide-react';
+import { X, ChevronRight, Award, Sparkles } from 'lucide-react';
 import { UpgradeDef, getUpgradeCost } from '../../constants/upgrades';
 import { CoreIcon } from '../CoreIcon';
 import { soundManager } from '../../utils/audio';
-import { drawBallWithPreset } from '../../engine/draw/ballDrawers';
-import { drawPaddleWithPreset } from '../../engine/draw/paddleDrawers';
+import { UpgradePreviewCanvas } from './previews/UpgradePreviewCanvas';
 
 interface UpgradePreviewModalProps {
   isOpen: boolean;
@@ -25,260 +24,25 @@ export const UpgradePreviewModal: React.FC<UpgradePreviewModalProps> = ({
   onClose,
   onUpgrade,
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  const isMax = upgrade ? currentLevel >= upgrade.maxLevel : false;
-  const nextLevel = currentLevel + 1;
-  const cost = upgrade ? getUpgradeCost(upgrade.baseCost, currentLevel) : 0;
-  const canAfford = !isMax && cores >= cost;
-
-  // Live Looping Canvas Animation for current vs upgraded preview
-  useEffect(() => {
-    if (!isOpen || !upgrade) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animId: number;
-    let tick = 0;
-
-    const render = () => {
-      tick += 0.035;
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-
-      // ── Grid & Split Divider Background ──────────────────────────────
-      ctx.strokeStyle = 'rgba(0, 247, 255, 0.08)';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < w; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
-      }
-      for (let y = 0; y < h; y += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
-        ctx.stroke();
-      }
-
-      // Vertical Center Divider Line
-      ctx.save();
-      ctx.strokeStyle = 'rgba(0, 247, 255, 0.25)';
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(w / 2, 8);
-      ctx.lineTo(w / 2, h - 8);
-      ctx.stroke();
-      ctx.restore();
-
-      // Side Centers
-      const leftCenterX = w * 0.25;
-      const rightCenterX = w * 0.75;
-      const centerY = h * 0.52;
-
-      // ── 1. BALL SIZE PREVIEW ─────────────────────────────────────────
-      if (upgrade.id === 'ball_size') {
-        const baseR = 19;
-        const curR = baseR * (1 + (currentLevel - 1) * 0.08);
-        const nextR = baseR * (1 + (isMax ? currentLevel - 1 : currentLevel) * 0.08);
-
-        // Left: CURRENT Ball
-        drawBallWithPreset(ctx, { x: leftCenterX, y: centerY, radius: curR }, 1, {
-          animTick: tick,
-          tier: currentLevel >= 5 ? 3 : currentLevel >= 3 ? 2 : 1,
-        });
-
-        // Right: UPGRADED Ball with Green Expansion Indicator Ring
-        ctx.save();
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.6)';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([3, 3]);
-        ctx.beginPath();
-        ctx.arc(rightCenterX, centerY, nextR + 4, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Pulsing expansion aura
-        const auraR = nextR + 6 + Math.sin(tick * 3) * 2;
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = 8;
-        ctx.beginPath();
-        ctx.arc(rightCenterX, centerY, auraR, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-
-        drawBallWithPreset(ctx, { x: rightCenterX, y: centerY, radius: nextR }, 1, {
-          animTick: tick,
-          tier: (currentLevel + 1) >= 5 ? 3 : (currentLevel + 1) >= 3 ? 2 : 1,
-        });
-      }
-
-      // ── 2. BALL SPEED PREVIEW (Continuous Velocity Race Loop) ───────
-      else if (upgrade.id === 'ball_speed') {
-        const laneTopY = h * 0.36;
-        const laneBtmY = h * 0.68;
-        const laneW = w - 70;
-        const startX = 35;
-
-        // Current speed trajectory
-        const speed1 = 1.2 + (currentLevel - 1) * 0.16;
-        const pos1 = (Math.sin(tick * speed1) * 0.5 + 0.5) * laneW;
-
-        // Upgraded speed trajectory (+8% faster with speed streak)
-        const speed2 = 1.2 + (isMax ? currentLevel - 1 : currentLevel) * 0.16;
-        const pos2 = (Math.sin(tick * speed2) * 0.5 + 0.5) * laneW;
-
-        // Lane dividers
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.fillRect(startX, laneTopY - 14, laneW, 28);
-        ctx.fillRect(startX, laneBtmY - 14, laneW, 28);
-
-        // Current Ball (Top Lane)
-        drawBallWithPreset(ctx, { x: startX + pos1, y: laneTopY, radius: 12 }, 1, {
-          animTick: tick,
-        });
-
-        // Upgraded Ball with Comet Trail (Bottom Lane)
-        ctx.save();
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = 14;
-        const trailLen = 22;
-        const dir = Math.cos(tick * speed2) > 0 ? -1 : 1;
-        const grad = ctx.createLinearGradient(startX + pos2, laneBtmY, startX + pos2 + dir * trailLen, laneBtmY);
-        grad.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
-        grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        ctx.fillStyle = grad;
-        ctx.fillRect(startX + pos2, laneBtmY - 5, dir * trailLen, 10);
-        ctx.restore();
-
-        drawBallWithPreset(ctx, { x: startX + pos2, y: laneBtmY, radius: 12 }, 1, {
-          animTick: tick * 1.5,
-          tier: 2,
-        });
-      }
-
-      // ── 3. BALL IMPACT POWER PREVIEW (Looping Kinetic Blast) ─────────
-      else if (upgrade.id === 'ball_impact') {
-        const loopT = (tick % 2.5) / 2.5; // 0 to 1 every 2.5s
-        const strikePoint = 0.55;
-
-        // Draw Target Armor Blocks
-        const blockW = 44;
-        const blockH = 22;
-        const leftBlockX = leftCenterX - blockW / 2;
-        const rightBlockX = rightCenterX - blockW / 2;
-        const blockY = centerY + 18;
-
-        ctx.fillStyle = '#1e293b';
-        ctx.strokeStyle = '#64748b';
-        ctx.lineWidth = 1.5;
-        ctx.fillRect(leftBlockX, blockY, blockW, blockH);
-        ctx.strokeRect(leftBlockX, blockY, blockW, blockH);
-
-        ctx.fillStyle = '#0f291e';
-        ctx.strokeStyle = '#10b981';
-        ctx.fillRect(rightBlockX, blockY, blockW, blockH);
-        ctx.strokeRect(rightBlockX, blockY, blockW, blockH);
-
-        // Falling Ball strike
-        let ballY: number;
-        if (loopT < strikePoint) {
-          ballY = centerY - 35 + (loopT / strikePoint) * 35;
-        } else {
-          ballY = centerY + (1 - (loopT - strikePoint) / (1 - strikePoint)) * 8 - 8;
-        }
-
-        // Left (Normal Hit)
-        drawBallWithPreset(ctx, { x: leftCenterX, y: ballY, radius: 13 }, 1, { animTick: tick });
-
-        // Right (Heavy Impact with Blast Shockwave)
-        drawBallWithPreset(ctx, { x: rightCenterX, y: ballY, radius: 13 }, 1, { animTick: tick, tier: 2 });
-
-        if (loopT >= strikePoint && loopT <= strikePoint + 0.3) {
-          const blastProg = (loopT - strikePoint) / 0.3;
-          ctx.save();
-          // Massive kinetic shockwave
-          ctx.beginPath();
-          ctx.arc(rightCenterX, blockY, 8 + blastProg * 35, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(16, 185, 129, ${1 - blastProg})`;
-          ctx.lineWidth = 3 * (1 - blastProg);
-          ctx.shadowColor = '#10b981';
-          ctx.shadowBlur = 12;
-          ctx.stroke();
-          ctx.restore();
-        }
-      }
-
-      // ── 4. PADDLE WIDTH PREVIEW ──────────────────────────────────────
-      else if (upgrade.id === 'paddle_width') {
-        const curW = Math.min(130, 85 + (currentLevel - 1) * 9);
-        const nextW = Math.min(150, 85 + (isMax ? currentLevel - 1 : currentLevel) * 9);
-
-        // Left: CURRENT Paddle
-        drawPaddleWithPreset(ctx, { x: leftCenterX, y: centerY, width: curW, height: 16, vx: 0, targetX: leftCenterX }, 1, {
-          animTick: tick,
-          widthLevel: currentLevel,
-        });
-
-        // Right: UPGRADED Paddle with Green Wingtips Extension Highlight
-        drawPaddleWithPreset(ctx, { x: rightCenterX, y: centerY, width: nextW, height: 16, vx: 0, targetX: rightCenterX }, 1, {
-          animTick: tick,
-          widthLevel: currentLevel + 1,
-        });
-
-        // Green Extension Bracket Lines
-        ctx.save();
-        ctx.strokeStyle = '#10b981';
-        ctx.lineWidth = 1.5;
-        const leftWing = rightCenterX - nextW / 2;
-        const rightWing = rightCenterX + nextW / 2;
-        ctx.beginPath();
-        ctx.moveTo(leftWing, centerY - 14);
-        ctx.lineTo(leftWing, centerY + 14);
-        ctx.moveTo(rightWing, centerY - 14);
-        ctx.lineTo(rightWing, centerY + 14);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // ── 5. PADDLE SPEED PREVIEW (Looping Thruster Glide) ─────────────
-      else if (upgrade.id === 'paddle_speed') {
-        const curSpeed = 1.0 + (currentLevel - 1) * 0.15;
-        const nextSpeed = 1.0 + (isMax ? currentLevel - 1 : currentLevel) * 0.15;
-        const glideSpan = 45;
-
-        const leftOffset = Math.sin(tick * curSpeed) * glideSpan;
-        const rightOffset = Math.sin(tick * nextSpeed) * glideSpan;
-
-        drawPaddleWithPreset(ctx, { x: leftCenterX + leftOffset, y: centerY, width: 85, height: 15, vx: 0, targetX: leftCenterX }, 1, {
-          animTick: tick,
-          speedLevel: currentLevel,
-        });
-
-        drawPaddleWithPreset(ctx, { x: rightCenterX + rightOffset, y: centerY, width: 85, height: 15, vx: 0, targetX: rightCenterX }, 1, {
-          animTick: tick * 1.4,
-          speedLevel: currentLevel + 1,
-        });
-      }
-
-      animId = requestAnimationFrame(render);
-    };
-
-    render();
-    return () => cancelAnimationFrame(animId);
-  }, [isOpen, upgrade, currentLevel, isMax]);
-
   if (!isOpen || !upgrade) return null;
 
+  const isMax = currentLevel >= upgrade.maxLevel;
+  const nextLevel = currentLevel + 1;
+  const cost = getUpgradeCost(upgrade.baseCost, currentLevel);
+  const canAfford = !isMax && cores >= cost;
+
   const handleUpgradeNow = () => {
-    if (!canAfford) return;
-    soundManager.play('click');
+    if (!canAfford) {
+      soundManager.playInsufficientFunds();
+      return;
+    }
+    soundManager.playUpgradeSuccess();
     onUpgrade(upgrade.id);
+  };
+
+  const handleClose = () => {
+    soundManager.playClick('close');
+    onClose();
   };
 
   return (
@@ -320,7 +84,7 @@ export const UpgradePreviewModal: React.FC<UpgradePreviewModalProps> = ({
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer"
             >
               <X className="w-4 h-4" />
@@ -354,23 +118,21 @@ export const UpgradePreviewModal: React.FC<UpgradePreviewModalProps> = ({
             </div>
           </div>
 
-          {/* Canvas Live Comparison View (Continuous Looping Preview) */}
+          {/* Canvas Live Comparison View (Continuous Looping Preview from /previews) */}
           <div className="p-4 pt-2">
-            <div
-              style={{
-                border: '1.2px solid rgba(0, 247, 255, 0.25)',
-                backgroundColor: 'rgba(3, 7, 20, 0.85)',
-              }}
-              className="w-full h-44 rounded-xl overflow-hidden relative shadow-inner"
-            >
-              <canvas ref={canvasRef} width={380} height={176} className="w-full h-full" />
-            </div>
+            <UpgradePreviewCanvas
+              upgrade={upgrade}
+              currentLevel={currentLevel}
+              isMax={isMax}
+            />
           </div>
 
           {/* Stat Delta Difference Banner */}
           <div className="px-4 pb-2">
             <div className="p-2.5 rounded-xl bg-black/60 border border-cyan-500/25 flex items-center justify-between text-xs font-tech">
-              <span className="text-slate-300 font-bold text-[11px]">{upgrade.statLabel(currentLevel)}</span>
+              <span className="text-slate-300 font-bold text-[11px]">
+                {upgrade.statLabel(currentLevel)}
+              </span>
               {!isMax ? (
                 <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-[11px] shrink-0 ml-2">
                   NEXT: {upgrade.nextLabel(currentLevel)}
