@@ -102,8 +102,10 @@ export const getRoutePath = (
 export const pushAppRoute = (path: string): void => {
   if (typeof window === 'undefined') return;
   scrubUrlParams();
+  const search = window.location.search;
+  const target = search ? `${path}${search}` : path;
   if (window.location.pathname !== path) {
-    window.history.pushState({ path }, '', path);
+    window.history.pushState({ path }, '', target);
   }
 };
 
@@ -113,5 +115,7 @@ export const pushAppRoute = (path: string): void => {
 export const replaceAppRoute = (path: string): void => {
   if (typeof window === 'undefined') return;
   scrubUrlParams();
-  window.history.replaceState({ path }, '', path);
+  const search = window.location.search;
+  const target = search ? `${path}${search}` : path;
+  window.history.replaceState({ path }, '', target);
 };
