@@ -46,7 +46,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
 
     hasPlayedSoundRef.current = false;
 
-    // 1. Calculate accurate start & target positions once per active trigger
+    // 1. Calculate accurate start & target positions (icon after the number)
     const currentOrigin = originRef.current;
     const sX = currentOrigin?.x ?? (typeof window !== 'undefined' ? window.innerWidth / 2 : 200);
     const sY = currentOrigin?.y ?? (typeof window !== 'undefined' ? window.innerHeight * 0.55 : 350);
@@ -54,29 +54,30 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
 
     let foundTarget = { x: 320, y: 28 };
     if (typeof document !== 'undefined') {
-      const badge =
-        document.getElementById('top-cores-badge') ||
-        document.getElementById('header-cores-badge') ||
-        document.querySelector('[title*="Cores"]');
-      if (badge) {
-        const icon = badge.querySelector('svg');
-        const rect = icon ? icon.getBoundingClientRect() : badge.getBoundingClientRect();
+      const iconEl =
+        document.getElementById('top-cores-badge-icon') ||
+        document.querySelector('#top-cores-badge svg') ||
+        document.querySelector('#header-cores-badge svg') ||
+        document.querySelector('[title*="Cores"] svg') ||
+        document.getElementById('top-cores-badge');
+      if (iconEl) {
+        const rect = iconEl.getBoundingClientRect();
         if (rect.width > 0 && rect.right > 0) {
           foundTarget = {
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2,
+            x: Math.round(rect.left + rect.width / 2),
+            y: Math.round(rect.top + rect.height / 2),
           };
         }
       } else if (typeof window !== 'undefined') {
         foundTarget = {
-          x: Math.min(window.innerWidth - 45, window.innerWidth - 40),
+          x: Math.min(window.innerWidth - 30, window.innerWidth - 35),
           y: 28,
         };
       }
     }
     setTargetPos(foundTarget);
 
-    // 2. Spawn sleek glowing core crystals across a generous source burst radius
+    // 2. Spawn sleek glowing core crystals across source burst radius (source part preserved)
     const count = 9;
     const items: Particle[] = Array.from({ length: count }).map((_, i) => {
       // Big random radial distribution inside radius ~36px around click origin
@@ -85,10 +86,10 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
       return {
         id: i,
         delay: 0.02 + i * 0.05,
-        duration: 1.05 + (i % 3) * 0.07,
+        duration: 0.88 + (i % 3) * 0.06,
         offsetX: Math.cos(randAngle) * randDist,
         offsetY: Math.sin(randAngle) * randDist,
-        curveOffset: (i % 2 === 0 ? 1 : -1) * (18 + (i % 4) * 8),
+        curveOffset: (i % 2 === 0 ? 1 : -1) * (14 + (i % 4) * 8),
         scaleMod: 0.95 + (i % 3) * 0.1,
       };
     });
@@ -115,8 +116,8 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
         {particles.map((p) => {
           const sX = startPos.x + p.offsetX;
           const sY = startPos.y + p.offsetY;
-          const midX = sX * 0.45 + targetPos.x * 0.55 + p.curveOffset;
-          const midY = Math.min(sY, targetPos.y) - 30;
+          const midX = sX + (targetPos.x - sX) * 0.55 + p.curveOffset;
+          const midY = sY + (targetPos.y - sY) * 0.55 + (p.id % 2 === 0 ? -12 : 12);
 
           return (
             <motion.div
@@ -124,28 +125,30 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
               initial={{
                 x: sX,
                 y: sY,
-                scale: 0.5,
+                scale: 0.3,
                 opacity: 0,
               }}
               animate={{
-                x: [sX, sX, midX, targetPos.x],
-                y: [sY, sY - 6, midY, targetPos.y],
-                scale: [0.5, 1.05 * p.scaleMod, 0.9, 0.35],
-                opacity: [0, 1, 1, 0],
+                x: [sX, sX + p.offsetX * 0.4, midX, targetPos.x, targetPos.x],
+                y: [sY, sY + p.offsetY * 0.4 - 8, midY, targetPos.y, targetPos.y],
+                scale: [0.3, 1.15 * p.scaleMod, 1.0, 0.95, 0],
+                opacity: [0, 1, 1, 1, 0],
               }}
               transition={{
                 duration: p.duration,
                 delay: p.delay,
-                times: [0, 0.15, 0.75, 1],
+                times: [0, 0.12, 0.55, 0.90, 1.0],
                 ease: [0.25, 0.1, 0.25, 1.0],
               }}
               style={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
+                marginLeft: -10,
+                marginTop: -10,
                 zIndex: 1000002,
               }}
-              className="flex items-center justify-center w-5 h-5 rounded-full bg-[#080d26]/90 shadow-[0_0_12px_#00f7ff] border border-cyan-300"
+              className="flex items-center justify-center w-5 h-5 rounded-full bg-[#080d26]/90 shadow-[0_0_12px_#00f7ff] border border-cyan-300 pointer-events-none"
             >
               <CoreIcon size={12} glow variant="cyan" />
             </motion.div>

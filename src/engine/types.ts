@@ -77,11 +77,32 @@ export interface Particle {
   vx: number;
   vy: number;
   size: number;
+  baseSize?: number;
   color: string;
+  r?: number;
+  g?: number;
+  b?: number;
   alpha: number;
   life: number;
   maxLife: number;
   shape?: 'square' | 'circle' | 'spark';
+  isDebris?: boolean;
+}
+
+export interface DestroyingBlock {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  initialHealth: number;
+  color: string;
+  borderColor: string;
+  scale: number;
+  alpha: number;
+  life: number;
+  maxLife: number;
+  suctionVx: number;
+  suctionVy: number;
 }
 
 export interface Star {

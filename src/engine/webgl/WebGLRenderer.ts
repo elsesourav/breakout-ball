@@ -23,7 +23,7 @@ export class WebGLRenderer {
   private backdropBuffer: WebGLBuffer | null = null;
   private animTick = 0;
   private shakeIntensity = 0;
-  private guidelineFadeAlpha = 0;
+  private ballFadeAlphas: Map<number, number> = new Map();
 
   private bhCanvas: HTMLCanvasElement | null = null;
   private bhCtx: CanvasRenderingContext2D | null = null;
@@ -250,6 +250,18 @@ export class WebGLRenderer {
       }
     }
 
+    // 4.4. Draw Destroying Blocks (Shrinking Inward & Black Hole Suction Animation)
+    if (particles.destroyingBlocks.length > 0) {
+      for (const db of particles.destroyingBlocks) {
+        const uv = this.atlas.getUV(`block_${db.initialHealth}`);
+        const cx = db.x + db.w / 2;
+        const cy = db.y + db.h / 2;
+        const curW = db.w * db.scale;
+        const curH = db.h * db.scale;
+        this.batcher.pushSprite(cx - curW / 2, cy - curH / 2, curW, curH, uv.u0, uv.v0, uv.u1, uv.v1, 1.25, 1.25, 1.25, db.alpha);
+      }
+    }
+
     // 5. Draw Paddle with Sub-frame State Interpolation
     const renderPaddleX =
       paddle.prevX !== undefined && alpha < 0.999
@@ -270,39 +282,53 @@ export class WebGLRenderer {
     );
 
     // 5.1. Trajectory Matrix Guideline (8-Ball Pool Style Predictive Beam)
+    // Supports all active balls simultaneously (especially during Multiball)
     const ballList = Array.isArray(balls) ? balls : [balls];
     const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
-    const activeBalls = ballList.filter((b) => b.isActive);
-    let primaryBall: BallState | null = null;
-    let minDist = Infinity;
-    for (const b of activeBalls) {
-      if (b.vy > 0 && b.y < paddle.y) {
-        const d = paddle.y - b.y;
-        if (d < minDist) {
-          minDist = d;
-          primaryBall = b;
-        }
+    const dotUV = this.atlas.getUV('guideline_dot');
+    const reticleUV = this.atlas.getUV('guideline_reticle');
+    const arrowUV = this.atlas.getUV('guideline_arrow');
+
+    // Clean up fade alphas for balls that no longer exist
+    for (const key of this.ballFadeAlphas.keys()) {
+      if (key >= ballList.length) {
+        this.ballFadeAlphas.delete(key);
       }
     }
-    if (!primaryBall && activeBalls.length > 0) primaryBall = activeBalls[0];
 
-    if (primaryBall) {
-      const { guideline, nextFadeAlpha } = calculateTrajectoryGuideline(primaryBall, paddle, w, h, trajLvl, this.guidelineFadeAlpha);
-      this.guidelineFadeAlpha = nextFadeAlpha;
+    for (let idx = 0; idx < ballList.length; idx++) {
+      const b = ballList[idx];
+      const prevAlpha = this.ballFadeAlphas.get(idx) || 0;
 
-      if (guideline.visible && guideline.alpha > 0.01) {
-        const dotUV = this.atlas.getUV('guideline_dot');
-        const reticleUV = this.atlas.getUV('guideline_reticle');
-        const arrowUV = this.atlas.getUV('guideline_arrow');
+      if (!b || !b.isActive) {
+        if (prevAlpha > 0.01) {
+          this.ballFadeAlphas.set(idx, Math.max(0, prevAlpha - 1/60 * 2.2));
+        } else {
+          this.ballFadeAlphas.delete(idx);
+        }
+        continue;
+      }
 
+      const { guideline, nextFadeAlpha } = calculateTrajectoryGuideline(
+        b,
+        paddle,
+        w,
+        h,
+        trajLvl,
+        prevAlpha,
+        1 / 60
+      );
+      this.ballFadeAlphas.set(idx, nextFadeAlpha);
+
+      // ONLY display when collision is feasible with paddle (NO red miss lines)
+      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
         const gAlpha = guideline.alpha;
-        const isHit = guideline.isHit;
-        const inR = isHit ? 0.0 : 1.0;
-        const inG = isHit ? 0.97 : 0.45;
-        const inB = isHit ? 0.85 : 0.15;
-        const inAlpha = isHit ? gAlpha * 0.85 : gAlpha * 0.45;
+        const inR = 0.0;
+        const inG = 0.97;
+        const inB = 1.0;
+        const inAlpha = gAlpha * 0.85;
 
-        // 1. Draw Incoming Predictive Dotted Segments
+        // 1. Draw Incoming Predictive Dotted Segments (Vibrant Cyan)
         for (const seg of guideline.incomingSegments) {
           const dx = seg.x2 - seg.x1;
           const dy = seg.y2 - seg.y1;
@@ -324,8 +350,8 @@ export class WebGLRenderer {
         const reticleSize = 24;
         this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, inR, inG, inB, gAlpha * 0.95);
 
-        // 3. Draw Outgoing Deflected Guideline (when collision is possible)
-        if (isHit && guideline.outgoingSegments.length > 0) {
+        // 3. Draw Outgoing Deflected Guideline (Emerald Green with Arrowhead)
+        if (guideline.outgoingSegments.length > 0) {
           const outR = 0.06;
           const outG = 0.98;
           const outB = 0.65;
@@ -399,10 +425,10 @@ export class WebGLRenderer {
       const combatPoints = particles.particles.map((p) => ({
         x: p.x,
         y: p.y,
-        size: p.size * 1.8,
-        r: 1.0,
-        g: 0.9,
-        b: 0.3,
+        size: Math.max(1.0, p.size * 1.8),
+        r: p.r ?? 1.0,
+        g: p.g ?? 0.9,
+        b: p.b ?? 0.3,
         a: Math.max(0.05, Math.min(1.0, p.alpha)),
       }));
       this.glParticles.renderPoints(this.shaders.getProgram('particle'), combatPoints, w, h);

@@ -171,4 +171,56 @@ const exportedNames = new Set(exports.map(e => e.name));
 });
 console.log('✅ WebAssembly physics binary compiled and all native C-ABI exports verified.\n');
 
+// 6. VERIFY MULTIBALL & NO-HORIZONTAL-RED-LINE GUIDELINE INTEGRITY
+console.log('--- 6. Multiball Guidelines & Horizontal Red Line Prevention ---');
+const testPaddle = { x: 576, y: 1843, width: 140, height: 24, vx: 0 };
+const ball1 = { isActive: true, x: 550, y: 1400, vx: 10, vy: 500, radius: 10, speed: 720 };
+const ball2 = { isActive: true, x: 600, y: 1500, vx: -10, vy: 480, radius: 10, speed: 720 };
+const ball3Ascending = { isActive: true, x: 576, y: 1400, vx: 100, vy: -500, radius: 10, speed: 720 };
+const ball4Missing = { isActive: true, x: 100, y: 1400, vx: 0, vy: 500, radius: 10, speed: 720 };
+
+// Ball 1 (descending, aligned): should show incoming & outgoing segments
+const res1 = calculateTrajectoryGuideline(ball1, testPaddle, 1152, 2048, 1, 0.8, 1/60);
+if (!res1.guideline.visible || !res1.guideline.isHit || res1.guideline.incomingSegments.length === 0) {
+  throw new Error('Ball 1 should have an active guideline');
+}
+
+// Ball 2 (descending, aligned in Multiball): should ALSO show incoming & outgoing segments
+const res2 = calculateTrajectoryGuideline(ball2, testPaddle, 1152, 2048, 1, 0.8, 1/60);
+if (!res2.guideline.visible || !res2.guideline.isHit || res2.guideline.incomingSegments.length === 0) {
+  throw new Error('Ball 2 should have an active guideline in Multiball');
+}
+console.log('✅ Multiball: Both descending balls receive independent valid guidelines.');
+
+// Ball 3 (Ascending, vy < 0): must NOT produce horizontal raycast segments
+const res3 = calculateTrajectoryGuideline(ball3Ascending, testPaddle, 1152, 2048, 1, 0.5, 1/60);
+if (res3.guideline.incomingSegments.length > 0 || res3.guideline.outgoingSegments.length > 0) {
+  throw new Error('Ascending ball produced guideline segments (horizontal line bug)!');
+}
+console.log('✅ Ascending balls produce 0 segments (strictly NO horizontal lines).');
+
+// Ball 4 (Missing paddle): must NOT produce segments or visible red lines
+const res4 = calculateTrajectoryGuideline(ball4Missing, testPaddle, 1152, 2048, 1, 0.5, 1/60);
+if (res4.guideline.visible || res4.guideline.isHit || res4.guideline.incomingSegments.length > 0) {
+  throw new Error('Missing ball produced guideline segments (red miss line bug)!');
+}
+console.log('✅ Misaligned balls produce 0 segments (strictly NO red miss lines).\n');
+
+// 7. VERIFY BALL UPGRADE DEFINITIONS IN UI
+console.log('--- 7. Ball Upgrade Modules in UI ---');
+const ballUpgradeIds = BALL_UPGRADES.map(u => u.id);
+console.log('Configured Ball Upgrades:', ballUpgradeIds);
+if (!ballUpgradeIds.includes('ball_size') ||
+    !ballUpgradeIds.includes('ball_speed') ||
+    !ballUpgradeIds.includes('ball_impact') ||
+    !ballUpgradeIds.includes('ball_trajectory')) {
+  throw new Error('Missing core ball upgrades');
+}
+BALL_UPGRADES.forEach(u => {
+  const l1 = u.statLabel(1);
+  const lmax = u.statLabel(u.maxLevel);
+  console.log(`- ${u.name} (Max Lvl ${u.maxLevel}): L1 "${l1}" -> Max "${lmax}"`);
+});
+console.log('✅ All 4 ball upgrade modules properly defined and configured for UI.\n');
+
 console.log('🎉 ALL REQUIREMENTS FULLY VERIFIED AND WORKING 100%!');

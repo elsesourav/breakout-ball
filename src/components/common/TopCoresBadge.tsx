@@ -65,8 +65,11 @@ export const TopCoresBadge: React.FC<TopCoresBadgeProps> = ({
         {formattedCores}
       </span>
 
-      {/* Cores Icon on the right */}
-      <div className="flex items-center justify-center flex-shrink-0">
+      {/* Cores Icon on the right (after the number) */}
+      <div
+        id="top-cores-badge-icon"
+        className="relative flex items-center justify-center flex-shrink-0"
+      >
         <CoreIcon
           size={17}
           glow
@@ -75,6 +78,15 @@ export const TopCoresBadge: React.FC<TopCoresBadgeProps> = ({
             isPulsing ? 'scale-125 rotate-12 drop-shadow-[0_0_12px_#00f7ff]' : ''
           } group-hover:rotate-12 group-hover:scale-110`}
         />
+        {/* Destination absorption ripple effect when collecting cores into icon */}
+        {isPulsing && (
+          <span
+            className="absolute -inset-1 rounded-full pointer-events-none animate-ping opacity-60"
+            style={{
+              background: 'radial-gradient(circle, rgba(0, 247, 255, 0.8) 0%, transparent 70%)',
+            }}
+          />
+        )}
       </div>
     </div>
   );

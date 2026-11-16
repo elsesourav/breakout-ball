@@ -39,6 +39,12 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
         current: `${(level - 1) * 12}%`,
         delta: '+12%',
       };
+    case 'ball_trajectory':
+      return {
+        statName: 'RANGE',
+        current: `${Math.round(600 + (level - 1) * (1200 / 7))}px`,
+        delta: '+171px',
+      };
     case 'paddle_width':
       return {
         statName: 'WIDTH',
@@ -48,8 +54,8 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
     case 'paddle_speed':
       return {
         statName: 'SPEED',
-        current: `${(level - 1) * 10}%`,
-        delta: '+10%',
+        current: `${Math.round(800 + (level - 1) * (800 / 7))} px/s`,
+        delta: '+114 px/s',
       };
     case 'expand_power':
       return {
@@ -84,8 +90,8 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
     case 'shield_power':
       return {
         statName: 'DURATION',
-        current: `${(8.0 + (level - 1) * 2.5).toFixed(1)}s`,
-        delta: '2.5s',
+        current: `${(16.0 + (level - 1) * (32.0 / 3)).toFixed(1)}s`,
+        delta: '10.7s',
       };
     default:
       return {

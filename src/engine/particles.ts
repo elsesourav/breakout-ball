@@ -1,4 +1,4 @@
-import { Particle, Star, FloatingText } from './types';
+import { Particle, Star, FloatingText, DestroyingBlock } from './types';
 
 const STAR_PALETTE = [
   'rgba(255, 255, 255, ALPHA)',
@@ -8,10 +8,23 @@ const STAR_PALETTE = [
   'rgba(56, 189, 248, ALPHA)',
 ];
 
+function parseHexColor(hex: string): [number, number, number] {
+  if (hex && hex.startsWith('#')) {
+    let c = hex.slice(1);
+    if (c.length === 3) c = c.split('').map((x) => x + x).join('');
+    const num = parseInt(c, 16);
+    if (!isNaN(num)) {
+      return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
+    }
+  }
+  return [0.0, 0.97, 1.0];
+}
+
 export class ParticleSystem {
   public particles: Particle[] = [];
   public stars: Star[] = [];
   public floatingTexts: FloatingText[] = [];
+  public destroyingBlocks: DestroyingBlock[] = [];
   private textCounter: number = 0;
 
   constructor(width: number, height: number, starCount: number = 240) {
@@ -33,26 +46,67 @@ export class ParticleSystem {
     }
   }
 
+  /**
+   * Spawns a dying brick that collapses inwards ("slowly small, slowly small")
+   * and gets sucked downward into the black hole singularity.
+   */
+  public spawnDestroyingBlock(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    initialHealth: number,
+    color: string,
+    borderColor: string
+  ) {
+    this.destroyingBlocks.push({
+      x,
+      y,
+      w,
+      h,
+      initialHealth,
+      color,
+      borderColor,
+      scale: 1.0,
+      alpha: 1.0,
+      life: 1.0,
+      maxLife: 1.0,
+      suctionVx: 0,
+      suctionVy: 0,
+    });
+  }
+
+  /**
+   * Spawns block shatter particles. Destroyed particles have extended lifespan
+   * and are gravitationally sucked downward into the black hole singularity.
+   */
   public spawnBlockExplosion(x: number, y: number, color: string, isDestroy: boolean = true) {
-    const count = isDestroy ? 34 : 18;
-    const baseSpeed = isDestroy ? 13 : 7;
+    const count = isDestroy ? 38 : 18;
+    const baseSpeed = isDestroy ? 7.5 : 5.5;
+    const [r, g, b] = parseHexColor(color);
 
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * baseSpeed + (isDestroy ? 3 : 1);
-      const life = Math.random() * 0.45 + (isDestroy ? 0.65 : 0.4);
+      const speed = Math.random() * baseSpeed + (isDestroy ? 2.0 : 1.0);
+      const life = isDestroy ? Math.random() * 0.7 + 1.8 : Math.random() * 0.35 + 0.4;
+      const baseSize = Math.random() * (isDestroy ? 5.5 : 4.0) + 3.0;
 
       this.particles.push({
-        x,
-        y,
+        x: x + (Math.random() - 0.5) * 16,
+        y: y + (Math.random() - 0.5) * 10,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        size: Math.random() * (isDestroy ? 8 : 5) + 3,
+        vy: Math.sin(angle) * speed - (isDestroy ? 1.2 : 0),
+        size: baseSize,
+        baseSize,
         color,
+        r,
+        g,
+        b,
         alpha: 1.0,
         life,
         maxLife: life,
         shape: Math.random() > 0.4 ? 'square' : 'spark',
+        isDebris: isDestroy,
       });
     }
   }
@@ -62,13 +116,18 @@ export class ParticleSystem {
     for (let i = 0; i < 24; i++) {
       const angle = -Math.PI / 2 + (Math.random() * 1.6 - 0.8);
       const speed = Math.random() * 9 + 3;
+      const chosenColor = bounceColors[Math.floor(Math.random() * bounceColors.length)];
+      const [r, g, b] = parseHexColor(chosenColor);
       this.particles.push({
         x: x + (Math.random() * 36 - 18),
         y: y - 2,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         size: Math.random() * 5 + 2.5,
-        color: bounceColors[Math.floor(Math.random() * bounceColors.length)],
+        color: chosenColor,
+        r,
+        g,
+        b,
         alpha: 0.95,
         life: 0.45,
         maxLife: 0.45,
@@ -88,13 +147,18 @@ export class ParticleSystem {
       const y = height * 0.45 + Math.random() * (height * 0.15);
       const angle = -Math.PI / 2 + (Math.random() * 1.0 - 0.5);
       const speed = Math.random() * 6 + 3;
+      const chosenColor = colors[Math.floor(Math.random() * colors.length)];
+      const [r, g, b] = parseHexColor(chosenColor);
       this.particles.push({
         x,
         y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         size: Math.random() * 6 + 3,
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color: chosenColor,
+        r,
+        g,
+        b,
         alpha: 1.0,
         life: 0.9,
         maxLife: 0.9,
@@ -116,10 +180,11 @@ export class ParticleSystem {
   }
 
   public update(width: number, height: number) {
-    // 1. Continuous Steady Ambient Particle Stream (Living arcade arena atmosphere)
+    // 1. Living arcade arena atmosphere ambient stream
     if (this.particles.length < 80 && Math.random() < 0.45) {
       const ambientColors = ['#00f7ff', '#38bdf8', '#818cf8', '#c084fc', '#facc15'];
       const chosenColor = ambientColors[Math.floor(Math.random() * ambientColors.length)];
+      const [r, g, b] = parseHexColor(chosenColor);
       const startX = Math.random() * width;
       const startY = Math.random() * (height * 0.55);
       const life = Math.random() * 1.8 + 1.2;
@@ -130,6 +195,9 @@ export class ParticleSystem {
         vy: Math.random() * 0.9 + 0.25,
         size: Math.random() * 3.5 + 1.8,
         color: chosenColor,
+        r,
+        g,
+        b,
         alpha: Math.random() * 0.6 + 0.35,
         life,
         maxLife: life,
@@ -137,16 +205,14 @@ export class ParticleSystem {
       });
     }
 
-    // 2. Update stars with Black Hole Gravitational Suction
+    // 2. Cosmic Black Hole Gravitational Singularity coordinates (bottom center)
     const bhX = width * 0.5;
     const bhY = height - 16;
 
+    // Stars update with Black Hole Gravitational Suction
     for (let i = 0; i < this.stars.length; i++) {
       const s = this.stars[i];
-      // Baseline downward drift
       s.y += s.speed * 0.75;
-
-      // Gravitational suction begins in mid-lower arena and accelerates toward singularity
       if (s.y > height * 0.35) {
         const dx = bhX - s.x;
         const dy = bhY - s.y;
@@ -154,19 +220,14 @@ export class ParticleSystem {
         const dist = Math.sqrt(distSq);
 
         if (dist > 8) {
-          // Graceful suction spiral
           const pullForce = Math.min(5.5, 68000 / (distSq + 16000));
           const dirX = dx / dist;
           const dirY = dy / dist;
           const swirlDir = i % 2 === 0 ? 1 : -1;
-          const tanX = -dirY * swirlDir;
-          const tanY = dirX * swirlDir;
-
-          s.x += dirX * pullForce * 1.4 + tanX * pullForce * 0.6;
-          s.y += dirY * pullForce * 1.4 + tanY * pullForce * 0.6;
+          s.x += dirX * pullForce * 1.4 + -dirY * swirlDir * pullForce * 0.6;
+          s.y += dirY * pullForce * 1.4 + dirX * swirlDir * pullForce * 0.6;
         }
 
-        // Singularity swallow condition: plunged into black hole event horizon
         if (dist < 55 || s.y > height + 20) {
           s.y = -10 - Math.random() * 30;
           s.x = Math.random() * width;
@@ -175,33 +236,110 @@ export class ParticleSystem {
           s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.01;
           s.alpha = Math.max(0.15, Math.min(0.9, s.alpha));
         }
+      } else if (s.y > height) {
+        s.y = -10 - Math.random() * 20;
+        s.x = Math.random() * width;
       } else {
-        if (s.y > height) {
-          s.y = -10 - Math.random() * 20;
-          s.x = Math.random() * width;
-        } else {
-          s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.01;
-          s.alpha = Math.max(0.15, Math.min(0.9, s.alpha));
+        s.alpha += Math.sin(Date.now() * s.twinkleSpeed) * 0.01;
+        s.alpha = Math.max(0.15, Math.min(0.9, s.alpha));
+      }
+    }
+
+    // 3. Update Particles with Authentic Black Hole Gravitational Suction & Progressive Shrinking
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+
+      if (p.isDebris) {
+        // Gravitational suction towards bottom-center singularity
+        const dx = bhX - p.x;
+        const dy = bhY - p.y;
+        const distSq = dx * dx + dy * dy;
+        const dist = Math.sqrt(distSq);
+
+        // Smoothly ramp in suction after initial shatter burst
+        const age = p.maxLife - p.life;
+        const ramp = Math.min(1.0, age / 0.28);
+        const gravForce = Math.min(8.5, 140000 / (distSq + 20000)) * ramp;
+        const dirX = dx / Math.max(1, dist);
+        const dirY = dy / Math.max(1, dist);
+
+        // Swirl around black hole axis
+        const swirlDir = i % 2 === 0 ? 1 : -1;
+        const tanX = -dirY * swirlDir * 0.18 * gravForce;
+
+        p.vx += dirX * gravForce * 0.55 + tanX;
+        p.vy += 0.28 + dirY * gravForce * 0.85;
+
+        // Dampen velocity to create smooth gravitational fluid motion
+        p.vx *= 0.965;
+        p.vy *= 0.985;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        p.life -= 0.018;
+
+        // Size slowly shrinks as it descends towards black hole ("slowly small, slowly small")
+        const distFactor = Math.max(0.12, Math.min(1.0, dist / 220));
+        const lifeFactor = Math.max(0.15, p.life / p.maxLife);
+        p.size = (p.baseSize || 4) * distFactor * lifeFactor;
+        p.alpha = Math.max(0, p.life / p.maxLife);
+
+        // Singularity swallow condition: plunged into black hole event horizon
+        if (dist < 32 || p.y > height + 10 || p.life <= 0) {
+          this.particles.splice(i, 1);
+        }
+      } else {
+        // Non-debris particles (paddle bounce, ambient)
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.18;
+        p.vx *= 0.98;
+        p.life -= 0.022;
+        p.alpha = Math.max(0, p.life / p.maxLife);
+
+        if (p.life <= 0) {
+          this.particles.splice(i, 1);
         }
       }
     }
 
-    // 3. Update particles
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      const p = this.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.18; // Gravity
-      p.vx *= 0.98; // Friction
-      p.life -= 0.022;
-      p.alpha = Math.max(0, p.life / p.maxLife);
+    // 4. Update Destroying Blocks (Shrinking Inward & Black Hole Suction)
+    for (let i = this.destroyingBlocks.length - 1; i >= 0; i--) {
+      const db = this.destroyingBlocks[i];
+      db.life -= 0.035; // ~28 frames / ~0.46s
 
-      if (p.life <= 0) {
-        this.particles.splice(i, 1);
+      const t = 1.0 - Math.max(0, db.life / db.maxLife);
+
+      // "the bricks are slowly small, slowly small... Not very big, okay?"
+      // Smooth inward contraction: holds steady for initial 15%, then scales down to 0
+      if (t < 0.15) {
+        db.scale = 1.0;
+      } else {
+        const prog = (t - 0.15) / 0.85;
+        db.scale = Math.max(0, 1.0 - Math.pow(prog, 1.35));
+      }
+
+      // "and then suction": pull downward and toward black hole center
+      const dx = bhX - (db.x + db.w / 2);
+      const dy = bhY - (db.y + db.h / 2);
+      const dist = Math.max(1, Math.hypot(dx, dy));
+
+      db.suctionVy += 0.32 + (dy / dist) * 0.6;
+      db.suctionVx += (dx / dist) * 0.25;
+      db.suctionVx *= 0.96;
+
+      db.x += db.suctionVx;
+      db.y += db.suctionVy;
+
+      db.alpha = Math.max(0, Math.min(1.0, db.life / (db.maxLife * 0.65)));
+
+      if (db.life <= 0 || db.scale <= 0.01 || db.y > height + 10) {
+        this.destroyingBlocks.splice(i, 1);
       }
     }
 
-    // 4. Update floating texts
+    // 5. Update floating texts
     for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
       const ft = this.floatingTexts[i];
       ft.y -= 1.8;
@@ -215,7 +353,7 @@ export class ParticleSystem {
   }
 
   public render(ctx: CanvasRenderingContext2D) {
-    // 1. Render Stars (Crisp, zero-shadow micro-stars for locked 60 FPS)
+    // 1. Render Stars
     ctx.save();
     for (let i = 0; i < this.stars.length; i++) {
       const s = this.stars[i];
@@ -225,7 +363,7 @@ export class ParticleSystem {
     }
     ctx.restore();
 
-    // 2. Render Particles (NO heavy shadowBlur for ultra-fast GPU rasterization)
+    // 2. Render Particles
     ctx.save();
     for (let i = 0; i < this.particles.length; i++) {
       const p = this.particles[i];
@@ -240,7 +378,45 @@ export class ParticleSystem {
     }
     ctx.restore();
 
-    // 3. Render Floating Texts
+    // 3. Render Destroying Blocks (Canvas 2D)
+    if (this.destroyingBlocks.length > 0) {
+      ctx.save();
+      for (const db of this.destroyingBlocks) {
+        const cx = db.x + db.w / 2;
+        const cy = db.y + db.h / 2;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(db.scale, db.scale);
+        ctx.globalAlpha = db.alpha;
+
+        const rw = db.w;
+        const rh = db.h;
+        ctx.fillStyle = db.color;
+        ctx.beginPath();
+        if (typeof (ctx as any).roundRect === 'function') {
+          (ctx as any).roundRect(-rw / 2, -rh / 2, rw, rh, 4);
+        } else {
+          ctx.rect(-rw / 2, -rh / 2, rw, rh);
+        }
+        ctx.fill();
+
+        ctx.strokeStyle = db.borderColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(-rw * 0.3, 0);
+        ctx.lineTo(rw * 0.3, 0);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    // 4. Render Floating Texts
     if (this.floatingTexts.length > 0) {
       ctx.save();
       ctx.textAlign = 'center';
@@ -259,5 +435,6 @@ export class ParticleSystem {
   public clear() {
     this.particles = [];
     this.floatingTexts = [];
+    this.destroyingBlocks = [];
   }
 }

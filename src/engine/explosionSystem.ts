@@ -274,53 +274,57 @@ export class ExplosionSystem {
 
   /**
    * Updates all active blast waves, shatter chunks, and debris.
+   * Chunks and shards are sucked downward into the black hole singularity.
    */
-  public update(): void {
+  public update(width: number = 412, height: number = 915): void {
+    const bhX = width * 0.5, bhY = height - 16;
+
     // 1. Update Blast Waves
     for (let i = this.blastWaves.length - 1; i >= 0; i--) {
       const bw = this.blastWaves[i];
       bw.radius += bw.speed;
-      bw.speed *= 0.93; // Explosive deceleration
+      bw.speed *= 0.93;
       bw.life -= 0.038;
-
       if (bw.life <= 0 || bw.radius >= bw.maxRadius * 1.15) {
         this.blastWaves.splice(i, 1);
       }
     }
 
-    // 2. Update Shatter Chunks
+    // 2. Update Shatter Chunks with Black Hole Gravitational Suction
     for (let i = this.shatterChunks.length - 1; i >= 0; i--) {
       const sc = this.shatterChunks[i];
-      if (sc.delay > 0) {
-        sc.delay--;
-        continue;
-      }
-
-      sc.x += sc.vx;
-      sc.y += sc.vy;
-      sc.vx *= 0.94; // Air resistance
-      sc.vy += 0.22; // Gravity
+      if (sc.delay > 0) { sc.delay--; continue; }
+      const dx = bhX - sc.x, dy = bhY - sc.y;
+      const dist = Math.max(1, Math.hypot(dx, dy));
+      sc.vx += (dx / dist) * 0.45;
+      sc.vy += 0.28 + (dy / dist) * 0.75;
+      sc.vx *= 0.95; sc.vy *= 0.98;
+      sc.x += sc.vx; sc.y += sc.vy;
       sc.angle += sc.rotSpeed;
-      sc.life -= 0.026;
+      sc.life -= 0.024;
+      const factor = Math.max(0.2, sc.life / sc.maxLife);
+      sc.w = Math.max(2, sc.w * factor);
+      sc.h = Math.max(2, sc.h * factor);
       sc.alpha = Math.max(0, sc.life / sc.maxLife);
-
-      if (sc.life <= 0) {
+      if (dist < 32 || sc.y > height + 10 || sc.life <= 0) {
         this.shatterChunks.splice(i, 1);
       }
     }
 
-    // 3. Update Shards
+    // 3. Update Shards with Black Hole Suction
     for (let i = this.shards.length - 1; i >= 0; i--) {
       const sh = this.shards[i];
-      sh.x += sh.vx;
-      sh.y += sh.vy;
-      sh.vx *= 0.94;
-      sh.vy += 0.18;
+      const dx = bhX - sh.x, dy = bhY - sh.y;
+      const dist = Math.max(1, Math.hypot(dx, dy));
+      sh.vx += (dx / dist) * 0.5;
+      sh.vy += 0.26 + (dy / dist) * 0.8;
+      sh.vx *= 0.95; sh.vy *= 0.98;
+      sh.x += sh.vx; sh.y += sh.vy;
       sh.angle += sh.rotSpeed;
-      sh.life -= 0.032;
+      sh.life -= 0.028;
+      sh.size = Math.max(1, sh.size * Math.max(0.2, sh.life / sh.maxLife));
       sh.alpha = Math.max(0, sh.life / sh.maxLife);
-
-      if (sh.life <= 0) {
+      if (dist < 32 || sh.y > height + 10 || sh.life <= 0) {
         this.shards.splice(i, 1);
       }
     }
@@ -330,10 +334,7 @@ export class ExplosionSystem {
       const ea = this.electricArcs[i];
       ea.life -= 0.045;
       ea.alpha = Math.max(0, ea.life / ea.maxLife);
-
-      if (ea.life <= 0) {
-        this.electricArcs.splice(i, 1);
-      }
+      if (ea.life <= 0) this.electricArcs.splice(i, 1);
     }
   }
 
@@ -489,9 +490,6 @@ export class ExplosionSystem {
   }
 
   public clear(): void {
-    this.blastWaves = [];
-    this.shatterChunks = [];
-    this.shards = [];
-    this.electricArcs = [];
+    this.blastWaves = []; this.shatterChunks = []; this.shards = []; this.electricArcs = [];
   }
 }

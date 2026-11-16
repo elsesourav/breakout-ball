@@ -24,7 +24,7 @@ export class GameRenderer {
   private height: number;
   private animTick = 0;
   private shakeIntensity = 0;
-  private guidelineFadeAlpha = 0;
+  private ballFadeAlphas: Map<number, number> = new Map();
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -125,7 +125,31 @@ export class GameRenderer {
       });
     });
 
-    // 5.1. Render Explode Block Shockwaves, Lightning & Near-Block Shatter Waves
+    // 5.1. Render Destroying Blocks (Shrinking Inward & Black Hole Suction Animation)
+    if (particles.destroyingBlocks.length > 0) {
+      ctx.save();
+      for (const db of particles.destroyingBlocks) {
+        ctx.save();
+        ctx.translate(db.x + db.w / 2, db.y + db.h / 2);
+        ctx.scale(db.scale, db.scale);
+        ctx.globalAlpha = db.alpha;
+        ctx.fillStyle = db.color;
+        ctx.beginPath();
+        if (typeof (ctx as any).roundRect === 'function') {
+          (ctx as any).roundRect(-db.w / 2, -db.h / 2, db.w, db.h, 4);
+        } else {
+          ctx.rect(-db.w / 2, -db.h / 2, db.w, db.h);
+        }
+        ctx.fill();
+        ctx.strokeStyle = db.borderColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    // 5.2. Render Explode Block Shockwaves, Lightning & Near-Block Shatter Waves
     if (explosions) {
       explosions.render(ctx);
     }
@@ -145,45 +169,51 @@ export class GameRenderer {
     });
 
     // 6.1. Trajectory Matrix Guideline (8-Ball Pool Style Predictive Beam)
+    // Supports all active balls simultaneously (especially during Multiball)
     const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
-    const activeBalls = ballList.filter((b) => b.isActive);
-    let primaryBall: BallState | null = null;
-    let minDist = Infinity;
-    for (const b of activeBalls) {
-      if (b.vy > 0 && b.y < interpolatedPaddle.y) {
-        const d = interpolatedPaddle.y - b.y;
-        if (d < minDist) {
-          minDist = d;
-          primaryBall = b;
-        }
+    
+    // Clean up fade alphas for balls that no longer exist
+    for (const key of this.ballFadeAlphas.keys()) {
+      if (key >= ballList.length) {
+        this.ballFadeAlphas.delete(key);
       }
     }
-    if (!primaryBall && activeBalls.length > 0) {
-      primaryBall = activeBalls[0];
-    }
 
-    if (primaryBall) {
+    for (let idx = 0; idx < ballList.length; idx++) {
+      const b = ballList[idx];
+      const prevAlpha = this.ballFadeAlphas.get(idx) || 0;
+
+      if (!b || !b.isActive) {
+        if (prevAlpha > 0.01) {
+          this.ballFadeAlphas.set(idx, Math.max(0, prevAlpha - 1/60 * 2.2));
+        } else {
+          this.ballFadeAlphas.delete(idx);
+        }
+        continue;
+      }
+
       const { guideline, nextFadeAlpha } = calculateTrajectoryGuideline(
-        primaryBall,
+        b,
         interpolatedPaddle,
         w,
         h,
         trajLvl,
-        this.guidelineFadeAlpha
+        prevAlpha,
+        1 / 60
       );
-      this.guidelineFadeAlpha = nextFadeAlpha;
+      this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      if (guideline.visible && guideline.alpha > 0.01) {
+      // ONLY display when collision is feasible with paddle (NO red miss lines)
+      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
         ctx.save();
         const gAlpha = guideline.alpha;
-        const isHit = guideline.isHit;
 
-        // Incoming Line
+        // Incoming Line (Vibrant Cyan, NEVER Red)
         ctx.lineWidth = 2.5;
         ctx.setLineDash([6, 8]);
-        ctx.strokeStyle = isHit ? `rgba(0, 247, 255, ${gAlpha * 0.85})` : `rgba(245, 158, 11, ${gAlpha * 0.5})`;
-        ctx.shadowColor = isHit ? '#00f7ff' : '#f59e0b';
-        ctx.shadowBlur = isHit ? 8 : 4;
+        ctx.strokeStyle = `rgba(0, 247, 255, ${gAlpha * 0.85})`;
+        ctx.shadowColor = '#00f7ff';
+        ctx.shadowBlur = 8;
 
         for (const seg of guideline.incomingSegments) {
           ctx.beginPath();
@@ -192,18 +222,18 @@ export class GameRenderer {
           ctx.stroke();
         }
 
-        // Impact Reticle
+        // Impact Reticle (Emerald Center with White Rim)
         ctx.setLineDash([]);
         ctx.beginPath();
         ctx.arc(guideline.hitX, guideline.hitY, 8, 0, Math.PI * 2);
-        ctx.fillStyle = isHit ? `rgba(16, 185, 129, ${gAlpha * 0.9})` : `rgba(245, 158, 11, ${gAlpha * 0.7})`;
+        ctx.fillStyle = `rgba(16, 185, 129, ${gAlpha * 0.9})`;
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Outgoing Reflected Ray
-        if (isHit && guideline.outgoingSegments.length > 0) {
+        // Outgoing Reflected Ray (Emerald Green with Arrowhead)
+        if (guideline.outgoingSegments.length > 0) {
           ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.9})`;
           ctx.shadowColor = '#10b981';
           ctx.shadowBlur = 10;
@@ -244,7 +274,7 @@ export class GameRenderer {
     const ballSizeLvl = currencyService.getUpgradeLevel('ball_size');
     const ballSpeedLvl = currencyService.getUpgradeLevel('ball_speed');
     const ballImpactLvl = currencyService.getUpgradeLevel('ball_impact');
-    const ballTier = designConfig.ballTierOverride || getBallTierFromUpgrades(ballSizeLvl, ballSpeedLvl, ballImpactLvl);
+    const ballTier = designConfig.ballTierOverride || getBallTierFromUpgrades(ballSizeLvl, ballSpeedLvl, ballImpactLvl, trajLvl);
 
     for (const b of ballList) {
       if (!b.isActive) continue;

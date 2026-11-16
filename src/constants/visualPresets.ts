@@ -77,10 +77,10 @@ export const getPaddleTierFromUpgrades = (widthLvl = 1, speedLvl = 1): PaddleTie
   return 1;
 };
 
-export const getBallTierFromUpgrades = (sizeLvl = 1, speedLvl = 1, impactLvl = 1): BallTier => {
-  const sum = sizeLvl + speedLvl + impactLvl;
-  if (sum >= 10) return 3;
-  if (sum >= 5) return 2;
+export const getBallTierFromUpgrades = (sizeLvl = 1, speedLvl = 1, impactLvl = 1, trajLvl = 1): BallTier => {
+  const sum = sizeLvl + speedLvl + impactLvl + trajLvl;
+  if (sum >= 14) return 3;
+  if (sum >= 7) return 2;
   return 1;
 };
 

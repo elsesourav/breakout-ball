@@ -247,7 +247,7 @@ export class GameEngine {
         b.vx = 0; b.vy = 0; b.isActive = false;
       }
       this.particles.update(CANVAS_WIDTH, CANVAS_HEIGHT);
-      this.explosions.update();
+      this.explosions.update(CANVAS_WIDTH, CANVAS_HEIGHT);
       return;
     }
 
@@ -325,16 +325,11 @@ export class GameEngine {
       const block = this.tsPhysics.blocks[hit.blockIndex];
       if (block && !block.isDead) {
         block.hitAnim = 1.0;
-        if (this.useWasm && this.wasmBridge.ready) {
-          this.wasmBridge.damageBlock(hit.blockIndex, 1);
-        }
-        if (block.health >= 1 && block.health <= 5) {
-          block.health--;
-          if (block.health <= 0) {
-            block.isDead = true;
-            this.tsPhysics.remainingBreakable = Math.max(0, this.tsPhysics.remainingBreakable - 1);
-            events.push({ type: 'block_destroy', blockIndex: hit.blockIndex, hitX: hit.x, hitY: hit.y, combo: ++this.state.combo });
-          }
+        if (this.useWasm && this.wasmBridge.ready) this.wasmBridge.damageBlock(hit.blockIndex, 1);
+        if (block.health >= 1 && block.health <= 5 && --block.health <= 0) {
+          block.isDead = true;
+          this.tsPhysics.remainingBreakable = Math.max(0, this.tsPhysics.remainingBreakable - 1);
+          events.push({ type: 'block_destroy', blockIndex: hit.blockIndex, hitX: hit.x, hitY: hit.y, combo: ++this.state.combo });
         }
       }
     }
@@ -356,8 +351,10 @@ export class GameEngine {
         this.particles.addFloatingText('🌀 PORTAL WARP', ev.hitX, ev.hitY, '#00f7ff');
         this.triggerCameraShake(2.0);
       } else if (ev.type === 'emp_explode') {
-        this.explosions.spawnExplosion(ev.hitX, ev.hitY, this.tsPhysics.config.blockWidth * 2.3);
+        const bw = this.tsPhysics.config.blockWidth, bh = this.tsPhysics.config.blockHeight;
+        this.explosions.spawnExplosion(ev.hitX, ev.hitY, bw * 2.3);
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, '#ff9900', true);
+        this.particles.spawnDestroyingBlock(ev.hitX - bw / 2, ev.hitY - bh / 2, bw, bh, 8, '#ff3b00', '#ffaa00');
         this.particles.addFloatingText('💥 EMP DETONATION!', ev.hitX, ev.hitY, '#ff3b00');
         this.triggerCameraShake(14.0);
         this.state.blocksDestroyed++;
@@ -379,7 +376,10 @@ export class GameEngine {
         const fallback = isCrit ? '#fbbf24' : isDestroy ? '#ff0844' : '#00f7ff';
         const color = block ? BLOCK_COLORS[block.initialHealth]?.border || fallback : fallback;
 
-        // If block destroyed or damaged by EMP blast wave, trigger dedicated near-block explosion animation
+        if (isDestroy && block) {
+          const cfg = BLOCK_COLORS[block.initialHealth] || BLOCK_COLORS[1];
+          this.particles.spawnDestroyingBlock(block.x, block.y, block.w, block.h, block.initialHealth, cfg.bg[0] || color, cfg.border || color);
+        }
         if (ev.source === 'emp' && ev.epicenterX !== undefined && ev.epicenterY !== undefined && block) {
           if (isDestroy) this.explosions.spawnNearBlockShatter(block.x, block.y, block.w, block.h, color, ev.epicenterX, ev.epicenterY);
           else this.explosions.spawnNearBlockDamage(block.x, block.y, block.w, block.h, color);
@@ -437,7 +437,7 @@ export class GameEngine {
       }
     }
     this.particles.update(CANVAS_WIDTH, CANVAS_HEIGHT);
-    this.explosions.update();
+    this.explosions.update(CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 
   private handleLifeLost() {
