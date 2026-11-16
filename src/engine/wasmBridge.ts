@@ -155,14 +155,18 @@ export class WasmPhysicsBridge {
 
   public damageBlock(blockIndex: number, damage: number = 1) {
     if (!this.instance) return;
-    const fn = this.instance.exports.engine_damage_block as (idx: number, dmg: number) => void;
-    fn(blockIndex, damage);
+    const fn = this.instance.exports.engine_damage_block as ((idx: number, dmg: number) => void) | undefined;
+    if (typeof fn === 'function') {
+      fn(blockIndex, damage);
+    }
   }
 
   public detonateEmp(blockIndex: number) {
     if (!this.instance) return;
-    const fn = this.instance.exports.engine_detonate_emp as (idx: number) => void;
-    fn(blockIndex);
+    const fn = this.instance.exports.engine_detonate_emp as ((idx: number) => void) | undefined;
+    if (typeof fn === 'function') {
+      fn(blockIndex);
+    }
   }
 
   public update(substeps: number = 6) {
