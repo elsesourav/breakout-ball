@@ -182,7 +182,9 @@ export class GameEngine {
         this.accumulator -= this.FIXED_STEP;
       }
 
-      this.render();
+      // Sub-frame alpha for high-FPS 90Hz/120Hz/144Hz state interpolation
+      const alpha = Math.max(0, Math.min(1, this.accumulator / this.FIXED_STEP));
+      this.render(alpha);
       this.animFrameId = requestAnimationFrame(loop);
     };
 
@@ -474,7 +476,7 @@ export class GameEngine {
     this.callbacks.onLevelWin?.(this.state);
   }
 
-  public render() {
+  public render(alpha: number = 1.0) {
     this.renderer.render(
       this.ctx,
       this.tsPhysics.balls,
@@ -482,7 +484,8 @@ export class GameEngine {
       this.tsPhysics.blocks,
       this.particles,
       this.powerUps,
-      this.ballSkin
+      this.ballSkin,
+      alpha
     );
   }
 }

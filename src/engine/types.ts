@@ -3,6 +3,8 @@ import { BlockData } from '../types/game';
 export interface BallState {
   x: number;
   y: number;
+  prevX?: number;
+  prevY?: number;
   vx: number;
   vy: number;
   radius: number;
@@ -20,6 +22,7 @@ export interface BallState {
 export interface PaddleState {
   x: number;
   y: number;
+  prevX?: number;
   width: number;
   height: number;
   vx: number;

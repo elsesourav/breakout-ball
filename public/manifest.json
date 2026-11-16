@@ -1,16 +1,27 @@
 {
-  "name": "Breakout Ball",
-  "short_name": "Breakout",
-  "description": "Next-generation cyberpunk breakout arcade game featuring 50 campaign sectors, community level studio, global arena, and live leaderboards.",
+  "name": "Breakout Ball // Cyberpunk Neon Arcade",
+  "short_name": "Breakout Ball",
+  "description": "Next-generation cyberpunk breakout ball arcade game featuring 50 campaign sectors, route firewalls, community level studio, global arena, and live leaderboards.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#060713",
+  "background_color": "#030408",
   "theme_color": "#060713",
+  "categories": ["games", "arcade"],
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/favicon-32x32.png",
       "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png"
     },
     {
@@ -20,9 +31,10 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -1,15 +1,19 @@
 import React, { useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { useGame } from './context/GameContext';
-import { MobileBottomNav } from './components/navigation/MobileBottomNav';
+import { SideNavDock } from './components/navigation/SideNavDock';
 import { ArcadeView, ArenaView, ArmoryView, ProfileView, StudioView } from './components/views';
 import { LevelDesigner } from './components/designer';
 import { GameCanvas } from './components/gameplay';
 import { AlertModal, AuthModal, LevelModifierModal, LevelPreviewModal } from './components/modals';
 import { AchievementToast, CyberToastContainer, GameLoadingScreen } from './components/common';
+import { usePageMeta } from './hooks/usePageMeta';
 
 export const AppContent: React.FC = () => {
   const { screen, setScreen, activeTab, editingLevel, isInitialLoading } = useGame();
+
+  // Dynamic SEO, Open Graph & Twitter Card synchronization
+  usePageMeta();
 
   // Dynamic mobile-first responsive layout scaling (strictly using 100svh for height)
   useEffect(() => {
@@ -64,17 +68,21 @@ export const AppContent: React.FC = () => {
         ) : screen === 'designer' ? (
           <LevelDesigner />
         ) : (
-          <div id="gameMode">
+          <div id="gameMode" className="w-full h-full relative">
             <div id="modeType" className="w-full h-full relative overflow-hidden">
               <div key={activeTab} className="cyber-page-transition w-full h-full">
-                {activeTab === 'local' && <ArcadeView />}
+                {activeTab === 'local' && (
+                  <>
+                    <ArcadeView />
+                    <SideNavDock />
+                  </>
+                )}
                 {activeTab === 'online' && <ArenaView />}
                 {activeTab === 'armory' && <ArmoryView />}
                 {activeTab === 'create' && <StudioView />}
                 {activeTab === 'profile' && <ProfileView />}
               </div>
             </div>
-            <MobileBottomNav />
           </div>
         )}
 

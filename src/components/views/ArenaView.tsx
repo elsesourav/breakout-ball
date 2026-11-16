@@ -6,7 +6,7 @@ import { ArenaLevelCard } from '../arena/ArenaLevelCard';
 import { ArenaPagination } from '../arena/ArenaPagination';
 import { DailyFeaturedBanner } from '../arena/DailyFeaturedBanner';
 import { ArenaSkeletonGrid } from '../arena/ArenaSkeletonGrid';
-import { CyberSectionHeader } from '../common/CyberSectionHeader';
+import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
 import { currencyService } from '../../services/currency';
 import { dbService } from '../../services/db';
 import { LevelData } from '../../types/game';
@@ -175,44 +175,17 @@ export const ArenaView: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pt-0 pb-28 select-none cyber-grid-bg"
+      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center pt-0 pb-10 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',
       }}
     >
-      {/* 1. Top Cyber Section Header */}
-      <div
-        className="w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg"
-        style={{
-          borderBottom: '1px solid rgba(0, 247, 255, 0.22)',
-          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
-        }}
-      >
-        <CyberSectionHeader
-          title={user.fullName || user.username.toUpperCase() || 'CYBER PLAYER'}
-          subtitle={`@${user.username || 'player'}`}
-          rightSlot={
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('armory');
-                  window?.history.pushState(null, '', '/shop');
-                  window?.dispatchEvent(new CustomEvent('open-core-shop'));
-                }}
-                title="View Cores & Shop"
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.4)] active:scale-95 group transition-all bg-gradient-to-br from-cyan-500/20 to-indigo-500/25 border border-cyan-400/45 shadow-[0_0_12px_rgba(0,247,255,0.25)]"
-              >
-                <CoreIcon size={15} glow variant="cyan" className="group-hover:rotate-12 transition-transform" />
-                <span className="font-tech font-bold text-xs text-cyan-200">{cores.toLocaleString()}</span>
-                <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">CORES</span>
-                <span className="w-3.5 h-3.5 rounded-full bg-cyan-400/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center text-[10px] font-bold group-hover:bg-cyan-400 group-hover:text-black transition-colors ml-0.5">+</span>
-              </button>
-            </div>
-          }
-        />
-      </div>
+      {/* 1. Top Cyber Page Header with Back to Arcade */}
+      <PageHeaderWithBack
+        title="COMMUNITY ARENA"
+        subtitle="CHALLENGES & STAGES"
+      />
 
       {/* Sticky Full-Width Search & Filter Controls */}
       <div

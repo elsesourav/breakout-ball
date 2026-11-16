@@ -22,6 +22,7 @@ import { ProfileHeroCard } from '../profile/ProfileHeroCard';
 import { achievementManager } from '../../services/achievements';
 import { soundManager } from '../../audio';
 import { authService } from '../../services/auth';
+import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
 
 export const ProfileView: React.FC = () => {
   const {
@@ -335,7 +336,15 @@ export const ProfileView: React.FC = () => {
         /* =========================================================================
             VIEW 2: MAIN PROFILE PAGE (Profile card, Stats, Sign-In/Up & Leaderboard/Badges)
             ========================================================================= */
-        <div className="w-full max-w-sm flex flex-col">
+        <div className="w-full max-w-sm flex flex-col pb-8">
+          {/* Top Page Header with Back to Arcade */}
+          <div className="w-full -mx-0 mb-1">
+            <PageHeaderWithBack
+              title="PILOT PROFILE"
+              subtitle="STATS & IDENTITY"
+            />
+          </div>
+
           {/* 1. Hero Player Profile Card */}
           <div ref={heroCardRef} className="w-full mt-2 mb-2.5">
             <ProfileHeroCard

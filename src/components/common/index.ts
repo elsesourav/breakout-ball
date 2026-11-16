@@ -7,3 +7,4 @@ export { CustomCyberSlider } from './CustomCyberSlider';
 export { CustomCyberSwitch } from './CustomCyberSwitch';
 export { cyberToast, CyberToastContainer } from './CyberToast';
 export { GameLoadingScreen } from './GameLoadingScreen';
+export { TopCoresBadge } from './TopCoresBadge';

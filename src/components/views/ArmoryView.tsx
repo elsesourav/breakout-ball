@@ -5,7 +5,8 @@ import { currencyService, DailyCollectStatus } from '../../services/currency';
 import { UpgradeState, POWER_UPGRADES, PADDLE_UPGRADES } from '../../constants/upgrades';
 import { UpgradeTab, UpgradeSubSection } from '../armory/UpgradeTab';
 import { ShopTab } from '../armory/ShopTab';
-import { CyberSectionHeader } from '../common/CyberSectionHeader';
+import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
+import { TopCoresBadge } from '../common/TopCoresBadge';
 import { FlyingCoresAnimation } from '../armory/FlyingCoresAnimation';
 import { CoreIcon } from '../common/CoreIcon';
 import { soundManager } from '../../audio';
@@ -40,7 +41,7 @@ const SUB_SECTIONS: {
 ];
 
 export const ArmoryView: React.FC = () => {
-  const { user, setScreen } = useGame();
+  const { user, setScreen, setActiveTab } = useGame();
   const [activeSection, setActiveSection] = useState<ArmorySection>(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname;
@@ -239,63 +240,25 @@ export const ArmoryView: React.FC = () => {
         onComplete={handleAnimationComplete}
       />
 
-      {/* ── 1. ACCOUNT / PROFILE HEADER (NON-STICKY: Scrolls with page) ──────── */}
-      <div
-        className="w-full flex justify-center bg-[#06081c] shadow-sm flex-shrink-0"
-        style={{
-          borderBottom: '1px solid rgba(0, 247, 255, 0.15)',
-        }}
-      >
-        <CyberSectionHeader
-          title={user.fullName || user.username.toUpperCase() || 'CYBER PLAYER'}
-          subtitle={`@${user.username || 'player'}`}
-          rightSlot={
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Visually Enhanced Cores Button (Click directs to Shop) */}
-              <button
-                type="button"
-                id="header-cores-badge"
-                onClick={() => {
-                  setActiveSection('shop');
-                  if (typeof window !== 'undefined') {
-                    window.history.pushState(null, '', '/shop');
-                  }
-                }}
-                title="Click to Open Core Shop"
-                style={{
-                  background: isPulsing
-                    ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.28) 0%, rgba(99, 102, 241, 0.32) 100%)'
-                    : 'linear-gradient(135deg, rgba(6, 182, 212, 0.22) 0%, rgba(99, 102, 241, 0.28) 100%)',
-                  border: isPulsing
-                    ? '1.2px solid #00f7ff'
-                    : '1.2px solid rgba(0, 247, 255, 0.5)',
-                  boxShadow: isPulsing
-                    ? '0 0 14px rgba(0, 247, 255, 0.5)'
-                    : '0 0 12px rgba(0, 247, 255, 0.25)',
-                  transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                }}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.45)] active:scale-95 group transition-all"
-              >
-                <CoreIcon
-                  size={15}
-                  glow
-                  variant="cyan"
-                  className="transition-transform duration-300 group-hover:rotate-12"
-                />
-                <span className={`font-tech font-bold text-xs transition-colors ${isPulsing ? 'text-white' : 'text-cyan-200'}`}>
-                  {displayCores.toLocaleString()}
-                </span>
-                <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
-                  CORES
-                </span>
-                <span className="w-3.5 h-3.5 rounded-full bg-cyan-400/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center text-[10px] font-bold group-hover:bg-cyan-400 group-hover:text-black transition-colors ml-0.5">
-                  +
-                </span>
-              </button>
-            </div>
+      {/* ── 1. PAGE HEADER WITH BACK TO ARCADE ──────── */}
+      <PageHeaderWithBack
+        title={activeSection === 'shop' ? 'CORE SHOP' : 'ARMORY & ARSENAL'}
+        subtitle={activeSection === 'shop' ? 'CREDITS & REWARDS' : 'TACTICAL UPGRADES'}
+        onBack={() => {
+          if (activeSection === 'shop') {
+            setActiveSection('upgrade');
+          } else {
+            setActiveTab('local');
           }
-        />
-      </div>
+        }}
+        rightSlot={
+          <TopCoresBadge
+            cores={displayCores}
+            isPulsing={isPulsing}
+            onOpenShop={() => setActiveSection('shop')}
+          />
+        }
+      />
 
       {/* ── 2. STICKY SWITCHERS BAR (ONLY Upgrades & Shop Switchers are Sticky) ── */}
       <div

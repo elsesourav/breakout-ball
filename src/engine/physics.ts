@@ -35,6 +35,7 @@ export class PhysicsWorld {
     this.paddle = {
       x: initialPadX,
       y: initialPadY,
+      prevX: initialPadX,
       width: config.paddleWidth,
       height: config.paddleHeight,
       vx: 0,
@@ -45,6 +46,8 @@ export class PhysicsWorld {
     this.defaultBall = {
       x: initialPadX,
       y: initialPadY - config.ballRadius - 5,
+      prevX: initialPadX,
+      prevY: initialPadY - config.ballRadius - 5,
       vx: 0,
       vy: 0,
       radius: config.ballRadius,
@@ -107,6 +110,8 @@ export class PhysicsWorld {
     const mainBall: BallState = {
       x,
       y,
+      prevX: x,
+      prevY: y,
       vx,
       vy,
       radius: this.config.ballRadius,
@@ -151,6 +156,8 @@ export class PhysicsWorld {
         newBalls.push({
           x: b.x,
           y: b.y,
+          prevX: b.x,
+          prevY: b.y,
           vx: Math.cos(baseAngle + offset) * spd,
           vy: Math.sin(baseAngle + offset) * spd,
           radius: b.radius,
@@ -175,6 +182,13 @@ export class PhysicsWorld {
 
   public step(substeps: number = 6): CollisionEvent[] {
     this.events = [];
+
+    // Store previous physics state for high-FPS sub-frame render interpolation
+    this.paddle.prevX = this.paddle.x;
+    for (let bi = 0; bi < this.balls.length; bi++) {
+      this.balls[bi].prevX = this.balls[bi].x;
+      this.balls[bi].prevY = this.balls[bi].y;
+    }
 
     // Decrement portal recharge break timers once per physics frame
     for (let b = 0; b < this.blocks.length; b++) {

@@ -15,7 +15,9 @@ import {
   Check,
   Star,
   Sparkles,
+  Share2,
 } from 'lucide-react';
+import { shareLevel } from '../../services/sharing';
 import {
   isTodayDailyMission,
   isDailyMissionCompleted,
@@ -174,9 +176,24 @@ export const LevelPreviewModal: React.FC = () => {
             </div>
           </div>
 
-          <span className="px-3 py-1 rounded-full text-[10px] font-tech font-bold uppercase tracking-wider bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 shadow-[0_0_10px_rgba(0,247,255,0.25)] flex-shrink-0">
-            {isCampaign ? 'Campaign' : 'Community'}
-          </span>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => shareLevel(selectedLevel)}
+              title="Share Mission Link"
+              style={{
+                borderRadius: '8px',
+                backgroundColor: 'rgba(6, 182, 212, 0.15)',
+                border: '1px solid rgba(0, 247, 255, 0.4)',
+              }}
+              className="w-8 h-8 flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-300 active:scale-95 transition-all cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)]"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
+            <span className="px-3 py-1 rounded-full text-[10px] font-tech font-bold uppercase tracking-wider bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 shadow-[0_0_10px_rgba(0,247,255,0.25)] flex-shrink-0">
+              {isCampaign ? 'Campaign' : 'Community'}
+            </span>
+          </div>
         </div>
 
         {/* Game Canvas Preview Container */}
@@ -379,7 +396,24 @@ export const LevelPreviewModal: React.FC = () => {
             </button>
           )}
 
-          {/* 3. HOME Button: Clicking closes modal and returns to menu */}
+          {/* 3. SHARE Button: Native share / clipboard copy with toast feedback */}
+          <button
+            type="button"
+            onClick={() => shareLevel(selectedLevel)}
+            title="Share Mission Link"
+            style={{
+              borderRadius: '12px',
+              backgroundColor: '#0c1a30',
+              backgroundImage: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(15, 23, 42, 0.95) 100%)',
+              border: '1.5px solid rgba(0, 247, 255, 0.45)',
+              boxShadow: '0 0 12px rgba(0, 247, 255, 0.2)',
+            }}
+            className="w-12 h-12 flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-300 active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
+          >
+            <Share2 className="w-5 h-5 stroke-[2.2]" />
+          </button>
+
+          {/* 4. HOME Button: Clicking closes modal and returns to menu */}
           <button
             type="button"
             onClick={() => {

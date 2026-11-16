@@ -140,6 +140,8 @@ export function handlePortalCollision(
           Math.min(config.width - ball.radius - 6, targetPortal.x + targetPortal.w / 2)
         );
         ball.y = exitDown ? targetPortal.y + targetPortal.h + clearance : targetPortal.y - clearance;
+        ball.prevX = ball.x;
+        ball.prevY = ball.y;
         ball.vy = exitDown ? Math.abs(ball.vy) : -Math.abs(ball.vy);
         ball.warpCooldown = 35;
         block.portalRechargeTimer = 180;

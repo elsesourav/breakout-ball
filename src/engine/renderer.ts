@@ -44,13 +44,23 @@ export class GameRenderer {
     blocks: BlockEngineState[],
     particles: ParticleSystem,
     powerUps?: PowerUpManager,
-    ballSkin: string = 'cyan'
+    ballSkin: string = 'cyan',
+    alpha: number = 1.0
   ) {
     const w = this.width;
     const h = this.height;
     this.animTick += 0.05;
 
     const ballList = Array.isArray(balls) ? balls : [balls];
+
+    // Sub-frame interpolation for paddle
+    const renderPaddleX = paddle.prevX !== undefined && alpha < 0.999
+      ? paddle.prevX + (paddle.x - paddle.prevX) * alpha
+      : paddle.x;
+    const interpolatedPaddle: PaddleState = {
+      ...paddle,
+      x: renderPaddleX,
+    };
 
     // 1. Clear & Cyber Radial Backdrop
     ctx.clearRect(0, 0, w, h);
@@ -98,7 +108,7 @@ export class GameRenderer {
 
     // 4. Power-Up Shards & Shield Barrier
     if (powerUps) {
-      powerUps.render(ctx, paddle, w, h);
+      powerUps.render(ctx, interpolatedPaddle, w, h);
     }
 
     const designConfig = getActiveDesignConfig();
@@ -111,12 +121,12 @@ export class GameRenderer {
       });
     });
 
-    // 6. 3D Paddle Rendering (Dynamic Presets & Upgrade Progression Tiers)
+    // 6. 3D Paddle Rendering with Sub-Frame State Interpolation
     const hasLaser = !!powerUps && powerUps.buffs.laser > 0;
     const hasShield = !!powerUps && (powerUps.buffs.hasShield || powerUps.buffs.shieldCharges > 0);
     const widthLevel = currencyService.getUpgradeLevel('paddle_width');
     const speedLevel = currencyService.getUpgradeLevel('paddle_speed');
-    drawPaddleWithPreset(ctx, paddle, 1, {
+    drawPaddleWithPreset(ctx, interpolatedPaddle, 1, {
       animTick,
       hasLaser,
       hasShield,
@@ -125,7 +135,7 @@ export class GameRenderer {
       tier: designConfig.paddleTierOverride,
     });
 
-    // 7. Render All Active Balls with 3D Shading & Internal Upgrades (Zero Outside Particles)
+    // 7. Render All Active Balls with Sub-Frame State Interpolation (Ultra-Smooth 120Hz/144Hz)
     const palette = BALL_SKIN_PALETTES[ballSkin] || BALL_SKIN_PALETTES.cyan;
     const ballSizeLvl = currencyService.getUpgradeLevel('ball_size');
     const ballSpeedLvl = currencyService.getUpgradeLevel('ball_speed');
@@ -134,7 +144,21 @@ export class GameRenderer {
 
     for (const b of ballList) {
       if (!b.isActive) continue;
-      drawBallWithPreset(ctx, b, designConfig.ballPreset || 1, {
+
+      const renderBallX = b.prevX !== undefined && alpha < 0.999
+        ? b.prevX + (b.x - b.prevX) * alpha
+        : b.x;
+      const renderBallY = b.prevY !== undefined && alpha < 0.999
+        ? b.prevY + (b.y - b.prevY) * alpha
+        : b.y;
+
+      const interpolatedBall: BallState = {
+        ...b,
+        x: renderBallX,
+        y: renderBallY,
+      };
+
+      drawBallWithPreset(ctx, interpolatedBall, designConfig.ballPreset || 1, {
         animTick,
         tier: ballTier,
         palette,

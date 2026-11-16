@@ -381,9 +381,8 @@ export const ArcadeView: React.FC = () => {
         `,
       }}
     >
-      {/* ── Top Cyber Section Header & Floating Controls ────────────────── */}
+      {/* ── Top Bar & Floating Controls ────────────────── */}
       <LevelMapHeader
-        user={user}
         displayCores={displayCores}
         isPulsing={isPulsing}
         dailyStatus={dailyStatus}

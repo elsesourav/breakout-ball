@@ -2,52 +2,32 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../../context/GameContext';
 import { LevelData } from '../../types/game';
 import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../../utils/helpers';
-import { Plus, Settings2, Play, Eye, EyeOff, Layers, ArrowLeft } from 'lucide-react';
+import { Plus, Settings2, Play, Eye, EyeOff, Layers } from 'lucide-react';
 import { StudioMatrixForgeIcon } from '../navigation/NavIcons';
+import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
 
 export const StudioView: React.FC = () => {
   const { userCreatedLevels, openDesigner, openPreview, openModifier, setActiveTab } = useGame();
 
   return (
     <div
-      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 py-4 gap-3.5 pb-28 select-none cyber-grid-bg"
+      className="w-full h-full overflow-y-auto overflow-x-hidden flex flex-col items-center px-3.5 py-4 gap-3.5 pb-10 select-none cyber-grid-bg"
       style={{
         WebkitOverflowScrolling: 'touch',
         color: '#ffffff',
       }}
     >
       {/* Studio Header Bar */}
+      <div className="w-full max-w-sm -mt-4 -mx-3.5 mb-2">
+        <PageHeaderWithBack
+          title="ARENA STUDIO"
+          subtitle={`${userCreatedLevels.length} CUSTOM ARENAS`}
+          onBack={() => setActiveTab('local')}
+        />
+      </div>
+
       <div className="w-full max-w-sm flex flex-col gap-2">
-        {/* Back to Arena Button */}
-        <button
-          type="button"
-          onClick={() => setActiveTab('online')}
-          className="flex items-center gap-1.5 text-xs font-tech font-bold text-cyan-400 hover:text-white transition-all cursor-pointer self-start -ml-1 py-1 px-2 rounded-lg hover:bg-cyan-500/10 active:scale-95"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>BACK TO ARENA</span>
-        </button>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img
-              src="/logo.png"
-              alt="Breakout Ball"
-              className="w-4 h-4 rounded-full object-cover shadow-[0_0_8px_#ff4500]"
-            />
-            <span
-              className="font-display font-black text-sm tracking-wider text-cyan-300"
-              style={{ color: '#00f7ff' }}
-            >
-              ARENA STUDIO
-            </span>
-          </div>
-          <span className="font-tech text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">
-            {userCreatedLevels.length} ARENAS
-          </span>
-        </div>
-
-        <p className="text-xs text-slate-400 font-ui">
+        <p className="text-xs text-slate-400 font-ui text-center">
           Design, test, and publish custom Breakout arenas for the community.
         </p>
 
