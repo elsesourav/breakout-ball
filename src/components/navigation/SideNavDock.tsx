@@ -7,72 +7,10 @@ import { currencyService } from '../../services/currency';
 import {
   NavArenaIcon,
   NavArmoryIcon,
-  StudioMatrixForgeIcon,
+  NavStudioIcon,
+  NavShopIcon,
+  NavRanksIcon,
 } from './NavIcons';
-
-/** Cyber Storefront / Core Vault Shop Icon */
-const NavShopIcon: React.FC<{ active?: boolean; className?: string; style?: React.CSSProperties }> = ({
-  active,
-  className = 'w-5 h-5',
-  style,
-}) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    className={className}
-    style={style}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M3 9l2-5h14l2 5v2a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2 2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"
-      fill={active ? 'currentColor' : '#475569'}
-      fillOpacity={active ? 0.35 : 0.2}
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M4 13v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    />
-    <path
-      d="M10 21v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-/** Cyber Global Trophy / Ranks Icon */
-const NavRanksIcon: React.FC<{ active?: boolean; className?: string; style?: React.CSSProperties }> = ({
-  active,
-  className = 'w-5 h-5',
-  style,
-}) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    className={className}
-    style={style}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M6 9H4a2 2 0 0 1-2-2V5h4v4zm12 0h2a2 2 0 0 0 2-2V5h-4v4z"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    />
-    <path
-      d="M4 5h16v4a8 8 0 0 1-8 8 8 8 0 0 1-8-8V5z"
-      fill={active ? 'currentColor' : '#475569'}
-      fillOpacity={active ? 0.35 : 0.2}
-      stroke="currentColor"
-      strokeWidth="1.8"
-    />
-    <path d="M12 17v4m-4 0h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
 
 interface NavButtonConfig {
   id: ActiveTab;
@@ -80,6 +18,8 @@ interface NavButtonConfig {
   icon: React.ComponentType<{ active?: boolean; className?: string; style?: React.CSSProperties }>;
   accentColor: string;
   glowColor: string;
+  baseBg: string;
+  baseBorder: string;
   badge?: string | number | null;
   isFreeBadge?: boolean;
   isHero?: boolean;
@@ -129,9 +69,11 @@ export const SideNavDock: React.FC = () => {
       id: 'online',
       label: 'ARENA',
       icon: NavArenaIcon,
-      accentColor: '#a855f7',
-      glowColor: 'rgba(168, 85, 247, 0.7)',
-      badge: 'APEX',
+      accentColor: '#c084fc',
+      glowColor: 'rgba(192, 132, 252, 0.65)',
+      baseBg: 'linear-gradient(180deg, #9333ea 0%, #4c1d95 100%)',
+      baseBorder: '#6b21a8',
+      badge: null,
       isHero: true,
     },
     {
@@ -140,13 +82,17 @@ export const SideNavDock: React.FC = () => {
       icon: NavArmoryIcon,
       accentColor: '#00f7ff',
       glowColor: 'rgba(0, 247, 255, 0.6)',
+      baseBg: 'linear-gradient(180deg, #06b6d4 0%, #0891b2 100%)',
+      baseBorder: '#0e7490',
     },
     {
       id: 'create',
       label: 'STUDIO',
-      icon: StudioMatrixForgeIcon,
+      icon: NavStudioIcon,
       accentColor: '#38bdf8',
       glowColor: 'rgba(56, 189, 248, 0.6)',
+      baseBg: 'linear-gradient(180deg, #38bdf8 0%, #0284c7 100%)',
+      baseBorder: '#0369a1',
     },
     {
       id: 'shop',
@@ -154,6 +100,8 @@ export const SideNavDock: React.FC = () => {
       icon: NavShopIcon,
       accentColor: '#fbbf24',
       glowColor: 'rgba(251, 191, 36, 0.6)',
+      baseBg: 'linear-gradient(180deg, #f59e0b 0%, #b45309 100%)',
+      baseBorder: '#78350f',
       badge: canShowFree ? 'FREE' : null,
       isFreeBadge: canShowFree,
     },
@@ -163,6 +111,8 @@ export const SideNavDock: React.FC = () => {
       icon: NavRanksIcon,
       accentColor: '#ffd700',
       glowColor: 'rgba(255, 215, 0, 0.6)',
+      baseBg: 'linear-gradient(180deg, #eab308 0%, #a16207 100%)',
+      baseBorder: '#713f12',
     },
   ];
 
@@ -172,7 +122,7 @@ export const SideNavDock: React.FC = () => {
       style={{
         top: 'calc(50% + 18px)',
       }}
-      className="absolute left-2 sm:left-3.5 -translate-y-1/2 z-40 flex flex-col items-center gap-2.5 sm:gap-3 pointer-events-none select-none"
+      className="absolute left-2 sm:left-3.5 -translate-y-1/2 z-40 flex flex-col items-center gap-3 sm:gap-3.5 pointer-events-none select-none"
     >
       {navItems.map((item) => {
         const isActive = activeTab === item.id;
@@ -180,33 +130,58 @@ export const SideNavDock: React.FC = () => {
         const isHero = !!item.isHero;
 
         return (
-          <div key={item.id} className="relative flex items-center justify-center">
+          <div
+            key={item.id}
+            className={`relative flex items-center justify-center ${
+              isHero
+                ? 'w-[74px] h-[74px] sm:w-[80px] sm:h-[80px]'
+                : 'w-[58px] h-[58px] sm:w-[64px] sm:h-[64px]'
+            }`}
+          >
+            {/* 3D Extruded Base Shelf */}
+            <div
+              className="absolute inset-0 rounded-2xl pointer-events-none"
+              style={{
+                transform: `translateY(${isHero ? 5.5 : 5}px)`,
+                background: item.baseBg,
+                border: `2px solid ${item.baseBorder}`,
+                boxShadow: isHero
+                  ? '0 9px 20px rgba(0, 0, 0, 0.85), 0 0 16px rgba(168, 85, 247, 0.3)'
+                  : isActive
+                  ? `0 7px 16px rgba(0, 0, 0, 0.85), 0 0 12px ${item.glowColor}`
+                  : '0 7px 16px rgba(0, 0, 0, 0.85)',
+              }}
+            />
+
+            {/* 3D Raised Top Face Button */}
             <motion.button
               type="button"
               onClick={() => handleNavClick(item.id)}
-              whileHover={{ scale: isHero ? 1.05 : 1.08, x: 2 }}
-              whileTap={{ scale: 0.93 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              whileHover={{ y: -1.5, scale: 1.02 }}
+              whileTap={{ y: isHero ? 5 : 4.5, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 25 }}
               style={{
                 background: isActive
-                  ? `linear-gradient(135deg, rgba(8, 14, 44, 0.96) 0%, rgba(18, 28, 68, 0.98) 100%)`
-                  : `linear-gradient(135deg, rgba(8, 14, 38, 0.88) 0%, rgba(15, 23, 52, 0.92) 100%)`,
+                  ? `linear-gradient(180deg, rgba(20, 36, 80, 0.98) 0%, rgba(10, 18, 48, 0.98) 100%)`
+                  : isHero
+                  ? `linear-gradient(180deg, rgba(42, 22, 78, 0.98) 0%, rgba(20, 10, 42, 0.98) 100%)`
+                  : `linear-gradient(180deg, rgba(18, 30, 60, 0.96) 0%, rgba(10, 15, 34, 0.98) 100%)`,
                 border: isHero
-                  ? '1.8px solid rgba(168, 85, 247, 0.65)'
+                  ? '2px solid rgba(192, 132, 252, 0.85)'
                   : isActive
-                  ? `1.5px solid ${item.accentColor}`
-                  : `1.5px solid rgba(0, 247, 255, 0.28)`,
-                boxShadow: isHero
-                  ? '0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(168, 85, 247, 0.25)'
-                  : isActive
-                  ? `0 0 16px ${item.glowColor}, inset 0 0 8px ${item.glowColor}`
-                  : `0 4px 14px rgba(0, 0, 0, 0.6), 0 0 8px rgba(0, 247, 255, 0.15)`,
+                  ? `2px solid ${item.accentColor}`
+                  : item.id === 'shop' && canShowFree
+                  ? '2px solid rgba(0, 247, 255, 0.8)'
+                  : `1.8px solid ${item.accentColor}cc`,
+                boxShadow: [
+                  'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35)',
+                  'inset 0 -2px 0 rgba(0, 0, 0, 0.5)',
+                  isActive ? `0 0 12px ${item.glowColor}` : '',
+                ]
+                  .filter(Boolean)
+                  .join(', '),
               }}
-              className={`pointer-events-auto relative ${
-                isHero
-                  ? 'w-[68px] h-[68px] sm:w-[74px] sm:h-[74px] rounded-2xl p-1.5'
-                  : 'w-[58px] h-[58px] sm:w-[64px] sm:h-[64px] rounded-2xl p-1.5'
-              } flex flex-col items-center justify-center cursor-pointer backdrop-blur-xl group transition-colors duration-200`}
+              className="pointer-events-auto relative w-full h-full rounded-2xl p-1.5 flex flex-col items-center justify-center cursor-pointer backdrop-blur-xl group transition-colors duration-200"
               title={item.label}
               aria-label={item.label}
             >
@@ -218,11 +193,13 @@ export const SideNavDock: React.FC = () => {
                 />
               )}
 
-              {/* Sweeping Light Shimmer for Hero button */}
-              {isHero && (
+              {/* Sweeping Light Shimmer for Hero Arena button or Shop button when FREE cores available */}
+              {(isHero || (item.id === 'shop' && canShowFree)) && (
                 <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                   <motion.div
-                    className="w-[200%] h-full bg-gradient-to-r from-transparent via-purple-300/35 to-transparent skew-x-[-25deg]"
+                    className={`w-[200%] h-full bg-gradient-to-r from-transparent ${
+                      item.id === 'shop' ? 'via-cyan-200/40' : 'via-purple-300/35'
+                    } to-transparent skew-x-[-25deg]`}
                     animate={{ x: ['-100%', '150%'] }}
                     transition={{
                       duration: 2.8,
@@ -275,7 +252,7 @@ export const SideNavDock: React.FC = () => {
               >
                 <Icon
                   active={isActive}
-                  className={isHero ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-7 sm:h-7'}
+                  className={isHero ? 'w-8 h-8 sm:w-9 sm:h-9' : 'w-6 h-6 sm:w-7 sm:h-7'}
                 />
               </div>
 
@@ -283,7 +260,7 @@ export const SideNavDock: React.FC = () => {
               <span
                 className={`${
                   isHero
-                    ? 'font-tech text-[9.5px] sm:text-[10.5px] tracking-widest uppercase font-black mt-1'
+                    ? 'font-tech text-[10px] sm:text-[11px] tracking-widest uppercase font-black mt-1'
                     : 'font-tech text-[8.5px] sm:text-[9.5px] tracking-wider uppercase font-bold mt-1'
                 } leading-none transition-colors`}
                 style={{

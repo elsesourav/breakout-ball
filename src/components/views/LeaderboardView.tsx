@@ -19,6 +19,7 @@ export const LeaderboardView: React.FC = () => {
         title="GLOBAL RANKINGS"
         subtitle="APEX PILOTS // LEADERBOARD"
         onBack={() => setActiveTab('local')}
+        showCores={false}
       />
 
       {/* ── 2. Leaderboard Content Area ── */}

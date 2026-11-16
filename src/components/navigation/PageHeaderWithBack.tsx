@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Settings } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { soundManager } from '../../audio';
 import { TopCoresBadge } from '../common/TopCoresBadge';
@@ -11,7 +11,7 @@ interface PageHeaderWithBackProps {
   subtitle?: string;
   onBack?: () => void;
   rightSlot?: React.ReactNode;
-  hideSettings?: boolean;
+  showCores?: boolean;
 }
 
 export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
@@ -19,16 +19,20 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
   subtitle,
   onBack,
   rightSlot,
-  hideSettings = false,
+  showCores = false,
 }) => {
-  const { setActiveTab, setIsSettingsOpen } = useGame();
+  const { setActiveTab } = useGame();
   const [cores, setCores] = React.useState<number>(() => currencyService.getBalance());
 
   React.useEffect(() => {
     const sync = () => setCores(currencyService.getBalance());
     sync();
     window.addEventListener('currency-changed', sync);
-    return () => window.removeEventListener('currency-changed', sync);
+    window.addEventListener('currency_balance_changed', sync);
+    return () => {
+      window.removeEventListener('currency-changed', sync);
+      window.removeEventListener('currency_balance_changed', sync);
+    };
   }, []);
 
   const handleBack = () => {
@@ -90,30 +94,14 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
           )}
         </div>
 
-        {/* Right: TopCoresBadge and Optional Settings Button */}
-        <div className="flex-shrink-0 flex items-center gap-1.5">
-          {rightSlot || (
+        {/* Right: Cores Badge only for designated important views, no settings */}
+        <div className="flex-shrink-0 flex items-center justify-end min-w-[70px]">
+          {rightSlot ? (
+            rightSlot
+          ) : showCores ? (
             <TopCoresBadge cores={cores} onOpenShop={handleOpenShop} />
-          )}
-          {!hideSettings && (
-            <motion.button
-              type="button"
-              onClick={() => {
-                soundManager.playClick();
-                setIsSettingsOpen(true);
-              }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              style={{
-                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(26, 18, 54, 0.95) 100%)',
-                border: '1.2px solid rgba(168, 85, 247, 0.45)',
-                boxShadow: '0 0 12px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-              }}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-purple-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0"
-              title="System Settings"
-            >
-              <Settings className="w-4 h-4 text-purple-300" />
-            </motion.button>
+          ) : (
+            <div className="w-9 h-9" />
           )}
         </div>
       </div>

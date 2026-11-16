@@ -79,6 +79,18 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           willChange: 'transform, opacity',
         }}
       >
+        {/* 3D Ground Elevation Contact Shadow */}
+        <div
+          className="absolute -bottom-2.5 w-16 h-3 rounded-full pointer-events-none select-none"
+          style={{
+            background: isCurrent
+              ? 'radial-gradient(ellipse at center, rgba(0,247,255,0.4) 0%, rgba(0,0,0,0.85) 50%, transparent 75%)'
+              : 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 75%)',
+            filter: 'blur(2.5px)',
+            transform: 'scaleY(0.45)',
+          }}
+        />
+
         {/* 3D Celestial Cyber Globe (High-tech Arcade Stage Node) */}
         <button
           type="button"
@@ -221,6 +233,13 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               d="M 16 22 C 22 10, 48 10, 54 22 C 46 14, 24 14, 16 22 Z"
               fill="#ffffff"
               opacity={isUnlocked ? 0.45 : 0.2}
+            />
+
+            {/* 3D Fresnel Lower Rim Reflection (Ground Bounce Light) */}
+            <path
+              d="M 14 46 C 20 58, 50 58, 56 46 C 48 55, 22 55, 14 46 Z"
+              fill={isComplete ? '#34d399' : isCurrent ? '#00f7ff' : sectorColor}
+              opacity={isUnlocked ? 0.5 : 0.2}
             />
           </svg>
 

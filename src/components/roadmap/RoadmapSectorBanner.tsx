@@ -26,7 +26,7 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
             data-base-transform="translateX(-50%)"
             data-y={bannerY}
             style={{
-              left: '50%',
+              left: `${(230 / SVG_WIDTH) * 100}%`,
               // Sector 1 entrance sits cleanly below Level 1; other sectors sit comfortably at the midpoint between milestone levels
               top: `${bannerY}px`,
               transform: 'translateX(-50%)',
@@ -85,7 +85,7 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
           data-base-transform="translateX(-50%)"
           data-y={summitNode.y - 200}
           style={{
-            left: '50%',
+            left: `${((summitNode ? summitNode.x : 230) / SVG_WIDTH) * 100}%`,
             top: `${summitNode.y - 200}px`,
             transform: 'translateX(-50%)',
             willChange: 'transform, opacity',

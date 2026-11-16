@@ -22,6 +22,8 @@ import { RoadmapNodeItem } from '../roadmap/RoadmapNodeItem';
 import { LevelMapHeader } from '../roadmap/LevelMapHeader';
 
 // ─── Scroll-linked perspective scale ─────────────────────────────────────────
+const SCALE_HORIZON = 0.38;      // horizon vanishing size limit (noticeably small distant)
+const SCALE_FOREGROUND = 1.08;   // foreground size limit (noticeably large close)
 const SCALE_MIN = 0.50;          // horizon vanishing size limit
 const SCALE_MAX = 1.0;           // actual size (100%) for foreground and summit
 const FOREGROUND_LIMIT_Y = 0.48; // foreground threshold where size growth reaches its limit
@@ -82,13 +84,13 @@ export const ArcadeView: React.FC = () => {
   const scaleElementsRef = useRef<HTMLElement[]>([]);
   const conduitSegmentsRef = useRef<SVGGElement[]>([]);
 
-  // ── Node layout ─────────────────────────────────────────────────────────────
+  // ── Node layout (shifted to the right: center 230, sway 74 for ample left clearance) ──
   const nodes: RoadmapNode[] = useMemo(() => {
     const list: RoadmapNode[] = [];
     for (let i = 1; i <= TOTAL_LEVELS; i++) {
       const y = TOTAL_HEIGHT - BOTTOM_OFFSET - (i - 1) * SPACING;
       const angle = (i - 1) * 1.05;
-      const x = 190 + Math.sin(angle) * 95;
+      const x = 230 + Math.sin(angle) * 74;
       let zone = 1;
       if (i > 40) zone = 5;
       else if (i > 30) zone = 4;
@@ -132,7 +134,7 @@ export const ArcadeView: React.FC = () => {
       const iL = i % 2 === 0;
       const w = 34 + ((i * 7) % 12);
       const h = 15 + ((i * 3) % 6);
-      const x = iL ? 20 + ((i * 15) % 25) : SVG_WIDTH - w - 20 - ((i * 17) % 25);
+      const x = iL ? 80 + ((i * 12) % 25) : SVG_WIDTH - w - 12 - ((i * 14) % 18);
       bricks.push({
         id: i, x, y, w, h, color: p.color, glow: p.glow,
         rotation: ((i * 17) % 30) - 15, opacity: 0.18 + ((i * 5) % 15) * 0.01,
@@ -141,18 +143,18 @@ export const ArcadeView: React.FC = () => {
     return bricks;
   }, []);
 
-  // ── Kinetic hazards ──────────────────────────────────────────────────────────
+  // ── Kinetic hazards (flanking the shifted path cleanly) ──────────────────────
   const obstacles: Obstacle[] = useMemo(() => ([
-    { id: 'titanium-1', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.5  * SPACING },
-    { id: 'plasma-1',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5  * SPACING },
-    { id: 'titanium-2', type: 'titanium', x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.5 * SPACING },
-    { id: 'plasma-2',   type: 'plasma',   x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING },
-    { id: 'titanium-3', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING },
-    { id: 'plasma-3',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 27.5 * SPACING },
-    { id: 'titanium-4', type: 'titanium', x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 33.5 * SPACING },
-    { id: 'plasma-4',   type: 'plasma',   x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 37.5 * SPACING },
-    { id: 'titanium-5', type: 'titanium', x: 65,  y: TOTAL_HEIGHT - BOTTOM_OFFSET - 43.5 * SPACING },
-    { id: 'plasma-5',   type: 'plasma',   x: 315, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 47.5 * SPACING },
+    { id: 'titanium-1', type: 'titanium', x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.5  * SPACING },
+    { id: 'plasma-1',   type: 'plasma',   x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5  * SPACING },
+    { id: 'titanium-2', type: 'titanium', x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.5 * SPACING },
+    { id: 'plasma-2',   type: 'plasma',   x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING },
+    { id: 'titanium-3', type: 'titanium', x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING },
+    { id: 'plasma-3',   type: 'plasma',   x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 27.5 * SPACING },
+    { id: 'titanium-4', type: 'titanium', x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 33.5 * SPACING },
+    { id: 'plasma-4',   type: 'plasma',   x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 37.5 * SPACING },
+    { id: 'titanium-5', type: 'titanium', x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 43.5 * SPACING },
+    { id: 'plasma-5',   type: 'plasma',   x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 47.5 * SPACING },
   ]), []);
 
   // ── Route blockers ───────────────────────────────────────────────────────────
@@ -172,28 +174,6 @@ export const ArcadeView: React.FC = () => {
         isActive: i === currentUnlockedId,
       } as RouteBlocker;
     });
-  }, [nodes, currentUnlockedId]);
-
-  // ── SVG conduit paths ────────────────────────────────────────────────────────
-  const conduitPathData = useMemo(() => {
-    if (!nodes.length) return '';
-    let d = `M ${nodes[0].x} ${nodes[0].y}`;
-    nodes.slice(0, -1).forEach((c, i) => {
-      const n = nodes[i + 1], dy = (n.y - c.y) * 0.5;
-      d += ` C ${c.x} ${c.y + dy}, ${n.x} ${n.y - dy}, ${n.x} ${n.y}`;
-    });
-    return d;
-  }, [nodes]);
-
-  const activePathData = useMemo(() => {
-    const active = nodes.filter(n => n.id <= currentUnlockedId);
-    if (active.length <= 1) return '';
-    let d = `M ${active[0].x} ${active[0].y}`;
-    active.slice(0, -1).forEach((c, i) => {
-      const n = active[i + 1], dy = (n.y - c.y) * 0.5;
-      d += ` C ${c.x} ${c.y + dy}, ${n.x} ${n.y - dy}, ${n.x} ${n.y}`;
-    });
-    return d;
   }, [nodes, currentUnlockedId]);
 
   // ── Collect all scalable elements ───────────────────────────────────────────
@@ -225,10 +205,9 @@ export const ArcadeView: React.FC = () => {
   }, [currentUnlockedId]);
 
   // ── rAF scroll-linked perspective scale ───────────────────────────────────────
-  // Projects both objects and conduit path segments with screen-space perspective:
-  // 1. Objects & paths near the bottom: full size (capped at SCALE_MAX) and full distance.
-  // 2. Objects & paths near the top: smoothly small (thinner stroke) and short (compressed distance),
-  //    recreating authentic 3D road perspective foreshortening as you scroll through the entire map.
+  // Projects both objects and conduit path segments with authentic 3D perspective:
+  // 1. Foreground (bottom of screen): large scale (1.08x), vivid brightness, and wide spacing.
+  // 2. Horizon (top of screen): noticeably small scale (0.38x), atmospheric depth, and compressed spacing.
   const tick = useCallback(() => {
     const container = scrollRef.current;
     if (container) {
@@ -241,33 +220,29 @@ export const ArcadeView: React.FC = () => {
       const viewH = container.clientHeight;
 
       // Perspective projection function:
-      // Computes yShift (foreshortening compression) and scale for any coordinate on screen.
+      // Computes yShift (vertical distance foreshortening) and scale across the entire viewport.
       const projectY = (rawY: number) => {
         const u = rawY / viewH;
 
-        // When scrolled near the top of the map, smoothly expand foreground scale so summit nodes reach full 1.0 actual size
+        // When scrolled near the summit (top of map), smoothly boost scale so Stage 50 reaches full 1.08x size
         const topScrollBoost = Math.max(0, 1 - scrollTop / 350);
         if (topScrollBoost >= 0.95) {
-          return { yShift: 0, scale: SCALE_MAX, u, topScrollBoost: 1 };
+          return { yShift: 0, scale: SCALE_FOREGROUND, u, progress: 1, topScrollBoost: 1 };
         }
 
-        const effectiveLimit = Math.max(0.05, FOREGROUND_LIMIT_Y * (1 - topScrollBoost));
+        // Viewport depth progress: 1.0 at bottom (close/big), 0.0 at top (distant/small)
+        const v = Math.max(0, Math.min(1, u / 0.96));
+        const progress = Math.pow(v, 0.85);
 
-        if (u >= effectiveLimit) {
-          return { yShift: 0, scale: SCALE_MAX, u, topScrollBoost };
-        }
+        // Continuous perspective scale: distant nodes small (0.38) and close nodes big (1.08)
+        const baseScale = SCALE_HORIZON + progress * (SCALE_FOREGROUND - SCALE_HORIZON);
+        const scale = baseScale + (SCALE_FOREGROUND - baseScale) * topScrollBoost;
 
-        const t = Math.max(0, Math.min(1, (effectiveLimit - u) / effectiveLimit));
-        // Foreshortening compression smoothly fades to zero as scrolled to top
-        const yShift = t * t * 75 * Math.max(0, 1 - topScrollBoost);
+        // Quadratic vertical foreshortening compression towards the horizon
+        const t = Math.max(0, Math.min(1, 1 - v));
+        const yShift = t * t * 90 * Math.max(0, 1 - topScrollBoost);
 
-        const ny = Math.max(0, Math.min(1, u));
-        const progress = Math.max(0, Math.min(1, ny / effectiveLimit));
-        const eased = Math.sin((progress * Math.PI) / 2);
-        const baseScale = SCALE_MIN + eased * (SCALE_MAX - SCALE_MIN);
-        const scale = baseScale + (SCALE_MAX - baseScale) * topScrollBoost;
-
-        return { yShift, scale, u, topScrollBoost };
+        return { yShift, scale, u, progress, topScrollBoost };
       };
 
       // Fade out the dark horizon haze when scrolling near the summit so the apex area is crystal clear
@@ -281,11 +256,15 @@ export const ArcadeView: React.FC = () => {
         if (!el) return;
         const dataY = parseFloat(el.getAttribute('data-y') || '');
         const rawY = !isNaN(dataY) ? dataY - scrollTop : el.offsetTop - scrollTop;
-        const { yShift, scale, u, topScrollBoost } = projectY(rawY);
+        const { yShift, scale, u, progress, topScrollBoost } = projectY(rawY);
 
         const baseTransform = el.getAttribute('data-base-transform') || 'translate(-50%, -50%)';
         el.style.transform = `${baseTransform} translateY(${yShift.toFixed(1)}px) scale(${scale.toFixed(3)})`;
         el.style.transformOrigin = 'center center';
+
+        // 3D atmospheric depth lighting: close objects vivid, distant objects atmospheric
+        const brightness = Math.min(1.08, 0.78 + progress * 0.30);
+        el.style.filter = `brightness(${brightness.toFixed(2)})`;
 
         // Only fade out elements when dissolving into the horizon haze at the very top (disabled when scrolled to summit)
         const effectiveFadeZone = FADE_ZONE * (1 - topScrollBoost);
@@ -294,10 +273,10 @@ export const ArcadeView: React.FC = () => {
         } else {
           el.style.opacity = '';
         }
-        el.style.willChange = 'transform, opacity';
+        el.style.willChange = 'transform, opacity, filter';
       });
 
-      // 2. Transform all conduit path segments: makes the top path small (thinner) and short (compressed)
+      // 2. Transform all conduit path segments: makes the distant path thin and compressed
       conduitSegmentsRef.current.forEach((g) => {
         if (!g) return;
         const currY = parseFloat(g.getAttribute('data-curr-y') || '0');
@@ -315,7 +294,7 @@ export const ArcadeView: React.FC = () => {
         // Vertical distance compression: raw vs projected
         const dy = nextY - currY;
         const projDy = (nextY + pNext.yShift) - (currY + pCurr.yShift);
-        const sy = dy !== 0 ? Math.max(0.35, Math.min(1.0, projDy / dy)) : 1.0;
+        const sy = dy !== 0 ? Math.max(0.30, Math.min(1.0, projDy / dy)) : 1.0;
         const ty = pCurr.yShift;
         const Yt = ty + currY * (1 - sy);
 
@@ -325,7 +304,7 @@ export const ArcadeView: React.FC = () => {
         g.style.transform = '';
 
         // Dynamic perspective stroke-factor: shrinks stroke thickness at the top (SMALL)
-        const strokeFactor = Math.max(0.35, Math.min(1.0, pMid.scale / SCALE_MAX));
+        const strokeFactor = Math.max(0.32, Math.min(1.10, pMid.scale / SCALE_FOREGROUND));
         g.style.setProperty('--stroke-factor', strokeFactor.toFixed(3));
 
         if (pMid.u < FADE_ZONE) {
@@ -438,8 +417,6 @@ export const ArcadeView: React.FC = () => {
           {/* Breakout Ball Kinetic Trajectory Laser SVG */}
           <LevelPathSvg
             nodes={nodes}
-            pathData={conduitPathData}
-            activePathData={activePathData}
             currentUnlockedId={currentUnlockedId}
           />
 

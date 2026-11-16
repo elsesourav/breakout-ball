@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, Settings, User as UserIcon } from 'lucide-react';
-import { CoreIcon } from '../common/CoreIcon';
+import { Star } from 'lucide-react';
+import { CyberPilotIcon, CyberGearIcon } from '../navigation/NavIcons';
 import { TopCoresBadge } from '../common/TopCoresBadge';
 import { DailyCollectStatus } from '../../services/currency';
 import { TOTAL_LEVELS } from './types';
@@ -46,37 +46,51 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
         <div className="w-full max-w-sm flex items-start justify-between gap-1.5">
           {/* Top Left: Profile Button (with Free Collect button underneath if available) */}
           <div className="flex pointer-events-auto">
-            {/* 1. Profile / Pilot Avatar Button (Square / Squircle type) */}
-            <motion.button
-              type="button"
-              onClick={handleOpenProfile}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(12, 30, 60, 0.95) 100%)',
-                border: '1px solid rgba(0, 247, 255, 0.45)',
-                boxShadow: '0 0 10px rgba(0, 247, 255, 0.22)',
-              }}
-              className="size-10 rounded-lg flex items-center justify-center cursor-pointer transition-all flex-shrink-0 overflow-hidden"
-              title="Pilot Profile"
-            >
-              {user.isLoggedIn && user.avatarUrl && !avatarErr ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.fullName || 'Pilot'}
-                  referrerPolicy="no-referrer"
-                  onError={() => setAvatarErr(true)}
-                  className="w-full h-full object-cover rounded-md"
-                />
-              ) : user.isLoggedIn ? (
-                <span className="text-xs font-tech font-bold text-cyan-300">
-                  {(user.fullName || user.username || 'P').slice(0, 2).toUpperCase()}
-                </span>
-              ) : (
-                <UserIcon className="size-7 text-cyan-400 stroke-[2]" />
-              )}
-            </motion.button>
+            {/* 1. Profile / Pilot Avatar Button (Square / Squircle 3D keycap) */}
+            <div className="relative size-10 flex-shrink-0">
+              {/* 3D Base */}
+              <div
+                className="absolute inset-0 rounded-lg pointer-events-none"
+                style={{
+                  transform: 'translateY(3.5px)',
+                  background: 'linear-gradient(180deg, #0891b2 0%, #083344 100%)',
+                  border: '1.5px solid #0e7490',
+                  boxShadow: '0 5px 12px rgba(0, 0, 0, 0.85)',
+                }}
+              />
+              <motion.button
+                type="button"
+                onClick={handleOpenProfile}
+                whileHover={{ y: -0.5 }}
+                whileTap={{ y: 3 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                style={{
+                  background:
+                    'linear-gradient(180deg, rgba(20, 35, 70, 0.96) 0%, rgba(10, 18, 42, 0.98) 100%)',
+                  border: '1.8px solid rgba(0, 247, 255, 0.8)',
+                  boxShadow:
+                    'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 247, 255, 0.25)',
+                }}
+                className="relative w-full h-full rounded-lg flex items-center justify-center cursor-pointer overflow-hidden pointer-events-auto"
+                title="Pilot Profile"
+              >
+                {user.isLoggedIn && user.avatarUrl && !avatarErr ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.fullName || 'Pilot'}
+                    referrerPolicy="no-referrer"
+                    onError={() => setAvatarErr(true)}
+                    className="w-full h-full object-cover rounded-md"
+                  />
+                ) : user.isLoggedIn ? (
+                  <span className="text-xs font-tech font-bold text-cyan-300">
+                    {(user.fullName || user.username || 'P').slice(0, 2).toUpperCase()}
+                  </span>
+                ) : (
+                  <CyberPilotIcon className="w-6 h-6" />
+                )}
+              </motion.button>
+            </div>
           </div>
 
           {/* Top Center: Total Stars Badge */}
@@ -106,26 +120,39 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
               className="my-1"
             />
             
-            <motion.button
-              type="button"
-              onClick={() => {
-                soundManager.playClick();
-                setIsSettingsOpen(true);
-              }}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(26, 18, 54, 0.95) 100%)',
-                border: '1.2px solid rgba(168, 85, 247, 0.45)',
-                boxShadow:
-                  '0 0 12px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-              }}
-              className="size-10 rounded-md flex items-center justify-center text-purple-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0 mt-1"
-              title="System Settings"
-            >
-              <Settings className="w-6 h-6 text-purple-300 stroke-[2.2]" />
-            </motion.button>
+            <div className="relative size-10 flex-shrink-0 mt-1">
+              {/* 3D Base */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  transform: 'translateY(3.5px)',
+                  background: 'linear-gradient(180deg, #7e22ce 0%, #3b0764 100%)',
+                  border: '1.5px solid #581c87',
+                  boxShadow: '0 5px 12px rgba(0, 0, 0, 0.85)',
+                }}
+              />
+              <motion.button
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setIsSettingsOpen(true);
+                }}
+                whileHover={{ y: -0.5 }}
+                whileTap={{ y: 3 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                style={{
+                  background:
+                    'linear-gradient(180deg, rgba(38, 20, 68, 0.96) 0%, rgba(18, 10, 36, 0.98) 100%)',
+                  border: '1.8px solid rgba(168, 85, 247, 0.8)',
+                  boxShadow:
+                    'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(168, 85, 247, 0.25)',
+                }}
+                className="relative w-full h-full rounded-full flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0 pointer-events-auto"
+                title="System Settings"
+              >
+                <CyberGearIcon className="w-6 h-6" />
+              </motion.button>
+            </div>
           </div>
         </div>
       </div>

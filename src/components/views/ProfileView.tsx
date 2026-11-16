@@ -92,7 +92,7 @@ export const ProfileView: React.FC = () => {
             title="PILOT PROFILE"
             subtitle="STATS & IDENTITY"
             onBack={() => setActiveTab('local')}
-            hideSettings={true}
+            showCores={true}
           />
         </div>
 

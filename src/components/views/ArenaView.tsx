@@ -185,6 +185,7 @@ export const ArenaView: React.FC = () => {
       <PageHeaderWithBack
         title="COMMUNITY ARENA"
         subtitle="CHALLENGES & STAGES"
+        showCores={true}
       />
 
       {/* Sticky Full-Width Search & Filter Controls */}

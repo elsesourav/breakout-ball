@@ -23,6 +23,7 @@ export const StudioView: React.FC = () => {
           title="ARENA STUDIO"
           subtitle={`${userCreatedLevels.length} CUSTOM ARENAS`}
           onBack={() => setActiveTab('local')}
+          showCores={false}
         />
       </div>
 
