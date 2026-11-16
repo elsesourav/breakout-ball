@@ -90,7 +90,7 @@ export class WasmPhysicsBridge {
     if (!this.instance || !this.memory) return;
 
     const count = blocks.length;
-    const requiredBytes = count * 3 * 4; // 3 ints per block (col, row, hp)
+    const requiredBytes = count * 4 * 4; // 4 ints per block (col, row, hp, portalPairId)
 
     const malloc = this.instance.exports.malloc as (bytes: number) => number;
     const free = this.instance.exports.free as (ptr: number) => void;
@@ -105,12 +105,13 @@ export class WasmPhysicsBridge {
       this.maxBlocksAllocated = Math.max(count, 340);
     }
 
-    // Write block data directly into WASM linear memory
-    const intView = new Int32Array(this.memory.buffer, this.blocksLoadBufPtr, count * 3);
+    // Write block data directly into WASM linear memory: col, row, hp, portalPairId
+    const intView = new Int32Array(this.memory.buffer, this.blocksLoadBufPtr, count * 4);
     for (let i = 0; i < count; i++) {
-      intView[i * 3 + 0] = blocks[i].x;
-      intView[i * 3 + 1] = blocks[i].y;
-      intView[i * 3 + 2] = blocks[i].h;
+      intView[i * 4 + 0] = blocks[i].x;
+      intView[i * 4 + 1] = blocks[i].y;
+      intView[i * 4 + 2] = blocks[i].h;
+      intView[i * 4 + 3] = blocks[i].portalPairId ?? 0;
     }
 
     const loadFn = this.instance.exports.engine_load_blocks as (

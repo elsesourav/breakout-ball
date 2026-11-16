@@ -1,8 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import { Lock, Globe, Check } from 'lucide-react';
+import { Lock, Globe, Check, AlertTriangle, ShieldCheck, AlertCircle } from 'lucide-react';
 import { draw3DBlock } from '../../utils/helpers';
 import { GRID_ROWS, GRID_COLS } from '../../constants/game';
 import { GridCell, PORTAL_COLORS } from './DesignerTypes';
+import { LevelData } from '../../types/game';
 
 interface DesignerSaveModalProps {
   grid: GridCell[][];
@@ -12,6 +13,8 @@ interface DesignerSaveModalProps {
   levelName: string;
   isPrivate: boolean;
   isEditing?: boolean;
+  existingLevels?: LevelData[];
+  editingLevelId?: string | null;
   onSetName: (name: string) => void;
   onSetPrivate: (isPrivate: boolean) => void;
   onConfirmSave: () => void;
@@ -26,12 +29,27 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
   levelName,
   isPrivate,
   isEditing = false,
+  existingLevels = [],
+  editingLevelId = null,
   onSetName,
   onSetPrivate,
   onConfirmSave,
   onClose,
 }) => {
   const savePreviewCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const trimmed = (levelName || '').trim();
+  const isEmpty = trimmed.length === 0;
+  const isDuplicateName = existingLevels.some(
+    (l) => l.id !== editingLevelId && (l.name || '').trim().toLowerCase() === trimmed.toLowerCase()
+  );
+  const isValid = !isEmpty && !isDuplicateName;
+
+  const nameError = isEmpty
+    ? 'Arena name cannot be empty'
+    : isDuplicateName
+    ? 'Another arena has this name. Enter a unique name.'
+    : null;
 
   // Render Mini Preview for Save Dialog
   useEffect(() => {
@@ -106,9 +124,30 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
             value={levelName}
             maxLength={28}
             onChange={(e) => onSetName(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-cyan-200 font-display font-bold text-sm focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_12px_rgba(0,247,255,0.4)]"
+            style={{
+              borderColor: nameError ? '#f43f5e' : isValid ? '#10b981' : 'rgba(0, 247, 255, 0.4)',
+            }}
+            className="w-full px-3 py-2 rounded-xl bg-cyan-950/40 border text-cyan-200 font-display font-bold text-sm focus:outline-none focus:shadow-[0_0_12px_rgba(0,247,255,0.4)] transition-colors"
             placeholder="Arena Name"
           />
+
+          {/* Real-time Uniqueness Validation */}
+          <div className="flex items-center justify-between text-[11px] font-tech min-h-[16px]">
+            {nameError ? (
+              <span className="text-rose-400 flex items-center gap-1 font-bold">
+                <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                <span>{nameError}</span>
+              </span>
+            ) : (
+              <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                <Check className="w-3 h-3 flex-shrink-0" />
+                <span>Unique name verified</span>
+              </span>
+            )}
+            <span className="text-slate-400 self-end ml-auto">
+              {trimmed.length}/28
+            </span>
+          </div>
         </div>
 
         {/* Canvas Thumbnail Preview */}
@@ -164,7 +203,7 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
               className="flex items-center justify-center gap-2 py-2 rounded-xl border font-tech font-bold text-xs transition-all cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5" />
-              <span>PRIVATE</span>
+              <span>PRIVATE DRAFT</span>
             </button>
             <button
               type="button"
@@ -177,10 +216,29 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
               className="flex items-center justify-center gap-2 py-2 rounded-xl border font-tech font-bold text-xs transition-all cursor-pointer"
             >
               <Globe className="w-3.5 h-3.5" />
-              <span>PUBLIC</span>
+              <span>PUBLIC ARENA</span>
             </button>
           </div>
         </div>
+
+        {/* Informative Policy Note (Public Lock vs Private Draft) */}
+        {!isPrivate ? (
+          <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/50 flex items-start gap-2.5 text-[11px] font-tech text-amber-200 leading-tight">
+            <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold text-amber-300 block mb-0.5">⚠️ PERMANENT PUBLIC LOCK</span>
+              Once saved as Public, this arena will be published to the Community Arena and <strong>permanently locked</strong> from future edits and renaming. You can only duplicate or delete it.
+            </div>
+          </div>
+        ) : (
+          <div className="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/50 flex items-start gap-2.5 text-[11px] font-tech text-cyan-200 leading-tight">
+            <ShieldCheck className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold text-cyan-300 block mb-0.5">🔒 EDITABLE PRIVATE DRAFT</span>
+              Saved as a private draft in your Studio. You can freely edit blocks, change the name, test, and publish this arena whenever you are ready.
+            </div>
+          </div>
+        )}
 
         {/* Modal Actions */}
         <div className="flex items-center gap-2 pt-2 border-t border-cyan-500/25">
@@ -193,15 +251,26 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={onConfirmSave}
-            style={{
-              backgroundColor: '#00f7ff',
-              boxShadow: '0 0 16px rgba(0, 247, 255, 0.5)',
+            disabled={!isValid}
+            onClick={() => {
+              if (isValid) onConfirmSave();
             }}
-            className="flex-1 py-2.5 rounded-xl font-display font-black text-xs text-black tracking-wider transition-all cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
+            style={{
+              backgroundColor: isValid ? (!isPrivate ? '#00f7ff' : '#10b981') : '#1e293b',
+              color: isValid ? '#000000' : '#64748b',
+              boxShadow: isValid ? (!isPrivate ? '0 0 16px rgba(0, 247, 255, 0.5)' : '0 0 16px rgba(16, 185, 129, 0.5)') : 'none',
+              cursor: isValid ? 'pointer' : 'not-allowed',
+            }}
+            className="flex-1 py-2.5 rounded-xl font-display font-black text-xs tracking-wider transition-all active:scale-98 flex items-center justify-center gap-1.5"
           >
             <Check className="w-4 h-4 stroke-[3]" />
-            <span>{isEditing ? 'UPDATE ARENA' : 'SAVE ARENA'}</span>
+            <span>
+              {!isPrivate
+                ? 'PUBLISH & LOCK ARENA'
+                : isEditing
+                ? 'UPDATE DRAFT'
+                : 'SAVE DRAFT'}
+            </span>
           </button>
         </div>
       </div>

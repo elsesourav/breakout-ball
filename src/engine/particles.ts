@@ -81,15 +81,15 @@ export class ParticleSystem {
    * and are gravitationally sucked downward into the black hole singularity.
    */
   public spawnBlockExplosion(x: number, y: number, color: string, isDestroy: boolean = true) {
-    const count = isDestroy ? 38 : 18;
-    const baseSpeed = isDestroy ? 7.5 : 5.5;
+    const count = isDestroy ? 48 : 20;
+    const baseSpeed = isDestroy ? 7.0 : 5.0;
     const [r, g, b] = parseHexColor(color);
 
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * baseSpeed + (isDestroy ? 2.0 : 1.0);
       const life = isDestroy ? Math.random() * 0.7 + 1.8 : Math.random() * 0.35 + 0.4;
-      const baseSize = Math.random() * (isDestroy ? 5.5 : 4.0) + 3.0;
+      const baseSize = Math.random() * (isDestroy ? 5.0 : 3.5) + (isDestroy ? 4.8 : 3.2);
 
       this.particles.push({
         x: x + (Math.random() - 0.5) * 16,
@@ -280,10 +280,11 @@ export class ParticleSystem {
         p.life -= 0.018;
 
         // Size slowly shrinks as it descends towards black hole ("slowly small, slowly small")
-        const distFactor = Math.max(0.12, Math.min(1.0, dist / 220));
-        const lifeFactor = Math.max(0.15, p.life / p.maxLife);
-        p.size = (p.baseSize || 4) * distFactor * lifeFactor;
-        p.alpha = Math.max(0, p.life / p.maxLife);
+        // Retain clear visibility floor for eye perception without sudden pixel collapse
+        const distFactor = Math.max(0.42, Math.min(1.0, dist / 260));
+        const lifeFactor = Math.max(0.38, p.life / p.maxLife);
+        p.size = Math.max(2.8, (p.baseSize || 5) * distFactor * lifeFactor);
+        p.alpha = Math.max(0.22, Math.min(1.0, p.life / (p.maxLife * 0.72)));
 
         // Singularity swallow condition: plunged into black hole event horizon
         if (dist < 32 || p.y > height + 10 || p.life <= 0) {
@@ -307,7 +308,7 @@ export class ParticleSystem {
     // 4. Update Destroying Blocks (Shrinking Inward & Black Hole Suction)
     for (let i = this.destroyingBlocks.length - 1; i >= 0; i--) {
       const db = this.destroyingBlocks[i];
-      db.life -= 0.035; // ~28 frames / ~0.46s
+      db.life -= 0.025; // Smooth inward contraction and suction (~40 frames)
 
       const t = 1.0 - Math.max(0, db.life / db.maxLife);
 
@@ -371,7 +372,7 @@ export class ParticleSystem {
       ctx.fillStyle = p.color;
 
       if (p.shape === 'spark') {
-        ctx.fillRect(p.x - p.size / 2, p.y - 1, p.size * 1.6, 2.2);
+        ctx.fillRect(p.x - p.size / 2, p.y - 1.2, p.size * 1.6, 2.4);
       } else {
         ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
       }

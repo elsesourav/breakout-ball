@@ -229,7 +229,8 @@ export class WebGLRenderer {
       const b = blocks[i];
       if (b.isDead || b.health <= 0) continue;
 
-      const uv = this.atlas.getUV(`block_${b.health}`);
+      const blockKey = b.health === 7 ? `block_7_p${b.portalPairId || 1}` : `block_${b.health}`;
+      const uv = this.atlas.getUV(blockKey);
       const tint = b.hitAnim > 0 ? 1.0 + b.hitAnim * 0.6 : 1.0;
 
       // Portal (health 7) recharge cooldown transparency
@@ -242,18 +243,24 @@ export class WebGLRenderer {
 
       this.batcher.pushSprite(b.x, b.y, b.w, b.h, uv.u0, uv.v0, uv.u1, uv.v1, tint, tint, tint, alphaBlock);
 
-      // Recharging portal: draw an inner pulsing cooldown energy line across the bottom of the portal
+      // Recharging portal: draw an inner pulsing cooldown energy line across the bottom of the portal with theme color
       if (b.health === 7 && (b.portalRechargeTimer ?? 0) > 0) {
+        const pairId = b.portalPairId || 1;
+        let barR = 0.0, barG = 0.97, barB = 1.0;
+        if (pairId === 2) { barR = 0.94; barG = 0.47; barB = 0.98; }
+        else if (pairId === 3) { barR = 0.98; barG = 0.75; barB = 0.14; }
+        else if (pairId === 4) { barR = 0.20; barG = 0.83; barB = 0.60; }
         const progress = Math.max(0, 1.0 - (b.portalRechargeTimer! / 180));
         const barW = (b.w - 16) * progress;
-        this.batcher.pushSprite(b.x + 8, b.y + b.h - 8, barW, 3, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 0.0, 0.97, 1.0, 0.85);
+        this.batcher.pushSprite(b.x + 8, b.y + b.h - 8, barW, 3, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, barR, barG, barB, 0.85);
       }
     }
 
     // 4.4. Draw Destroying Blocks (Shrinking Inward & Black Hole Suction Animation)
     if (particles.destroyingBlocks.length > 0) {
       for (const db of particles.destroyingBlocks) {
-        const uv = this.atlas.getUV(`block_${db.initialHealth}`);
+        const dbKey = db.initialHealth === 7 ? 'block_7_p1' : `block_${db.initialHealth}`;
+        const uv = this.atlas.getUV(dbKey);
         const cx = db.x + db.w / 2;
         const cy = db.y + db.h / 2;
         const curW = db.w * db.scale;
@@ -403,17 +410,63 @@ export class WebGLRenderer {
       this.batcher.pushSprite(renderBallX - ballSlotSize / 2, renderBallY - ballSlotSize / 2, ballSlotSize, ballSlotSize, ballUV.u0, ballUV.v0, ballUV.u1, ballUV.v1, 1.0, 1.0, 1.0, 1.0);
     }
 
-    // 8. Draw Explosions (Shockwave Rings & Near-Block Shatter Chunks)
+    // 8. Draw Explosions (Shockwave Rings, Fireball Flare, Shards & Shatter Chunks)
     if (explosions) {
       const ringUV = this.atlas.getUV('shockwave_ring');
       for (const wave of explosions.blastWaves) {
         const rad = wave.radius;
+        const progress = Math.min(1.0, wave.radius / wave.maxRadius);
         const alphaWave = Math.max(0, wave.life / wave.maxLife);
-        this.batcher.pushSprite(wave.x - rad, wave.y - rad, rad * 2, rad * 2, ringUV.u0, ringUV.v0, ringUV.u1, ringUV.v1, 1.0, 0.6, 0.1, alphaWave);
+        this.batcher.pushSprite(wave.x - rad, wave.y - rad, rad * 2, rad * 2, ringUV.u0, ringUV.v0, ringUV.u1, ringUV.v1, 1.0, 0.65, 0.15, alphaWave);
+
+        // Core Plasma Fireball in WebGL
+        if (progress < 0.65) {
+          const coreAlpha = alphaWave * (1.0 - progress / 0.65) * 0.85;
+          const coreR = Math.max(16, rad * 0.6);
+          this.batcher.pushSprite(wave.x - coreR, wave.y - coreR, coreR * 2, coreR * 2, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 1.0, 0.9, 0.4, coreAlpha);
+        }
       }
+
+      // Epicenter Explosive Shards & Sparks
+      for (const shard of explosions.shards) {
+        const sSize = shard.size * 1.5;
+        const [sr, sg, sb] = parseColorRgb(shard.color);
+        this.batcher.pushSprite(
+          shard.x - sSize / 2,
+          shard.y - sSize / 2,
+          sSize,
+          sSize,
+          whiteUV.u0,
+          whiteUV.v0,
+          whiteUV.u1,
+          whiteUV.v1,
+          sr,
+          sg,
+          sb,
+          shard.alpha,
+          shard.angle
+        );
+      }
+
+      // Directional Shatter Chunks of Destroyed Near Blocks with Authentic Block Colors
       for (const chunk of explosions.shatterChunks) {
         if (chunk.delay > 0) continue;
-        this.batcher.pushSprite(chunk.x - chunk.w / 2, chunk.y - chunk.h / 2, chunk.w, chunk.h, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 1.0, 0.3, 0.2, chunk.alpha, chunk.angle);
+        const [cr, cg, cb] = parseColorRgb(chunk.color);
+        this.batcher.pushSprite(
+          chunk.x - chunk.w / 2,
+          chunk.y - chunk.h / 2,
+          chunk.w,
+          chunk.h,
+          whiteUV.u0,
+          whiteUV.v0,
+          whiteUV.u1,
+          whiteUV.v1,
+          cr,
+          cg,
+          cb,
+          chunk.alpha,
+          chunk.angle
+        );
       }
     }
 
@@ -425,13 +478,25 @@ export class WebGLRenderer {
       const combatPoints = particles.particles.map((p) => ({
         x: p.x,
         y: p.y,
-        size: Math.max(1.0, p.size * 1.8),
+        size: Math.max(3.0, p.size * 2.2),
         r: p.r ?? 1.0,
         g: p.g ?? 0.9,
         b: p.b ?? 0.3,
-        a: Math.max(0.05, Math.min(1.0, p.alpha)),
+        a: Math.max(0.12, Math.min(1.0, p.alpha)),
       }));
       this.glParticles.renderPoints(this.shaders.getProgram('particle'), combatPoints, w, h);
     }
   }
+}
+
+function parseColorRgb(color: string): [number, number, number] {
+  if (color && color.startsWith('#')) {
+    let hex = color.slice(1);
+    if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
+    const num = parseInt(hex, 16);
+    if (!isNaN(num)) {
+      return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
+    }
+  }
+  return [1.0, 0.6, 0.2];
 }

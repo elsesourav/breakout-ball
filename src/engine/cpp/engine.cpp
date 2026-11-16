@@ -62,9 +62,10 @@ void BreakoutEngine::loadBlocks(const int* data, int count, float bw, float bh) 
     blockHeight = bh;
 
     for (int i = 0; i < count; i++) {
-        int col = data[i * 3];
-        int row = data[i * 3 + 1];
-        int hp = data[i * 3 + 2];
+        int col = data[i * 4 + 0];
+        int row = data[i * 4 + 1];
+        int hp = data[i * 4 + 2];
+        int pairId = data[i * 4 + 3];
 
         NativeBlock b;
         b.col = col;
@@ -79,7 +80,7 @@ void BreakoutEngine::loadBlocks(const int* data, int count, float bw, float bh) 
         b.hitAnim = 0.0f;
         b.counter = (hp == 8) ? 3 : 0;
         b.portalPairIndex = -1;
-        b.portalPairId = 0;
+        b.portalPairId = pairId;
         b.portalRechargeTimer = 0;
 
         if ((hp >= 1 && hp <= 5) || hp == 8) {
@@ -92,23 +93,48 @@ void BreakoutEngine::loadBlocks(const int* data, int count, float bw, float bh) 
 }
 
 void BreakoutEngine::pairPortals() {
-    std::vector<int> portals;
     for (size_t i = 0; i < blocks.size(); i++) {
         if (blocks[i].health == 7) {
             blocks[i].portalPairIndex = -1;
-            portals.push_back((int)i);
         }
     }
 
-    // Pair adjacent portals in order of encounter
-    for (size_t i = 0; i + 1 < portals.size(); i += 2) {
-        int a = portals[i];
-        int b = portals[i + 1];
-        int pairId = (int)(i / 2) + 1;
+    std::vector<int> pairGroups[5];
+    std::vector<int> unassignedPortals;
+
+    for (size_t i = 0; i < blocks.size(); i++) {
+        if (blocks[i].health == 7) {
+            int pid = blocks[i].portalPairId;
+            if (pid >= 1 && pid <= 4) {
+                pairGroups[pid].push_back((int)i);
+            } else {
+                unassignedPortals.push_back((int)i);
+            }
+        }
+    }
+
+    // 1. Link explicit matching pairs (1, 2, 3, 4)
+    for (int pid = 1; pid <= 4; pid++) {
+        auto& group = pairGroups[pid];
+        if (group.size() >= 2) {
+            for (size_t p = 0; p < group.size(); p++) {
+                int curr = group[p];
+                int next = group[(p + 1) % group.size()];
+                blocks[curr].portalPairIndex = next;
+            }
+        } else if (group.size() == 1) {
+            unassignedPortals.push_back(group[0]);
+        }
+    }
+
+    // 2. Link unassigned / orphan portals in sequential pairs
+    for (size_t i = 0; i + 1 < unassignedPortals.size(); i += 2) {
+        int a = unassignedPortals[i];
+        int b = unassignedPortals[i + 1];
         blocks[a].portalPairIndex = b;
-        blocks[a].portalPairId = pairId;
         blocks[b].portalPairIndex = a;
-        blocks[b].portalPairId = pairId;
+        if (blocks[a].portalPairId <= 0) blocks[a].portalPairId = (int)(i / 2) + 1;
+        if (blocks[b].portalPairId <= 0) blocks[b].portalPairId = (int)(i / 2) + 1;
     }
 }
 
@@ -371,7 +397,7 @@ void BreakoutEngine::detonateEmpReactor(int bIdx) {
     ev.epicenterY = hitCenterY;
     events.push_back(ev);
 
-    float blastRadius = blockWidth * 2.2f;
+    float blastRadius = blockWidth * 2.4f;
     float blastRadSq = blastRadius * blastRadius;
 
     std::vector<int> chainEmpIndices;

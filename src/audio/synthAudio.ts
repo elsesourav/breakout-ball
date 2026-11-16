@@ -84,6 +84,137 @@ export class SynthAudioEngine {
     osc.stop(now + 0.1);
   }
 
+  /**
+   * Block Destruction Impact Sound
+   * Combines high-frequency fracture click, resonant acoustic body, and punchy sub thump.
+   */
+  public playBlockDestroy(combo: number = 1, isEmp: boolean = false) {
+    if (!this.enabled || this.volume <= 0) return;
+    const ctx = this.initContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // 1. High transient fracture click (snap)
+    const clickOsc = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    clickOsc.type = 'sawtooth';
+    clickOsc.frequency.setValueAtTime(isEmp ? 3800 : 2800, now);
+    clickOsc.frequency.exponentialRampToValueAtTime(320, now + 0.035);
+
+    const clickVol = Math.min(0.4, 0.22 + combo * 0.015) * this.volume;
+    clickGain.gain.setValueAtTime(clickVol, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    clickOsc.connect(clickGain);
+    clickGain.connect(ctx.destination);
+    clickOsc.start(now);
+    clickOsc.stop(now + 0.045);
+
+    // 2. Resonant shatter body tone (scales musically with combo)
+    const baseFreqs = [260, 310, 360, 420, 480, 540, 620, 720, 840, 960];
+    const baseFreq = baseFreqs[Math.min(combo - 1, baseFreqs.length - 1)] || 360;
+
+    const bodyOsc = ctx.createOscillator();
+    const bodyGain = ctx.createGain();
+    bodyOsc.type = isEmp ? 'sawtooth' : 'triangle';
+    bodyOsc.frequency.setValueAtTime(baseFreq, now);
+    bodyOsc.frequency.exponentialRampToValueAtTime(baseFreq * 0.65, now + 0.14);
+
+    const bodyVol = Math.min(0.35, 0.18 + combo * 0.02) * this.volume;
+    bodyGain.gain.setValueAtTime(bodyVol, now);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    bodyOsc.connect(bodyGain);
+    bodyGain.connect(ctx.destination);
+    bodyOsc.start(now);
+    bodyOsc.stop(now + 0.17);
+
+    // 3. Sub-bass punch (gives weight & visceral impact)
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(isEmp ? 130 : 110, now);
+    subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+
+    const subVol = (isEmp ? 0.38 : 0.26) * this.volume;
+    subGain.gain.setValueAtTime(subVol, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+    subOsc.connect(subGain);
+    subGain.connect(ctx.destination);
+    subOsc.start(now);
+    subOsc.stop(now + 0.15);
+  }
+
+  /**
+   * Massive Detonation / Explode Block Impact
+   * Synthesizes a deep seismic sub-rumble, filtered explosive blast, and cyber EMP crackle.
+   */
+  public playExplosion() {
+    if (!this.enabled || this.volume <= 0) return;
+    const ctx = this.initContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    // 1. Deep Sub-Bass Seismic Boom
+    const boomOsc = ctx.createOscillator();
+    const boomGain = ctx.createGain();
+    boomOsc.type = 'sine';
+    boomOsc.frequency.setValueAtTime(95, now);
+    boomOsc.frequency.exponentialRampToValueAtTime(26, now + 0.42);
+
+    const boomVol = 0.55 * this.volume;
+    boomGain.gain.setValueAtTime(boomVol, now);
+    boomGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    boomOsc.connect(boomGain);
+    boomGain.connect(ctx.destination);
+    boomOsc.start(now);
+    boomOsc.stop(now + 0.46);
+
+    // 2. Synthesized Noise Blast Shockwave
+    try {
+      const bufferSize = Math.floor(ctx.sampleRate * 0.35);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, now);
+      filter.frequency.exponentialRampToValueAtTime(65, now + 0.32);
+      filter.Q.setValueAtTime(3.2, now);
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.42 * this.volume, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+
+      noise.start(now);
+      noise.stop(now + 0.35);
+    } catch {}
+
+    // 3. Cyber Electric Arc Sizzle
+    const sizzleOsc = ctx.createOscillator();
+    const sizzleGain = ctx.createGain();
+    sizzleOsc.type = 'sawtooth';
+    sizzleOsc.frequency.setValueAtTime(2200, now);
+    sizzleOsc.frequency.exponentialRampToValueAtTime(180, now + 0.18);
+
+    sizzleGain.gain.setValueAtTime(0.25 * this.volume, now);
+    sizzleGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    sizzleOsc.connect(sizzleGain);
+    sizzleGain.connect(ctx.destination);
+    sizzleOsc.start(now);
+    sizzleOsc.stop(now + 0.21);
+  }
+
   public playPortalWarp() {
     if (!this.enabled || this.volume <= 0) return;
     const ctx = this.initContext();

@@ -14,7 +14,7 @@ export class AudioBridge {
     this.vibrateEnabled = enabled;
   }
 
-  public triggerEvent(type: CollisionEventType, combo: number = 0) {
+  public triggerEvent(type: CollisionEventType, combo: number = 0, source?: string) {
     switch (type) {
       case 'paddle':
         soundManager.playSideHit();
@@ -37,14 +37,13 @@ export class AudioBridge {
         break;
 
       case 'block_destroy':
-        soundManager.playBlockHit();
+        soundManager.playBlockDestroy(combo, source === 'emp');
         synthAudio.playComboHit(combo);
         if (!achievementManager.isRestricted()) {
           achievementManager.unlock('first_blood');
           if (combo >= 5) achievementManager.unlock('combo_5');
           if (combo >= 10) achievementManager.unlock('combo_10');
         }
-        this.vibrate(combo > 3 ? 80 : 50);
         break;
 
       case 'ball_lost':
@@ -62,11 +61,10 @@ export class AudioBridge {
         break;
 
       case 'emp_explode':
-        soundManager.playBlockHit();
+        soundManager.playExplosion();
         if (!achievementManager.isRestricted()) {
           achievementManager.unlock('emp_detonator');
         }
-        this.vibrate(120);
         break;
 
       case 'powerup_collect':

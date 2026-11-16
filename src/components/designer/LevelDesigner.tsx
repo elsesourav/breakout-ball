@@ -260,20 +260,12 @@ export const LevelDesigner: React.FC = () => {
   const placedBlocks: BlockData[] = [];
   grid.forEach((row, y) => {
     row.forEach((cell, x) => {
-      if (cell.h > 0) {
-        placedBlocks.push({
-          x,
-          y,
-          h: cell.h,
-          ...(cell.portalPairId !== undefined ? { portalPairId: cell.portalPairId } : {}),
-        });
-      }
+      if (cell.h > 0) placedBlocks.push({ x, y, h: cell.h, ...(cell.portalPairId !== undefined ? { portalPairId: cell.portalPairId } : {}) });
     });
   });
 
   const stats = calculateLevelHp(placedBlocks);
   const activePairs = extractActivePairs(grid);
-
   const validateLevel = () => validateDesignerLevel(stats.breakableCount, pendingPortal, activePairs);
 
   const handleClearMatrix = () => {
@@ -298,12 +290,9 @@ export const LevelDesigner: React.FC = () => {
   const handleMirrorHorizontal = () => {
     if (placedBlocks.length === 0) return;
     setHistoryState((curr) => {
-      const currentGrid = curr.present.grid;
-      const nextGrid = currentGrid.map((row) => {
+      const nextGrid = curr.present.grid.map((row) => {
         const newRow = row.map((c) => ({ ...c }));
-        for (let x = 0; x < 4; x++) {
-          newRow[8 - x] = { ...newRow[x] };
-        }
+        for (let x = 0; x < 4; x++) newRow[8 - x] = { ...newRow[x] };
         return newRow;
       });
       soundManager.playClick();
@@ -318,21 +307,10 @@ export const LevelDesigner: React.FC = () => {
   const handleTestLevel = () => {
     const val = validateLevel();
     if (!val.valid) {
-      showAlert({
-        title: 'VALIDATION ERROR',
-        message: val.error || 'Matrix is incomplete.',
-        btn1Text: 'OKAY',
-        singleBtn: true,
-      });
+      showAlert({ title: 'VALIDATION ERROR', message: val.error || 'Matrix is incomplete.', btn1Text: 'OKAY', singleBtn: true });
       return;
     }
-    updateDesignerSession({
-      historyState,
-      levelName,
-      isPrivate,
-      editingLevelId,
-      selectedTool,
-    });
+    updateDesignerSession({ historyState, levelName, isPrivate, editingLevelId, selectedTool });
     const effectiveCreatorId = user.id || authService.getEffectiveUserId();
     startPlayLevel({
       id: 'TEST',
@@ -347,12 +325,7 @@ export const LevelDesigner: React.FC = () => {
   const handleOpenSaveModal = () => {
     const val = validateLevel();
     if (!val.valid) {
-      showAlert({
-        title: 'CANNOT SAVE ARENA',
-        message: val.error || 'Please fix errors before saving.',
-        btn1Text: 'OKAY',
-        singleBtn: true,
-      });
+      showAlert({ title: 'CANNOT SAVE ARENA', message: val.error || 'Please fix errors before saving.', btn1Text: 'OKAY', singleBtn: true });
       return;
     }
     setShowSaveModal(true);
@@ -363,6 +336,22 @@ export const LevelDesigner: React.FC = () => {
     const isEditing = Boolean(editingLevelId);
     const targetId = editingLevelId || generateLevelId();
     const existing = userCreatedLevels.find((l) => l.id === targetId);
+
+    // Guard: Prevent overwriting any already-published locked level
+    if (isEditing && existing?.isPublic) {
+      cyberToast.error('Published arenas are locked. Duplicate to create an editable draft.');
+      return;
+    }
+
+    // Guard: Prevent duplicate name across other arenas
+    const isDuplicate = userCreatedLevels.some(
+      (l) => l.id !== targetId && (l.name || '').trim().toLowerCase() === trimmedName.toLowerCase()
+    );
+    if (isDuplicate) {
+      cyberToast.error('Arena name must be unique. Another arena already uses this name.');
+      return;
+    }
+
     const effectiveCreatorId = existing?.creatorId || user.id || authService.getEffectiveUserId();
 
     saveUserLevel({
@@ -378,7 +367,13 @@ export const LevelDesigner: React.FC = () => {
     clearDesignerSession();
     setShowSaveModal(false);
     setScreen('menu');
-    cyberToast.success(isEditing ? `Arena "${trimmedName}" updated!` : `Arena "${trimmedName}" published!`);
+    cyberToast.success(
+      !isPrivate
+        ? `Arena "${trimmedName}" published and locked!`
+        : isEditing
+        ? `Draft "${trimmedName}" updated!`
+        : `Draft "${trimmedName}" saved!`
+    );
   };
 
   const handleClose = () => {
@@ -473,6 +468,8 @@ export const LevelDesigner: React.FC = () => {
           levelName={levelName}
           isPrivate={isPrivate}
           isEditing={Boolean(editingLevelId)}
+          existingLevels={userCreatedLevels}
+          editingLevelId={editingLevelId}
           onSetName={setLevelName}
           onSetPrivate={setIsPrivate}
           onConfirmSave={handleConfirmSave}

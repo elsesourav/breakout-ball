@@ -57,11 +57,17 @@ export const cloneSnapshot = (snapshot: DesignerSnapshot): DesignerSnapshot => (
 
 export const blocksToGrid = (blocks: BlockData[] = []): GridCell[][] => {
   const grid = createEmptyGrid();
+  let unassignedCount = 0;
   blocks.forEach((b) => {
     if (b.y >= 0 && b.y < GRID_COLS && b.x >= 0 && b.x < 9) {
+      let pairId = b.portalPairId;
+      if (b.h === 7 && (pairId === undefined || pairId < 1 || pairId > 4)) {
+        pairId = Math.min(4, Math.floor(unassignedCount / 2) + 1);
+        unassignedCount++;
+      }
       grid[b.y][b.x] = {
         h: b.h,
-        ...(b.portalPairId !== undefined ? { portalPairId: b.portalPairId } : {}),
+        ...(pairId !== undefined ? { portalPairId: pairId } : {}),
       };
     }
   });

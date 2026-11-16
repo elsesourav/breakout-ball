@@ -206,6 +206,22 @@ class SoundManager {
     this.playStatic('blockHit', 0.9);
   }
 
+  public playBlockDestroy(combo: number = 1, isEmp: boolean = false) {
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      synthAudio.playBlockDestroy(combo, isEmp);
+    }
+    this.playStatic('blockHit', isEmp ? 1.0 : 0.85);
+    this.triggerVibrate(isEmp ? [45, 30, 75] : combo > 3 ? 75 : 45);
+  }
+
+  public playExplosion() {
+    if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
+      synthAudio.playExplosion();
+    }
+    this.playStatic('damage', 0.65);
+    this.triggerVibrate([60, 40, 140]);
+  }
+
   public playSideHit() {
     this.playStatic('sideHit', 0.7);
   }

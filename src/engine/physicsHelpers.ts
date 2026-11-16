@@ -218,7 +218,7 @@ export function detonateEmpExplosion(
     epicenterY: hitCenterY,
   });
 
-  const blastRadius = config.blockWidth * 2.2;
+  const blastRadius = config.blockWidth * 2.4;
   const blastSq = blastRadius * blastRadius;
 
   for (let ob = 0; ob < blocks.length; ob++) {

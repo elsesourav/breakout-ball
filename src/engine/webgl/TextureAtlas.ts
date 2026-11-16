@@ -79,9 +79,9 @@ export class TextureAtlas {
       rowMaxH = Math.max(rowMaxH, height);
     };
 
-    // 1. Bake Blocks (HP 1-5, Titanium 6, Portals 7, EMP 8)
-    const blockTypes = [1, 2, 3, 4, 5, 6, 7, 8];
-    for (const hp of blockTypes) {
+    // 1. Bake Blocks (HP 1-5, Titanium 6, EMP 8, and Portals 7 with Pair Themes 1-4)
+    const standardBlockTypes = [1, 2, 3, 4, 5, 6, 8];
+    for (const hp of standardBlockTypes) {
       placeItem(`block_${hp}`, BLOCK_WIDTH, BLOCK_HEIGHT, (c, x, y) => {
         c.save();
         c.translate(x, y);
@@ -105,6 +105,57 @@ export class TextureAtlas {
         c.restore();
       });
     }
+
+    // Bake all 4 Quantum Portal Pair Themes (1: Cyan, 2: Magenta, 3: Amber, 4: Emerald)
+    for (let pairId = 1; pairId <= 4; pairId++) {
+      placeItem(`block_7_p${pairId}`, BLOCK_WIDTH, BLOCK_HEIGHT, (c, x, y) => {
+        c.save();
+        c.translate(x, y);
+        drawBlockWithPreset(
+          c,
+          {
+            index: 0,
+            col: 0,
+            row: 0,
+            x: 0,
+            y: 0,
+            w: BLOCK_WIDTH,
+            h: BLOCK_HEIGHT,
+            health: 7,
+            initialHealth: 7,
+            isDead: false,
+            hitAnim: 0,
+            portalPairId: pairId,
+          },
+          1
+        );
+        c.restore();
+      });
+    }
+    // Also place default block_7 as alias
+    placeItem(`block_7`, BLOCK_WIDTH, BLOCK_HEIGHT, (c, x, y) => {
+      c.save();
+      c.translate(x, y);
+      drawBlockWithPreset(
+        c,
+        {
+          index: 0,
+          col: 0,
+          row: 0,
+          x: 0,
+          y: 0,
+          w: BLOCK_WIDTH,
+          h: BLOCK_HEIGHT,
+          health: 7,
+          initialHealth: 7,
+          isDead: false,
+          hitAnim: 0,
+          portalPairId: 1,
+        },
+        1
+      );
+      c.restore();
+    });
 
     // 2. Bake Paddle Tiers (1, 2, 3)
     const paddleTiers = [1, 2, 3] as const;

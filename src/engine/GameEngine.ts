@@ -338,9 +338,19 @@ export class GameEngine {
     const ballImpactLvl = currencyService.getUpgradeLevel('ball_impact');
     const impactShakeMult = 1 + (ballImpactLvl - 1) * 0.15;
 
+    let empDestroyStagger = 0;
     for (const ev of events) {
-      this.audio.triggerEvent(ev.type, ev.combo);
-      this.callbacks.onEventAudio?.(ev.type, ev.combo);
+      if (ev.source === 'emp' && ev.type === 'block_destroy') {
+        empDestroyStagger++;
+        const delayMs = empDestroyStagger * 28;
+        setTimeout(() => {
+          this.audio.triggerEvent(ev.type, ev.combo, ev.source);
+          this.callbacks.onEventAudio?.(ev.type, ev.combo);
+        }, delayMs);
+      } else {
+        this.audio.triggerEvent(ev.type, ev.combo, ev.source);
+        this.callbacks.onEventAudio?.(ev.type, ev.combo);
+      }
 
       if (ev.type === 'paddle') {
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
@@ -352,11 +362,11 @@ export class GameEngine {
         this.triggerCameraShake(2.0);
       } else if (ev.type === 'emp_explode') {
         const bw = this.tsPhysics.config.blockWidth, bh = this.tsPhysics.config.blockHeight;
-        this.explosions.spawnExplosion(ev.hitX, ev.hitY, bw * 2.3);
-        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, '#ff9900', true);
+        this.explosions.spawnExplosion(ev.hitX, ev.hitY, bw * 2.5);
+        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, '#ff7700', true);
         this.particles.spawnDestroyingBlock(ev.hitX - bw / 2, ev.hitY - bh / 2, bw, bh, 8, '#ff3b00', '#ffaa00');
         this.particles.addFloatingText('💥 EMP DETONATION!', ev.hitX, ev.hitY, '#ff3b00');
-        this.triggerCameraShake(14.0);
+        this.triggerCameraShake(20.0 * impactShakeMult);
         this.state.blocksDestroyed++;
         this.recordScore(ev.combo, 500);
         if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
@@ -373,21 +383,31 @@ export class GameEngine {
         const block = this.tsPhysics.blocks[ev.blockIndex];
         const isCrit = ev.type === 'crit_damage';
         const isDestroy = ev.type === 'block_destroy';
+        const isEmpSource = ev.source === 'emp';
         const fallback = isCrit ? '#fbbf24' : isDestroy ? '#ff0844' : '#00f7ff';
         const color = block ? BLOCK_COLORS[block.initialHealth]?.border || fallback : fallback;
 
         if (isDestroy && block) {
           const cfg = BLOCK_COLORS[block.initialHealth] || BLOCK_COLORS[1];
+          // 1. Inward collapsing block sprite shrinking and pulled into black hole suction
           this.particles.spawnDestroyingBlock(block.x, block.y, block.w, block.h, block.initialHealth, cfg.bg[0] || color, cfg.border || color);
-        }
-        if (ev.source === 'emp' && ev.epicenterX !== undefined && ev.epicenterY !== undefined && block) {
-          if (isDestroy) this.explosions.spawnNearBlockShatter(block.x, block.y, block.w, block.h, color, ev.epicenterX, ev.epicenterY);
-          else this.explosions.spawnNearBlockDamage(block.x, block.y, block.w, block.h, color);
-        } else {
-          this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, isCrit || isDestroy);
+          // 2. Full 48 neon debris particles with gravitational suction
+          this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, true);
+
+          if (isEmpSource && ev.epicenterX !== undefined && ev.epicenterY !== undefined) {
+            // 3. Directional explosive blast shrapnel propelled outward away from epicenter
+            this.explosions.spawnNearBlockShatter(block.x, block.y, block.w, block.h, color, ev.epicenterX, ev.epicenterY);
+          }
+        } else if (!isDestroy) {
+          if (isEmpSource) {
+            if (block) this.explosions.spawnNearBlockDamage(block.x, block.y, block.w, block.h, color);
+          } else {
+            this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, isCrit);
+          }
         }
 
-        this.triggerCameraShake((isCrit || isDestroy ? 3.5 : 1.5) * impactShakeMult);
+        const baseShake = isEmpSource ? 5.5 : isDestroy ? 4.0 : isCrit ? 3.5 : 1.5;
+        this.triggerCameraShake(baseShake * impactShakeMult);
 
         let pts = 50 * (1 + Math.floor(ev.combo / 3));
         let text = `+${pts}`;

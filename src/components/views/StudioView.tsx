@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../../context/GameContext';
 import { LevelData } from '../../types/game';
 import { drawLevelPreviewOnCanvas, calculateLevelHp, generateLevelId } from '../../utils/helpers';
-import { Plus, Settings2, Play, Eye, EyeOff, Pencil, CopyPlus, X, Check, AlertCircle } from 'lucide-react';
+import { Plus, Settings2, Play, EyeOff, Pencil, CopyPlus, X, Check, AlertCircle, Lock } from 'lucide-react';
 import { StudioMatrixForgeIcon } from '../navigation/NavIcons';
 import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
 import { initDesignerForNewLevel, initDesignerForEditLevel } from '../designer';
+import { authService } from '../../services/auth';
 import { cyberToast } from '../common/CyberToast';
 
 function getUniqueDuplicateName(originalName: string, existingLevels: LevelData[]): string {
@@ -42,6 +43,11 @@ export const StudioView: React.FC = () => {
   };
 
   const handleEditLevel = (lvl: LevelData) => {
+    if (lvl.isPublic) {
+      cyberToast.info('Published arenas are locked. Duplicate this arena to create an editable draft.');
+      handleOpenDuplicateModal(lvl);
+      return;
+    }
     initDesignerForEditLevel(lvl);
     setScreen('designer');
   };
@@ -82,14 +88,17 @@ export const StudioView: React.FC = () => {
       id: generateLevelId(),
       name: trimmed,
       creator: user.username,
+      creatorId: user.id || authService.getEffectiveUserId(),
       playCount: 0,
       blocks: JSON.parse(JSON.stringify(copyTargetLevel.blocks)),
       isPublic: false,
       createdAt: Date.now(),
     };
-    await saveUserLevel(duplicate);
-    cyberToast.success(`Arena duplicated as "${trimmed}"!`);
     setCopyTargetLevel(null);
+    initDesignerForEditLevel(duplicate);
+    setScreen('designer');
+    cyberToast.success(`Arena duplicated as "${trimmed}". Opened in Level Designer!`);
+    await saveUserLevel(duplicate);
   };
 
   return (
@@ -311,12 +320,21 @@ const StudioLevelCard: React.FC<{
         <span
           className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-tech font-bold uppercase tracking-wider ${
             level.isPublic
-              ? 'bg-emerald-950/80 border border-emerald-500/50 text-emerald-300'
-              : 'bg-amber-950/80 border border-amber-500/50 text-amber-300'
+              ? 'bg-emerald-950/85 border border-emerald-500/60 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
+              : 'bg-amber-950/85 border border-amber-500/60 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
           }`}
         >
-          {level.isPublic ? <Eye className="w-2.5 h-2.5" /> : <EyeOff className="w-2.5 h-2.5" />}
-          <span>{level.isPublic ? 'PUB' : 'PRIV'}</span>
+          {level.isPublic ? (
+            <>
+              <Lock className="w-2.5 h-2.5 text-emerald-400" />
+              <span>PUB • LOCKED</span>
+            </>
+          ) : (
+            <>
+              <EyeOff className="w-2.5 h-2.5 text-amber-400" />
+              <span>DRAFT</span>
+            </>
+          )}
         </span>
       </div>
 
@@ -345,17 +363,31 @@ const StudioLevelCard: React.FC<{
             {level.name || `Core #${level.id}`}
           </span>
           <div className="flex items-center gap-1 flex-shrink-0">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-              className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
-              title="Edit in Designer"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-            </button>
+            {level.isPublic ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="p-1 rounded-md bg-amber-500/10 hover:bg-amber-500/25 border border-amber-500/30 text-amber-400 transition-colors cursor-pointer"
+                title="Published & Locked. Duplicate to edit."
+              >
+                <Lock className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
+                title="Edit Draft in Designer"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
             <button
               type="button"
               onClick={(e) => {

@@ -106,16 +106,16 @@
     "difficulty": 0.19,
     "parTimes": {
       "gold": 19.9,
-      "silver": 28.9,
+      "silver": 40,
       "bronze": 14.2
     },
     "scores": {
       "lowest": 6477,
-      "balanced": 6109,
-      "maximum": 5118,
+      "balanced": 6466,
+      "maximum": 4951,
       "star1": 5505,
-      "star2": 6109,
-      "star3": 5374
+      "star2": 6466,
+      "star3": 5199
     },
     "performance": {
       "lowest": {
@@ -130,18 +130,18 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 26.3,
-        "avgScore": 6109,
+        "avgTime": 36.4,
+        "avgScore": 6466,
         "avgCombo": 12,
-        "avgHits": 5,
+        "avgHits": 8,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
         "avgTime": 17.3,
-        "avgScore": 5118,
-        "avgCombo": 4,
+        "avgScore": 4951,
+        "avgCombo": 5,
         "avgHits": 8,
         "winRate": 1
       },
@@ -180,17 +180,17 @@
     },
     "difficulty": 0.42,
     "parTimes": {
-      "gold": 29.2,
-      "silver": 27.1,
+      "gold": 24.1,
+      "silver": 34,
       "bronze": 75.4
     },
     "scores": {
       "lowest": 3600,
-      "balanced": 3035,
-      "maximum": 2933,
+      "balanced": 2843,
+      "maximum": 2992,
       "star1": 3060,
-      "star2": 3035,
-      "star3": 3080
+      "star2": 2843,
+      "star3": 3142
     },
     "performance": {
       "lowest": {
@@ -205,25 +205,26 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 24.6,
-        "avgScore": 3035,
+        "avgTime": 30.9,
+        "avgScore": 2843,
         "avgCombo": 7,
-        "avgHits": 9,
+        "avgHits": 12,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 25.4,
-        "avgScore": 2933,
-        "avgCombo": 5,
-        "avgHits": 7,
+        "avgTime": 21,
+        "avgScore": 2992,
+        "avgCombo": 4,
+        "avgHits": 6,
         "winRate": 1
       },
-      "powerSpeedupPct": 62.9
+      "powerSpeedupPct": 69.3
     },
     "flags": [
-      "WASTED EMP: EMP Reactor has zero breakables in shockwave blast radius."
+      "WASTED EMP: EMP Reactor has zero breakables in shockwave blast radius.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
     ]
   },
   {
@@ -257,7 +258,7 @@
     },
     "difficulty": 0.18,
     "parTimes": {
-      "gold": 101.2,
+      "gold": 107.8,
       "silver": 36.4,
       "bronze": 13.1
     },
@@ -291,13 +292,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 88,
+        "avgTime": 93.7,
         "avgScore": 2600,
         "avgCombo": 2,
         "avgHits": 28,
         "winRate": 1
       },
-      "powerSpeedupPct": -639.5
+      "powerSpeedupPct": -687.4
     },
     "flags": [
       "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
@@ -334,17 +335,17 @@
     },
     "difficulty": 0.34,
     "parTimes": {
-      "gold": 35.1,
-      "silver": 83.5,
+      "gold": 25,
+      "silver": 94.3,
       "bronze": 64
     },
     "scores": {
       "lowest": 3650,
-      "balanced": 1617,
-      "maximum": 3188,
+      "balanced": 1750,
+      "maximum": 3409,
       "star1": 3103,
-      "star2": 1617,
-      "star3": 3347
+      "star2": 1750,
+      "star3": 3579
     },
     "performance": {
       "lowest": {
@@ -359,22 +360,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 75.9,
-        "avgScore": 1617,
+        "avgTime": 85.7,
+        "avgScore": 1750,
         "avgCombo": 2,
-        "avgHits": 28,
+        "avgHits": 24,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 30.5,
-        "avgScore": 3188,
-        "avgCombo": 4,
-        "avgHits": 8,
+        "avgTime": 21.7,
+        "avgScore": 3409,
+        "avgCombo": 3,
+        "avgHits": 6,
         "winRate": 1
       },
-      "powerSpeedupPct": 47.6
+      "powerSpeedupPct": 62.7
     },
     "flags": []
   },
@@ -409,17 +410,17 @@
     },
     "difficulty": 0.48,
     "parTimes": {
-      "gold": 42.4,
-      "silver": 24.8,
+      "gold": 42.3,
+      "silver": 24.5,
       "bronze": 97.7
     },
     "scores": {
       "lowest": 8500,
-      "balanced": 4855,
-      "maximum": 4374,
+      "balanced": 4777,
+      "maximum": 4243,
       "star1": 7225,
-      "star2": 4855,
-      "star3": 4593
+      "star2": 4777,
+      "star3": 4455
     },
     "performance": {
       "lowest": {
@@ -434,22 +435,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 22.5,
-        "avgScore": 4855,
-        "avgCombo": 7,
-        "avgHits": 10,
+        "avgTime": 22.3,
+        "avgScore": 4777,
+        "avgCombo": 6,
+        "avgHits": 8,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 36.9,
-        "avgScore": 4374,
-        "avgCombo": 5,
-        "avgHits": 16,
+        "avgTime": 36.8,
+        "avgScore": 4243,
+        "avgCombo": 4,
+        "avgHits": 14,
         "winRate": 1
       },
-      "powerSpeedupPct": 58.4
+      "powerSpeedupPct": 58.6
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
@@ -486,17 +487,17 @@
     },
     "difficulty": 0.33,
     "parTimes": {
-      "gold": 50.7,
-      "silver": 175.9,
+      "gold": 56.1,
+      "silver": 179.6,
       "bronze": 64.5
     },
     "scores": {
       "lowest": 5750,
-      "balanced": 4217,
-      "maximum": 3300,
+      "balanced": 4083,
+      "maximum": 4017,
       "star1": 4888,
-      "star2": 4217,
-      "star3": 3465
+      "star2": 4083,
+      "star3": 4218
     },
     "performance": {
       "lowest": {
@@ -511,8 +512,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 159.9,
-        "avgScore": 4217,
+        "avgTime": 163.3,
+        "avgScore": 4083,
         "avgCombo": 4,
         "avgHits": 28,
         "winRate": 0
@@ -520,13 +521,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 44.1,
-        "avgScore": 3300,
-        "avgCombo": 4,
-        "avgHits": 12,
+        "avgTime": 48.8,
+        "avgScore": 4017,
+        "avgCombo": 5,
+        "avgHits": 14,
         "winRate": 1
       },
-      "powerSpeedupPct": 24.7
+      "powerSpeedupPct": 16.7
     },
     "flags": []
   },
@@ -561,17 +562,17 @@
     },
     "difficulty": 0.38,
     "parTimes": {
-      "gold": 17.7,
-      "silver": 39.8,
+      "gold": 9.9,
+      "silver": 22.4,
       "bronze": 71.8
     },
     "scores": {
       "lowest": 5950,
-      "balanced": 4893,
-      "maximum": 5747,
+      "balanced": 5223,
+      "maximum": 5750,
       "star1": 5058,
-      "star2": 4893,
-      "star3": 6034
+      "star2": 5223,
+      "star3": 6038
     },
     "performance": {
       "lowest": {
@@ -586,22 +587,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 36.2,
-        "avgScore": 4893,
-        "avgCombo": 5,
-        "avgHits": 7,
+        "avgTime": 20.4,
+        "avgScore": 5223,
+        "avgCombo": 6,
+        "avgHits": 6,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 15.4,
-        "avgScore": 5747,
+        "avgTime": 8.6,
+        "avgScore": 5750,
         "avgCombo": 5,
-        "avgHits": 5,
+        "avgHits": 7,
         "winRate": 1
       },
-      "powerSpeedupPct": 76.4
+      "powerSpeedupPct": 86.8
     },
     "flags": [
       "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
@@ -638,17 +639,17 @@
     },
     "difficulty": 0.4,
     "parTimes": {
-      "gold": 11.8,
-      "silver": 60.9,
+      "gold": 20.7,
+      "silver": 60.5,
       "bronze": 74.1
     },
     "scores": {
       "lowest": 6900,
-      "balanced": 2667,
-      "maximum": 9641,
+      "balanced": 2483,
+      "maximum": 7566,
       "star1": 5865,
-      "star2": 2667,
-      "star3": 10123
+      "star2": 2483,
+      "star3": 7944
     },
     "performance": {
       "lowest": {
@@ -663,8 +664,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 55.4,
-        "avgScore": 2667,
+        "avgTime": 55,
+        "avgScore": 2483,
         "avgCombo": 5,
         "avgHits": 14,
         "winRate": 1
@@ -672,13 +673,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 10.3,
-        "avgScore": 9641,
-        "avgCombo": 10,
-        "avgHits": 3,
+        "avgTime": 18,
+        "avgScore": 7566,
+        "avgCombo": 7,
+        "avgHits": 5,
         "winRate": 1
       },
-      "powerSpeedupPct": 84.7
+      "powerSpeedupPct": 73.3
     },
     "flags": [
       "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
@@ -715,17 +716,17 @@
     },
     "difficulty": 0.32,
     "parTimes": {
-      "gold": 8.7,
-      "silver": 10.3,
+      "gold": 6.3,
+      "silver": 8.1,
       "bronze": 40.8
     },
     "scores": {
       "lowest": 6971,
-      "balanced": 9530,
-      "maximum": 7392,
+      "balanced": 9498,
+      "maximum": 8163,
       "star1": 5925,
-      "star2": 9530,
-      "star3": 7762
+      "star2": 9498,
+      "star3": 8571
     },
     "performance": {
       "lowest": {
@@ -740,22 +741,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 9.4,
-        "avgScore": 9530,
-        "avgCombo": 11,
-        "avgHits": 2,
+        "avgTime": 7.4,
+        "avgScore": 9498,
+        "avgCombo": 12,
+        "avgHits": 1,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 7.6,
-        "avgScore": 7392,
-        "avgCombo": 8,
-        "avgHits": 2,
+        "avgTime": 5.5,
+        "avgScore": 8163,
+        "avgCombo": 10,
+        "avgHits": 1,
         "winRate": 1
       },
-      "powerSpeedupPct": 79.5
+      "powerSpeedupPct": 85.2
     },
     "flags": [
       "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
@@ -792,17 +793,17 @@
     },
     "difficulty": 0.42,
     "parTimes": {
-      "gold": 19.2,
-      "silver": 29.4,
+      "gold": 24,
+      "silver": 48.2,
       "bronze": 91.4
     },
     "scores": {
       "lowest": 3200,
-      "balanced": 4409,
-      "maximum": 4382,
+      "balanced": 3010,
+      "maximum": 4212,
       "star1": 2720,
-      "star2": 4409,
-      "star3": 4601
+      "star2": 3010,
+      "star3": 4423
     },
     "performance": {
       "lowest": {
@@ -817,22 +818,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 26.7,
-        "avgScore": 4409,
-        "avgCombo": 6,
-        "avgHits": 7,
+        "avgTime": 43.8,
+        "avgScore": 3010,
+        "avgCombo": 4,
+        "avgHits": 10,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 16.7,
-        "avgScore": 4382,
+        "avgTime": 20.9,
+        "avgScore": 4212,
         "avgCombo": 4,
-        "avgHits": 5,
+        "avgHits": 7,
         "winRate": 1
       },
-      "powerSpeedupPct": 79.9
+      "powerSpeedupPct": 74.8
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
@@ -870,17 +871,17 @@
     },
     "difficulty": 0.48,
     "parTimes": {
-      "gold": 21.2,
-      "silver": 26.5,
+      "gold": 24,
+      "silver": 32.8,
       "bronze": 90.9
     },
     "scores": {
       "lowest": 6700,
-      "balanced": 7265,
-      "maximum": 7006,
+      "balanced": 8903,
+      "maximum": 6493,
       "star1": 5695,
-      "star2": 7265,
-      "star3": 7356
+      "star2": 8903,
+      "star3": 6818
     },
     "performance": {
       "lowest": {
@@ -895,22 +896,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 24.1,
-        "avgScore": 7265,
-        "avgCombo": 8,
-        "avgHits": 9,
+        "avgTime": 29.8,
+        "avgScore": 8903,
+        "avgCombo": 13,
+        "avgHits": 11,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 18.4,
-        "avgScore": 7006,
+        "avgTime": 20.9,
+        "avgScore": 6493,
         "avgCombo": 7,
-        "avgHits": 7,
+        "avgHits": 9,
         "winRate": 1
       },
-      "powerSpeedupPct": 77.7
+      "powerSpeedupPct": 74.7
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
@@ -948,17 +949,17 @@
     },
     "difficulty": 0.37,
     "parTimes": {
-      "gold": 127.9,
+      "gold": 81.2,
       "silver": 198,
       "bronze": 57.1
     },
     "scores": {
       "lowest": 5150,
-      "balanced": 4450,
-      "maximum": 3800,
+      "balanced": 4283,
+      "maximum": 3450,
       "star1": 4378,
-      "star2": 4450,
-      "star3": 3990
+      "star2": 4283,
+      "star3": 3623
     },
     "performance": {
       "lowest": {
@@ -974,7 +975,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 180,
-        "avgScore": 4450,
+        "avgScore": 4283,
         "avgCombo": 1,
         "avgHits": 35,
         "winRate": 0
@@ -982,13 +983,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 111.2,
-        "avgScore": 3800,
+        "avgTime": 70.6,
+        "avgScore": 3450,
         "avgCombo": 3,
-        "avgHits": 30,
-        "winRate": 0.6666666666666666
+        "avgHits": 25,
+        "winRate": 1
       },
-      "powerSpeedupPct": -114.3
+      "powerSpeedupPct": -36
     },
     "flags": [
       "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
@@ -1025,17 +1026,17 @@
     },
     "difficulty": 0.5,
     "parTimes": {
-      "gold": 86.6,
-      "silver": 16.7,
+      "gold": 15.9,
+      "silver": 64.1,
       "bronze": 108
     },
     "scores": {
       "lowest": 4250,
-      "balanced": 7054,
-      "maximum": 5000,
+      "balanced": 5689,
+      "maximum": 8055,
       "star1": 3613,
-      "star2": 7054,
-      "star3": 5250
+      "star2": 5689,
+      "star3": 8458
     },
     "performance": {
       "lowest": {
@@ -1050,25 +1051,26 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 15.2,
-        "avgScore": 7054,
-        "avgCombo": 7,
-        "avgHits": 3,
-        "winRate": 1
+        "avgTime": 58.3,
+        "avgScore": 5689,
+        "avgCombo": 5,
+        "avgHits": 11,
+        "winRate": 0.6666666666666666
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 75.3,
-        "avgScore": 5000,
-        "avgCombo": 6,
-        "avgHits": 21,
+        "avgTime": 13.8,
+        "avgScore": 8055,
+        "avgCombo": 7,
+        "avgHits": 6,
         "winRate": 1
       },
-      "powerSpeedupPct": 23.3
+      "powerSpeedupPct": 85.9
     },
     "flags": [
-      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
     ]
   },
   {
@@ -1102,17 +1104,17 @@
     },
     "difficulty": 0.37,
     "parTimes": {
-      "gold": 19.5,
-      "silver": 45.3,
+      "gold": 70,
+      "silver": 10.7,
       "bronze": 58
     },
     "scores": {
       "lowest": 5500,
-      "balanced": 3684,
-      "maximum": 4341,
+      "balanced": 5823,
+      "maximum": 4561,
       "star1": 4675,
-      "star2": 3684,
-      "star3": 4558
+      "star2": 5823,
+      "star3": 4789
     },
     "performance": {
       "lowest": {
@@ -1127,26 +1129,24 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 41.2,
-        "avgScore": 3684,
-        "avgCombo": 6,
-        "avgHits": 11,
+        "avgTime": 9.7,
+        "avgScore": 5823,
+        "avgCombo": 9,
+        "avgHits": 2,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 17,
-        "avgScore": 4341,
+        "avgTime": 60.9,
+        "avgScore": 4561,
         "avgCombo": 4,
-        "avgHits": 6,
-        "winRate": 1
+        "avgHits": 19,
+        "winRate": 0.6666666666666666
       },
-      "powerSpeedupPct": 67.7
+      "powerSpeedupPct": -15.6
     },
-    "flags": [
-      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
-    ]
+    "flags": []
   },
   {
     "id": "16",
@@ -1179,17 +1179,17 @@
     },
     "difficulty": 0.27,
     "parTimes": {
-      "gold": 44.3,
-      "silver": 24.4,
+      "gold": 25,
+      "silver": 28.9,
       "bronze": 24.3
     },
     "scores": {
       "lowest": 5096,
-      "balanced": 5128,
-      "maximum": 4223,
+      "balanced": 4742,
+      "maximum": 4557,
       "star1": 4332,
-      "star2": 5128,
-      "star3": 4434
+      "star2": 4742,
+      "star3": 4785
     },
     "performance": {
       "lowest": {
@@ -1204,22 +1204,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 22.2,
-        "avgScore": 5128,
-        "avgCombo": 5,
-        "avgHits": 6,
+        "avgTime": 26.3,
+        "avgScore": 4742,
+        "avgCombo": 4,
+        "avgHits": 8,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 38.5,
-        "avgScore": 4223,
+        "avgTime": 21.7,
+        "avgScore": 4557,
         "avgCombo": 3,
-        "avgHits": 13,
+        "avgHits": 7,
         "winRate": 1
       },
-      "powerSpeedupPct": -74.2
+      "powerSpeedupPct": 1.8
     },
     "flags": []
   },
@@ -1254,17 +1254,17 @@
     },
     "difficulty": 0.44,
     "parTimes": {
-      "gold": 142,
+      "gold": 141,
       "silver": 33.1,
       "bronze": 68.8
     },
     "scores": {
       "lowest": 6750,
-      "balanced": 5664,
-      "maximum": 5133,
+      "balanced": 5880,
+      "maximum": 5150,
       "star1": 5738,
-      "star2": 5664,
-      "star3": 5390
+      "star2": 5880,
+      "star3": 5408
     },
     "performance": {
       "lowest": {
@@ -1280,7 +1280,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 30.1,
-        "avgScore": 5664,
+        "avgScore": 5880,
         "avgCombo": 8,
         "avgHits": 8,
         "winRate": 1
@@ -1288,13 +1288,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 123.5,
-        "avgScore": 5133,
+        "avgTime": 122.6,
+        "avgScore": 5150,
         "avgCombo": 5,
         "avgHits": 35,
         "winRate": 0.3333333333333333
       },
-      "powerSpeedupPct": -97.6
+      "powerSpeedupPct": -96.2
     },
     "flags": [
       "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes."
@@ -1331,17 +1331,17 @@
     },
     "difficulty": 0.4,
     "parTimes": {
-      "gold": 39.1,
+      "gold": 39.7,
       "silver": 37.2,
       "bronze": 64.9
     },
     "scores": {
       "lowest": 4450,
-      "balanced": 4204,
-      "maximum": 4166,
+      "balanced": 4337,
+      "maximum": 4036,
       "star1": 3783,
-      "star2": 4204,
-      "star3": 4374
+      "star2": 4337,
+      "star3": 4238
     },
     "performance": {
       "lowest": {
@@ -1357,7 +1357,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 33.8,
-        "avgScore": 4204,
+        "avgScore": 4337,
         "avgCombo": 6,
         "avgHits": 7,
         "winRate": 1
@@ -1365,13 +1365,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 34,
-        "avgScore": 4166,
+        "avgTime": 34.5,
+        "avgScore": 4036,
         "avgCombo": 5,
         "avgHits": 11,
         "winRate": 1
       },
-      "powerSpeedupPct": 42.4
+      "powerSpeedupPct": 41.5
     },
     "flags": []
   },
@@ -1412,11 +1412,11 @@
     },
     "scores": {
       "lowest": 4578,
-      "balanced": 3906,
-      "maximum": 3635,
+      "balanced": 3756,
+      "maximum": 3802,
       "star1": 3891,
-      "star2": 3906,
-      "star3": 3817
+      "star2": 3756,
+      "star3": 3992
     },
     "performance": {
       "lowest": {
@@ -1432,7 +1432,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 35.8,
-        "avgScore": 3906,
+        "avgScore": 3756,
         "avgCombo": 7,
         "avgHits": 8,
         "winRate": 1
@@ -1441,7 +1441,7 @@
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
         "avgTime": 24.6,
-        "avgScore": 3635,
+        "avgScore": 3802,
         "avgCombo": 4,
         "avgHits": 8,
         "winRate": 1
@@ -1481,17 +1481,17 @@
     },
     "difficulty": 0.28,
     "parTimes": {
-      "gold": 6.6,
-      "silver": 30.5,
+      "gold": 14.9,
+      "silver": 24.1,
       "bronze": 48
     },
     "scores": {
       "lowest": 6950,
-      "balanced": 8853,
-      "maximum": 11572,
+      "balanced": 7414,
+      "maximum": 9308,
       "star1": 5908,
-      "star2": 8853,
-      "star3": 12151
+      "star2": 7414,
+      "star3": 9773
     },
     "performance": {
       "lowest": {
@@ -1506,22 +1506,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 27.7,
-        "avgScore": 8853,
-        "avgCombo": 10,
-        "avgHits": 9,
+        "avgTime": 21.9,
+        "avgScore": 7414,
+        "avgCombo": 8,
+        "avgHits": 12,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 5.7,
-        "avgScore": 11572,
-        "avgCombo": 11,
-        "avgHits": 2,
+        "avgTime": 13,
+        "avgScore": 9308,
+        "avgCombo": 10,
+        "avgHits": 3,
         "winRate": 1
       },
-      "powerSpeedupPct": 86.9
+      "powerSpeedupPct": 70.2
     },
     "flags": [
       "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
@@ -1558,17 +1558,17 @@
     },
     "difficulty": 0.54,
     "parTimes": {
-      "gold": 45.9,
-      "silver": 135.9,
+      "gold": 17.5,
+      "silver": 198,
       "bronze": 159.9
     },
     "scores": {
       "lowest": 5000,
-      "balanced": 3096,
-      "maximum": 3610,
+      "balanced": 2283,
+      "maximum": 4286,
       "star1": 4250,
-      "star2": 3096,
-      "star3": 3791
+      "star2": 2283,
+      "star3": 4500
     },
     "performance": {
       "lowest": {
@@ -1583,22 +1583,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 123.5,
-        "avgScore": 3096,
-        "avgCombo": 3,
-        "avgHits": 20,
-        "winRate": 0.3333333333333333
+        "avgTime": 180,
+        "avgScore": 2283,
+        "avgCombo": 2,
+        "avgHits": 28,
+        "winRate": 0
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 39.9,
-        "avgScore": 3610,
-        "avgCombo": 2,
-        "avgHits": 13,
+        "avgTime": 15.2,
+        "avgScore": 4286,
+        "avgCombo": 4,
+        "avgHits": 12,
         "winRate": 1
       },
-      "powerSpeedupPct": 72.6
+      "powerSpeedupPct": 89.5
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
@@ -1636,17 +1636,17 @@
     },
     "difficulty": 0.42,
     "parTimes": {
-      "gold": 44.2,
-      "silver": 64.8,
+      "gold": 26.4,
+      "silver": 29.4,
       "bronze": 71.7
     },
     "scores": {
       "lowest": 6550,
-      "balanced": 4383,
-      "maximum": 4372,
+      "balanced": 4916,
+      "maximum": 5008,
       "star1": 5568,
-      "star2": 4383,
-      "star3": 4591
+      "star2": 4916,
+      "star3": 5258
     },
     "performance": {
       "lowest": {
@@ -1661,22 +1661,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 58.9,
-        "avgScore": 4383,
-        "avgCombo": 6,
-        "avgHits": 14,
+        "avgTime": 26.7,
+        "avgScore": 4916,
+        "avgCombo": 7,
+        "avgHits": 11,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 38.4,
-        "avgScore": 4372,
+        "avgTime": 23,
+        "avgScore": 5008,
         "avgCombo": 5,
-        "avgHits": 13,
+        "avgHits": 16,
         "winRate": 1
       },
-      "powerSpeedupPct": 41.1
+      "powerSpeedupPct": 64.7
     },
     "flags": []
   },
@@ -1792,11 +1792,11 @@
     },
     "scores": {
       "lowest": 8414,
-      "balanced": 6062,
-      "maximum": 6019,
+      "balanced": 6145,
+      "maximum": 5769,
       "star1": 7152,
-      "star2": 6062,
-      "star3": 6320
+      "star2": 6145,
+      "star3": 6057
     },
     "performance": {
       "lowest": {
@@ -1812,7 +1812,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 25.5,
-        "avgScore": 6062,
+        "avgScore": 6145,
         "avgCombo": 8,
         "avgHits": 7,
         "winRate": 1
@@ -1821,8 +1821,8 @@
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
         "avgTime": 7.9,
-        "avgScore": 6019,
-        "avgCombo": 8,
+        "avgScore": 5769,
+        "avgCombo": 7,
         "avgHits": 3,
         "winRate": 1
       },
@@ -1861,17 +1861,17 @@
     },
     "difficulty": 0.31,
     "parTimes": {
-      "gold": 5.1,
-      "silver": 7,
+      "gold": 4.8,
+      "silver": 6.7,
       "bronze": 39.7
     },
     "scores": {
       "lowest": 4346,
-      "balanced": 4788,
-      "maximum": 5506,
+      "balanced": 4979,
+      "maximum": 5210,
       "star1": 3694,
-      "star2": 4788,
-      "star3": 5781
+      "star2": 4979,
+      "star3": 5471
     },
     "performance": {
       "lowest": {
@@ -1886,22 +1886,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 6.4,
-        "avgScore": 4788,
+        "avgTime": 6.1,
+        "avgScore": 4979,
         "avgCombo": 6,
-        "avgHits": 2,
+        "avgHits": 6,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 4.4,
-        "avgScore": 5506,
+        "avgTime": 4.2,
+        "avgScore": 5210,
         "avgCombo": 6,
         "avgHits": 2,
         "winRate": 1
       },
-      "powerSpeedupPct": 87.8
+      "powerSpeedupPct": 88.4
     },
     "flags": [
       "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes.",
@@ -1939,17 +1939,17 @@
     },
     "difficulty": 0.47,
     "parTimes": {
-      "gold": 38.5,
-      "silver": 79.2,
+      "gold": 40,
+      "silver": 78.2,
       "bronze": 90.2
     },
     "scores": {
       "lowest": 5200,
-      "balanced": 3633,
-      "maximum": 3995,
+      "balanced": 4850,
+      "maximum": 3863,
       "star1": 4420,
-      "star2": 3633,
-      "star3": 4195
+      "star2": 4850,
+      "star3": 4056
     },
     "performance": {
       "lowest": {
@@ -1964,22 +1964,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 72,
-        "avgScore": 3633,
-        "avgCombo": 5,
-        "avgHits": 19,
+        "avgTime": 71.1,
+        "avgScore": 4850,
+        "avgCombo": 6,
+        "avgHits": 18,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 33.5,
-        "avgScore": 3995,
-        "avgCombo": 4,
-        "avgHits": 11,
+        "avgTime": 34.8,
+        "avgScore": 3863,
+        "avgCombo": 5,
+        "avgHits": 12,
         "winRate": 1
       },
-      "powerSpeedupPct": 59.1
+      "powerSpeedupPct": 57.6
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
@@ -2016,17 +2016,17 @@
     },
     "difficulty": 0.4,
     "parTimes": {
-      "gold": 40.3,
-      "silver": 109.8,
+      "gold": 36.6,
+      "silver": 77.4,
       "bronze": 83.2
     },
     "scores": {
       "lowest": 5550,
-      "balanced": 2784,
-      "maximum": 4923,
+      "balanced": 3133,
+      "maximum": 4655,
       "star1": 4718,
-      "star2": 2784,
-      "star3": 5169
+      "star2": 3133,
+      "star3": 4888
     },
     "performance": {
       "lowest": {
@@ -2041,22 +2041,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 99.8,
-        "avgScore": 2784,
-        "avgCombo": 5,
-        "avgHits": 22,
-        "winRate": 0.3333333333333333
+        "avgTime": 70.4,
+        "avgScore": 3133,
+        "avgCombo": 6,
+        "avgHits": 14,
+        "winRate": 0.6666666666666666
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 35,
-        "avgScore": 4923,
-        "avgCombo": 3,
+        "avgTime": 31.8,
+        "avgScore": 4655,
+        "avgCombo": 4,
         "avgHits": 10,
         "winRate": 1
       },
-      "powerSpeedupPct": 53.7
+      "powerSpeedupPct": 57.9
     },
     "flags": []
   },
@@ -2091,17 +2091,17 @@
     },
     "difficulty": 0.66,
     "parTimes": {
-      "gold": 142.3,
-      "silver": 197.1,
+      "gold": 112.2,
+      "silver": 193.8,
       "bronze": 135.9
     },
     "scores": {
       "lowest": 9800,
-      "balanced": 5967,
-      "maximum": 4533,
+      "balanced": 6000,
+      "maximum": 3583,
       "star1": 8330,
-      "star2": 5967,
-      "star3": 4760
+      "star2": 6000,
+      "star3": 3762
     },
     "performance": {
       "lowest": {
@@ -2116,8 +2116,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 179.2,
-        "avgScore": 5967,
+        "avgTime": 176.2,
+        "avgScore": 6000,
         "avgCombo": 2,
         "avgHits": 32,
         "winRate": 0
@@ -2125,13 +2125,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 123.7,
-        "avgScore": 4533,
-        "avgCombo": 3,
-        "avgHits": 38,
-        "winRate": 0.6666666666666666
+        "avgTime": 97.6,
+        "avgScore": 3583,
+        "avgCombo": 4,
+        "avgHits": 36,
+        "winRate": 1
       },
-      "powerSpeedupPct": -0.2
+      "powerSpeedupPct": 21
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
@@ -2168,17 +2168,17 @@
     },
     "difficulty": 0.48,
     "parTimes": {
-      "gold": 50.7,
-      "silver": 32.8,
+      "gold": 11.2,
+      "silver": 101.3,
       "bronze": 75.9
     },
     "scores": {
       "lowest": 5950,
-      "balanced": 5609,
-      "maximum": 4417,
+      "balanced": 7425,
+      "maximum": 5741,
       "star1": 5058,
-      "star2": 5609,
-      "star3": 4638
+      "star2": 7425,
+      "star3": 6028
     },
     "performance": {
       "lowest": {
@@ -2193,24 +2193,26 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 29.8,
-        "avgScore": 5609,
-        "avgCombo": 6,
-        "avgHits": 13,
-        "winRate": 1
+        "avgTime": 92.1,
+        "avgScore": 7425,
+        "avgCombo": 5,
+        "avgHits": 20,
+        "winRate": 0.3333333333333333
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 44.1,
-        "avgScore": 4417,
+        "avgTime": 9.7,
+        "avgScore": 5741,
         "avgCombo": 4,
-        "avgHits": 15,
+        "avgHits": 4,
         "winRate": 1
       },
-      "powerSpeedupPct": 36.1
+      "powerSpeedupPct": 85.9
     },
-    "flags": []
+    "flags": [
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+    ]
   },
   {
     "id": "30",
@@ -2243,17 +2245,17 @@
     },
     "difficulty": 0.57,
     "parTimes": {
-      "gold": 41.3,
-      "silver": 198,
+      "gold": 32.8,
+      "silver": 197.1,
       "bronze": 102.5
     },
     "scores": {
       "lowest": 6650,
-      "balanced": 7000,
-      "maximum": 5641,
+      "balanced": 7033,
+      "maximum": 5719,
       "star1": 5653,
-      "star2": 7000,
-      "star3": 5923
+      "star2": 7033,
+      "star3": 6005
     },
     "performance": {
       "lowest": {
@@ -2268,8 +2270,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 180,
-        "avgScore": 7000,
+        "avgTime": 179.2,
+        "avgScore": 7033,
         "avgCombo": 2,
         "avgHits": 33,
         "winRate": 0
@@ -2277,16 +2279,17 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 35.9,
-        "avgScore": 5641,
+        "avgTime": 28.5,
+        "avgScore": 5719,
         "avgCombo": 6,
-        "avgHits": 12,
+        "avgHits": 10,
         "winRate": 1
       },
-      "powerSpeedupPct": 61.5
+      "powerSpeedupPct": 69.4
     },
     "flags": [
-      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
     ]
   },
   {
@@ -2320,17 +2323,17 @@
     },
     "difficulty": 0.53,
     "parTimes": {
-      "gold": 13.6,
-      "silver": 37.8,
+      "gold": 11.8,
+      "silver": 7.7,
       "bronze": 109.5
     },
     "scores": {
       "lowest": 5950,
-      "balanced": 5917,
-      "maximum": 6538,
+      "balanced": 6507,
+      "maximum": 6459,
       "star1": 5058,
-      "star2": 5917,
-      "star3": 6865
+      "star2": 6507,
+      "star3": 6782
     },
     "performance": {
       "lowest": {
@@ -2345,22 +2348,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 34.4,
-        "avgScore": 5917,
+        "avgTime": 7,
+        "avgScore": 6507,
         "avgCombo": 7,
-        "avgHits": 8,
+        "avgHits": 3,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 11.8,
-        "avgScore": 6538,
+        "avgTime": 10.3,
+        "avgScore": 6459,
         "avgCombo": 7,
-        "avgHits": 5,
+        "avgHits": 7,
         "winRate": 1
       },
-      "powerSpeedupPct": 88.1
+      "powerSpeedupPct": 89.6
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
@@ -2398,17 +2401,17 @@
     },
     "difficulty": 0.29,
     "parTimes": {
-      "gold": 27.6,
-      "silver": 24.1,
+      "gold": 21.2,
+      "silver": 19.9,
       "bronze": 34.5
     },
     "scores": {
       "lowest": 9016,
-      "balanced": 6453,
-      "maximum": 5184,
+      "balanced": 8515,
+      "maximum": 6139,
       "star1": 7664,
-      "star2": 6453,
-      "star3": 5443
+      "star2": 8515,
+      "star3": 6446
     },
     "performance": {
       "lowest": {
@@ -2423,22 +2426,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 21.9,
-        "avgScore": 6453,
-        "avgCombo": 12,
+        "avgTime": 18.1,
+        "avgScore": 8515,
+        "avgCombo": 14,
         "avgHits": 5,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 24,
-        "avgScore": 5184,
-        "avgCombo": 7,
-        "avgHits": 9,
+        "avgTime": 18.4,
+        "avgScore": 6139,
+        "avgCombo": 8,
+        "avgHits": 7,
         "winRate": 1
       },
-      "powerSpeedupPct": 23.6
+      "powerSpeedupPct": 41.4
     },
     "flags": []
   },
@@ -2473,17 +2476,17 @@
     },
     "difficulty": 0.56,
     "parTimes": {
-      "gold": 207,
+      "gold": 164.9,
       "silver": 198,
       "bronze": 122.3
     },
     "scores": {
       "lowest": 6050,
-      "balanced": 6050,
-      "maximum": 6200,
+      "balanced": 5733,
+      "maximum": 5150,
       "star1": 5143,
-      "star2": 6050,
-      "star3": 6510
+      "star2": 5733,
+      "star3": 5408
     },
     "performance": {
       "lowest": {
@@ -2499,7 +2502,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 180,
-        "avgScore": 6050,
+        "avgScore": 5733,
         "avgCombo": 2,
         "avgHits": 32,
         "winRate": 0
@@ -2507,13 +2510,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 180,
-        "avgScore": 6200,
-        "avgCombo": 2,
-        "avgHits": 38,
-        "winRate": 0
+        "avgTime": 143.4,
+        "avgScore": 5150,
+        "avgCombo": 3,
+        "avgHits": 33,
+        "winRate": 0.3333333333333333
       },
-      "powerSpeedupPct": -61.9
+      "powerSpeedupPct": -29
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
@@ -2556,11 +2559,11 @@
     },
     "scores": {
       "lowest": 8756,
-      "balanced": 4337,
-      "maximum": 9945,
+      "balanced": 4571,
+      "maximum": 10028,
       "star1": 7443,
-      "star2": 4337,
-      "star3": 10442
+      "star2": 4571,
+      "star3": 10529
     },
     "performance": {
       "lowest": {
@@ -2576,7 +2579,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 35.8,
-        "avgScore": 4337,
+        "avgScore": 4571,
         "avgCombo": 7,
         "avgHits": 9,
         "winRate": 1
@@ -2585,7 +2588,7 @@
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
         "avgTime": 4.8,
-        "avgScore": 9945,
+        "avgScore": 10028,
         "avgCombo": 12,
         "avgHits": 1,
         "winRate": 1
@@ -2627,17 +2630,17 @@
     },
     "difficulty": 0.66,
     "parTimes": {
-      "gold": 39.7,
+      "gold": 40.3,
       "silver": 198,
       "bronze": 182.3
     },
     "scores": {
       "lowest": 11550,
       "balanced": 7417,
-      "maximum": 5761,
+      "maximum": 6105,
       "star1": 9818,
       "star2": 7417,
-      "star3": 6049
+      "star3": 6410
     },
     "performance": {
       "lowest": {
@@ -2661,13 +2664,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 34.5,
-        "avgScore": 5761,
-        "avgCombo": 4,
+        "avgTime": 35,
+        "avgScore": 6105,
+        "avgCombo": 5,
         "avgHits": 11,
         "winRate": 1
       },
-      "powerSpeedupPct": 79.2
+      "powerSpeedupPct": 78.9
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
@@ -2705,17 +2708,17 @@
     },
     "difficulty": 0.5,
     "parTimes": {
-      "gold": 57.7,
+      "gold": 41.5,
       "silver": 198,
       "bronze": 92.7
     },
     "scores": {
       "lowest": 6100,
-      "balanced": 4383,
-      "maximum": 3331,
+      "balanced": 4250,
+      "maximum": 3482,
       "star1": 5185,
-      "star2": 4383,
-      "star3": 3498
+      "star2": 4250,
+      "star3": 3656
     },
     "performance": {
       "lowest": {
@@ -2731,21 +2734,21 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 180,
-        "avgScore": 4383,
+        "avgScore": 4250,
         "avgCombo": 2,
-        "avgHits": 33,
+        "avgHits": 35,
         "winRate": 0
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 50.2,
-        "avgScore": 3331,
+        "avgTime": 36.1,
+        "avgScore": 3482,
         "avgCombo": 4,
-        "avgHits": 16,
+        "avgHits": 11,
         "winRate": 1
       },
-      "powerSpeedupPct": 40.5
+      "powerSpeedupPct": 57.2
     },
     "flags": [
       "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes.",
@@ -2783,17 +2786,17 @@
     },
     "difficulty": 0.43,
     "parTimes": {
-      "gold": 94.6,
-      "silver": 156.8,
+      "gold": 93.5,
+      "silver": 155.1,
       "bronze": 80.6
     },
     "scores": {
       "lowest": 6500,
-      "balanced": 6650,
-      "maximum": 5583,
+      "balanced": 6683,
+      "maximum": 5550,
       "star1": 5525,
-      "star2": 6650,
-      "star3": 5862
+      "star2": 6683,
+      "star3": 5828
     },
     "performance": {
       "lowest": {
@@ -2808,8 +2811,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 142.5,
-        "avgScore": 6650,
+        "avgTime": 141,
+        "avgScore": 6683,
         "avgCombo": 6,
         "avgHits": 24,
         "winRate": 0
@@ -2817,13 +2820,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 82.3,
-        "avgScore": 5583,
+        "avgTime": 81.3,
+        "avgScore": 5550,
         "avgCombo": 4,
-        "avgHits": 23,
+        "avgHits": 24,
         "winRate": 0.6666666666666666
       },
-      "powerSpeedupPct": -12.3
+      "powerSpeedupPct": -10.9
     },
     "flags": []
   },
@@ -2858,17 +2861,17 @@
     },
     "difficulty": 0.63,
     "parTimes": {
-      "gold": 62.1,
-      "silver": 29.3,
+      "gold": 40.3,
+      "silver": 27.3,
       "bronze": 141.1
     },
     "scores": {
       "lowest": 16300,
-      "balanced": 11318,
-      "maximum": 6049,
+      "balanced": 10629,
+      "maximum": 7057,
       "star1": 13855,
-      "star2": 11318,
-      "star3": 6351
+      "star2": 10629,
+      "star3": 7410
     },
     "performance": {
       "lowest": {
@@ -2883,8 +2886,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 26.6,
-        "avgScore": 11318,
+        "avgTime": 24.8,
+        "avgScore": 10629,
         "avgCombo": 14,
         "avgHits": 8,
         "winRate": 1
@@ -2892,16 +2895,17 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 54,
-        "avgScore": 6049,
-        "avgCombo": 7,
-        "avgHits": 16,
+        "avgTime": 35,
+        "avgScore": 7057,
+        "avgCombo": 8,
+        "avgHits": 10,
         "winRate": 1
       },
-      "powerSpeedupPct": 57.9
+      "powerSpeedupPct": 72.7
     },
     "flags": [
-      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
+      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
     ]
   },
   {
@@ -2935,17 +2939,17 @@
     },
     "difficulty": 0.61,
     "parTimes": {
-      "gold": 178.1,
+      "gold": 140.1,
       "silver": 198,
       "bronze": 143.9
     },
     "scores": {
       "lowest": 11700,
-      "balanced": 5750,
-      "maximum": 5650,
+      "balanced": 5533,
+      "maximum": 4850,
       "star1": 9945,
-      "star2": 5750,
-      "star3": 5933
+      "star2": 5533,
+      "star3": 5093
     },
     "performance": {
       "lowest": {
@@ -2961,7 +2965,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 180,
-        "avgScore": 5750,
+        "avgScore": 5533,
         "avgCombo": 1,
         "avgHits": 33,
         "winRate": 0
@@ -2969,13 +2973,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 154.9,
-        "avgScore": 5650,
+        "avgTime": 121.8,
+        "avgScore": 4850,
         "avgCombo": 3,
         "avgHits": 42,
-        "winRate": 0.3333333333333333
+        "winRate": 0.6666666666666666
       },
-      "powerSpeedupPct": -18.4
+      "powerSpeedupPct": 6.9
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
@@ -3087,17 +3091,17 @@
     },
     "difficulty": 0.57,
     "parTimes": {
-      "gold": 13.8,
-      "silver": 33,
+      "gold": 59.8,
+      "silver": 45.1,
       "bronze": 136.3
     },
     "scores": {
       "lowest": 11600,
-      "balanced": 8972,
-      "maximum": 15166,
+      "balanced": 6749,
+      "maximum": 9070,
       "star1": 9860,
-      "star2": 8972,
-      "star3": 15924
+      "star2": 6749,
+      "star3": 9524
     },
     "performance": {
       "lowest": {
@@ -3112,26 +3116,25 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 30,
-        "avgScore": 8972,
-        "avgCombo": 11,
-        "avgHits": 18,
+        "avgTime": 41,
+        "avgScore": 6749,
+        "avgCombo": 9,
+        "avgHits": 10,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 12,
-        "avgScore": 15166,
-        "avgCombo": 12,
-        "avgHits": 3,
+        "avgTime": 52,
+        "avgScore": 9070,
+        "avgCombo": 8,
+        "avgHits": 15,
         "winRate": 1
       },
-      "powerSpeedupPct": 90.3
+      "powerSpeedupPct": 58
     },
     "flags": [
-      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
-      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
     ]
   },
   {
@@ -3165,17 +3168,17 @@
     },
     "difficulty": 0.65,
     "parTimes": {
-      "gold": 55.3,
+      "gold": 73.6,
       "silver": 198,
       "bronze": 198
     },
     "scores": {
       "lowest": 10450,
-      "balanced": 8783,
-      "maximum": 7696,
+      "balanced": 8650,
+      "maximum": 6700,
       "star1": 8883,
-      "star2": 8783,
-      "star3": 8081
+      "star2": 8650,
+      "star3": 7035
     },
     "performance": {
       "lowest": {
@@ -3191,25 +3194,24 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 180,
-        "avgScore": 8783,
-        "avgCombo": 5,
-        "avgHits": 35,
+        "avgScore": 8650,
+        "avgCombo": 4,
+        "avgHits": 36,
         "winRate": 0
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 48.1,
-        "avgScore": 7696,
-        "avgCombo": 9,
-        "avgHits": 19,
+        "avgTime": 64,
+        "avgScore": 6700,
+        "avgCombo": 7,
+        "avgHits": 24,
         "winRate": 1
       },
-      "powerSpeedupPct": 73.3
+      "powerSpeedupPct": 64.4
     },
     "flags": [
-      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP.",
-      "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
+      "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
     ]
   },
   {
@@ -3243,17 +3245,17 @@
     },
     "difficulty": 0.27,
     "parTimes": {
-      "gold": 87.2,
+      "gold": 110.5,
       "silver": 193.8,
       "bronze": 28.7
     },
     "scores": {
       "lowest": 16247,
       "balanced": 8700,
-      "maximum": 5467,
+      "maximum": 7333,
       "star1": 13810,
       "star2": 8700,
-      "star3": 5740
+      "star3": 7700
     },
     "performance": {
       "lowest": {
@@ -3277,13 +3279,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 75.8,
-        "avgScore": 5467,
+        "avgTime": 96.1,
+        "avgScore": 7333,
         "avgCombo": 5,
-        "avgHits": 25,
-        "winRate": 1
+        "avgHits": 28,
+        "winRate": 0.6666666666666666
       },
-      "powerSpeedupPct": -190.4
+      "powerSpeedupPct": -268.2
     },
     "flags": []
   },
@@ -3318,17 +3320,17 @@
     },
     "difficulty": 0.42,
     "parTimes": {
-      "gold": 10,
-      "silver": 13.1,
+      "gold": 6.2,
+      "silver": 23.3,
       "bronze": 59.6
     },
     "scores": {
       "lowest": 13700,
-      "balanced": 9853,
-      "maximum": 9782,
+      "balanced": 8119,
+      "maximum": 10865,
       "star1": 11645,
-      "star2": 9853,
-      "star3": 10271
+      "star2": 8119,
+      "star3": 11408
     },
     "performance": {
       "lowest": {
@@ -3343,22 +3345,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 11.9,
-        "avgScore": 9853,
-        "avgCombo": 8,
-        "avgHits": 6,
+        "avgTime": 21.2,
+        "avgScore": 8119,
+        "avgCombo": 7,
+        "avgHits": 10,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 8.7,
-        "avgScore": 9782,
-        "avgCombo": 8,
-        "avgHits": 7,
+        "avgTime": 5.4,
+        "avgScore": 10865,
+        "avgCombo": 9,
+        "avgHits": 2,
         "winRate": 1
       },
-      "powerSpeedupPct": 83.9
+      "powerSpeedupPct": 90
     },
     "flags": [
       "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
@@ -3395,17 +3397,17 @@
     },
     "difficulty": 0.52,
     "parTimes": {
-      "gold": 109.1,
-      "silver": 45.4,
+      "gold": 91.5,
+      "silver": 29.4,
       "bronze": 86.1
     },
     "scores": {
       "lowest": 7800,
-      "balanced": 6866,
-      "maximum": 5700,
+      "balanced": 8332,
+      "maximum": 4250,
       "star1": 6630,
-      "star2": 6866,
-      "star3": 5985
+      "star2": 8332,
+      "star3": 4463
     },
     "performance": {
       "lowest": {
@@ -3420,22 +3422,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 41.3,
-        "avgScore": 6866,
-        "avgCombo": 9,
-        "avgHits": 11,
+        "avgTime": 26.7,
+        "avgScore": 8332,
+        "avgCombo": 10,
+        "avgHits": 7,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 94.9,
-        "avgScore": 5700,
+        "avgTime": 79.6,
+        "avgScore": 4250,
         "avgCombo": 6,
-        "avgHits": 36,
-        "winRate": 0.6666666666666666
+        "avgHits": 23,
+        "winRate": 1
       },
-      "powerSpeedupPct": -21.2
+      "powerSpeedupPct": -1.7
     },
     "flags": []
   },
@@ -3470,17 +3472,17 @@
     },
     "difficulty": 0.6,
     "parTimes": {
-      "gold": 113.7,
-      "silver": 82.8,
+      "gold": 135.1,
+      "silver": 77.7,
       "bronze": 152.5
     },
     "scores": {
       "lowest": 9700,
-      "balanced": 3067,
-      "maximum": 5683,
+      "balanced": 3083,
+      "maximum": 5933,
       "star1": 8245,
-      "star2": 3067,
-      "star3": 5967
+      "star2": 3083,
+      "star3": 6230
     },
     "performance": {
       "lowest": {
@@ -3495,22 +3497,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 75.3,
-        "avgScore": 3067,
-        "avgCombo": 5,
-        "avgHits": 19,
+        "avgTime": 70.6,
+        "avgScore": 3083,
+        "avgCombo": 4,
+        "avgHits": 17,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 98.9,
-        "avgScore": 5683,
+        "avgTime": 117.5,
+        "avgScore": 5933,
         "avgCombo": 3,
-        "avgHits": 32,
+        "avgHits": 38,
         "winRate": 0.3333333333333333
       },
-      "powerSpeedupPct": 28.6
+      "powerSpeedupPct": 15.2
     },
     "flags": [
       "HIGH WALL DENSITY: Wall ricochets dominate over core block strikes.",
@@ -3548,17 +3550,17 @@
     },
     "difficulty": 0.36,
     "parTimes": {
-      "gold": 113,
-      "silver": 173.5,
+      "gold": 53.1,
+      "silver": 171.9,
       "bronze": 44.3
     },
     "scores": {
       "lowest": 8000,
-      "balanced": 7900,
-      "maximum": 6728,
+      "balanced": 8100,
+      "maximum": 5033,
       "star1": 6800,
-      "star2": 7900,
-      "star3": 7064
+      "star2": 8100,
+      "star3": 5285
     },
     "performance": {
       "lowest": {
@@ -3573,8 +3575,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 157.7,
-        "avgScore": 7900,
+        "avgTime": 156.3,
+        "avgScore": 8100,
         "avgCombo": 7,
         "avgHits": 31,
         "winRate": 0
@@ -3582,13 +3584,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 98.3,
-        "avgScore": 6728,
+        "avgTime": 46.2,
+        "avgScore": 5033,
         "avgCombo": 5,
-        "avgHits": 29,
-        "winRate": 0.6666666666666666
+        "avgHits": 15,
+        "winRate": 1
       },
-      "powerSpeedupPct": -143.9
+      "powerSpeedupPct": -14.6
     },
     "flags": []
   },
@@ -3623,17 +3625,17 @@
     },
     "difficulty": 0.48,
     "parTimes": {
-      "gold": 5.6,
-      "silver": 42.9,
+      "gold": 18.2,
+      "silver": 41.4,
       "bronze": 79.2
     },
     "scores": {
       "lowest": 10400,
-      "balanced": 6677,
-      "maximum": 7943,
+      "balanced": 7020,
+      "maximum": 7436,
       "star1": 8840,
-      "star2": 6677,
-      "star3": 8340
+      "star2": 7020,
+      "star3": 7808
     },
     "performance": {
       "lowest": {
@@ -3648,22 +3650,22 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 39,
-        "avgScore": 6677,
+        "avgTime": 37.6,
+        "avgScore": 7020,
         "avgCombo": 8,
-        "avgHits": 7,
+        "avgHits": 9,
         "winRate": 1
       },
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 4.9,
-        "avgScore": 7943,
+        "avgTime": 15.8,
+        "avgScore": 7436,
         "avgCombo": 8,
         "avgHits": 15,
         "winRate": 1
       },
-      "powerSpeedupPct": 93.2
+      "powerSpeedupPct": 78.1
     },
     "flags": [
       "OVERDRIVE FAVORED: High power sensitivity; max armory shreds this level >2.5x faster."
@@ -3700,17 +3702,17 @@
     },
     "difficulty": 0.46,
     "parTimes": {
-      "gold": 50.8,
+      "gold": 40.5,
       "silver": 93.8,
       "bronze": 76.5
     },
     "scores": {
       "lowest": 14700,
-      "balanced": 7317,
-      "maximum": 11401,
+      "balanced": 7333,
+      "maximum": 11386,
       "star1": 12495,
-      "star2": 7317,
-      "star3": 11971
+      "star2": 7333,
+      "star3": 11955
     },
     "performance": {
       "lowest": {
@@ -3726,7 +3728,7 @@
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
         "avgTime": 85.3,
-        "avgScore": 7317,
+        "avgScore": 7333,
         "avgCombo": 9,
         "avgHits": 28,
         "winRate": 1
@@ -3734,13 +3736,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 44.2,
-        "avgScore": 11401,
+        "avgTime": 35.2,
+        "avgScore": 11386,
         "avgCombo": 13,
-        "avgHits": 18,
+        "avgHits": 16,
         "winRate": 1
       },
-      "powerSpeedupPct": 36.4
+      "powerSpeedupPct": 49.4
     },
     "flags": []
   },
@@ -3775,17 +3777,17 @@
     },
     "difficulty": 0.62,
     "parTimes": {
-      "gold": 124.3,
-      "silver": 158.4,
+      "gold": 131.7,
+      "silver": 159.7,
       "bronze": 135
     },
     "scores": {
       "lowest": 14000,
-      "balanced": 8650,
-      "maximum": 12733,
+      "balanced": 8533,
+      "maximum": 12683,
       "star1": 11900,
-      "star2": 8650,
-      "star3": 13370
+      "star2": 8533,
+      "star3": 13317
     },
     "performance": {
       "lowest": {
@@ -3800,8 +3802,8 @@
       "balanced": {
         "profileId": "balanced",
         "profileName": "Mid-Tier (Balanced Power / Lvl 5)",
-        "avgTime": 144,
-        "avgScore": 8650,
+        "avgTime": 145.2,
+        "avgScore": 8533,
         "avgCombo": 9,
         "avgHits": 35,
         "winRate": 0
@@ -3809,13 +3811,13 @@
       "maximum": {
         "profileId": "maximum",
         "profileName": "Overdrive Apex (Max Power / Lvl 10)",
-        "avgTime": 108.1,
-        "avgScore": 12733,
+        "avgTime": 114.5,
+        "avgScore": 12683,
         "avgCombo": 13,
-        "avgHits": 34,
+        "avgHits": 36,
         "winRate": 0.3333333333333333
       },
-      "powerSpeedupPct": 11.9
+      "powerSpeedupPct": 6.7
     },
     "flags": [
       "HIGH ENDURANCE: Level takes >80s on base gear; consider reducing brick HP or adding EMP."
