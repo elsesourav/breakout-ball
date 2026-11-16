@@ -216,14 +216,14 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           {/* Top Right "FREE" pill badge */}
           <div className="absolute top-2.5 right-2.5">
             <span
-              className={`text-[8.5px] font-tech font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider border flex items-center gap-1 ${
+              className={`text-[8.5px] font-tech font-black px-2 py-0.5 rounded-full uppercase tracking-wider border flex items-center gap-1 ${
                 dailyStatus.canCollect
-                  ? 'bg-cyan-500/15 text-cyan-300 border-cyan-400/40 shadow-[0_0_8px_rgba(0,247,255,0.25)]'
+                  ? 'bg-cyan-400 text-slate-950 border-cyan-300 shadow-[0_0_12px_rgba(0,247,255,0.7)] animate-pulse'
                   : 'bg-slate-800/60 text-slate-400 border-slate-700/60'
               }`}
             >
-              <Sparkles className="w-2.5 h-2.5 text-cyan-300" />
-              <span>FREE</span>
+              <Sparkles className="w-2.5 h-2.5 text-slate-950" />
+              <span>100% FREE</span>
             </span>
           </div>
 
@@ -255,9 +255,14 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
             <span className="font-tech text-[10px] text-slate-400 font-bold uppercase tracking-wider">
               DAILY APEX
             </span>
+            {dailyStatus.canCollect && (
+              <span className="text-[9px] font-tech font-black text-cyan-300 tracking-wider animate-pulse mt-0.5">
+                FREE CLAIM READY!
+              </span>
+            )}
           </div>
 
-          {/* Action Button: Cyan Button (like Titan Vault) with "CLAIM" text, Gift icon (free reward) and smooth continuous shine */}
+          {/* Action Button: Cyan Button with "CLAIM FREE" text, Gift icon and continuous shine */}
           {dailyStatus.canCollect ? (
             <button
               type="button"
@@ -265,12 +270,12 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
               disabled={isClaimingDaily}
               style={{
                 background: 'linear-gradient(135deg, #a5f3fc 0%, #22d3ee 35%, #06b6d4 70%, #00f7ff 100%)',
-                boxShadow: '0 2px 10px rgba(0, 247, 255, 0.35)',
+                boxShadow: '0 2px 14px rgba(0, 247, 255, 0.55)',
               }}
               className="w-full py-2 px-2 rounded-xl text-slate-950 font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 hover:brightness-105 flex items-center justify-center gap-1.5 shadow-md relative overflow-hidden btn-shine-sweep select-none"
             >
               <Gift className="w-3.5 h-3.5 stroke-[2.8] text-slate-950 relative z-10" />
-              <span className="tracking-widest font-black text-slate-950 relative z-10">CLAIM</span>
+              <span className="tracking-widest font-black text-slate-950 relative z-10">CLAIM FREE</span>
             </button>
           ) : (
             <div

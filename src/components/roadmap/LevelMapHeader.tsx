@@ -51,14 +51,21 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                 type="button"
                 id="daily-free-collect-button"
                 onClick={onOpenShop}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                animate={{
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    '0 0 10px rgba(0, 247, 255, 0.35)',
+                    '0 0 22px rgba(0, 247, 255, 0.85)',
+                    '0 0 10px rgba(0, 247, 255, 0.35)',
+                  ],
+                }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
                 style={{
                   background:
-                    'linear-gradient(135deg, rgba(6, 182, 212, 0.28) 0%, rgba(14, 25, 54, 0.95) 100%)',
-                  border: '1.2px solid rgba(0, 247, 255, 0.65)',
-                  boxShadow:
-                    '0 0 14px rgba(0, 247, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                    'linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(14, 25, 54, 0.98) 100%)',
+                  border: '1.4px solid rgba(0, 247, 255, 0.85)',
                 }}
                 className="h-8 px-2.5 flex items-center gap-1.5 rounded-xl cursor-pointer select-none relative group overflow-hidden btn-shine-sweep"
                 title="Claim Free Cores in Core Shop!"
@@ -67,6 +74,7 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                 <span className="font-tech font-black text-[11px] text-cyan-100 tracking-wider leading-none">
                   FREE
                 </span>
+                <span className="text-[9px] font-tech font-bold text-cyan-300 leading-none">CORES</span>
                 <CoreIcon size={11} variant="cyan" glow />
               </motion.button>
             )}

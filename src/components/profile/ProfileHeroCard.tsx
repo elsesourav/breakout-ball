@@ -17,7 +17,8 @@ interface ProfileHeroCardProps {
   totalBadgesCount: number;
   userCreatedLevelsCount: number;
   onOpenSettings?: () => void;
-  onSectionSwitch: (section: 'badges' | 'leaderboard') => void;
+  onOpenLeaderboard?: () => void;
+  onSectionSwitch?: (section: 'badges' | 'leaderboard') => void;
   onSignIn: () => void;
   onCreateAccount: () => void;
 }
@@ -31,6 +32,7 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
   unlockedBadgesCount,
   totalBadgesCount,
   userCreatedLevelsCount,
+  onOpenLeaderboard,
   onSectionSwitch,
   onSignIn,
   onCreateAccount,
@@ -110,8 +112,16 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
       {/* Account Details & Quick Stats */}
       <div className="grid grid-cols-3 gap-2 mt-3.5 pt-3 border-t border-cyan-500/15 text-center">
         <div
-          onClick={() => onSectionSwitch('leaderboard')}
+          onClick={() => {
+            soundManager.play('click');
+            if (onOpenLeaderboard) {
+              onOpenLeaderboard();
+            } else if (onSectionSwitch) {
+              onSectionSwitch('leaderboard');
+            }
+          }}
           className="bg-black/40 rounded-xl p-2 border border-cyan-500/20 cursor-pointer hover:border-cyan-400/50 hover:bg-cyan-950/30 transition-all active:scale-95"
+          title="View Global Leaderboard"
         >
           <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
             <Trophy className="w-3.5 h-3.5 text-yellow-400" />
@@ -123,7 +133,10 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
         </div>
 
         <div
-          onClick={() => onSectionSwitch('badges')}
+          onClick={() => {
+            soundManager.play('click');
+            onSectionSwitch?.('badges');
+          }}
           className="bg-black/40 rounded-xl p-2 border border-cyan-500/20 cursor-pointer hover:border-amber-400/50 hover:bg-amber-950/20 transition-all active:scale-95"
         >
           <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">

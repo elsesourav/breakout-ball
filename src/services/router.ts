@@ -64,6 +64,9 @@ export const parseCurrentRoute = (): RouteState => {
   if (path === '/profile') {
     return { type: 'tab', tab: 'profile' };
   }
+  if (path === '/leaderboard' || path === '/ranks') {
+    return { type: 'tab', tab: 'leaderboard' };
+  }
 
   // Default to Arcade roadmap
   return { type: 'tab', tab: 'local' };
@@ -95,6 +98,8 @@ export const getRoutePath = (
       return '/shop';
     case 'profile':
       return '/profile';
+    case 'leaderboard':
+      return '/leaderboard';
     case 'local':
     default:
       return '/arcade';
