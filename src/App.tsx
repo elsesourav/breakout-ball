@@ -2,20 +2,11 @@ import React, { useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { useGame } from './context/GameContext';
 import { MobileBottomNav } from './components/navigation/MobileBottomNav';
-import { LevelMap } from './components/LevelMap';
-import { OnlineMode } from './components/OnlineMode';
-import { ArmoryView } from './components/ArmoryView';
-import { CreateMode } from './components/CreateMode';
-import { ProfileView } from './components/ProfileView';
-import { LevelPreviewModal } from './components/LevelPreviewModal';
-import { LevelDesigner } from './components/LevelDesigner';
-import { LevelModifierModal } from './components/LevelModifierModal';
-import { GameCanvas } from './components/GameCanvas';
-import { AlertModal } from './components/AlertModal';
-import { AuthModal } from './components/AuthModal';
-import { AchievementToast } from './components/AchievementToast';
-import { CyberToastContainer } from './components/common/CyberToast';
-import { GameLoadingScreen } from './components/common/GameLoadingScreen';
+import { ArcadeView, ArenaView, ArmoryView, ProfileView, StudioView } from './components/views';
+import { LevelDesigner } from './components/designer';
+import { GameCanvas } from './components/gameplay';
+import { AlertModal, AuthModal, LevelModifierModal, LevelPreviewModal } from './components/modals';
+import { AchievementToast, CyberToastContainer, GameLoadingScreen } from './components/common';
 
 export const AppContent: React.FC = () => {
   const { screen, setScreen, activeTab, editingLevel, isInitialLoading } = useGame();
@@ -76,10 +67,10 @@ export const AppContent: React.FC = () => {
           <div id="gameMode">
             <div id="modeType" className="w-full h-full relative overflow-hidden">
               <div key={activeTab} className="cyber-page-transition w-full h-full">
-                {activeTab === 'local' && <LevelMap />}
-                {activeTab === 'online' && <OnlineMode />}
+                {activeTab === 'local' && <ArcadeView />}
+                {activeTab === 'online' && <ArenaView />}
                 {activeTab === 'armory' && <ArmoryView />}
-                {activeTab === 'create' && <CreateMode />}
+                {activeTab === 'create' && <StudioView />}
                 {activeTab === 'profile' && <ProfileView />}
               </div>
             </div>

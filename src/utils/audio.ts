@@ -1,5 +1,5 @@
 /**
- * Legacy Audio Bridge - Re-exports from organized /audio module
+ * Audio Module Exports
  */
-export { soundManager } from '../audio/soundManager';
-export type { ClickSoundType } from '../audio/types';
+export { soundManager, synthAudio } from '../audio';
+export type { ClickSoundType } from '../audio';

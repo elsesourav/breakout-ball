@@ -1,9 +1,4 @@
-import React from 'react';
-
 /**
- * ParticleBackdrop: Disabled to eliminate GPU lag and remove the background dotted particle grid.
- * Replaced by the lightweight, silky-smooth Arcade Map gradient background.
+ * Re-export from gameplay module
  */
-export const ParticleBackdrop: React.FC = () => {
-  return null;
-};
+export { ParticleBackdrop } from './gameplay/ParticleBackdrop';

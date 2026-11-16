@@ -12,7 +12,7 @@ import {
   playSyntheticWarning,
   playSyntheticLockTap,
 } from './soundPresets';
-import { synthAudio } from '../utils/synthAudio';
+import { synthAudio } from './synthAudio';
 
 class SoundManager {
   private ctx: AudioContext | null = null;

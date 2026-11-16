@@ -1,5 +1,4 @@
-import { soundManager } from '../utils/audio';
-import { synthAudio } from '../utils/synthAudio';
+import { soundManager, synthAudio } from '../audio';
 import { achievementManager } from '../services/achievements';
 import { CollisionEventType } from './types';
 
