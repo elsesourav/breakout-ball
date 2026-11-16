@@ -52,8 +52,11 @@ export const parseCurrentRoute = (): RouteState => {
   if (path === '/arena') {
     return { type: 'tab', tab: 'online' };
   }
-  if (path === '/armory' || path === '/upgrades' || path === '/shop') {
+  if (path === '/armory' || path === '/upgrades') {
     return { type: 'tab', tab: 'armory' };
+  }
+  if (path === '/shop' || path === '/store') {
+    return { type: 'tab', tab: 'shop' };
   }
   if (path === '/studio') {
     return { type: 'tab', tab: 'create' };
@@ -88,6 +91,8 @@ export const getRoutePath = (
       return '/armory';
     case 'create':
       return '/studio';
+    case 'shop':
+      return '/shop';
     case 'profile':
       return '/profile';
     case 'local':

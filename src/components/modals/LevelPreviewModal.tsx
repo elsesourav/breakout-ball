@@ -396,24 +396,7 @@ export const LevelPreviewModal: React.FC = () => {
             </button>
           )}
 
-          {/* 3. SHARE Button: Native share / clipboard copy with toast feedback */}
-          <button
-            type="button"
-            onClick={() => shareLevel(selectedLevel)}
-            title="Share Mission Link"
-            style={{
-              borderRadius: '12px',
-              backgroundColor: '#0c1a30',
-              backgroundImage: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(15, 23, 42, 0.95) 100%)',
-              border: '1.5px solid rgba(0, 247, 255, 0.45)',
-              boxShadow: '0 0 12px rgba(0, 247, 255, 0.2)',
-            }}
-            className="w-12 h-12 flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-300 active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
-          >
-            <Share2 className="w-5 h-5 stroke-[2.2]" />
-          </button>
-
-          {/* 4. HOME Button: Clicking closes modal and returns to menu */}
+          {/* 3. HOME Button: Clicking closes modal and returns to menu */}
           <button
             type="button"
             onClick={() => {

@@ -12,9 +12,7 @@ import {
   Timer,
   ShieldAlert,
   Zap,
-  Share2,
 } from 'lucide-react';
-import { shareVictory } from '../../services/sharing';
 import { ScoreState } from '../../engine/types';
 import { CoreIcon } from '../common/CoreIcon';
 
@@ -405,13 +403,13 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                 </span>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2.5">
                 {onRetry && (
                   <button
                     type="button"
                     onClick={onRetry}
                     style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(0, 247, 255, 0.28)', borderRadius: '12px' }}
-                    className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-cyan-500/15 transition-all cursor-pointer text-white px-2"
+                    className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-cyan-500/15 transition-all cursor-pointer text-white px-3"
                   >
                     <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
                     <span>RETRY</span>
@@ -420,19 +418,9 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
 
                 <button
                   type="button"
-                  onClick={() => shareVictory(levelNumber, summaryState.score ?? 0, starsEarned)}
-                  style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(0, 247, 255, 0.45)', borderRadius: '12px' }}
-                  className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-cyan-500/20 text-cyan-300 hover:text-white transition-all cursor-pointer px-2"
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>SHARE</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={onExit}
                   style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}
-                  className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer text-slate-300 px-2"
+                  className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer text-slate-300 px-3"
                 >
                   <Home className="w-3.5 h-3.5 text-slate-400" />
                   <span>{gameMode === 'arena' ? 'ARENA' : 'ARCADE'}</span>

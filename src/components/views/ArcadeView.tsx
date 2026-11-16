@@ -75,11 +75,7 @@ export const ArcadeView: React.FC = () => {
   // When FREE or Cores button is clicked, redirect directly to Core Shop
   const handleOpenShop = () => {
     soundManager.playClick('cyber');
-    setActiveTab('armory');
-    if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', '/shop');
-      window.dispatchEvent(new CustomEvent('open-core-shop'));
-    }
+    setActiveTab('shop');
   };
 
   // Cached list of all scalable map elements (.roadmap-scale-item) and conduit segments

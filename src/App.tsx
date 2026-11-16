@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { useGame } from './context/GameContext';
 import { SideNavDock } from './components/navigation/SideNavDock';
-import { ArcadeView, ArenaView, ArmoryView, ProfileView, StudioView } from './components/views';
+import { ArcadeView, ArenaView, ArmoryView, ProfileView, ShopView, StudioView } from './components/views';
 import { LevelDesigner } from './components/designer';
 import { GameCanvas } from './components/gameplay';
 import { AlertModal, AuthModal, LevelModifierModal, LevelPreviewModal, SettingsModal } from './components/modals';
@@ -81,6 +81,7 @@ export const AppContent: React.FC = () => {
                 {activeTab === 'armory' && <ArmoryView />}
                 {activeTab === 'create' && <StudioView />}
                 {activeTab === 'profile' && <ProfileView />}
+                {activeTab === 'shop' && <ShopView />}
               </div>
             </div>
           </div>

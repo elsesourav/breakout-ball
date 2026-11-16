@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '../../context/GameContext';
 import { CustomCyberSlider } from '../common/CustomCyberSlider';
 import { CustomCyberSwitch } from '../common/CustomCyberSwitch';
-import { Volume2, VolumeX, Music, Zap, MousePointer, Vibrate, Compass, Sliders, Trash2, AlertTriangle } from 'lucide-react';
+import { Volume2, VolumeX, Music, Zap, MousePointer, Vibrate, Compass, Sliders, Trash2, AlertTriangle, Headphones } from 'lucide-react';
 import { soundManager } from '../../audio';
 
 export const ProfileSettingsGroup: React.FC = () => {
@@ -42,18 +42,9 @@ export const ProfileSettingsGroup: React.FC = () => {
     <>
       {/* Audio & Haptics Settings */}
       <div className="w-full max-w-sm rounded-xl bg-[#090d24]/90 border border-cyan-500/25 p-3.5 flex flex-col gap-3 shadow-lg backdrop-blur-xl">
-        <div className="flex items-center justify-between pb-2 border-b border-cyan-500/15 text-xs font-display font-black tracking-wider uppercase">
-          <div className="flex items-center gap-2 text-cyan-400">
-            {settings.soundEnabled ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
-            <span>Sound & Feedback</span>
-          </div>
-          <span className={`text-[9px] font-tech font-bold px-1.5 py-0.5 rounded border ${
-            settings.soundEnabled
-              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/40 shadow-[0_0_8px_rgba(0,247,255,0.3)]'
-              : 'bg-slate-800/60 text-slate-400 border-slate-700'
-          }`}>
-            {settings.soundEnabled ? 'AUDIO ON' : 'AUDIO MUTED'}
-          </span>
+        <div className="flex items-center gap-2 pb-2 border-b border-cyan-500/15 text-cyan-400 text-xs font-display font-black tracking-wider uppercase">
+          <Headphones className="w-4 h-4 text-cyan-400" />
+          <span>Sound & Feedback</span>
         </div>
 
         {/* 1. Master Audio Switch (DEFAULT: OFF) */}

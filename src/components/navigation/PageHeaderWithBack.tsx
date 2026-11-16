@@ -39,11 +39,8 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
   };
 
   const handleOpenShop = () => {
-    setActiveTab('armory');
-    if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', '/shop');
-      window.dispatchEvent(new CustomEvent('open-core-shop'));
-    }
+    soundManager.playClick();
+    setActiveTab('shop');
   };
 
   return (
@@ -55,7 +52,7 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
       }}
     >
       <div className="w-full max-w-sm px-3.5 py-2.5 flex items-center justify-between gap-2">
-        {/* Left: Back to Arcade Button */}
+        {/* Left: Back Button */}
         <motion.button
           type="button"
           onClick={handleBack}
@@ -67,10 +64,10 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
             boxShadow: '0 0 10px rgba(0, 247, 255, 0.25)',
           }}
           className="h-9 px-2.5 rounded-xl flex items-center gap-1.5 text-xs font-tech font-bold text-cyan-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0"
-          title="Return to Arcade campaign"
+          title="Return to previous screen"
         >
           <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
-          <span className="tracking-wider">ARCADE</span>
+          <span className="tracking-wider">BACK</span>
         </motion.button>
 
         {/* Center: Title / Subtitle */}
