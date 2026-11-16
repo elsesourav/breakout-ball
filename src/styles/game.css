@@ -130,8 +130,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #060713 url('/img/bg.jpg') no-repeat center center;
-  background-size: cover;
+  background: radial-gradient(ellipse at 50% 25%, #0e1638 0%, #070a1c 55%, #03040a 100%);
   overflow: hidden;
   touch-action: manipulation;
   overscroll-behavior: none;
