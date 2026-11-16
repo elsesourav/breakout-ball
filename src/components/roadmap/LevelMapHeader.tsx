@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
-import { CyberSectionHeader } from '../CyberSectionHeader';
-import { CoreIcon } from '../CoreIcon';
+import { CyberSectionHeader } from '../common/CyberSectionHeader';
+import { CoreIcon } from '../common/CoreIcon';
 import { UserProfile } from '../../types/game';
 import { DailyCollectStatus } from '../../services/currency';
 import { TOTAL_LEVELS } from './types';

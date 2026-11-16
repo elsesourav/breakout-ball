@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useGame } from '../../context/GameContext';
 import { LevelData } from '../../types/game';
 import { Play, Flame, Award, Clock, Check } from 'lucide-react';
-import { CoreIcon } from '../CoreIcon';
-import { soundManager } from '../../utils/audio';
+import { CoreIcon } from '../common/CoreIcon';
+import { soundManager } from '../../audio';
 import { cyberToast } from '../common/CyberToast';
 import {
   getSecondsUntilMidnight,

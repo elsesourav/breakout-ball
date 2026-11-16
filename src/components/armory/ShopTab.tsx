@@ -3,8 +3,8 @@ import { Ticket, X, CheckCircle, AlertCircle, Loader2, Sparkles, Lock, Database,
 import { SHOP_PACKS, ShopPack } from '../../constants/upgrades';
 import { couponService } from '../../services/coupons';
 import { currencyService, DailyCollectStatus } from '../../services/currency';
-import { soundManager } from '../../utils/audio';
-import { CoreIcon } from '../CoreIcon';
+import { soundManager } from '../../audio';
+import { CoreIcon } from '../common/CoreIcon';
 import { BackendAdminModal } from '../admin/BackendAdminModal';
 import { authService, isUserAdmin } from '../../services/auth';
 

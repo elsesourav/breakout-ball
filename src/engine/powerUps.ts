@@ -9,17 +9,8 @@ import {
   PowerUpDrop,
   ActiveBuffs,
   LaserBolt,
+  ActiveBuffInfo,
 } from './powerUpTypes';
-
-export interface ActiveBuffInfo {
-  type: PowerUpType;
-  name: string;
-  current: number;
-  max: number;
-  color: string;
-  glow: string;
-  isShield?: boolean;
-}
 
 export * from './powerUpTypes';
 

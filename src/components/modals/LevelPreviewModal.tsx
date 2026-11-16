@@ -25,7 +25,7 @@ import {
 import { cyberToast } from '../common/CyberToast';
 import { soundManager } from '../../audio';
 import { currencyService } from '../../services/currency';
-import { CoreIcon } from '../CoreIcon';
+import { CoreIcon } from '../common/CoreIcon';
 
 export const LevelPreviewModal: React.FC = () => {
   const {

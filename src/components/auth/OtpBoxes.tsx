@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { soundManager } from '../../utils/audio';
+import { soundManager } from '../../audio';
 
 interface OtpBoxesProps {
   value: string;

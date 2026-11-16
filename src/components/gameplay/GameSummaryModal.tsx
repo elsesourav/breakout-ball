@@ -14,7 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { ScoreState } from '../../engine/types';
-import { CoreIcon } from '../CoreIcon';
+import { CoreIcon } from '../common/CoreIcon';
 
 interface GameSummaryModalProps {
   summaryState: ScoreState;

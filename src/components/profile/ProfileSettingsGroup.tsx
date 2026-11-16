@@ -3,7 +3,7 @@ import { useGame } from '../../context/GameContext';
 import { CustomCyberSlider } from '../common/CustomCyberSlider';
 import { CustomCyberSwitch } from '../common/CustomCyberSwitch';
 import { Volume2, VolumeX, Music, Zap, MousePointer, Vibrate, Compass, Sliders, Trash2, AlertTriangle } from 'lucide-react';
-import { soundManager } from '../../utils/audio';
+import { soundManager } from '../../audio';
 
 export const ProfileSettingsGroup: React.FC = () => {
   const { settings, updateSettings } = useGame();

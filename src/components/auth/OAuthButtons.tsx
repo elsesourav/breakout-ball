@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { authService } from '../../services/auth';
 import { useGame } from '../../context/GameContext';
 import { Loader2 } from 'lucide-react';
-import { soundManager } from '../../utils/audio';
+import { soundManager } from '../../audio';
 
 interface OAuthButtonsProps {
   onSuccess?: () => void;

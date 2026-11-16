@@ -3,7 +3,7 @@ import { authService } from '../../services/auth';
 import { useGame } from '../../context/GameContext';
 import { OAuthButtons } from './OAuthButtons';
 import { LogIn, KeyRound, User, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
-import { soundManager } from '../../utils/audio';
+import { soundManager } from '../../audio';
 
 interface LoginFormProps {
   onSuccess: () => void;

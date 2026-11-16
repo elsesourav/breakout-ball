@@ -10,7 +10,7 @@ import {
   AlertConfig,
 } from '../types/game';
 import { DEFAULT_SETTINGS } from '../constants/game';
-import { soundManager } from '../utils/audio';
+import { soundManager } from '../audio';
 import { achievementManager } from '../services/achievements';
 import { dbService } from '../services/db';
 import { authService } from '../services/auth';

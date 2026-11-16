@@ -1,4 +1,4 @@
-import { BallState, PaddleState, BlockEngineState, CollisionEvent, CollisionEventType } from './types';
+import { BallState, PaddleState, BlockEngineState, CollisionEvent, CollisionEventType, PhysicsWorldConfig } from './types';
 import { BlockData } from '../types/game';
 import {
   pairPortals,
@@ -7,17 +7,7 @@ import {
   detonateEmpExplosion,
 } from './physicsHelpers';
 
-export interface PhysicsWorldConfig {
-  width: number;
-  height: number;
-  paddleWidth: number;
-  paddleHeight: number;
-  ballRadius: number;
-  ballSpeed: number;
-  blockWidth: number;
-  blockHeight: number;
-  substeps?: number;
-}
+export type { PhysicsWorldConfig };
 
 export class PhysicsWorld {
   public config: PhysicsWorldConfig;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User as UserIcon, Settings, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck, Pencil } from 'lucide-react';
-import { soundManager } from '../../utils/audio';
+import { soundManager } from '../../audio';
 
 interface ProfileHeroCardProps {
   user: {

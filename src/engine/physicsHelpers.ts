@@ -1,5 +1,4 @@
-import { BallState, PaddleState, BlockEngineState, CollisionEvent } from './types';
-import type { PhysicsWorldConfig } from './physics';
+import { BallState, PaddleState, BlockEngineState, CollisionEvent, PhysicsWorldConfig } from './types';
 
 export function pairPortals(blocks: BlockEngineState[], portalIndices: number[]): void {
   const pairMap = new Map<number, number[]>();

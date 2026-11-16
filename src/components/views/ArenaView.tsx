@@ -6,11 +6,11 @@ import { ArenaLevelCard } from '../arena/ArenaLevelCard';
 import { ArenaPagination } from '../arena/ArenaPagination';
 import { DailyFeaturedBanner } from '../arena/DailyFeaturedBanner';
 import { ArenaSkeletonGrid } from '../arena/ArenaSkeletonGrid';
-import { CyberSectionHeader } from '../CyberSectionHeader';
+import { CyberSectionHeader } from '../common/CyberSectionHeader';
 import { currencyService } from '../../services/currency';
 import { dbService } from '../../services/db';
 import { LevelData } from '../../types/game';
-import { CoreIcon } from '../CoreIcon';
+import { CoreIcon } from '../common/CoreIcon';
 
 const ITEMS_PER_PAGE = 20;
 

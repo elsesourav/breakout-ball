@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, Award, Sparkles } from 'lucide-react';
 import { UpgradeDef, getCostBetweenLevels } from '../../constants/upgrades';
-import { CoreIcon } from '../CoreIcon';
-import { soundManager } from '../../utils/audio';
+import { CoreIcon } from '../common/CoreIcon';
+import { soundManager } from '../../audio';
 import { UpgradePreviewCanvas } from './previews/UpgradePreviewCanvas';
 import { AssetThumbnail } from './AssetThumbnail';
 

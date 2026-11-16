@@ -5,9 +5,9 @@ import { currencyService, DailyCollectStatus } from '../../services/currency';
 import { UpgradeState, POWER_UPGRADES, PADDLE_UPGRADES } from '../../constants/upgrades';
 import { UpgradeTab, UpgradeSubSection } from '../armory/UpgradeTab';
 import { ShopTab } from '../armory/ShopTab';
-import { CyberSectionHeader } from '../CyberSectionHeader';
+import { CyberSectionHeader } from '../common/CyberSectionHeader';
 import { FlyingCoresAnimation } from '../armory/FlyingCoresAnimation';
-import { CoreIcon } from '../CoreIcon';
+import { CoreIcon } from '../common/CoreIcon';
 import { soundManager } from '../../audio';
 import { AssetThumbnail } from '../armory/AssetThumbnail';
 import {

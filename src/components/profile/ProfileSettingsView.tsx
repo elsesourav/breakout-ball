@@ -3,7 +3,7 @@ import { ArrowLeft, Settings, Mail, ShieldCheck, LogOut, Cloud, LogIn, UserPlus,
 import { ProfileSettingsGroup } from './ProfileSettingsGroup';
 import { BackendAdminModal } from '../admin/BackendAdminModal';
 import { isUserAdmin } from '../../services/auth';
-import { soundManager } from '../../utils/audio';
+import { soundManager } from '../../audio';
 
 interface ProfileSettingsViewProps {
   onBack: () => void;

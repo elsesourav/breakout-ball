@@ -60,6 +60,16 @@ export const POWER_UP_CONFIGS: Record<PowerUpType, PowerUpMeta> = {
   },
 };
 
+export interface ActiveBuffInfo {
+  type: PowerUpType;
+  name: string;
+  current: number;
+  max: number;
+  color: string;
+  glow: string;
+  isShield?: boolean;
+}
+
 export interface PowerUpDrop {
   id: number;
   x: number;

@@ -1,8 +1,8 @@
 import React from 'react';
 import { ChevronUp, Award } from 'lucide-react';
 import { UpgradeDef } from '../../constants/upgrades';
-import { soundManager } from '../../utils/audio';
-import { CoreIcon } from '../CoreIcon';
+import { soundManager } from '../../audio';
+import { CoreIcon } from '../common/CoreIcon';
 import { AssetThumbnail } from './AssetThumbnail';
 
 interface UpgradeCardProps {

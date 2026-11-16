@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Home, Zap, Heart, Boxes } from 'lucide-react';
 import { ScoreState } from '../../engine/types';
 import { GameSummaryModal } from './GameSummaryModal';
-import { CoreIcon } from '../CoreIcon';
+import { CoreIcon } from '../common/CoreIcon';
 import type { ActiveBuffInfo } from '../../engine/powerUps';
 
 interface GameHUDProps {

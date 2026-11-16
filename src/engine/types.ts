@@ -109,7 +109,19 @@ export interface ScoreState {
   status: 'countdown' | 'playing' | 'win' | 'gameover' | 'paused';
 }
 
-import type { ActiveBuffInfo } from './powerUps';
+export interface PhysicsWorldConfig {
+  width: number;
+  height: number;
+  paddleWidth: number;
+  paddleHeight: number;
+  ballRadius: number;
+  ballSpeed: number;
+  blockWidth: number;
+  blockHeight: number;
+  substeps?: number;
+}
+
+import type { ActiveBuffInfo } from './powerUpTypes';
 
 export interface EngineCallbacks {
   onScoreUpdate?: (scoreState: ScoreState) => void;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CoreIcon } from '../CoreIcon';
-import { soundManager } from '../../utils/audio';
+import { CoreIcon } from '../common/CoreIcon';
+import { soundManager } from '../../audio';
 
 interface FlyingCoresAnimationProps {
   active: boolean;

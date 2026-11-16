@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { authService } from '../../services/auth';
 import { OtpBoxes } from './OtpBoxes';
 import { Mail, KeyRound, Eye, EyeOff, Loader2, AlertCircle, ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
-import { soundManager } from '../../utils/audio';
+import { soundManager } from '../../audio';
 
 interface ForgotPasswordFormProps {
   onBackToLogin: () => void;
