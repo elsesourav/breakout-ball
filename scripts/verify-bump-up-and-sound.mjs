@@ -180,7 +180,8 @@ async function run() {
     await send('Runtime.evaluate', {
       expression: `
         (() => {
-          const backBtn = document.querySelector('button[title*="Back"]');
+          const backBtn = document.querySelector('button[title*="Return to previous screen"]') ||
+                          Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes('BACK'));
           if (backBtn) backBtn.click();
         })()
       `
@@ -190,7 +191,7 @@ async function run() {
     await send('Runtime.evaluate', {
       expression: `
         (() => {
-          const shopNav = Array.from(document.querySelectorAll('button')).find(b => b.title === 'SHOP');
+          const shopNav = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes('SHOP'));
           if (shopNav) shopNav.click();
         })()
       `
@@ -204,19 +205,21 @@ async function run() {
     console.log('Initial Shop badge text:', initShopBadge.result.value);
 
     // Click daily claim (CLAIM FREE)
-    await send('Runtime.evaluate', {
+    const clickedShop = await send('Runtime.evaluate', {
       expression: `
         (() => {
           const btns = Array.from(document.querySelectorAll('button'));
           const claimDaily = btns.find(b => b.textContent?.includes('CLAIM FREE'));
           if (claimDaily) {
             claimDaily.click();
-            return true;
+            return { clicked: true, text: claimDaily.textContent };
           }
-          return false;
+          return { clicked: false, availableButtons: btns.map(b => b.textContent?.trim()) };
         })()
-      `
+      `,
+      returnByValue: true
     });
+    console.log('Shop claim click result:', clickedShop.result.value);
 
     // Sample at 850ms (during collecting & bump-up time)
     await new Promise(r => setTimeout(r, 850));
@@ -227,7 +230,9 @@ async function run() {
           const badge = document.getElementById('top-cores-badge');
           const transform = badge ? window.getComputedStyle(badge).transform : 'none';
           const text = badge ? badge.textContent?.trim() : '';
-          return { transform, text };
+          const pulsing = badge ? badge.getAttribute('data-pulsing') : null;
+          const hasBumpClass = badge ? badge.classList.contains('core-counter-bump-active') : false;
+          return { transform, text, pulsing, hasBumpClass };
         })()
       `,
       returnByValue: true
@@ -246,7 +251,9 @@ async function run() {
           const badge = document.getElementById('top-cores-badge');
           const transform = badge ? window.getComputedStyle(badge).transform : 'none';
           const text = badge ? badge.textContent?.trim() : '';
-          return { transform, text };
+          const pulsing = badge ? badge.getAttribute('data-pulsing') : null;
+          const hasBumpClass = badge ? badge.classList.contains('core-counter-bump-active') : false;
+          return { transform, text, pulsing, hasBumpClass };
         })()
       `,
       returnByValue: true

@@ -39,10 +39,22 @@ export const ProfileView: React.FC = () => {
     });
   }, [user.username]);
 
-  // Synchronize currency balance when not pulsing/counting up
+  // Track active collecting state in ref so currency listeners never cancel animations
+  const isCollectingRef = useRef(false);
+  isCollectingRef.current = isPulsing || isFlyingCores;
+
+  // Cancel count-up and stop audio on component unmount ONLY
+  useEffect(() => {
+    return () => {
+      soundManager.stopCollectSequence();
+      if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
+    };
+  }, []);
+
+  // Synchronize currency balance when not actively collecting / counting up
   useEffect(() => {
     const sync = () => {
-      if (!isPulsing && !isFlyingCores) {
+      if (!isCollectingRef.current) {
         const b = currencyService.getBalance();
         setCores(b);
         setDisplayCores(b);
@@ -53,10 +65,8 @@ export const ProfileView: React.FC = () => {
     return () => {
       window.removeEventListener('currency-changed', sync);
       window.removeEventListener('currency_balance_changed', sync);
-      soundManager.stopCollectSequence();
-      if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
     };
-  }, [isPulsing, isFlyingCores]);
+  }, []);
 
   // Auto-refresh profile avatar when user returns to game tab from ElseSourav.com
   useEffect(() => {

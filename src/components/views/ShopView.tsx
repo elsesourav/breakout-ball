@@ -23,6 +23,8 @@ export const ShopView: React.FC = () => {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const countUpRef = useRef<number | null>(null);
+  const isCollectingRef = useRef(false);
+  isCollectingRef.current = isPulsing || isFlyingCores;
 
   useEffect(() => {
     currencyService.load(user.username).then(() => {
@@ -32,6 +34,23 @@ export const ShopView: React.FC = () => {
       setDailyStatus(currencyService.getDailyCollectStatus());
     });
   }, [user.username]);
+
+  // Synchronize currency balance when not actively collecting / counting up
+  useEffect(() => {
+    const sync = () => {
+      if (!isCollectingRef.current) {
+        const b = currencyService.getBalance();
+        setCores(b);
+        setDisplayCores(b);
+      }
+    };
+    window.addEventListener('currency-changed', sync);
+    window.addEventListener('currency_balance_changed', sync);
+    return () => {
+      window.removeEventListener('currency-changed', sync);
+      window.removeEventListener('currency_balance_changed', sync);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {

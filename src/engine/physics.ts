@@ -40,7 +40,7 @@ export class PhysicsWorld {
       height: config.paddleHeight,
       vx: 0,
       targetX: initialPadX,
-      maxSpeed: 1600,
+      maxSpeed: 800,
     };
 
     this.defaultBall = {
