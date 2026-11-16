@@ -56,7 +56,7 @@ export const POWER_UP_CONFIGS: Record<PowerUpType, PowerUpMeta> = {
     symbol: '◀▶',
     color: '#06b6d4',
     glow: 'rgba(6, 182, 212, 0.85)',
-    duration: 6.0,
+    duration: 12.0,
   },
 };
 

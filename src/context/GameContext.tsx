@@ -44,42 +44,21 @@ interface GameContextType {
   user: UserProfile;
   updateUser: (user: Partial<UserProfile>) => void;
   leaderboards: Record<string, LeaderboardEntry[]>;
-  alertConfig: AlertConfig | null;
-  showAlert: (config: AlertConfig) => void;
-  hideAlert: () => void;
-  isAuthModalOpen: boolean;
-  setIsAuthModalOpen: (open: boolean) => void;
-  isSettingsOpen: boolean;
-  setIsSettingsOpen: (open: boolean) => void;
-  authMode: 'signin' | 'signup';
-  setAuthMode: (mode: 'signin' | 'signup') => void;
-  startPlayLevel: (level: LevelData) => void;
-  openPreview: (level: LevelData) => void;
-  openDesigner: () => void;
-  openModifier: (level: LevelData) => void;
-  closeModifier: () => void;
+  alertConfig: AlertConfig | null; showAlert: (config: AlertConfig) => void; hideAlert: () => void;
+  isAuthModalOpen: boolean; setIsAuthModalOpen: (open: boolean) => void;
+  isSettingsOpen: boolean; setIsSettingsOpen: (open: boolean) => void;
+  authMode: 'signin' | 'signup'; setAuthMode: (mode: 'signin' | 'signup') => void;
+  startPlayLevel: (level: LevelData) => void; openPreview: (level: LevelData) => void;
+  openDesigner: () => void; openModifier: (level: LevelData) => void; closeModifier: () => void;
   saveUserLevel: (level: LevelData) => Promise<boolean>;
   deleteUserLevel: (id: string) => Promise<void>;
   updateLevelPrivacy: (id: string, isPublic: boolean) => Promise<void>;
-  isInitialLoading: boolean;
-  isOpeningLevel: boolean;
-  loadingLeaderboardLevelId: string | null;
+  isInitialLoading: boolean; isOpeningLevel: boolean; loadingLeaderboardLevelId: string | null;
   logoutUser: () => Promise<void>;
-  recordLevelCompletion: (
-    levelId: string,
-    time: number,
-    livesRemaining?: number
-  ) => Promise<{
-    rank: number;
-    isNewBest: boolean;
-    coresEarned?: number;
-    isFirstClear?: boolean;
-    starsEarned?: number;
-    previousStars?: number;
-    newBestStars?: number;
-    totalClaimedForLevel?: number;
-    maxCoresForLevel?: number;
-    remainingCoresForLevel?: number;
+  recordLevelCompletion: (levelId: string, time: number, livesRemaining?: number) => Promise<{
+    rank: number; isNewBest: boolean; coresEarned?: number; isFirstClear?: boolean;
+    starsEarned?: number; previousStars?: number; newBestStars?: number; totalClaimedForLevel?: number;
+    maxCoresForLevel?: number; remainingCoresForLevel?: number;
   }>;
 }
 
@@ -122,6 +101,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile>(() => {
     const authUser = authService.getCurrentUser();
     return {
+      id: authUser.id,
       fullName: authUser.fullName || 'Anonymous',
       username: authUser.username || 'anonymous',
       email: authUser.email || '',
@@ -156,7 +136,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (isDisposed) return;
 
-        const userLevels = await dbService.getUserCreatedLevels(user.username);
+        const effectiveId = user.id || authService.getEffectiveUserId();
+        const userLevels = await dbService.getUserCreatedLevels(effectiveId);
         if (isDisposed) return;
 
         setLocalLevels(locals);
@@ -185,7 +166,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setSelectedLevel(found);
             setScreenState('playing');
             soundManager.startBgMusic();
-            dbService.incrementPlayCount(found.id);
+            const isRestricted = isLevelSelfMadeOrTest(found);
+            achievementManager.setRestrictedContext(isRestricted);
+            if (!isRestricted) {
+              dbService.incrementPlayCount(found.id);
+            }
             replaceAppRoute(`/play/${encodeURIComponent(found.id)}`);
             return;
           }
@@ -295,14 +280,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUser = (newUser: Partial<UserProfile>) => {
     setUser((prev) => {
       const updated = { ...prev, ...newUser };
+      const effectiveId = updated.id || updated.username;
       authService.setCurrentUser({
-        id: updated.username,
+        id: effectiveId,
         fullName: updated.fullName,
         username: updated.username,
         email: updated.email,
         avatarUrl: updated.avatarUrl,
         provider: updated.provider || 'credentials',
         isLoggedIn: updated.isLoggedIn,
+      });
+      dbService.getUserCreatedLevels(effectiveId).then((levels) => {
+        setUserCreatedLevels(levels);
       });
       return updated;
     });
@@ -316,9 +305,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     achievementManager.reset();
     dbService.clearLocalProgress(prevUser);
     setLocalProgress({ '1': { levelNumber: 1, completed: false, rank: null, bestTime: null } });
-    setUserCreatedLevels([]);
     setSelectedLevel(localLevels[0] || null);
+    const anonId = authService.getAnonymousUserId();
     setUser({
+      id: anonId,
       fullName: 'Anonymous',
       username: 'anonymous',
       email: '',
@@ -326,15 +316,26 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       provider: undefined,
       isLoggedIn: false,
     });
+    const anonLevels = await dbService.getUserCreatedLevels(anonId);
+    setUserCreatedLevels(anonLevels);
   }, [user.username, localLevels]);
 
   const isLevelSelfMadeOrTest = useCallback(
     (level: LevelData | null): boolean => {
       if (!level) return false;
       if (level.id === 'TEST' || level.id.startsWith('test_') || level.id.startsWith('test-')) return true;
-      return !!(level.creator && user?.username && level.creator.trim().toLowerCase() === user.username.trim().toLowerCase());
+      const effectiveUserId = user?.id || authService.getEffectiveUserId();
+      if (level.creatorId && effectiveUserId) {
+        return level.creatorId.trim().toLowerCase() === effectiveUserId.trim().toLowerCase();
+      }
+      return !!(
+        level.creator &&
+        user?.username &&
+        level.creator.trim().toLowerCase() !== 'anonymous' &&
+        level.creator.trim().toLowerCase() === user.username.trim().toLowerCase()
+      );
     },
-    [user?.username]
+    [user?.id, user?.username]
   );
 
   const startPlayLevel = useCallback(
@@ -382,30 +383,33 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [activeTab]
   );
 
-  const syncUserAndOnlineLevels = async (uname: string) => {
-    const [userLvls, onlines] = await Promise.all([dbService.getUserCreatedLevels(uname), dbService.getOnlineLevels()]);
+  const syncUserAndOnlineLevels = async () => {
+    const effectiveId = user.id || authService.getEffectiveUserId();
+    const [userLvls, onlines] = await Promise.all([dbService.getUserCreatedLevels(effectiveId), dbService.getOnlineLevels()]);
     setUserCreatedLevels(userLvls);
     setOnlineLevels(onlines);
   };
 
   const saveUserLevel = async (newLevel: LevelData): Promise<boolean> => {
-    const success = await dbService.saveLevel(newLevel);
+    const effectiveId = user.id || authService.getEffectiveUserId();
+    const success = await dbService.saveLevel({ ...newLevel, creatorId: newLevel.creatorId || effectiveId });
     if (success) {
       achievementManager.unlock('level_architect');
-      await syncUserAndOnlineLevels(user.username);
+      await syncUserAndOnlineLevels();
     }
     return success;
   };
 
   const deleteUserLevel = async (id: string): Promise<void> => {
-    await dbService.deleteLevel(id);
-    await syncUserAndOnlineLevels(user.username);
+    const effectiveId = user.id || authService.getEffectiveUserId();
+    await dbService.deleteLevel(id, effectiveId);
+    await syncUserAndOnlineLevels();
     if (editingLevel?.id === id) setEditingLevel(null);
   };
 
   const updateLevelPrivacy = async (id: string, isPublic: boolean): Promise<void> => {
     await dbService.updateLevelPrivacy(id, isPublic);
-    await syncUserAndOnlineLevels(user.username);
+    await syncUserAndOnlineLevels();
   };
 
   const recordLevelCompletion = useCallback(

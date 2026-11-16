@@ -7,6 +7,7 @@ import { DailyCollectStatus } from '../../services/currency';
 import { TOTAL_LEVELS } from './types';
 import { useGame } from '../../context/GameContext';
 import { soundManager } from '../../audio';
+import { achievementManager } from '../../services/achievements';
 
 interface LevelMapHeaderProps {
   displayCores: number;
@@ -27,6 +28,24 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
 }) => {
   const { user, setActiveTab, setIsSettingsOpen } = useGame();
   const [avatarErr, setAvatarErr] = React.useState(false);
+  const [hasUnclaimedAch, setHasUnclaimedAch] = React.useState<boolean>(() => achievementManager.hasUncollected());
+  const [unclaimedCount, setUnclaimedCount] = React.useState<number>(() => achievementManager.getUncollectedCount());
+
+  React.useEffect(() => {
+    const checkAch = () => {
+      setHasUnclaimedAch(achievementManager.hasUncollected());
+      setUnclaimedCount(achievementManager.getUncollectedCount());
+    };
+    checkAch();
+    const unsub = achievementManager.onUnlock(checkAch);
+    window.addEventListener('achievement_claimed', checkAch);
+    window.addEventListener('achievement_unlocked', checkAch);
+    return () => {
+      unsub();
+      window.removeEventListener('achievement_claimed', checkAch);
+      window.removeEventListener('achievement_unlocked', checkAch);
+    };
+  }, []);
 
   const canShowFree =
     dailyStatus.canCollect ||
@@ -89,6 +108,31 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                 ) : (
                   <CyberPilotIcon className="w-6 h-6" />
                 )}
+
+                {/* Sweeping Radiant Light Shine when completed achievements are uncollected */}
+                {hasUnclaimedAch && (
+                  <div className="absolute inset-0 rounded-lg overflow-hidden pointer-events-none z-10">
+                    <motion.div
+                      className="w-[200%] h-full bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent skew-x-[-25deg]"
+                      animate={{ x: ['-100%', '150%'] }}
+                      transition={{
+                        duration: 2.8,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        repeatDelay: 0.8,
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Uncollected Achievements Indicator Badge */}
+                {hasUnclaimedAch && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 px-1.5 py-0.2 rounded-full font-tech font-black text-[8px] bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 border border-yellow-200 shadow-[0_0_8px_rgba(255,215,0,0.8)] leading-tight z-20 pointer-events-none"
+                  >
+                    {unclaimedCount > 0 ? unclaimedCount : '!'}
+                  </span>
+                )}
               </motion.button>
             </div>
           </div>
@@ -126,8 +170,8 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                 className="absolute inset-0 rounded-full pointer-events-none"
                 style={{
                   transform: 'translateY(3.5px)',
-                  background: 'linear-gradient(180deg, #7e22ce 0%, #3b0764 100%)',
-                  border: '1.5px solid #581c87',
+                  background: 'linear-gradient(180deg, #475569 0%, #1e293b 100%)',
+                  border: '1.5px solid #334155',
                   boxShadow: '0 5px 12px rgba(0, 0, 0, 0.85)',
                 }}
               />
@@ -137,34 +181,33 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                   soundManager.playClick();
                   setIsSettingsOpen(true);
                 }}
-                whileHover={{ y: -0.5 }}
-                whileTap={{ y: 3 }}
+                whileHover={{ y: -0.5, scale: 1.04 }}
+                whileTap={{ y: 3, scale: 0.96 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                 style={{
                   background:
-                    'linear-gradient(180deg, rgba(38, 20, 68, 0.96) 0%, rgba(18, 10, 36, 0.98) 100%)',
-                  border: '1.8px solid rgba(168, 85, 247, 0.8)',
+                    'linear-gradient(180deg, rgba(24, 34, 52, 0.96) 0%, rgba(12, 18, 30, 0.98) 100%)',
+                  border: '1.8px solid rgba(226, 232, 240, 0.85)',
                   boxShadow:
-                    'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(168, 85, 247, 0.25)',
+                    'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.25)',
                 }}
                 className="relative w-full h-full rounded-full flex items-center justify-center cursor-pointer active:scale-95 transition-all flex-shrink-0 pointer-events-auto"
                 title="System Settings"
               >
-                <CyberGearIcon className="w-6 h-6" />
+                <CyberGearIcon className="w-6 h-6" whiteIcon={true} />
               </motion.button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Distance-haze gradient at top (vanishing-point zone) */}
+      {/* Subtle ambient top lighting (clean full-screen visibility) */}
       <div
         ref={hazeRef}
-        className="absolute top-0 inset-x-0 h-28 pointer-events-none z-30 transition-opacity duration-150"
+        className="absolute top-0 inset-x-0 h-16 pointer-events-none z-30 transition-opacity duration-150"
         style={{
           background:
-            'radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0,247,255,0.10) 0%, transparent 80%),' +
-            'linear-gradient(to bottom, #03040c 0%, rgba(3,4,12,0.90) 38%, rgba(3,4,12,0.4) 68%, transparent 100%)',
+            'radial-gradient(ellipse 90% 80% at 50% 0%, rgba(0,247,255,0.06) 0%, transparent 80%)',
         }}
       />
     </>

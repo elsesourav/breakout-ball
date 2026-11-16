@@ -45,6 +45,27 @@ export interface AuthState {
 class AuthService {
   private userKey = 'breakout_auth_user';
   private tokenKey = 'breakout_auth_token';
+  private anonUserKey = 'breakout_anon_user_id';
+
+  public getAnonymousUserId(): string {
+    let anonId = localStorage.getItem(this.anonUserKey);
+    if (!anonId) {
+      const rand = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID().replace(/-/g, '').slice(0, 12)
+        : Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      anonId = `anon_${rand}`;
+      localStorage.setItem(this.anonUserKey, anonId);
+    }
+    return anonId;
+  }
+
+  public getEffectiveUserId(): string {
+    const user = this.getCurrentUser();
+    if (user.isLoggedIn && user.id && user.id !== 'anonymous') {
+      return user.id;
+    }
+    return this.getAnonymousUserId();
+  }
 
   constructor() {
     this.setupSsoPostMessageListener();
@@ -128,8 +149,9 @@ class AuthService {
         return parsed;
       } catch {}
     }
+    const anonId = this.getAnonymousUserId();
     return {
-      id: 'anonymous',
+      id: anonId,
       fullName: 'Anonymous',
       username: 'anonymous',
       email: '',

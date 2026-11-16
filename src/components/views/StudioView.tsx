@@ -1,13 +1,96 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useGame } from '../../context/GameContext';
 import { LevelData } from '../../types/game';
-import { drawLevelPreviewOnCanvas, calculateLevelHp } from '../../utils/helpers';
-import { Plus, Settings2, Play, Eye, EyeOff, Layers } from 'lucide-react';
+import { drawLevelPreviewOnCanvas, calculateLevelHp, generateLevelId } from '../../utils/helpers';
+import { Plus, Settings2, Play, Eye, EyeOff, Pencil, CopyPlus, X, Check, AlertCircle } from 'lucide-react';
 import { StudioMatrixForgeIcon } from '../navigation/NavIcons';
 import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
+import { initDesignerForNewLevel, initDesignerForEditLevel } from '../designer';
+import { cyberToast } from '../common/CyberToast';
+
+function getUniqueDuplicateName(originalName: string, existingLevels: LevelData[]): string {
+  const base = originalName.replace(/\s*\((?:Copy|V\d+|D\d+)[^)]*\)$/i, '').trim() || 'Arena';
+  const existingSet = new Set(
+    existingLevels.map((l) => (l.name || '').trim().toLowerCase())
+  );
+  let candidate = `${base} (Copy)`;
+  let count = 2;
+  while (existingSet.has(candidate.toLowerCase())) {
+    candidate = `${base} (Copy ${count})`;
+    count++;
+  }
+  return candidate;
+}
 
 export const StudioView: React.FC = () => {
-  const { userCreatedLevels, openDesigner, openPreview, openModifier, setActiveTab } = useGame();
+  const {
+    userCreatedLevels,
+    openPreview,
+    openModifier,
+    setActiveTab,
+    setScreen,
+    saveUserLevel,
+    user,
+  } = useGame();
+
+  const [copyTargetLevel, setCopyTargetLevel] = useState<LevelData | null>(null);
+  const [duplicateName, setDuplicateName] = useState('');
+
+  const handleDesignNew = () => {
+    initDesignerForNewLevel();
+    setScreen('designer');
+  };
+
+  const handleEditLevel = (lvl: LevelData) => {
+    initDesignerForEditLevel(lvl);
+    setScreen('designer');
+  };
+
+  const handleOpenDuplicateModal = (lvl: LevelData) => {
+    setCopyTargetLevel(lvl);
+    const suggested = getUniqueDuplicateName(lvl.name || 'Arena', userCreatedLevels);
+    setDuplicateName(suggested);
+  };
+
+  // Real-time validation for unique duplicate name
+  const trimmed = duplicateName.trim();
+  const sourceName = (copyTargetLevel?.name || '').trim();
+  const isEmpty = trimmed.length === 0;
+  const isSameAsOriginal = Boolean(
+    copyTargetLevel && trimmed.toLowerCase() === sourceName.toLowerCase()
+  );
+  const isAlreadyTaken = userCreatedLevels.some(
+    (l) => (l.name || '').trim().toLowerCase() === trimmed.toLowerCase()
+  );
+
+  const isValidUniqueName = !isEmpty && !isSameAsOriginal && !isAlreadyTaken;
+
+  const validationError = useMemo(() => {
+    if (isEmpty) return 'Arena name cannot be empty';
+    if (isSameAsOriginal) return 'Must be a different name from original arena';
+    if (isAlreadyTaken) return 'Name already exists. Must put a unique name';
+    return null;
+  }, [isEmpty, isSameAsOriginal, isAlreadyTaken]);
+
+  const handleConfirmDuplicate = async () => {
+    if (!copyTargetLevel) return;
+    if (!isValidUniqueName) {
+      cyberToast.error(validationError || 'Please enter a valid unique name.');
+      return;
+    }
+    const duplicate: LevelData = {
+      id: generateLevelId(),
+      name: trimmed,
+      creator: user.username,
+      playCount: 0,
+      blocks: JSON.parse(JSON.stringify(copyTargetLevel.blocks)),
+      isPublic: false,
+      createdAt: Date.now(),
+    };
+    await saveUserLevel(duplicate);
+    cyberToast.success(`Arena duplicated as "${trimmed}"!`);
+    setCopyTargetLevel(null);
+  };
 
   return (
     <div
@@ -35,7 +118,7 @@ export const StudioView: React.FC = () => {
         {/* Primary CTA: Design New Arena */}
         <button
           type="button"
-          onClick={openDesigner}
+          onClick={handleDesignNew}
           style={{
             borderRadius: '12px',
             backgroundColor: '#00e5ff',
@@ -57,10 +140,9 @@ export const StudioView: React.FC = () => {
             key={lvl.id}
             level={lvl}
             onSelect={() => openPreview(lvl)}
-            onSettings={(e) => {
-              e.stopPropagation();
-              openModifier(lvl);
-            }}
+            onEdit={() => handleEditLevel(lvl)}
+            onDuplicate={() => handleOpenDuplicateModal(lvl)}
+            onSettings={() => openModifier(lvl)}
           />
         ))}
       </div>
@@ -81,6 +163,104 @@ export const StudioView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Duplicate Level Modal */}
+      {copyTargetLevel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in">
+          <div
+            style={{
+              backgroundColor: 'rgba(7, 11, 28, 0.98)',
+              border: '1.5px solid rgba(0, 247, 255, 0.45)',
+              boxShadow: '0 0 35px rgba(0, 247, 255, 0.25)',
+            }}
+            className="w-full max-w-sm rounded-2xl flex flex-col gap-3.5 p-5 text-slate-200"
+          >
+            <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
+              <div className="flex items-center gap-2">
+                <CopyPlus className="w-4 h-4 text-cyan-400" />
+                <h3 className="font-display font-black text-sm text-[#00f7ff] tracking-wider">
+                  DUPLICATE ARENA
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCopyTargetLevel(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="font-tech text-xs text-slate-300">
+              Duplicating <span className="text-cyan-300 font-bold">"{sourceName || 'Arena'}"</span>. Put a new unique name:
+            </p>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="font-tech text-xs font-bold text-slate-300 tracking-wider">
+                NEW UNIQUE ARENA NAME
+              </label>
+              <input
+                type="text"
+                autoFocus
+                value={duplicateName}
+                maxLength={28}
+                onChange={(e) => setDuplicateName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && isValidUniqueName) handleConfirmDuplicate();
+                }}
+                style={{
+                  borderColor: validationError ? '#f43f5e' : isValidUniqueName ? '#10b981' : 'rgba(0, 247, 255, 0.4)',
+                }}
+                className="w-full px-3 py-2 rounded-xl bg-cyan-950/40 border text-cyan-200 font-display font-bold text-sm focus:outline-none focus:shadow-[0_0_12px_rgba(0,247,255,0.4)] transition-colors"
+                placeholder="Unique Arena Name"
+              />
+
+              {/* Real-time Validation Message */}
+              <div className="flex items-center justify-between text-[11px] font-tech min-h-[18px]">
+                {validationError ? (
+                  <span className="text-rose-400 flex items-center gap-1 font-bold">
+                    <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                    <span>{validationError}</span>
+                  </span>
+                ) : (
+                  <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                    <Check className="w-3 h-3 flex-shrink-0" />
+                    <span>Unique name verified</span>
+                  </span>
+                )}
+                <span className="text-slate-400 self-end ml-auto">
+                  {duplicateName.length}/28
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2 border-t border-cyan-500/20">
+              <button
+                type="button"
+                onClick={() => setCopyTargetLevel(null)}
+                className="flex-1 py-2.5 rounded-xl border border-white/15 bg-white/5 font-display font-bold text-xs text-slate-300 hover:text-white transition-all cursor-pointer"
+              >
+                CANCEL
+              </button>
+              <button
+                type="button"
+                disabled={!isValidUniqueName}
+                onClick={handleConfirmDuplicate}
+                style={{
+                  backgroundColor: isValidUniqueName ? '#00f7ff' : '#0f172a',
+                  color: isValidUniqueName ? '#000000' : '#475569',
+                  boxShadow: isValidUniqueName ? '0 0 16px rgba(0, 247, 255, 0.5)' : 'none',
+                  cursor: isValidUniqueName ? 'pointer' : 'not-allowed',
+                }}
+                className="flex-1 py-2.5 rounded-xl font-display font-black text-xs tracking-wider transition-all active:scale-98 flex items-center justify-center gap-1.5"
+              >
+                <CopyPlus className="w-4 h-4 stroke-[2.5]" />
+                <span>DUPLICATE</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -88,8 +268,10 @@ export const StudioView: React.FC = () => {
 const StudioLevelCard: React.FC<{
   level: LevelData;
   onSelect: () => void;
-  onSettings: (e: React.MouseEvent) => void;
-}> = ({ level, onSelect, onSettings }) => {
+  onEdit: () => void;
+  onDuplicate: () => void;
+  onSettings: () => void;
+}> = ({ level, onSelect, onEdit, onDuplicate, onSettings }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -157,22 +339,49 @@ const StudioLevelCard: React.FC<{
       </div>
 
       {/* Details Bar */}
-      <div className="p-2.5 flex flex-col gap-1.5 min-w-0">
+      <div className="p-2 flex flex-col gap-1 min-w-0">
         <div className="flex items-center justify-between min-w-0">
-          <span className="font-tech font-black text-xs text-cyan-300 truncate min-w-0 flex-1 mr-1.5">
+          <span className="font-tech font-black text-xs text-cyan-300 truncate min-w-0 flex-1 mr-1">
             {level.name || `Core #${level.id}`}
           </span>
-          <button
-            type="button"
-            onClick={onSettings}
-            className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer flex-shrink-0"
-            title="Edit Level Settings"
-          >
-            <Settings2 className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
+              title="Edit in Designer"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicate();
+              }}
+              className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
+              title="Duplicate Arena"
+            >
+              <CopyPlus className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSettings();
+              }}
+              className="p-1 rounded-md bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer"
+              title="Settings & Delete"
+            >
+              <Settings2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between text-[10px] font-tech text-slate-400 border-t border-white/10 pt-1.5">
+        <div className="flex items-center justify-between text-[10px] font-tech text-slate-400 border-t border-white/10 pt-1">
           <span className="flex items-center gap-1 text-slate-300">
             <Play className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
             <span>{level.playCount || 0}</span>

@@ -26,7 +26,7 @@ export const PaddleTab: React.FC<PaddleTabProps> = ({ upgrades, cores, onUpgrade
     <div className="w-full flex flex-col gap-3">
       {/* Section Header */}
       <div className="flex items-center justify-between text-[11px] font-tech text-cyan-400 uppercase tracking-wider px-1 pt-0.5">
-        <span>🏓 PADDLE MODULES</span>
+        <span>PADDLE MODULES</span>
         <span className="text-slate-400">TAP CARD TO PREVIEW</span>
       </div>
 

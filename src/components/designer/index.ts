@@ -7,3 +7,4 @@ export * from './DesignerCanvas';
 export * from './DesignerFooter';
 export * from './DesignerSaveModal';
 export * from './DesignerInfoModal';
+export * from './designerSession';

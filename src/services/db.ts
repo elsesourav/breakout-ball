@@ -7,34 +7,8 @@ import {
   collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc, increment, query, orderBy, limit
 } from 'firebase/firestore';
 
-/**
- * Ensures all portals remain Quantum Portals (h: 7) and are properly paired.
- * Under NO circumstances does this function convert a portal (h: 7) into a standard block or Titanium block!
- */
-export function sanitizePortals(level: LevelData): LevelData {
-  if (!level || !level.blocks || !Array.isArray(level.blocks)) return level;
-  const portals = level.blocks.filter((b) => b.h === 7);
-  if (portals.length === 0) return level;
-
-  // Track existing portal pair IDs (1..4)
-  let unassignedPortalsCount = 0;
-  const newBlocks = level.blocks.map((b) => {
-    if (b.h !== 7) return b;
-    // Keep portal type (h: 7) strictly intact - NEVER convert to Titanium or another block
-    if (b.portalPairId !== undefined && b.portalPairId >= 1 && b.portalPairId <= 4) {
-      return b;
-    }
-    // Allocate sequential pair IDs for unassigned portals (every 2 portals share a pairId)
-    const pairId = Math.min(4, Math.floor(unassignedPortalsCount / 2) + 1);
-    unassignedPortalsCount++;
-    return { ...b, portalPairId: pairId };
-  });
-
-  return {
-    ...level,
-    blocks: newBlocks,
-  };
-}
+import { sanitizePortals, getOverallLeaderboard } from './dbHelpers';
+export { sanitizePortals, getOverallLeaderboard };
 
 class CloudDatabaseService {
   private localLevelsKey = 'breakout_db_local_levels';
@@ -76,8 +50,37 @@ class CloudDatabaseService {
         localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
       }
     }
-    if (!localStorage.getItem(this.leaderboardsKey)) {
+    const rawLeaderboards = localStorage.getItem(this.leaderboardsKey);
+    if (!rawLeaderboards) {
       localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
+    } else {
+      try {
+        const parsed = JSON.parse(rawLeaderboards);
+        if (parsed && parsed.default) {
+          delete parsed.default;
+          localStorage.setItem(this.leaderboardsKey, JSON.stringify(parsed));
+        }
+      } catch {}
+    }
+
+    // Ensure locally created levels on this device are attached to this device's unique anonymous ID
+    const rawUser = localStorage.getItem(this.userLevelsKey);
+    if (rawUser) {
+      try {
+        const parsed: LevelData[] = JSON.parse(rawUser);
+        let modified = false;
+        const anonId = authService.getAnonymousUserId();
+        const updated = parsed.map((lvl) => {
+          if (!lvl.creatorId && (!lvl.creator || lvl.creator.toLowerCase() === 'anonymous')) {
+            modified = true;
+            return { ...lvl, creatorId: anonId };
+          }
+          return lvl;
+        });
+        if (modified) {
+          localStorage.setItem(this.userLevelsKey, JSON.stringify(updated));
+        }
+      } catch {}
     }
   }
 
@@ -113,30 +116,15 @@ class CloudDatabaseService {
 
       if (!snap.empty) {
         const cloudLevels: LevelData[] = snap.docs.map((d) => d.data() as LevelData);
-        // Exclude numeric arcade levels
         const cleanCloud = cloudLevels.filter((l) => isNaN(Number(l.id)));
-
-        // Merge: Curated levels ALWAYS use official definitions with verified portal pairings,
-        // while adopting any updated playCount.
-        // User-generated levels are strictly sanitized against orphan single portals.
         const sanitizedCloud = cleanCloud.map((cloudLvl) => {
           const curated = curatedMap.get(cloudLvl.id);
-          if (curated) {
-            return {
-              ...curated,
-              playCount: Math.max(curated.playCount || 0, cloudLvl.playCount || 0),
-            };
-          }
-          return sanitizePortals(cloudLvl);
+          return curated ? { ...curated, playCount: Math.max(curated.playCount || 0, cloudLvl.playCount || 0) } : sanitizePortals(cloudLvl);
         });
-
         const cloudIds = new Set(sanitizedCloud.map((l) => l.id));
         const missingCurated = INITIAL_ONLINE_LEVELS.filter((l) => !cloudIds.has(l.id));
         const merged = [...sanitizedCloud, ...missingCurated];
-
-        // Update local cache for offline play
         localStorage.setItem(this.onlineLevelsKey, JSON.stringify(merged));
-
         return this.filterLevelsByTerm(merged, searchTerm);
       }
     } catch {}
@@ -147,13 +135,7 @@ class CloudDatabaseService {
     const cleanLevels = rawLevels
       .map((l) => {
         const curated = curatedMap.get(l.id);
-        if (curated) {
-          return {
-            ...curated,
-            playCount: Math.max(curated.playCount || 0, l.playCount || 0),
-          };
-        }
-        return sanitizePortals(l);
+        return curated ? { ...curated, playCount: Math.max(curated.playCount || 0, l.playCount || 0) } : sanitizePortals(l);
       })
       .filter((l) => isNaN(Number(l.id)));
     return this.filterLevelsByTerm(cleanLevels, searchTerm);
@@ -167,20 +149,33 @@ class CloudDatabaseService {
     );
   }
 
-  public async getUserCreatedLevels(username: string): Promise<LevelData[]> {
+  public async getUserCreatedLevels(userOrCreatorId: string): Promise<LevelData[]> {
+    const target = (userOrCreatorId || '').trim().toLowerCase();
+    if (!target) return [];
+
     try {
       const snap = await getDocs(collection(firestoreDb, 'user_levels'));
       if (!snap.empty) {
         const cloudLevels = snap.docs
           .map((d) => d.data() as LevelData)
-          .filter((l) => l.creator.toLowerCase() === username.toLowerCase());
+          .filter((l) => {
+            const cid = (l.creatorId || '').trim().toLowerCase();
+            const cname = (l.creator || '').trim().toLowerCase();
+            if (cid) return cid === target;
+            return cname !== 'anonymous' && cname === target;
+          });
         if (cloudLevels.length > 0) return cloudLevels;
       }
     } catch {}
 
     const raw = localStorage.getItem(this.userLevelsKey);
     const levels: LevelData[] = raw ? JSON.parse(raw) : [];
-    return levels.filter((l) => l.creator.toLowerCase() === username.toLowerCase());
+    return levels.filter((l) => {
+      const cid = (l.creatorId || '').trim().toLowerCase();
+      const cname = (l.creator || '').trim().toLowerCase();
+      if (cid) return cid === target;
+      return cname !== 'anonymous' && cname === target;
+    });
   }
 
   public async getLevelById(id: string): Promise<LevelData | null> {
@@ -208,6 +203,7 @@ class CloudDatabaseService {
   }
 
   public async saveLevel(level: LevelData): Promise<boolean> {
+    const creatorKey = level.creatorId || level.creator;
     try {
       // 1. Save to Cloud Firestore
       if (level.isPublic) {
@@ -217,7 +213,7 @@ class CloudDatabaseService {
         }, { merge: true });
       }
 
-      await setDoc(doc(firestoreDb, 'user_levels', `${level.creator}_${level.id}`), {
+      await setDoc(doc(firestoreDb, 'user_levels', `${creatorKey}_${level.id}`), {
         ...level,
         updatedAt: new Date().toISOString(),
       }, { merge: true });
@@ -254,9 +250,21 @@ class CloudDatabaseService {
     return this.saveLevel(level);
   }
 
-  public async deleteLevel(id: string): Promise<boolean> {
+  public async deleteLevel(id: string, creatorId?: string): Promise<boolean> {
     try {
       await deleteDoc(doc(firestoreDb, 'online_levels', id)).catch(() => {});
+      if (creatorId) {
+        await deleteDoc(doc(firestoreDb, 'user_levels', `${creatorId}_${id}`)).catch(() => {});
+      }
+      const snap = await getDocs(collection(firestoreDb, 'user_levels')).catch(() => null);
+      if (snap) {
+        for (const d of snap.docs) {
+          const data = d.data() as LevelData;
+          if (data.id === id) {
+            await deleteDoc(d.ref).catch(() => {});
+          }
+        }
+      }
       const rawUser = localStorage.getItem(this.userLevelsKey);
       if (rawUser) {
         const userLevels: LevelData[] = JSON.parse(rawUser);
@@ -274,6 +282,10 @@ class CloudDatabaseService {
   }
 
   public async incrementPlayCount(levelId: string): Promise<void> {
+    if (!levelId || levelId === 'TEST' || levelId.startsWith('test_') || levelId.startsWith('test-')) {
+      return;
+    }
+
     try {
       await updateDoc(doc(firestoreDb, 'online_levels', levelId), {
         playCount: increment(1),
@@ -296,6 +308,10 @@ class CloudDatabaseService {
   // ==========================================
 
   public async getLeaderboard(levelId: string): Promise<LeaderboardEntry[]> {
+    if (!levelId || levelId === 'TEST' || levelId.startsWith('test_') || levelId.startsWith('test-') || levelId === 'default') {
+      return [];
+    }
+
     // 1. Live Backend Microservice
     try {
       const apiEntries = await backendApi.getLevelLeaderboard(levelId);
@@ -322,10 +338,10 @@ class CloudDatabaseService {
       }
     } catch {}
 
-    // 3. Local fallback
+    // 3. Local fallback (Only return curated leaderboard for explicit levelId, NEVER default mock users)
     const raw = localStorage.getItem(this.leaderboardsKey);
     const all: Record<string, LeaderboardEntry[]> = raw ? JSON.parse(raw) : MOCK_LEADERBOARDS;
-    return all[levelId] || all.default || [];
+    return (all && all[levelId]) || [];
   }
 
   public async submitScore(
@@ -334,6 +350,9 @@ class CloudDatabaseService {
     time: number,
     livesRemaining: number = 3
   ): Promise<{ rank: number; isNewBest: boolean; updatedLeaderboard: LeaderboardEntry[] }> {
+    if (!levelId || levelId === 'TEST' || levelId.startsWith('test_') || levelId.startsWith('test-') || levelId === 'default') {
+      return { rank: 1, isNewBest: false, updatedLeaderboard: [] };
+    }
     const existingList: LeaderboardEntry[] = await this.getLeaderboard(levelId);
     const currentEntry = existingList.find((e) => e.username.toLowerCase() === username.toLowerCase());
     const isNewBest = !currentEntry || time < currentEntry.time;
@@ -475,11 +494,3 @@ class CloudDatabaseService {
 }
 
 export const dbService = new CloudDatabaseService();
-
-export async function getOverallLeaderboard() {
-  try {
-    const snap = await getDoc(doc(firestoreDb, 'leaderboards', 'overall'));
-    if (snap.exists() && Array.isArray(snap.data()?.entries)) return snap.data()?.entries;
-  } catch {}
-  return [];
-}

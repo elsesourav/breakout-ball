@@ -101,3 +101,32 @@ export function validateDesignerLevel(
   }
   return { valid: true };
 }
+
+export function movePortalInGrid(
+  currentGrid: GridCell[][],
+  fromX: number,
+  fromY: number,
+  pairId: number,
+  currentX: number,
+  currentY: number
+): GridCell[][] | null {
+  if (
+    currentX === fromX && currentY === fromY ||
+    currentX < 0 || currentX >= GRID_ROWS ||
+    currentY < 0 || currentY >= GRID_COLS
+  ) {
+    return null;
+  }
+  const targetCell = currentGrid[currentY][currentX];
+  if (targetCell.h === 7 && targetCell.portalPairId === pairId) return null;
+
+  return currentGrid.map((row, rIdx) =>
+    row.map((cell, cIdx) => {
+      if (rIdx === currentY && cIdx === currentX) return { h: 7, portalPairId: pairId };
+      if (rIdx === fromY && cIdx === fromX) {
+        return targetCell.h > 0 && targetCell.h !== 7 ? { ...targetCell } : { h: 0 };
+      }
+      return cell;
+    })
+  );
+}

@@ -66,6 +66,9 @@ export interface CollisionEvent {
   hitX: number;
   hitY: number;
   combo: number;
+  source?: 'ball' | 'emp' | 'laser';
+  epicenterX?: number;
+  epicenterY?: number;
 }
 
 export interface Particle {

@@ -12,6 +12,7 @@ import {
   Timer,
   ShieldAlert,
   Zap,
+  ArrowLeft,
 } from 'lucide-react';
 import { ScoreState } from '../../engine/types';
 import { CoreIcon } from '../common/CoreIcon';
@@ -31,7 +32,8 @@ interface GameSummaryModalProps {
   onNextLevel?: () => void;
   onExit: () => void;
   isDailyMission?: boolean;
-  gameMode?: 'arcade' | 'arena';
+  gameMode?: 'arcade' | 'arena' | 'studio';
+  isTestMode?: boolean;
 }
 
 export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
@@ -45,6 +47,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
   onExit,
   isDailyMission = false,
   gameMode = 'arcade',
+  isTestMode = false,
 }) => {
   const isWin = summaryState.status === 'win';
   const hearts = Math.min(3, Math.max(1, summaryState.lives ?? 3));
@@ -422,8 +425,8 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                   style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}
                   className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer text-slate-300 px-3"
                 >
-                  <Home className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{gameMode === 'arena' ? 'ARENA' : 'ARCADE'}</span>
+                  {isTestMode ? <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" /> : <Home className="w-3.5 h-3.5 text-slate-400" />}
+                  <span>{isTestMode ? 'DESIGNER' : gameMode === 'studio' ? 'STUDIO' : gameMode === 'arena' ? 'ARENA' : 'ARCADE'}</span>
                 </button>
               </div>
             )}
@@ -453,8 +456,8 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
               style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}
               className="w-full h-11 flex items-center justify-center gap-2 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer text-slate-400 px-4"
             >
-              <Home className="w-3.5 h-3.5 text-slate-400" />
-              <span>{gameMode === 'arena' ? 'EXIT TO ARENA' : 'EXIT TO ARCADE'}</span>
+              {isTestMode ? <ArrowLeft className="w-3.5 h-3.5 text-cyan-400" /> : <Home className="w-3.5 h-3.5 text-slate-400" />}
+              <span>{isTestMode ? 'BACK TO DESIGNER' : gameMode === 'studio' ? 'EXIT TO STUDIO' : gameMode === 'arena' ? 'EXIT TO ARENA' : 'EXIT TO ARCADE'}</span>
             </button>
           </div>
         )}

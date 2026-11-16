@@ -59,6 +59,10 @@ class CyberToastManager {
     this.show({ message, type: 'warning', duration });
   }
 
+  public error(message: string, duration = 2200) {
+    this.show({ message, type: 'warning', duration });
+  }
+
   public success(message: string, duration = 2200) {
     this.show({ message, type: 'success', duration });
   }

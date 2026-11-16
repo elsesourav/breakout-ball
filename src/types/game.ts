@@ -10,6 +10,7 @@ export interface LevelData {
   id: string;
   name?: string;
   creator: string;
+  creatorId?: string;
   playCount: number;
   blocks: BlockData[];
   isPublic?: boolean;
@@ -36,6 +37,7 @@ export interface LeaderboardEntry {
 }
 
 export interface UserProfile {
+  id?: string;
   fullName: string;
   username: string;
   email: string;

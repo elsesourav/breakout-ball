@@ -57,7 +57,7 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
         boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
       }}
     >
-      <div className="w-full max-w-sm px-3.5 py-2.5 flex items-center justify-between gap-2">
+      <div className="w-full max-w-sm px-2 py-2 relative flex items-center justify-between">
         {/* Left: Back Button */}
         <motion.button
           type="button"
@@ -69,15 +69,15 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
             border: '1.2px solid rgba(0, 247, 255, 0.45)',
             boxShadow: '0 0 10px rgba(0, 247, 255, 0.25)',
           }}
-          className="h-9 px-2.5 rounded-xl flex items-center gap-1.5 text-xs font-tech font-bold text-cyan-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0"
+          className="h-8 px-2.5 rounded-xl flex items-center gap-1.5 text-xs font-tech font-bold text-cyan-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0 z-10"
           title="Return to previous screen"
         >
           <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
           <span className="tracking-wider">BACK</span>
         </motion.button>
 
-        {/* Center: Title / Subtitle */}
-        <div className="flex-1 min-w-0 flex flex-col items-center text-center px-1">
+        {/* Center: Title / Subtitle (Mathematically Centered in Header) */}
+        <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none flex flex-col items-center text-center max-w-[190px] px-1 z-0">
           <span
             className="font-display font-black text-xs sm:text-[13px] tracking-wider uppercase truncate"
             style={{
@@ -94,14 +94,14 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
           )}
         </div>
 
-        {/* Right: Cores Badge only for designated important views, no settings */}
-        <div className="flex-shrink-0 flex items-center justify-end min-w-[70px]">
+        {/* Right: Cores Badge fixed to the right side */}
+        <div className="flex-shrink-0 flex items-center justify-end min-w-[80px] z-10">
           {rightSlot ? (
             rightSlot
           ) : showCores ? (
             <TopCoresBadge cores={cores} onOpenShop={handleOpenShop} />
           ) : (
-            <div className="w-9 h-9" />
+            <div className="w-8 h-8" />
           )}
         </div>
       </div>

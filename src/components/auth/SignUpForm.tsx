@@ -40,6 +40,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSwitchToLog
 
       if (res.success && res.user) {
         updateUser({
+          id: res.user.id,
           fullName: res.user.fullName,
           username: res.user.username,
           email: res.user.email,

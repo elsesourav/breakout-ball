@@ -46,41 +46,50 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
 
     hasPlayedSoundRef.current = false;
 
-    // 1. Calculate start & target positions once per active trigger
+    // 1. Calculate accurate start & target positions once per active trigger
     const currentOrigin = originRef.current;
     const sX = currentOrigin?.x ?? (typeof window !== 'undefined' ? window.innerWidth / 2 : 200);
     const sY = currentOrigin?.y ?? (typeof window !== 'undefined' ? window.innerHeight * 0.55 : 350);
     setStartPos({ x: sX, y: sY });
 
-    const badge = typeof document !== 'undefined' ? document.getElementById('header-cores-badge') : null;
-    if (badge) {
-      const rect = badge.getBoundingClientRect();
-      if (rect.width > 0 && rect.right > 0) {
-        setTargetPos({
-          x: rect.left + rect.width / 2,
-          y: rect.top >= 0 && rect.bottom <= 120 ? rect.top + rect.height / 2 : 28,
-        });
+    let foundTarget = { x: 320, y: 28 };
+    if (typeof document !== 'undefined') {
+      const badge =
+        document.getElementById('top-cores-badge') ||
+        document.getElementById('header-cores-badge') ||
+        document.querySelector('[title*="Cores"]');
+      if (badge) {
+        const icon = badge.querySelector('svg');
+        const rect = icon ? icon.getBoundingClientRect() : badge.getBoundingClientRect();
+        if (rect.width > 0 && rect.right > 0) {
+          foundTarget = {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+          };
+        }
+      } else if (typeof window !== 'undefined') {
+        foundTarget = {
+          x: Math.min(window.innerWidth - 45, window.innerWidth - 40),
+          y: 28,
+        };
       }
-    } else if (typeof window !== 'undefined') {
-      setTargetPos({
-        x: Math.min(window.innerWidth - 65, window.innerWidth / 2 + 130),
-        y: 28,
-      });
     }
+    setTargetPos(foundTarget);
 
-    // 2. Spawn 8 sleek glowing core crystals
-    const count = 8;
+    // 2. Spawn sleek glowing core crystals across a generous source burst radius
+    const count = 9;
     const items: Particle[] = Array.from({ length: count }).map((_, i) => {
-      const angle = (i / count) * Math.PI * 2;
-      const spread = 8 + (i % 3) * 6;
+      // Big random radial distribution inside radius ~36px around click origin
+      const randAngle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.45;
+      const randDist = 12 + Math.random() * 26;
       return {
         id: i,
-        delay: 0.04 + i * 0.07,
-        duration: 1.15 + (i % 3) * 0.06,
-        offsetX: Math.cos(angle) * spread,
-        offsetY: Math.sin(angle) * spread,
-        curveOffset: (i % 2 === 0 ? 1 : -1) * (14 + (i % 3) * 8),
-        scaleMod: 0.95 + (i % 2) * 0.1,
+        delay: 0.02 + i * 0.05,
+        duration: 1.05 + (i % 3) * 0.07,
+        offsetX: Math.cos(randAngle) * randDist,
+        offsetY: Math.sin(randAngle) * randDist,
+        curveOffset: (i % 2 === 0 ? 1 : -1) * (18 + (i % 4) * 8),
+        scaleMod: 0.95 + (i % 3) * 0.1,
       };
     });
     setParticles(items);
@@ -94,10 +103,10 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
       }
     }, 750);
 
-    // 4. Complete whole animation sequence smoothly at 1.7s
+    // 4. Complete whole animation sequence smoothly at 1.6s
     const completeTimer = setTimeout(() => {
       onCompleteRef.current();
-    }, 1700);
+    }, 1600);
 
     return () => {
       clearTimeout(soundTimer);

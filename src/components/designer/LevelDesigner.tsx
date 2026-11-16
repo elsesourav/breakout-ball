@@ -4,17 +4,20 @@ import { BlockData } from '../../types/game';
 import { GRID_ROWS, GRID_COLS } from '../../constants/game';
 import { generateLevelId, calculateLevelHp } from '../../utils/helpers';
 import { soundManager } from '../../audio';
+import { authService } from '../../services/auth';
 import {
   GridCell,
   HistoryStack,
   DesignerSnapshot,
   createEmptyGrid,
+  cloneSnapshot,
 } from './DesignerTypes';
 import {
   getNextAvailablePairId,
   findAdjacentPortalSlot,
   extractActivePairs,
   validateDesignerLevel,
+  movePortalInGrid,
 } from './designerLogic';
 import { DesignerHeader } from './DesignerHeader';
 import { DesignerPalette } from './DesignerPalette';
@@ -22,20 +25,24 @@ import { DesignerCanvas } from './DesignerCanvas';
 import { DesignerFooter } from './DesignerFooter';
 import { DesignerSaveModal } from './DesignerSaveModal';
 import { DesignerInfoModal } from './DesignerInfoModal';
+import {
+  getDesignerSession,
+  updateDesignerSession,
+  clearDesignerSession,
+} from './designerSession';
+import { cyberToast } from '../common/CyberToast';
 
 export const LevelDesigner: React.FC = () => {
-  const { setScreen, saveUserLevel, startPlayLevel, user, showAlert } = useGame();
+  const { setScreen, saveUserLevel, startPlayLevel, user, showAlert, userCreatedLevels } = useGame();
+  const session = getDesignerSession();
 
-  const [selectedTool, setSelectedTool] = useState<number>(1);
-  const selectedToolRef = useRef(1);
+  const [selectedTool, setSelectedTool] = useState<number>(session.selectedTool || 1);
+  const selectedToolRef = useRef(session.selectedTool || 1);
 
   const [historyState, setHistoryState] = useState<HistoryStack>(() => ({
-    past: [],
-    present: {
-      grid: createEmptyGrid(),
-      pendingPortal: null,
-    },
-    future: [],
+    past: session.historyState.past.map(cloneSnapshot),
+    present: cloneSnapshot(session.historyState.present),
+    future: session.historyState.future.map(cloneSnapshot),
   }));
 
   const present = historyState?.present ?? {
@@ -44,9 +51,6 @@ export const LevelDesigner: React.FC = () => {
   };
   const grid = present.grid;
   const pendingPortal = present.pendingPortal;
-
-  const strokeStartSnapshotRef = useRef<DesignerSnapshot | null>(null);
-  const strokeModifiedRef = useRef(false);
 
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
 
@@ -60,32 +64,41 @@ export const LevelDesigner: React.FC = () => {
 
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [levelName, setLevelName] = useState(`Matrix #${Math.floor(100 + Math.random() * 900)}`);
-  const [isPrivate, setIsPrivate] = useState<boolean>(true);
+  const [levelName, setLevelName] = useState(
+    session.levelName || `Matrix #${Math.floor(100 + Math.random() * 900)}`
+  );
+  const [isPrivate, setIsPrivate] = useState<boolean>(session.isPrivate);
+  const editingLevelId = session.editingLevelId;
 
   const canUndo = (historyState?.past?.length ?? 0) > 0;
   const canRedo = (historyState?.future?.length ?? 0) > 0;
 
+  // Standard Atomic Undo: reverts only the most recent placed block or modification
   const handleUndo = useCallback(() => {
     setHistoryState((curr) => {
       if (!curr || curr.past.length === 0) return curr;
       soundManager.playClick();
+      const previous = curr.past[curr.past.length - 1];
+      const newPast = curr.past.slice(0, curr.past.length - 1);
       return {
-        past: curr.past.slice(0, curr.past.length - 1),
-        present: curr.past[curr.past.length - 1],
-        future: [curr.present, ...curr.future],
+        past: newPast,
+        present: cloneSnapshot(previous),
+        future: [cloneSnapshot(curr.present), ...curr.future].slice(0, 50),
       };
     });
   }, []);
 
+  // Standard Atomic Redo: re-applies the next undone block or modification
   const handleRedo = useCallback(() => {
     setHistoryState((curr) => {
       if (!curr || curr.future.length === 0) return curr;
       soundManager.playClick();
+      const next = curr.future[0];
+      const newFuture = curr.future.slice(1);
       return {
-        past: [...curr.past, curr.present],
-        present: curr.future[0],
-        future: curr.future.slice(1),
+        past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
+        present: cloneSnapshot(next),
+        future: newFuture,
       };
     });
   }, []);
@@ -132,7 +145,7 @@ export const LevelDesigner: React.FC = () => {
         row.map((cell, cIdx) => (rIdx === p.y && cIdx === p.x ? { h: 0 } : cell))
       );
       setHistoryState((curr) => ({
-        past: [...curr.past, curr.present].slice(-40),
+        past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
         present: { grid: cleanGrid, pendingPortal: null },
         future: [],
       }));
@@ -178,7 +191,7 @@ export const LevelDesigner: React.FC = () => {
           });
 
           return {
-            past: [...curr.past, curr.present].slice(-50),
+            past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
             present: { grid: nextGrid, pendingPortal: null },
             future: [],
           };
@@ -187,29 +200,25 @@ export const LevelDesigner: React.FC = () => {
         if (tool === 0) {
           if (currentCell.h === 0) return curr;
 
+          let nextGrid: GridCell[][];
           if (currentCell.h === 7 && currentCell.portalPairId !== undefined) {
             const targetPairId = currentCell.portalPairId;
-            const nextGrid = currentGrid.map((row) =>
+            nextGrid = currentGrid.map((row) =>
               row.map((cell) =>
                 cell.h === 7 && cell.portalPairId === targetPairId ? { h: 0 } : cell
               )
             );
-            soundManager.playClick();
-            strokeModifiedRef.current = true;
-            return {
-              ...curr,
-              present: { grid: nextGrid, pendingPortal: null },
-            };
+          } else {
+            nextGrid = currentGrid.map((row, rIdx) =>
+              row.map((cell, cIdx) => (rIdx === gridY && cIdx === gridX ? { h: 0 } : cell))
+            );
           }
-
-          const nextGrid = currentGrid.map((row, rIdx) =>
-            row.map((cell, cIdx) => (rIdx === gridY && cIdx === gridX ? { h: 0 } : cell))
-          );
           soundManager.playClick();
-          strokeModifiedRef.current = true;
+
           return {
-            ...curr,
-            present: { ...curr.present, grid: nextGrid },
+            past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
+            present: { grid: nextGrid, pendingPortal: null },
+            future: [],
           };
         }
 
@@ -237,10 +246,11 @@ export const LevelDesigner: React.FC = () => {
         }
 
         soundManager.playClick();
-        strokeModifiedRef.current = true;
+
         return {
-          ...curr,
+          past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
           present: { grid: nextGrid, pendingPortal: nextPending },
+          future: [],
         };
       });
     },
@@ -276,7 +286,7 @@ export const LevelDesigner: React.FC = () => {
       btn2Color: '#ff0055',
       onConfirm: () => {
         setHistoryState((curr) => ({
-          past: [...curr.past, curr.present].slice(-40),
+          past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
           present: { grid: createEmptyGrid(), pendingPortal: null },
           future: [],
         }));
@@ -298,7 +308,7 @@ export const LevelDesigner: React.FC = () => {
       });
       soundManager.playClick();
       return {
-        past: [...curr.past, curr.present].slice(-40),
+        past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
         present: { grid: nextGrid, pendingPortal: null },
         future: [],
       };
@@ -316,10 +326,19 @@ export const LevelDesigner: React.FC = () => {
       });
       return;
     }
+    updateDesignerSession({
+      historyState,
+      levelName,
+      isPrivate,
+      editingLevelId,
+      selectedTool,
+    });
+    const effectiveCreatorId = user.id || authService.getEffectiveUserId();
     startPlayLevel({
       id: 'TEST',
       name: levelName || 'Custom Test Level',
-      creator: user.username,
+      creator: user.isLoggedIn ? user.username : 'Anonymous',
+      creatorId: effectiveCreatorId,
       playCount: 0,
       blocks: placedBlocks,
     });
@@ -341,20 +360,32 @@ export const LevelDesigner: React.FC = () => {
 
   const handleConfirmSave = () => {
     const trimmedName = levelName.trim() || `Matrix #${Math.floor(100 + Math.random() * 900)}`;
+    const isEditing = Boolean(editingLevelId);
+    const targetId = editingLevelId || generateLevelId();
+    const existing = userCreatedLevels.find((l) => l.id === targetId);
+    const effectiveCreatorId = existing?.creatorId || user.id || authService.getEffectiveUserId();
+
     saveUserLevel({
-      id: generateLevelId(),
+      id: targetId,
       name: trimmedName,
-      creator: user.username,
-      playCount: 0,
+      creator: existing?.creator || (user.isLoggedIn ? user.username : 'Anonymous'),
+      creatorId: effectiveCreatorId,
+      playCount: existing?.playCount || 0,
       blocks: placedBlocks,
       isPublic: !isPrivate,
-      createdAt: Date.now(),
+      createdAt: existing?.createdAt || Date.now(),
     });
+    clearDesignerSession();
     setShowSaveModal(false);
     setScreen('menu');
+    cyberToast.success(isEditing ? `Arena "${trimmedName}" updated!` : `Arena "${trimmedName}" published!`);
   };
 
   const handleClose = () => {
+    const doClose = () => {
+      clearDesignerSession();
+      setScreen('menu');
+    };
     if (placedBlocks.length > 0) {
       showAlert({
         title: 'EXIT LEVEL STUDIO',
@@ -362,50 +393,25 @@ export const LevelDesigner: React.FC = () => {
         btn1Text: 'CANCEL',
         btn2Text: 'DISCARD & EXIT',
         btn2Color: '#ff0844',
-        onConfirm: () => setScreen('menu'),
+        onConfirm: doClose,
       });
     } else {
-      setScreen('menu');
+      doClose();
     }
   };
 
   const commitPortalMove = useCallback((fromX: number, fromY: number, pairId: number, currentX: number, currentY: number) => {
     setDraggedPortal(null);
-    if ((currentX !== fromX || currentY !== fromY) && currentX >= 0 && currentX < GRID_ROWS && currentY >= 0 && currentY < GRID_COLS) {
-      setHistoryState((curr) => {
-        const currentGrid = curr.present.grid;
-        const targetCell = currentGrid[currentY][currentX];
-        if (targetCell.h === 7 && targetCell.portalPairId === pairId) return curr;
-
-        const nextGrid = currentGrid.map((row, rIdx) =>
-          row.map((cell, cIdx) => {
-            if (rIdx === currentY && cIdx === currentX) return { h: 7, portalPairId: pairId };
-            if (rIdx === fromY && cIdx === fromX) {
-              return targetCell.h > 0 && targetCell.h !== 7 ? { ...targetCell } : { h: 0 };
-            }
-            return cell;
-          })
-        );
-        soundManager.playClick();
-        return {
-          past: [...curr.past, curr.present].slice(-50),
-          present: { grid: nextGrid, pendingPortal: null },
-          future: [],
-        };
-      });
-    }
-  }, []);
-
-  const commitStroke = useCallback(() => {
-    if (strokeModifiedRef.current && strokeStartSnapshotRef.current) {
-      setHistoryState((curr) => ({
-        past: [...curr.past, strokeStartSnapshotRef.current!].slice(-50),
-        present: curr.present,
+    setHistoryState((curr) => {
+      const nextGrid = movePortalInGrid(curr.present.grid, fromX, fromY, pairId, currentX, currentY);
+      if (!nextGrid) return curr;
+      soundManager.playClick();
+      return {
+        past: [...curr.past, cloneSnapshot(curr.present)].slice(-50),
+        present: { grid: nextGrid, pendingPortal: null },
         future: [],
-      }));
-      strokeModifiedRef.current = false;
-      strokeStartSnapshotRef.current = null;
-    }
+      };
+    });
   }, []);
 
   return (
@@ -418,6 +424,8 @@ export const LevelDesigner: React.FC = () => {
           canUndo={canUndo}
           canRedo={canRedo}
           brickCount={placedBlocks.length}
+          isEditing={Boolean(editingLevelId)}
+          editingName={levelName}
           onUndo={handleUndo}
           onRedo={handleRedo}
           onMirrorHorizontal={handleMirrorHorizontal}
@@ -438,7 +446,6 @@ export const LevelDesigner: React.FC = () => {
         draggedPortal={draggedPortal}
         hoverPos={hoverPos}
         onApplyToolAt={applyToolAt}
-        onCommitStroke={commitStroke}
         onStartDragPortal={(fromX, fromY, pairId) => {
           setDraggedPortal({ fromX, fromY, pairId, currentX: fromX, currentY: fromY });
           soundManager.playClick();
@@ -448,10 +455,6 @@ export const LevelDesigner: React.FC = () => {
         }}
         onCommitPortalMove={commitPortalMove}
         onSetHoverPos={setHoverPos}
-        onStrokeStart={() => {
-          strokeStartSnapshotRef.current = present;
-          strokeModifiedRef.current = false;
-        }}
       />
 
       <DesignerFooter
@@ -469,6 +472,7 @@ export const LevelDesigner: React.FC = () => {
           totalHp={stats.totalHp}
           levelName={levelName}
           isPrivate={isPrivate}
+          isEditing={Boolean(editingLevelId)}
           onSetName={setLevelName}
           onSetPrivate={setIsPrivate}
           onConfirmSave={handleConfirmSave}

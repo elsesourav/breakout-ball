@@ -14,6 +14,7 @@ import {
   FloatingBrick,
   Obstacle,
   RouteBlocker,
+  getSectorIndex,
 } from '../roadmap/types';
 import { LevelPathSvg } from '../roadmap/LevelPathSvg';
 import { RoadmapObstacles } from '../roadmap/RoadmapObstacles';
@@ -22,12 +23,12 @@ import { RoadmapNodeItem } from '../roadmap/RoadmapNodeItem';
 import { LevelMapHeader } from '../roadmap/LevelMapHeader';
 
 // ─── Scroll-linked perspective scale ─────────────────────────────────────────
-const SCALE_HORIZON = 0.38;      // horizon vanishing size limit (noticeably small distant)
-const SCALE_FOREGROUND = 1.08;   // foreground size limit (noticeably large close)
-const SCALE_MIN = 0.50;          // horizon vanishing size limit
-const SCALE_MAX = 1.0;           // actual size (100%) for foreground and summit
-const FOREGROUND_LIMIT_Y = 0.48; // foreground threshold where size growth reaches its limit
-const FADE_ZONE = 0.08;          // top 8% of viewport dissolves into horizon haze
+const SCALE_HORIZON = 0.85;      // Subtle arcade depth (85% size at top of screen)
+const SCALE_FOREGROUND = 1.0;    // Full size (100%) at foreground
+const SCALE_MIN = 0.85;
+const SCALE_MAX = 1.0;
+const FOREGROUND_LIMIT_Y = 0.48;
+const FADE_ZONE = 0.0;          // Full screen visibility without artificial blackout zones
 
 // Retain user's current scroll position across tab navigation (no jarring auto-scroll)
 let savedArcadeScrollTop: number | null = null;
@@ -118,56 +119,78 @@ export const ArcadeView: React.FC = () => {
     }, 0);
   }, [localProgress]);
 
-  // ── Ambient floating bricks ─────────────────────────────────────────────────
+  // ── Ambient floating bricks (Sector-Themed Palette Progression) ─────────────
   const floatingBricks: FloatingBrick[] = useMemo(() => {
     const bricks: FloatingBrick[] = [];
-    const palette = [
-      { color: '#00f7ff', glow: 'rgba(0,247,255,0.6)' },
-      { color: '#818cf8', glow: 'rgba(129,140,248,0.6)' },
-      { color: '#f43f5e', glow: 'rgba(244,63,94,0.6)' },
-      { color: '#10b981', glow: 'rgba(16,185,129,0.6)' },
-      { color: '#ffd700', glow: 'rgba(255,215,0,0.6)' },
-    ];
-    for (let i = 0; i < 28; i++) {
+    const sectorPalettes: Record<number, Array<{ color: string; glow: string }>> = {
+      1: [
+        { color: '#00f7ff', glow: 'rgba(0, 247, 255, 0.65)' },
+        { color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.55)' },
+      ],
+      2: [
+        { color: '#818cf8', glow: 'rgba(129, 140, 248, 0.65)' },
+        { color: '#6366f1', glow: 'rgba(99, 102, 241, 0.55)' },
+      ],
+      3: [
+        { color: '#c084fc', glow: 'rgba(192, 132, 252, 0.65)' },
+        { color: '#e879f9', glow: 'rgba(232, 121, 249, 0.55)' },
+      ],
+      4: [
+        { color: '#f43f5e', glow: 'rgba(244, 63, 94, 0.65)' },
+        { color: '#fb7185', glow: 'rgba(251, 113, 133, 0.55)' },
+      ],
+      5: [
+        { color: '#ffd700', glow: 'rgba(255, 215, 0, 0.70)' },
+        { color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.60)' },
+      ],
+    };
+
+    for (let i = 0; i < 30; i++) {
+      const y = (TOTAL_HEIGHT / 30) * i + ((i * 47) % 55);
+      const approxLevel = Math.max(1, Math.min(50, Math.round(((TOTAL_HEIGHT - y - BOTTOM_OFFSET) / SPACING) + 1)));
+      const sectorId = getSectorIndex(approxLevel);
+      const palette = sectorPalettes[sectorId] || sectorPalettes[1];
       const p = palette[i % palette.length];
-      const y = (TOTAL_HEIGHT / 28) * i + ((i * 47) % 60);
+
       const iL = i % 2 === 0;
       const w = 34 + ((i * 7) % 12);
       const h = 15 + ((i * 3) % 6);
       const x = iL ? 80 + ((i * 12) % 25) : SVG_WIDTH - w - 12 - ((i * 14) % 18);
       bricks.push({
         id: i, x, y, w, h, color: p.color, glow: p.glow,
-        rotation: ((i * 17) % 30) - 15, opacity: 0.18 + ((i * 5) % 15) * 0.01,
+        rotation: ((i * 17) % 30) - 15, opacity: 0.20 + ((i * 5) % 15) * 0.01,
       });
     }
     return bricks;
   }, []);
 
-  // ── Kinetic hazards (flanking the shifted path cleanly) ──────────────────────
+  // ── Kinetic hazards (flanking the shifted path with Sector-Themed Obstacles) ──
   const obstacles: Obstacle[] = useMemo(() => ([
-    { id: 'titanium-1', type: 'titanium', x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.5  * SPACING },
-    { id: 'plasma-1',   type: 'plasma',   x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5  * SPACING },
-    { id: 'titanium-2', type: 'titanium', x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.5 * SPACING },
-    { id: 'plasma-2',   type: 'plasma',   x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING },
-    { id: 'titanium-3', type: 'titanium', x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING },
-    { id: 'plasma-3',   type: 'plasma',   x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 27.5 * SPACING },
-    { id: 'titanium-4', type: 'titanium', x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 33.5 * SPACING },
-    { id: 'plasma-4',   type: 'plasma',   x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 37.5 * SPACING },
-    { id: 'titanium-5', type: 'titanium', x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 43.5 * SPACING },
-    { id: 'plasma-5',   type: 'plasma',   x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 47.5 * SPACING },
+    { id: 'hazard-1-1', type: 'ion_cell', sector: 1, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.5  * SPACING },
+    { id: 'hazard-1-2', type: 'cyan_vortex', sector: 1, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5  * SPACING },
+    { id: 'hazard-2-1', type: 'sonic_prism', sector: 2, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.5 * SPACING },
+    { id: 'hazard-2-2', type: 'pulse_core', sector: 2, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING },
+    { id: 'hazard-3-1', type: 'quantum_monolith', sector: 3, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING },
+    { id: 'hazard-3-2', type: 'void_singularity', sector: 3, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 27.5 * SPACING },
+    { id: 'hazard-4-1', type: 'bastion_turret', sector: 4, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 33.5 * SPACING },
+    { id: 'hazard-4-2', type: 'molten_core', sector: 4, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 37.5 * SPACING },
+    { id: 'hazard-5-1', type: 'solar_relic', sector: 5, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 43.5 * SPACING },
+    { id: 'hazard-5-2', type: 'hyper_singularity', sector: 5, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 47.5 * SPACING },
   ]), []);
 
-  // ── Route blockers ───────────────────────────────────────────────────────────
+  // ── Route blockers with Sector Assignment ────────────────────────────────────
   const routeBlockers: RouteBlocker[] = useMemo(() => {
     return nodes.slice(0, -1).map((curr, idx) => {
       const i = idx + 1;
       const next = nodes[idx + 1];
+      const sectorId = getSectorIndex(i);
       return {
         id: `route-blocker-${i}`,
         fromLevel: i,
         toLevel: i + 1,
         x: Math.round((curr.x + next.x) / 2),
         y: Math.round((curr.y + next.y) / 2),
+        sector: sectorId,
         type: i % 3 === 0 ? 'quantum_gate' : i % 2 === 0 ? 'plasma_shield' : 'firewall',
         title: `FIREWALL ${i < 10 ? '0' + i : i}`,
         isCleared: i < currentUnlockedId,
@@ -234,13 +257,12 @@ export const ArcadeView: React.FC = () => {
         const v = Math.max(0, Math.min(1, u / 0.96));
         const progress = Math.pow(v, 0.85);
 
-        // Continuous perspective scale: distant nodes small (0.38) and close nodes big (1.08)
+        // Continuous perspective scale: distant nodes 85% and close nodes 100%
         const baseScale = SCALE_HORIZON + progress * (SCALE_FOREGROUND - SCALE_HORIZON);
         const scale = baseScale + (SCALE_FOREGROUND - baseScale) * topScrollBoost;
 
-        // Quadratic vertical foreshortening compression towards the horizon
-        const t = Math.max(0, Math.min(1, 1 - v));
-        const yShift = t * t * 90 * Math.max(0, 1 - topScrollBoost);
+        // Natural full-screen flow with zero displacement pushing nodes away from the top
+        const yShift = 0;
 
         return { yShift, scale, u, progress, topScrollBoost };
       };
@@ -376,15 +398,8 @@ export const ArcadeView: React.FC = () => {
           WebkitOverflowScrolling: 'touch',
           overscrollBehaviorY: 'contain',
           pointerEvents: isOpeningLevel ? 'none' : 'auto',
-          paddingTop: '72px',
-          paddingBottom: '140px',
-          backgroundImage: `
-            radial-gradient(ellipse 95% 18% at 50% 1%,   rgba(255,215,0,0.16)   0%, transparent 75%),
-            radial-gradient(ellipse 90% 18% at 50% 24%,  rgba(244,63,94,0.13)   0%, transparent 75%),
-            radial-gradient(ellipse 90% 18% at 50% 48%,  rgba(183,115,255,0.13) 0%, transparent 75%),
-            radial-gradient(ellipse 90% 18% at 50% 72%,  rgba(99,102,241,0.14)  0%, transparent 75%),
-            radial-gradient(ellipse 95% 20% at 50% 98%,  rgba(0,247,255,0.16)   0%, transparent 75%)
-          `,
+          paddingTop: '20px',
+          paddingBottom: '0px',
         }}
       >
         {/* ── Map canvas ──────────────────────────────────────────────────── */}

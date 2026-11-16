@@ -19,6 +19,7 @@ export const OAuthButtons: React.FC<OAuthButtonsProps> = ({ onSuccess }) => {
       const res = await authService.loginWithOAuth(provider);
       if (res.success && res.user) {
         updateUser({
+          id: res.user.id,
           fullName: res.user.fullName,
           username: res.user.username,
           email: res.user.email,

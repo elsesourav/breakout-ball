@@ -26,12 +26,12 @@ interface DesignerCanvasProps {
   draggedPortal: DraggedPortalInfo | null;
   hoverPos: { x: number; y: number } | null;
   onApplyToolAt: (gridX: number, gridY: number) => void;
-  onCommitStroke: () => void;
+  onCommitStroke?: () => void;
   onStartDragPortal: (fromX: number, fromY: number, pairId: number) => void;
   onUpdateDragPortal: (currentX: number, currentY: number) => void;
   onCommitPortalMove: (fromX: number, fromY: number, pairId: number, currentX: number, currentY: number) => void;
   onSetHoverPos: (pos: { x: number; y: number } | null) => void;
-  onStrokeStart: () => void;
+  onStrokeStart?: () => void;
 }
 
 export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
@@ -52,6 +52,7 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isMouseDownRef = useRef(false);
   const isTouchInputRef = useRef(isTouchDevice);
+  const lastPaintedCellRef = useRef<{ x: number; y: number } | null>(null);
 
   // Screen client coordinates to grid cell calculator
   const getCanvasCoordsFromPoint = useCallback((clientX: number, clientY: number) => {
@@ -218,7 +219,7 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     isTouchInputRef.current = false;
     isMouseDownRef.current = true;
-    onStrokeStart();
+    onStrokeStart?.();
 
     const coords = getCanvasCoordsFromPoint(e.clientX, e.clientY);
     if (!coords) return;
@@ -226,6 +227,7 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
     const cell = grid[coords.gridY][coords.gridX];
     if (cell.h === 7 && cell.portalPairId !== undefined) {
       if (selectedTool === 0) {
+        lastPaintedCellRef.current = { x: coords.gridX, y: coords.gridY };
         onApplyToolAt(coords.gridX, coords.gridY);
         return;
       }
@@ -233,6 +235,7 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
       return;
     }
 
+    lastPaintedCellRef.current = { x: coords.gridX, y: coords.gridY };
     onApplyToolAt(coords.gridX, coords.gridY);
   };
 
@@ -254,11 +257,20 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
     }
 
     if (isMouseDownRef.current && selectedTool !== 7) {
-      onApplyToolAt(coords.gridX, coords.gridY);
+      // Only apply tool when moving into a new grid cell to avoid duplicate state dispatches
+      if (
+        !lastPaintedCellRef.current ||
+        lastPaintedCellRef.current.x !== coords.gridX ||
+        lastPaintedCellRef.current.y !== coords.gridY
+      ) {
+        lastPaintedCellRef.current = { x: coords.gridX, y: coords.gridY };
+        onApplyToolAt(coords.gridX, coords.gridY);
+      }
     }
   };
 
   const handleMouseUp = () => {
+    lastPaintedCellRef.current = null;
     if (draggedPortal) {
       const { fromX, fromY, pairId, currentX, currentY } = draggedPortal;
       isMouseDownRef.current = false;
@@ -268,12 +280,13 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
 
     if (isMouseDownRef.current) {
       isMouseDownRef.current = false;
-      onCommitStroke();
+      onCommitStroke?.();
     }
   };
 
   const handleMouseLeave = () => {
     onSetHoverPos(null);
+    lastPaintedCellRef.current = null;
     handleMouseUp();
   };
 
@@ -283,7 +296,7 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
     isTouchInputRef.current = true;
     onSetHoverPos(null);
     isMouseDownRef.current = true;
-    onStrokeStart();
+    onStrokeStart?.();
 
     const touch = e.touches[0];
     if (!touch) return;
@@ -293,6 +306,7 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
     const cell = grid[coords.gridY][coords.gridX];
     if (cell.h === 7 && cell.portalPairId !== undefined) {
       if (selectedTool === 0) {
+        lastPaintedCellRef.current = { x: coords.gridX, y: coords.gridY };
         onApplyToolAt(coords.gridX, coords.gridY);
         return;
       }
@@ -300,6 +314,7 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
       return;
     }
 
+    lastPaintedCellRef.current = { x: coords.gridX, y: coords.gridY };
     onApplyToolAt(coords.gridX, coords.gridY);
   };
 
@@ -322,7 +337,14 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
     }
 
     if (selectedTool !== 7) {
-      onApplyToolAt(coords.gridX, coords.gridY);
+      if (
+        !lastPaintedCellRef.current ||
+        lastPaintedCellRef.current.x !== coords.gridX ||
+        lastPaintedCellRef.current.y !== coords.gridY
+      ) {
+        lastPaintedCellRef.current = { x: coords.gridX, y: coords.gridY };
+        onApplyToolAt(coords.gridX, coords.gridY);
+      }
     }
   };
 
@@ -330,11 +352,13 @@ export const DesignerCanvas: React.FC<DesignerCanvasProps> = ({
     if (e.cancelable) e.preventDefault();
     isTouchInputRef.current = true;
     onSetHoverPos(null);
+    lastPaintedCellRef.current = null;
     handleMouseUp();
   };
 
   const handleTouchCancel = () => {
     onSetHoverPos(null);
+    lastPaintedCellRef.current = null;
     isMouseDownRef.current = false;
   };
 

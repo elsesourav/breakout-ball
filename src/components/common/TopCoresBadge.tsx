@@ -46,15 +46,8 @@ export const TopCoresBadge: React.FC<TopCoresBadgeProps> = ({
           ? '0 0 16px rgba(0, 247, 255, 0.6), inset 0 0 8px rgba(0, 247, 255, 0.25)'
           : '0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 247, 255, 0.2)',
       }}
-      className={`h-8 w-[112px] sm:w-[118px] px-2.5 rounded-full flex items-center justify-between cursor-pointer select-none transition-all duration-200 hover:scale-105 active:scale-95 group pointer-events-auto flex-shrink-0 ${className}`}
+      className={`h-8 w-[80px] sm:w-[100px] px-2 md:px-2.5 rounded-full flex items-center justify-between cursor-pointer select-none transition-all duration-200 hover:scale-105 active:scale-95 group pointer-events-auto flex-shrink-0 ${className}`}
     >
-      {/* Plus icon on the left without border */}
-      <span
-        className="text-cyan-300 group-hover:text-white transition-colors flex items-center justify-center flex-shrink-0"
-        title="Add Cores / Open Shop"
-      >
-        <Plus className="w-4 h-4 stroke-[3] group-hover:scale-110 transition-transform" />
-      </span>
 
       {/* Cores Value (centered in fixed space) */}
       <span

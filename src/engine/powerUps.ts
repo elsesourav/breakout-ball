@@ -31,7 +31,7 @@ export class PowerUpManager {
     megaball: 5.0,
     laser: 6.0,
     slowmo: 4.0,
-    expand: 6.0,
+    expand: 12.0,
     shield: 8.0,
   };
 
@@ -217,7 +217,7 @@ export class PowerUpManager {
         break;
       }
       case 'expand': {
-        const dur = 6.0 + (expandLvl - 1) * 0.8;
+        const dur = 12.0 + (expandLvl - 1) * 1.5;
         this.maxDurations.expand = dur;
         this.buffs.expand = dur; // Reset to full duration
         break;
@@ -341,7 +341,7 @@ export class PowerUpManager {
         type: 'expand',
         name: 'EXPAND',
         current: Math.round(this.buffs.expand * 10) / 10,
-        max: this.maxDurations.expand || 6.0,
+        max: this.maxDurations.expand || 12.0,
         color: POWER_UP_CONFIGS.expand.color,
         glow: POWER_UP_CONFIGS.expand.glow,
       });

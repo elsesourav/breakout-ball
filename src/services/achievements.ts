@@ -338,6 +338,14 @@ class AchievementManager {
     return this.unlockedIds.size;
   }
 
+  public hasUncollected(): boolean {
+    return this.getAll().some((a) => a.unlocked && !a.claimed);
+  }
+
+  public getUncollectedCount(): number {
+    return this.getAll().filter((a) => a.unlocked && !a.claimed).length;
+  }
+
   public unlock(id: string): Achievement | null {
     // Strictly block achievement completion when testing or playing self-made levels
     if (this.isRestrictedContext) {

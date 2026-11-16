@@ -8,7 +8,11 @@ import { CoreIcon } from '../common/CoreIcon';
 import { Award, Lock, Check } from 'lucide-react';
 import { ACHIEVEMENT_CUSTOM_ICONS, IconFirstImpact } from './AchievementIcons';
 
-export const AchievementsList: React.FC = () => {
+interface AchievementsListProps {
+  onClaimSuccess?: (reward: number, origin?: { x: number; y: number }) => void;
+}
+
+export const AchievementsList: React.FC<AchievementsListProps> = ({ onClaimSuccess }) => {
   const { user } = useGame();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
 
@@ -23,11 +27,19 @@ export const AchievementsList: React.FC = () => {
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const progressPercent = Math.round((unlockedCount / Math.max(1, achievements.length)) * 100);
 
-  const handleClaim = (id: string) => {
+  const handleClaim = (id: string, e?: React.MouseEvent<HTMLButtonElement>) => {
     soundManager.playClick();
+    const rect = e?.currentTarget?.getBoundingClientRect();
+    const origin = rect
+      ? {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        }
+      : undefined;
     const res = achievementManager.claimReward(id, user.username);
     if (res.success) {
       setAchievements(achievementManager.getAll());
+      onClaimSuccess?.(res.reward, origin);
     }
   };
 
@@ -134,7 +146,7 @@ export const AchievementsList: React.FC = () => {
                     type="button"
                     whileHover={{ scale: 1.06 }}
                     whileTap={{ scale: 0.94 }}
-                    onClick={() => handleClaim(ach.id)}
+                    onClick={(e) => handleClaim(ach.id, e)}
                     animate={{
                       boxShadow: [
                         '0 0 8px rgba(0, 247, 255, 0.4)',
@@ -147,12 +159,25 @@ export const AchievementsList: React.FC = () => {
                       background: 'linear-gradient(135deg, #00f7ff 0%, #0284c7 100%)',
                       border: '1.2px solid #7dd3fc',
                     }}
-                    className="h-7 px-2.5 rounded-lg flex items-center gap-1 cursor-pointer select-none text-slate-950 font-tech font-black text-xs shadow-md"
+                    className="relative overflow-hidden h-7 px-2.5 rounded-lg flex items-center gap-1 cursor-pointer select-none text-slate-950 font-tech font-black text-xs shadow-md"
                     title={`Collect ${rewardAmount} Cores!`}
                   >
-                    <span>+{rewardAmount}</span>
-                    <CoreIcon size={12} variant="cyan" />
-                    <span className="text-[10px] ml-0.5 tracking-wider">CLAIM</span>
+                    {/* Sweeping Radiant Shine Effect */}
+                    <div className="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
+                      <motion.div
+                        className="w-[200%] h-full bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-[-25deg]"
+                        animate={{ x: ['-100%', '150%'] }}
+                        transition={{
+                          duration: 2.2,
+                          repeat: Infinity,
+                          ease: 'easeInOut',
+                          repeatDelay: 0.5,
+                        }}
+                      />
+                    </div>
+                    <span className="relative z-10">+{rewardAmount}</span>
+                    <CoreIcon size={12} variant="cyan" className="relative z-10" />
+                    <span className="relative z-10 text-[10px] ml-0.5 tracking-wider">CLAIM</span>
                   </motion.button>
                 ) : ach.claimed ? (
                   <div className="h-7 px-2 rounded-lg bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-1 text-emerald-400 font-tech font-bold text-[11px] select-none">

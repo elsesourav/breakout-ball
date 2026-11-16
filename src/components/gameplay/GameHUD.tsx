@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Home, Zap, Heart, Boxes } from 'lucide-react';
+import { Home, Zap, Heart, Boxes, ArrowLeft } from 'lucide-react';
 import { ScoreState } from '../../engine/types';
 import { GameSummaryModal } from './GameSummaryModal';
 import { CoreIcon } from '../common/CoreIcon';
@@ -32,7 +32,8 @@ interface GameHUDProps {
   remainingCoresForLevel?: number;
   totalCores?: number;
   isDailyMission?: boolean;
-  gameMode?: 'arcade' | 'arena';
+  gameMode?: 'arcade' | 'arena' | 'studio';
+  isTestMode?: boolean;
 }
 
 const countdownTheme: Record<string, { color: string; border: string; glow: string; sub: string }> = {
@@ -89,11 +90,16 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   totalCores = 0,
   isDailyMission = false,
   gameMode = 'arcade',
+  isTestMode = false,
 }) => {
   const [showExitConfirm, setShowExitConfirm] = React.useState(false);
   const remainingTargets = Math.max(0, totalBreakable - blocksDestroyed);
 
   const handleHomeClick = () => {
+    if (isTestMode) {
+      onExit();
+      return;
+    }
     onPause?.();
     setShowExitConfirm(true);
   };
@@ -108,55 +114,90 @@ export const GameHUD: React.FC<GameHUDProps> = ({
     onExit();
   };
 
+  const formattedScore = score.toLocaleString();
+  const getScoreFontSize = () => {
+    if (formattedScore.length <= 4) return 'text-sm';
+    if (formattedScore.length <= 6) return 'text-xs';
+    if (formattedScore.length <= 8) return 'text-[11px]';
+    return 'text-[10px]';
+  };
+
   return (
     <>
       {/* Sleek, Two-Line Cyber HUD Header (No Time Display) */}
-      <header className="absolute top-2 left-0 right-0 z-30 px-3 flex flex-col gap-1.5 pointer-events-none max-w-[480px] mx-auto">
+      <header className="absolute top-2 left-0 right-0 z-30 px-2 sm:px-3 flex flex-col gap-1.5 pointer-events-none max-w-[480px] mx-auto w-full">
         {/* LINE 1: Hearts, Level/Score, and Targets / Combo */}
-        <div className="w-full flex items-center justify-between gap-2">
-          {/* Left Section: Compact Exit Button + Micro-Hearts */}
-          <div className="flex items-center gap-1.5 pointer-events-auto shrink-0">
+        <div className="w-full flex items-center justify-between gap-1 sm:gap-2">
+          {/* Left Section: Compact Exit Button + Triangle Hearts */}
+          <div className="flex items-center gap-1 sm:gap-1.5 pointer-events-auto shrink-0">
             <button
               onClick={handleHomeClick}
-              className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#090d24] border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all cursor-pointer"
-              title={gameMode === 'arena' ? 'Exit to Arena' : 'Exit to Arcade'}
+              className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#090d24] border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)]"
+              title={
+                isTestMode
+                  ? 'Back to Designer'
+                  : gameMode === 'studio'
+                  ? 'Exit to Studio'
+                  : gameMode === 'arena'
+                  ? 'Exit to Arena'
+                  : 'Exit to Arcade'
+              }
             >
-              <Home className="w-4 h-4" />
+              {isTestMode ? <ArrowLeft className="w-4 h-4" /> : <Home className="w-4 h-4" />}
             </button>
 
-            {/* Micro-Hearts (High-performance opaque background, zero blur) */}
-            <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#06091c] border border-white/10">
-              {[1, 2, 3].map((heartIndex) => {
-                const isAlive = heartIndex <= lives;
-                return (
-                  <div
-                    key={`life-${heartIndex}`}
-                    className={`transition-all duration-300 ${
-                      isAlive ? 'text-red-400 scale-100' : 'text-slate-600 scale-90 opacity-30'
-                    }`}
-                  >
-                    <Heart className={`w-3.5 h-3.5 ${isAlive ? 'fill-red-500' : ''}`} />
-                  </div>
-                );
-              })}
+            {/* Micro-Hearts (Compact Triangle Layout: 1 Top, 2 Bottom) */}
+            <div
+              className="flex flex-col items-center justify-center w-8 h-8 rounded-lg bg-[#06091c] border border-white/10 shrink-0 select-none"
+              title={`${lives} / 3 Lives`}
+            >
+              {/* Top 1 Heart (Life 3) */}
+              <div className="flex justify-center -mb-0.5">
+                <div
+                  className={`transition-all duration-300 ${
+                    lives >= 3 ? 'text-red-400 scale-100' : 'text-slate-600 scale-90 opacity-30'
+                  }`}
+                >
+                  <Heart className={`w-2.5 h-2.5 ${lives >= 3 ? 'fill-red-500' : ''}`} />
+                </div>
+              </div>
+              {/* Bottom 2 Hearts (Life 1, Life 2) */}
+              <div className="flex items-center justify-center gap-1">
+                <div
+                  className={`transition-all duration-300 ${
+                    lives >= 1 ? 'text-red-400 scale-100' : 'text-slate-600 scale-90 opacity-30'
+                  }`}
+                >
+                  <Heart className={`w-2.5 h-2.5 ${lives >= 1 ? 'fill-red-500' : ''}`} />
+                </div>
+                <div
+                  className={`transition-all duration-300 ${
+                    lives >= 2 ? 'text-red-400 scale-100' : 'text-slate-600 scale-90 opacity-30'
+                  }`}
+                >
+                  <Heart className={`w-2.5 h-2.5 ${lives >= 2 ? 'fill-red-500' : ''}`} />
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Center Section: Compact Cyber Score Display */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#06091c] border border-white/10 shrink-0">
+          {/* Center Section: Compact Cyber Score Display with Dynamic Responsive Font Size */}
+          <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-[#06091c] border border-white/10 shrink-0">
             <span className="font-tech text-[10px] font-bold text-slate-400 tracking-wider">
               LVL {levelNumber}
             </span>
             <span className="text-slate-600 text-[10px]">•</span>
-            <span className="font-display font-black text-sm tracking-wider text-cyan-300">
-              {score.toLocaleString()}
+            <span
+              className={`font-display font-black tracking-wider text-cyan-300 transition-all ${getScoreFontSize()}`}
+            >
+              {formattedScore}
             </span>
           </div>
 
           {/* Right Section: Compact Targets & Cores / Combo */}
-          <div className="flex items-center gap-1.5 justify-end shrink-0 pointer-events-auto">
+          <div className="flex items-center gap-1 sm:gap-1.5 justify-end shrink-0 pointer-events-auto">
             {totalBreakable > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c] border border-cyan-500/30">
+              <div className="flex items-center gap-1 px-1.5 py-1 rounded-lg bg-[#06091c] border border-cyan-500/30 shrink-0">
                 <Boxes className="w-3.5 h-3.5 text-cyan-400" />
                 <span className="font-tech font-bold text-xs text-cyan-300">
                   {remainingTargets}
@@ -166,12 +207,12 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
             {/* Cores or Combo */}
             {combo > 1 ? (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/30 to-red-500/30 border border-amber-400/50 animate-pulse">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500/30 to-red-500/30 border border-amber-400/50 animate-pulse shrink-0">
                 <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
                 <span className="font-tech font-black text-xs text-amber-300">{combo}x</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c] border border-cyan-500/30">
+              <div className="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-lg bg-[#06091c] border border-cyan-500/30 shrink-0">
                 <CoreIcon size={12} variant="cyan" />
                 <span className="font-tech font-bold text-xs text-cyan-200">
                   {totalCores.toLocaleString()}
@@ -261,7 +302,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
                   onClick={handleConfirmExit}
                   className="flex-1 py-2.5 rounded-xl border border-rose-500/60 bg-rose-600/90 hover:bg-rose-600 font-display font-black text-xs text-white shadow-lg transition-all cursor-pointer active:scale-95"
                 >
-                  EXIT TO MENU
+                  {gameMode === 'studio' ? 'EXIT TO STUDIO' : gameMode === 'arena' ? 'EXIT TO ARENA' : 'EXIT TO ARCADE'}
                 </button>
               </div>
             </motion.div>
@@ -344,6 +385,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             onExit={onExit}
             isDailyMission={isDailyMission}
             gameMode={gameMode}
+            isTestMode={isTestMode}
           />
         )}
       </AnimatePresence>

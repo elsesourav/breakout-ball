@@ -83,91 +83,71 @@ export const AchievementToast: React.FC = () => {
     <AnimatePresence>
       <div
         style={{
-          zIndex: 9999,
+          zIndex: 99999,
           position: 'fixed',
-          top: isInGame ? '8px' : '64px',
+          top: '8px',
           left: '50%',
           transform: 'translateX(-50%)',
           width: 'calc(100% - 24px)',
-          maxWidth: isInGame ? '290px' : '360px',
+          maxWidth: '290px',
           pointerEvents: 'none',
-          transition: 'top 0.3s ease, max-width 0.3s ease',
         }}
       >
         <motion.div
           key={activeToast.id}
-          initial={{ opacity: 0, y: -16, scale: 0.92 }}
+          initial={{ opacity: 0, y: -20, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.9 }}
-          transition={{ type: 'spring', damping: 24, stiffness: 420 }}
+          exit={{ opacity: 0, y: -16, scale: 0.9 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 450 }}
           onClick={handleCardClick}
           style={{
-            backgroundColor: 'rgba(7, 10, 32, 0.97)',
-            border: '1.5px solid #ffd700',
-            boxShadow: '0 0 22px rgba(255, 215, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-            borderRadius: isInGame ? '12px' : '14px',
+            backgroundColor: 'rgba(6, 10, 30, 0.98)',
+            border: '1.2px solid #ffd700',
+            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.85), 0 0 12px rgba(255, 215, 0, 0.4)',
+            borderRadius: '12px',
             backdropFilter: 'blur(16px)',
           }}
-          className={`pointer-events-auto cursor-pointer select-none flex items-center justify-between gap-2.5 shadow-2xl active:scale-98 transition-all ${
-            isInGame ? 'px-2.5 py-1.5' : 'px-3 py-2'
-          }`}
-          title={isInGame ? 'Achievement Unlocked' : 'Tap to view achievement in Profile'}
+          className="pointer-events-auto cursor-pointer select-none flex items-center justify-between gap-2 shadow-2xl active:scale-95 transition-all px-2.5 py-1.5"
+          title="Achievement Unlocked! Tap to collect in Profile"
         >
-          {/* Left: Icon Box */}
+          {/* Left: Small Icon Box */}
           <div
             style={{
               backgroundColor: 'rgba(255, 215, 0, 0.15)',
-              border: '1.2px solid #ffd700',
-              boxShadow: '0 0 10px rgba(255, 215, 0, 0.45)',
+              border: '1px solid #ffd700',
+              boxShadow: '0 0 8px rgba(255, 215, 0, 0.4)',
             }}
-            className={`rounded-lg flex items-center justify-center flex-shrink-0 text-amber-300 ${
-              isInGame ? 'w-6 h-6' : 'w-8 h-8'
-            }`}
+            className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-amber-300"
           >
-            <IconComp
-              className={`fill-amber-300/40 text-amber-300 ${isInGame ? 'w-3.5 h-3.5' : 'w-4 h-4'}`}
-            />
+            <IconComp className="w-3.5 h-3.5 fill-amber-300/40 text-amber-300" />
           </div>
 
-          {/* Middle: Content */}
+          {/* Middle: Compact Title & Core Reward */}
           <div className="flex-1 min-w-0 flex flex-col justify-center">
-            <div className="flex items-center gap-1 text-[9px] font-tech font-bold text-amber-400 tracking-wider uppercase leading-none mb-0.5">
+            <div className="flex items-center gap-1 text-[8px] font-tech font-bold text-amber-400 tracking-wider uppercase leading-none">
               <Trophy className="w-2.5 h-2.5 fill-amber-400 text-amber-400 flex-shrink-0" />
-              <span className="truncate">
-                {isInGame ? 'ACHIEVEMENT UNLOCKED' : 'ACHIEVEMENT COMPLETED'}
-              </span>
+              <span className="truncate">ACHIEVEMENT UNLOCKED</span>
             </div>
 
-            <h4
-              className={`font-display font-black text-white truncate leading-tight ${
-                isInGame ? 'text-[11.5px]' : 'text-xs'
-              }`}
-            >
-              {activeToast.title}
-            </h4>
-
-            {!isInGame && (
-              <p className="font-ui text-[10.5px] text-slate-300 truncate mt-0.5 leading-none">
-                {activeToast.description}
-              </p>
-            )}
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <h4 className="font-tech font-black text-white text-[11px] truncate leading-tight">
+                {activeToast.title}
+              </h4>
+              <span className="text-[9px] font-tech font-bold text-cyan-300 flex-shrink-0">
+                +{activeToast.coreReward || 25}
+              </span>
+            </div>
           </div>
 
-          {/* Right Action: Chevron arrow indicator + Cross Dismiss Button */}
-          <div className="flex items-center gap-1 flex-shrink-0">
-            {!isInGame && (
-              <ChevronRight className="w-3.5 h-3.5 text-amber-400/80 stroke-[2.5]" />
-            )}
-
-            <button
-              type="button"
-              onClick={handleClose}
-              className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all cursor-pointer flex-shrink-0"
-              title="Dismiss notification"
-            >
-              <X className="w-3.5 h-3.5 stroke-[2.5]" />
-            </button>
-          </div>
+          {/* Right Action: Small Cross Dismiss Button */}
+          <button
+            type="button"
+            onClick={handleClose}
+            className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/10 active:scale-90 transition-all cursor-pointer flex-shrink-0 ml-0.5"
+            title="Dismiss notification"
+          >
+            <X className="w-3 h-3 stroke-[2.5]" />
+          </button>
         </motion.div>
       </div>
     </AnimatePresence>

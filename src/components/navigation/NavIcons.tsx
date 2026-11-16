@@ -397,9 +397,15 @@ export const NavProfileIcon = CyberPilotIcon;
 /**
  * Custom Breakout System Settings / Quantum Gear Icon:
  * 8-tooth mechanical cyber-gear chassis with glowing central hexagonal reactor core,
- * 4 telemetry crosshair conduits, and neon violet/fuchsia styling.
+ * 4 telemetry crosshair conduits, and clean cyber styling.
  */
-export const CyberGearIcon: React.FC<IconProps> = ({ active, className = 'w-6 h-6', style }) => (
+export const CyberGearIcon: React.FC<IconProps & { darkOnLight?: boolean; whiteIcon?: boolean }> = ({
+  active,
+  darkOnLight = false,
+  whiteIcon = true,
+  className = 'w-6 h-6',
+  style,
+}) => (
   <svg
     viewBox="0 0 24 24"
     fill="none"
@@ -410,24 +416,56 @@ export const CyberGearIcon: React.FC<IconProps> = ({ active, className = 'w-6 h-
     {/* 8-Tooth Cyber Cog Outer Perimeter */}
     <path
       d="M10.2 2.5h3.6l.6 2.3 2 .8 1.9-1.4 2.5 2.5-1.4 1.9.8 2 2.3.6v3.6l-2.3.6-.8 2 1.4 1.9-2.5 2.5-1.9-1.4-2 .8-.6 2.3h-3.6l-.6-2.3-2-.8-1.9 1.4-2.5-2.5 1.4-1.9-.8-2-2.3-.6v-3.6l2.3-.6.8-2-1.4-1.9 2.5-2.5 1.9 1.4 2-.8.6-2.3Z"
-      fill={active ? '#180e2f' : '#120b24'}
-      stroke="#c084fc"
-      strokeWidth="1.6"
+      fill={whiteIcon ? 'rgba(255, 255, 255, 0.12)' : darkOnLight ? '#334155' : active ? '#180e2f' : '#120b24'}
+      stroke={whiteIcon ? '#ffffff' : darkOnLight ? '#0f172a' : '#c084fc'}
+      strokeWidth={whiteIcon ? 1.8 : darkOnLight ? 1.8 : 1.6}
       strokeLinejoin="round"
     />
     {/* Inner Hexagonal Reactor Wall */}
     <path
       d="M12 6.5l4.5 2.6v5.2L12 16.9l-4.5-2.6V9.1L12 6.5Z"
-      fill="#2e1065"
-      stroke="#e879f9"
-      strokeWidth="1.3"
+      fill={whiteIcon ? 'rgba(255, 255, 255, 0.18)' : darkOnLight ? '#0f172a' : '#2e1065'}
+      stroke={whiteIcon ? '#f8fafc' : darkOnLight ? '#0284c7' : '#e879f9'}
+      strokeWidth={whiteIcon ? 1.4 : darkOnLight ? 1.4 : 1.3}
       strokeLinejoin="round"
     />
     {/* 4 Radial Energy Conduits */}
-    <line x1="12" y1="3.5" x2="12" y2="6.5" stroke="#00f7ff" strokeWidth="1.2" strokeLinecap="round" />
-    <line x1="12" y1="16.9" x2="12" y2="19.9" stroke="#00f7ff" strokeWidth="1.2" strokeLinecap="round" />
-    <line x1="3.5" y1="11.7" x2="7.5" y2="11.7" stroke="#00f7ff" strokeWidth="1.2" strokeLinecap="round" />
-    <line x1="16.5" y1="11.7" x2="20.5" y2="11.7" stroke="#00f7ff" strokeWidth="1.2" strokeLinecap="round" />
+    <line
+      x1="12"
+      y1="3.5"
+      x2="12"
+      y2="6.5"
+      stroke="#00f7ff"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
+    <line
+      x1="12"
+      y1="16.9"
+      x2="12"
+      y2="19.9"
+      stroke="#00f7ff"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
+    <line
+      x1="3.5"
+      y1="11.7"
+      x2="7.5"
+      y2="11.7"
+      stroke="#00f7ff"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
+    <line
+      x1="16.5"
+      y1="11.7"
+      x2="20.5"
+      y2="11.7"
+      stroke="#00f7ff"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
     {/* Central Pulsing Power Node */}
     <circle cx="12" cy="11.7" r="2.2" fill="#00f7ff" />
     <circle cx="12" cy="11.7" r="1.1" fill="#ffffff" />

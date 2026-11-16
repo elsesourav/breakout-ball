@@ -216,14 +216,14 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
           {/* Top Right "FREE" pill badge */}
           <div className="absolute top-2.5 right-2.5">
             <span
-              className={`text-[8.5px] font-tech font-black px-2 py-0.5 rounded-full uppercase tracking-wider border flex items-center gap-1 ${
+              className={`text-[8.5px] font-tech font-black px-3 py-1 rounded-full uppercase tracking-wider border flex items-center gap-1 ${
                 dailyStatus.canCollect
                   ? 'bg-cyan-400 text-slate-950 border-cyan-300 shadow-[0_0_12px_rgba(0,247,255,0.7)] animate-pulse'
                   : 'bg-slate-800/60 text-slate-400 border-slate-700/60'
               }`}
             >
               <Sparkles className="w-2.5 h-2.5 text-slate-950" />
-              <span>100% FREE</span>
+              <span>FREE</span>
             </span>
           </div>
 

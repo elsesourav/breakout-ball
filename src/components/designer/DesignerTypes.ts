@@ -1,4 +1,5 @@
 import { CANVAS_WIDTH, GRID_COLS } from '../../constants/game';
+import { BlockData } from '../../types/game';
 
 export const DESIGNER_CANVAS_WIDTH = CANVAS_WIDTH; // 1152
 export const DESIGNER_CANVAS_HEIGHT = GRID_COLS * (128 * 0.75); // 1056 (11 rows * 96px)
@@ -45,6 +46,27 @@ export const createEmptyGrid = (cols = GRID_COLS, rows = 9): GridCell[][] =>
   Array.from({ length: cols }, () =>
     Array.from({ length: rows }, () => ({ h: 0 }))
   );
+
+export const cloneGrid = (grid: GridCell[][]): GridCell[][] =>
+  grid.map((row) => row.map((cell) => ({ ...cell })));
+
+export const cloneSnapshot = (snapshot: DesignerSnapshot): DesignerSnapshot => ({
+  grid: cloneGrid(snapshot.grid),
+  pendingPortal: snapshot.pendingPortal ? { ...snapshot.pendingPortal } : null,
+});
+
+export const blocksToGrid = (blocks: BlockData[] = []): GridCell[][] => {
+  const grid = createEmptyGrid();
+  blocks.forEach((b) => {
+    if (b.y >= 0 && b.y < GRID_COLS && b.x >= 0 && b.x < 9) {
+      grid[b.y][b.x] = {
+        h: b.h,
+        ...(b.portalPairId !== undefined ? { portalPairId: b.portalPairId } : {}),
+      };
+    }
+  });
+  return grid;
+};
 
 export const isMac =
   typeof window !== 'undefined' &&

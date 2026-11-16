@@ -2,6 +2,7 @@ import { BallState, PaddleState, BlockEngineState } from './types';
 import { ParticleSystem } from './particles';
 import { BLOCK_COLORS } from '../constants/game';
 import { PowerUpManager } from './powerUps';
+import { ExplosionSystem } from './explosionSystem';
 import { currencyService } from '../services/currency';
 import { getActiveDesignConfig, getBallTierFromUpgrades } from '../constants/visualPresets';
 import { drawBlockWithPreset } from './draw/blockDrawers';
@@ -45,7 +46,8 @@ export class GameRenderer {
     particles: ParticleSystem,
     powerUps?: PowerUpManager,
     ballSkin: string = 'cyan',
-    alpha: number = 1.0
+    alpha: number = 1.0,
+    explosions?: ExplosionSystem
   ) {
     const w = this.width;
     const h = this.height;
@@ -120,6 +122,11 @@ export class GameRenderer {
         portalCenterStyle: designConfig.portalCenterStyle,
       });
     });
+
+    // 5.1. Render Explode Block Shockwaves, Lightning & Near-Block Shatter Waves
+    if (explosions) {
+      explosions.render(ctx);
+    }
 
     // 6. 3D Paddle Rendering with Sub-Frame State Interpolation
     const hasLaser = !!powerUps && powerUps.buffs.laser > 0;

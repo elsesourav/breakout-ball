@@ -77,15 +77,6 @@ export const SideNavDock: React.FC = () => {
       isHero: true,
     },
     {
-      id: 'armory',
-      label: 'UPGRADE',
-      icon: NavArmoryIcon,
-      accentColor: '#00f7ff',
-      glowColor: 'rgba(0, 247, 255, 0.6)',
-      baseBg: 'linear-gradient(180deg, #06b6d4 0%, #0891b2 100%)',
-      baseBorder: '#0e7490',
-    },
-    {
       id: 'create',
       label: 'STUDIO',
       icon: NavStudioIcon,
@@ -104,6 +95,15 @@ export const SideNavDock: React.FC = () => {
       baseBorder: '#78350f',
       badge: canShowFree ? 'FREE' : null,
       isFreeBadge: canShowFree,
+    },
+    {
+      id: 'armory',
+      label: 'UPGRADE',
+      icon: NavArmoryIcon,
+      accentColor: '#00f7ff',
+      glowColor: 'rgba(0, 247, 255, 0.6)',
+      baseBg: 'linear-gradient(180deg, #06b6d4 0%, #0891b2 100%)',
+      baseBorder: '#0e7490',
     },
     {
       id: 'leaderboard',

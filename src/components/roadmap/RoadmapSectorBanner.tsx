@@ -17,12 +17,12 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
         const sector = node.sector;
         const isEntrance = node.id === 1;
 
-        const bannerY = isEntrance ? node.y + 75 : node.y - 88;
+        const bannerY = isEntrance ? node.y + 60 : node.y - 58;
 
         return (
           <div
             key={`sector-banner-${node.id}`}
-            className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none w-full max-w-[88vw] sm:max-w-xs px-2"
+            className="roadmap-scale-item absolute z-10 flex flex-col items-center pointer-events-none select-none px-2"
             data-base-transform="translateX(-50%)"
             data-y={bannerY}
             style={{
@@ -44,7 +44,7 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               {/* Clean Crisp Sector Heading without Magic/Sparkle Icon */}
               <div className="flex items-center justify-center gap-1.5 leading-none whitespace-nowrap">
                 <span
-                  className="font-display font-black text-[11px] sm:text-xs tracking-wider whitespace-nowrap text-white"
+                  className="font-display font-black text-[10.5px] sm:text-xs tracking-wider whitespace-nowrap text-white"
                   style={{
                     letterSpacing: '0.08em',
                   }}
@@ -53,12 +53,12 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
                 </span>
                 <span
                   style={{ color: sector.color }}
-                  className="font-display font-black text-[11px] sm:text-xs"
+                  className="font-display font-black text-[10.5px] sm:text-xs"
                 >
                   //
                 </span>
                 <span
-                  className="font-display font-black text-[11px] sm:text-xs tracking-wider whitespace-nowrap"
+                  className="font-display font-black text-[10.5px] sm:text-xs tracking-wider whitespace-nowrap"
                   style={{
                     color: sector.color,
                     letterSpacing: '0.08em',
@@ -70,7 +70,7 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               </div>
 
               {/* Subtitle in Clean Slate Contrast */}
-              <span className="font-tech text-[9.5px] sm:text-[10px] font-bold tracking-wider mt-0.5 sm:mt-1 whitespace-nowrap text-slate-300 text-center">
+              <span className="font-tech text-[9px] sm:text-[9.5px] font-bold tracking-wider mt-0.5 sm:mt-1 whitespace-nowrap text-slate-300 text-center">
                 {sector.subtitle}
               </span>
             </div>
@@ -81,12 +81,12 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
       {/* Grand Apex Summit Reactor at Level 50 */}
       {summitNode && (
         <div
-          className="roadmap-scale-item absolute z-30 flex flex-col items-center pointer-events-none select-none whitespace-nowrap"
+          className="roadmap-scale-item absolute z-30 flex flex-col items-center pointer-events-none select-none px-2"
           data-base-transform="translateX(-50%)"
-          data-y={summitNode.y - 200}
+          data-y={summitNode.y - 140}
           style={{
-            left: `${((summitNode ? summitNode.x : 230) / SVG_WIDTH) * 100}%`,
-            top: `${summitNode.y - 200}px`,
+            left: `${(230 / SVG_WIDTH) * 100}%`,
+            top: `${summitNode.y - 140}px`,
             transform: 'translateX(-50%)',
             willChange: 'transform, opacity',
           }}
@@ -98,35 +98,36 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               border: '2.5px solid #ffd700',
               boxShadow: '0 4px 0 #92400e, 0 8px 25px rgba(255, 215, 0, 0.8), inset 0 2px 4px #ffffff',
             }}
-            className="w-14 h-14 rounded-full flex items-center justify-center mb-2.5"
+            className="w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mb-2"
           >
-            <Trophy style={{ color: '#ffd700' }} className="w-7 h-7 drop-shadow-[0_0_12px_#ffd700]" />
+            <Trophy style={{ color: '#ffd700' }} className="w-6 h-6 sm:w-7 sm:h-7 drop-shadow-[0_0_12px_#ffd700]" />
           </div>
 
-          {/* High-tech Apex Cyber Card - No Text Wrapping / No Overlap */}
+          {/* High-tech Apex Cyber Card - Perfectly Centered, Never Cut Off */}
           <div
-            className="flex flex-col items-center px-6 py-2.5 rounded-2xl border select-none whitespace-nowrap shadow-2xl backdrop-blur-md"
+            className="flex flex-col items-center px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl border select-none shadow-2xl backdrop-blur-md max-w-full text-center"
             style={{
               backgroundColor: 'rgba(6, 10, 26, 0.98)',
               borderColor: '#ffd700',
-              boxShadow: '0 4px 25px rgba(0,0,0,0.95), 0 0 18px rgba(255, 215, 0, 0.5), inset 0 1px 2px rgba(255,255,255,0.3)',
+              boxShadow:
+                '0 4px 20px rgba(0,0,0,0.9), 0 0 14px rgba(255, 215, 0, 0.45), inset 0 1px 1px rgba(255,255,255,0.25)',
             }}
           >
-            <div className="flex items-center gap-2 leading-none whitespace-nowrap">
+            <div className="flex items-center justify-center gap-1.5 leading-none whitespace-nowrap">
               <span
-                className="font-display font-black text-xs tracking-wider whitespace-nowrap text-amber-300"
+                className="font-display font-black text-[10.5px] sm:text-xs tracking-wider whitespace-nowrap text-amber-300"
                 style={{
                   letterSpacing: '0.08em',
                   textShadow: '0 0 10px rgba(255, 215, 0, 0.7)',
                 }}
               >
-                GRAND APEX REACTOR
+                GRAND APEX
               </span>
-              <span className="font-display font-black text-xs text-amber-400">
+              <span className="font-display font-black text-[10.5px] sm:text-xs text-amber-400">
                 //
               </span>
               <span
-                className="font-display font-black text-xs tracking-wider whitespace-nowrap text-white"
+                className="font-display font-black text-[10.5px] sm:text-xs tracking-wider whitespace-nowrap text-white"
                 style={{
                   letterSpacing: '0.08em',
                   textShadow: '0 0 10px rgba(255, 255, 255, 0.6)',
@@ -136,7 +137,7 @@ export const RoadmapSectorBanner: React.FC<RoadmapSectorBannerProps> = ({ nodes 
               </span>
             </div>
 
-            <span className="font-tech text-[10px] font-bold tracking-widest mt-1.5 whitespace-nowrap text-amber-200">
+            <span className="font-tech text-[9px] sm:text-[9.5px] font-bold tracking-wider mt-0.5 sm:mt-1 whitespace-nowrap text-amber-200/90 text-center">
               FINAL OVERDRIVE CORE
             </span>
           </div>

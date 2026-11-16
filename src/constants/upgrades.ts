@@ -174,8 +174,8 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     accentColor: '#06b6d4',
     glowColor: 'rgba(6, 182, 212, 0.4)',
     symbol: '◀▶',
-    statLabel: (lvl) => `${(6.0 + (lvl - 1) * 0.8).toFixed(1)}s Duration`,
-    nextLabel: (lvl) => `${(6.0 + lvl * 0.8).toFixed(1)}s Duration`,
+    statLabel: (lvl) => `${(12.0 + (lvl - 1) * 1.5).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(12.0 + lvl * 1.5).toFixed(1)}s Duration`,
   },
   {
     id: 'slowmo_power',

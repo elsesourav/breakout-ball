@@ -16,6 +16,7 @@ import {
   Star,
   Sparkles,
   Share2,
+  ArrowLeft,
 } from 'lucide-react';
 import { shareLevel } from '../../services/sharing';
 import {
@@ -41,6 +42,7 @@ export const LevelPreviewModal: React.FC = () => {
     leaderboards,
     loadingLeaderboardLevelId,
     user,
+    activeTab,
   } = useGame();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -396,14 +398,14 @@ export const LevelPreviewModal: React.FC = () => {
             </button>
           )}
 
-          {/* 3. HOME Button: Clicking closes modal and returns to menu */}
+          {/* 3. RETURN Button: Clicking closes modal and returns to menu/studio */}
           <button
             type="button"
             onClick={() => {
               setSelectedLevel(null);
               setScreen('menu');
             }}
-            title="Return to Menu"
+            title={activeTab === 'create' ? 'Return to Studio' : 'Return to Menu'}
             style={{
               borderRadius: '12px',
               backgroundColor: '#1e293b',
@@ -413,7 +415,11 @@ export const LevelPreviewModal: React.FC = () => {
             }}
             className="w-12 h-12 flex items-center justify-center text-slate-200 hover:text-white active:scale-[0.98] transition-all cursor-pointer flex-shrink-0"
           >
-            <Home className="w-5 h-5 stroke-[2.2]" />
+            {activeTab === 'create' ? (
+              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
+            ) : (
+              <Home className="w-5 h-5 stroke-[2.2]" />
+            )}
           </button>
         </div>
 

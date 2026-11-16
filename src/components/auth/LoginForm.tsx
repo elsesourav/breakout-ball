@@ -33,6 +33,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       const res = await authService.loginWithIdentifier(identifier, password);
       if (res.success && res.user) {
         updateUser({
+          id: res.user.id,
           fullName: res.user.fullName,
           username: res.user.username,
           email: res.user.email,

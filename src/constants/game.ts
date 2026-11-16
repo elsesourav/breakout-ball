@@ -48,6 +48,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
 };
 
 export const DEFAULT_USER: UserProfile = {
+  id: 'anonymous',
   fullName: 'Anonymous',
   username: 'anonymous',
   email: '',
@@ -69,17 +70,5 @@ export const MOCK_LEADERBOARDS: Record<string, LeaderboardEntry[]> = {
     { rank: 8, username: 'breakout_pro', displayName: 'Marcus Vance', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=breakout_pro&size=64', time: 14.8, score: 675 },
     { rank: 9, username: 'pixel_guy', displayName: 'Leo Martinez', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=pixel_guy&size=64', time: 15.2, score: 657 },
     { rank: 10, username: 'quantum_ace', displayName: 'Devon Ward', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=quantum_ace&size=64', time: 15.9, score: 628 },
-  ],
-  default: [
-    { rank: 1, username: 'cyber_ninja', displayName: 'Kenji Takahashi', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=cyber_ninja&size=64', time: 20.4, score: 490 },
-    { rank: 2, username: 'speedy_sam', displayName: 'Samantha Speed', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=speedy_sam&size=64', time: 22.1, score: 452 },
-    { rank: 3, username: 'sourav', displayName: 'Sourav Elsesourav', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=sourav&size=64', time: 22.4, score: 446 },
-    { rank: 4, username: 'arcade_queen', displayName: 'Elena Rostova', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=arcade_queen&size=64', time: 24.0, score: 416 },
-    { rank: 5, username: 'hyper_dash', displayName: 'Lucas Thorne', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=hyper_dash&size=64', time: 25.5, score: 392 },
-    { rank: 6, username: 'neon_striker', displayName: 'Chloe Bennett', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=neon_striker&size=64', time: 27.2, score: 367 },
-    { rank: 7, username: 'void_walker', displayName: 'Dante Cross', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=void_walker&size=64', time: 29.8, score: 335 },
-    { rank: 8, username: 'breakout_pro', displayName: 'Marcus Vance', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=breakout_pro&size=64', time: 31.4, score: 318 },
-    { rank: 9, username: 'pixel_guy', displayName: 'Leo Martinez', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=pixel_guy&size=64', time: 33.6, score: 297 },
-    { rank: 10, username: 'quantum_ace', displayName: 'Devon Ward', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=quantum_ace&size=64', time: 35.0, score: 285 },
   ],
 };

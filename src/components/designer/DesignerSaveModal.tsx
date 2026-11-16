@@ -11,6 +11,7 @@ interface DesignerSaveModalProps {
   totalHp: number;
   levelName: string;
   isPrivate: boolean;
+  isEditing?: boolean;
   onSetName: (name: string) => void;
   onSetPrivate: (isPrivate: boolean) => void;
   onConfirmSave: () => void;
@@ -24,6 +25,7 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
   totalHp,
   levelName,
   isPrivate,
+  isEditing = false,
   onSetName,
   onSetPrivate,
   onConfirmSave,
@@ -91,7 +93,7 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
         className="w-full max-w-sm rounded-2xl flex flex-col gap-3 p-4 text-slate-200"
       >
         <h3 className="font-display font-black text-sm text-[#00f7ff] tracking-wider text-center">
-          SAVE ARENA MATRIX
+          {isEditing ? 'UPDATE ARENA MATRIX' : 'SAVE ARENA MATRIX'}
         </h3>
 
         {/* Level Name Input */}
@@ -199,7 +201,7 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
             className="flex-1 py-2.5 rounded-xl font-display font-black text-xs text-black tracking-wider transition-all cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
           >
             <Check className="w-4 h-4 stroke-[3]" />
-            <span>SAVE ARENA</span>
+            <span>{isEditing ? 'UPDATE ARENA' : 'SAVE ARENA'}</span>
           </button>
         </div>
       </div>

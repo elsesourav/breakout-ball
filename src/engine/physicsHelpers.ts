@@ -54,9 +54,13 @@ export function resolvePaddleBounce(
   const withinPaddleWidth = ball.x >= padLeft - ball.radius && ball.x <= padRight + ball.radius;
   const isNearPaddle = padDistSq <= ball.radius ** 2 || (crossedPaddleTop && withinPaddleWidth && ball.vy > 0);
   const isNotOnCooldown = !ball.paddleCooldown || ball.paddleCooldown <= 0;
-  const isMovingTowardsPaddle = ball.vy > 0 || ball.y <= padTop + paddle.height * 0.5;
 
-  if (isNearPaddle && isNotOnCooldown && isMovingTowardsPaddle) {
+  if (!isNearPaddle || !isNotOnCooldown) return false;
+
+  // Case 1: True Top Hit - Ball strikes the top surface of the paddle from above
+  const isTopHit = ball.vy > 0 && (crossedPaddleTop || ball.y <= padTop + 4);
+
+  if (isTopHit) {
     const hitOffset = Math.max(-1, Math.min(1, (ball.x - paddle.x) / halfPadW));
     const currentSpeed = ball.speed || config.ballSpeed;
 
@@ -88,7 +92,7 @@ export function resolvePaddleBounce(
 
     const finalAngle = finalAngleSign * finalAngleMag;
     ball.vx = currentSpeed * Math.sin(finalAngle);
-    ball.vy = -currentSpeed * Math.cos(finalAngle);
+    ball.vy = -currentSpeed * Math.cos(finalAngle); // Upward reflection
 
     ball.y = padTop - ball.radius - 1;
     ball.paddleCooldown = 8;
@@ -103,6 +107,38 @@ export function resolvePaddleBounce(
     });
     return true;
   }
+
+  // Case 2: South / Bottom Face Hit - Ball is below the paddle
+  if (ball.y >= padBottom) {
+    if (ball.vy < 0) {
+      // Moving upwards from below -> bounce downwards back into bottom abyss
+      ball.vy = Math.abs(ball.vy);
+      ball.y = padBottom + ball.radius + 1;
+      ball.paddleCooldown = 6;
+      return true;
+    }
+    // If ball.vy > 0, it's already falling downwards past the paddle -> do not intercept, let it fall cleanly
+    return false;
+  }
+
+  // Case 3: Lateral / Flank Hit - Ball touches the left or right side while ball.y > padTop + 4
+  if (ball.y > padTop + 4 && ball.y < padBottom) {
+    const isLeftFlank = ball.x < paddle.x;
+    if (isLeftFlank) {
+      ball.vx = -Math.abs(ball.vx);
+      if (paddle.vx < 0) ball.vx += paddle.vx * 0.3;
+      ball.x = padLeft - ball.radius - 1;
+    } else {
+      ball.vx = Math.abs(ball.vx);
+      if (paddle.vx > 0) ball.vx += paddle.vx * 0.3;
+      ball.x = padRight + ball.radius + 1;
+    }
+    // Never force vy upward! If falling, continue downward
+    if (ball.vy < 20) ball.vy = Math.max(50, Math.abs(ball.vy));
+    ball.paddleCooldown = 6;
+    return true;
+  }
+
   return false;
 }
 
@@ -118,54 +154,42 @@ export function handlePortalCollision(
   if (ball.warpCooldown && ball.warpCooldown > 0) return 'continue';
   if (block.portalRechargeTimer && block.portalRechargeTimer > 0) return 'continue';
 
-  const isCenterInside =
-    ball.x >= block.x &&
-    ball.x <= block.x + block.w &&
-    ball.y >= block.y &&
-    ball.y <= block.y + block.h;
+  // Immediate warp on touch: does not require 50% penetration; never bounces like titanium
+  if (
+    block.portalPairIndex !== undefined &&
+    blocks[block.portalPairIndex] &&
+    blocks[block.portalPairIndex].health === 7 &&
+    !blocks[block.portalPairIndex].isDead
+  ) {
+    const targetPortal = blocks[block.portalPairIndex];
+    if (typeof targetPortal.x === 'number' && typeof targetPortal.y === 'number') {
+      const clearance = ball.radius + 8;
+      const exitDown = targetPortal.y < config.blockHeight * 2 || ball.vy > 0;
+      ball.x = Math.max(
+        ball.radius + 6,
+        Math.min(config.width - ball.radius - 6, targetPortal.x + targetPortal.w / 2)
+      );
+      ball.y = exitDown ? targetPortal.y + targetPortal.h + clearance : targetPortal.y - clearance;
+      ball.prevX = ball.x;
+      ball.prevY = ball.y;
+      ball.vy = exitDown ? Math.abs(ball.vy) : -Math.abs(ball.vy);
+      ball.warpCooldown = 35;
+      block.portalRechargeTimer = 180;
+      targetPortal.portalRechargeTimer = 180;
 
-  if (isCenterInside) {
-    if (
-      block.portalPairIndex !== undefined &&
-      blocks[block.portalPairIndex] &&
-      blocks[block.portalPairIndex].health === 7 &&
-      !blocks[block.portalPairIndex].isDead
-    ) {
-      const targetPortal = blocks[block.portalPairIndex];
-      if (typeof targetPortal.x === 'number' && typeof targetPortal.y === 'number') {
-        const clearance = ball.radius + 8;
-        const exitDown = targetPortal.y < config.blockHeight * 2 || ball.vy > 0;
-        ball.x = Math.max(
-          ball.radius + 6,
-          Math.min(config.width - ball.radius - 6, targetPortal.x + targetPortal.w / 2)
-        );
-        ball.y = exitDown ? targetPortal.y + targetPortal.h + clearance : targetPortal.y - clearance;
-        ball.prevX = ball.x;
-        ball.prevY = ball.y;
-        ball.vy = exitDown ? Math.abs(ball.vy) : -Math.abs(ball.vy);
-        ball.warpCooldown = 35;
-        block.portalRechargeTimer = 180;
-        targetPortal.portalRechargeTimer = 180;
-
-        events.push({
-          type: 'portal_warp',
-          blockIndex: b,
-          hitX: block.x + block.w / 2,
-          hitY: block.y + block.h / 2,
-          combo,
-        });
-        return 'break';
-      }
-    }
-  } else {
-    const toCenterX = (block.x + block.w / 2) - ball.x;
-    const toCenterY = (block.y + block.h / 2) - ball.y;
-    const isMovingInward = (ball.vx * toCenterX + ball.vy * toCenterY) > 0;
-    if (isMovingInward && block.portalPairIndex !== undefined) {
-      return 'continue';
+      events.push({
+        type: 'portal_warp',
+        blockIndex: b,
+        hitX: block.x + block.w / 2,
+        hitY: block.y + block.h / 2,
+        combo,
+      });
+      return 'break';
     }
   }
-  return 'reflect';
+
+  // If lone portal or no active pair, pass through safely without bouncing like titanium
+  return 'continue';
 }
 
 export function detonateEmpExplosion(
@@ -189,6 +213,9 @@ export function detonateEmpExplosion(
     hitX: hitCenterX,
     hitY: hitCenterY,
     combo: ++state.combo,
+    source: 'emp',
+    epicenterX: hitCenterX,
+    epicenterY: hitCenterY,
   });
 
   const blastRadius = config.blockWidth * 2.2;
@@ -218,6 +245,20 @@ export function detonateEmpExplosion(
             hitX: ox,
             hitY: oy,
             combo: ++state.combo,
+            source: 'emp',
+            epicenterX: hitCenterX,
+            epicenterY: hitCenterY,
+          });
+        } else {
+          events.push({
+            type: 'block_damage',
+            blockIndex: ob,
+            hitX: ox,
+            hitY: oy,
+            combo: state.combo,
+            source: 'emp',
+            epicenterX: hitCenterX,
+            epicenterY: hitCenterY,
           });
         }
       }

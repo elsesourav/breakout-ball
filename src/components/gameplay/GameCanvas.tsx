@@ -23,21 +23,16 @@ function computeGameCanvasSize(containerW: number, containerH: number): CanvasDi
   const GAME_ASPECT = CANVAS_WIDTH / CANVAS_HEIGHT;
   const topPadding = Math.max(54, Math.min(68, Math.round(containerH * 0.075)));
   const bottomPadding = Math.max(18, Math.min(28, Math.round(containerH * 0.035)));
-  const horizontalMargin = containerW < 360 ? 6 : 14;
   const boundH = Math.min(Math.max(160, containerH - topPadding - bottomPadding), 600);
-  const boundW = Math.min(Math.max(120, containerW - horizontalMargin * 2), Math.round(600 * GAME_ASPECT));
-  let width = boundW;
-  let height = Math.round(width / GAME_ASPECT);
-  if (height > boundH) {
-    height = boundH;
-    width = Math.round(height * GAME_ASPECT);
-  }
+  const boundW = Math.min(Math.max(120, containerW - (containerW < 360 ? 12 : 28)), Math.round(600 * GAME_ASPECT));
+  let width = boundW, height = Math.round(width / GAME_ASPECT);
+  if (height > boundH) { height = boundH; width = Math.round(height * GAME_ASPECT); }
   return { width: Math.round(width / 2) * 2, height: Math.round(height / 2) * 2, topPadding, bottomPadding };
 }
 
 export const GameCanvas: React.FC = () => {
   const {
-    selectedLevel, localLevels, onlineLevels, setScreen,
+    selectedLevel, localLevels, onlineLevels, userCreatedLevels, activeTab, setScreen,
     setActiveTab, settings, recordLevelCompletion, startPlayLevel,
   } = useGame();
 
@@ -194,34 +189,17 @@ export const GameCanvas: React.FC = () => {
     let isDisposed = false;
 
     // Reset UI state
-    setLives(3);
-    setTimeUsed(0);
-    setScore(0);
-    setCombo(0);
-    setCountdownText('3');
-    setSummaryState(null);
-    setLiveScoreState(null);
-    setActiveBuffs([]);
+    setLives(3); setTimeUsed(0); setScore(0); setCombo(0);
+    setCountdownText('3'); setSummaryState(null); setLiveScoreState(null); setActiveBuffs([]);
 
     const engine = new GameEngine(canvas, {
       onScoreUpdate: (st) => {
         if (isDisposed) return;
-        setLiveScoreState(st);
-        setScore(st.score);
-        setTimeUsed(st.timeUsed);
+        setLiveScoreState(st); setScore(st.score); setTimeUsed(st.timeUsed);
       },
-      onLivesChange: (l) => {
-        if (isDisposed) return;
-        setLives(l);
-      },
-      onComboChange: (c) => {
-        if (isDisposed) return;
-        setCombo(c);
-      },
-      onBuffsChange: (b) => {
-        if (isDisposed) return;
-        setActiveBuffs(b);
-      },
+      onLivesChange: (l) => { if (!isDisposed) setLives(l); },
+      onComboChange: (c) => { if (!isDisposed) setCombo(c); },
+      onBuffsChange: (b) => { if (!isDisposed) setActiveBuffs(b); },
       onLevelWin: (st) => {
         if (isDisposed) return;
         handleLevelWinRef.current?.(st);
@@ -391,6 +369,14 @@ export const GameCanvas: React.FC = () => {
       // Ignore fallback
     }
     processPointerPosition(e.clientX);
+
+    // Tap to launch immediately if ball is resting on paddle
+    if (
+      engineRef.current &&
+      (engineRef.current.state.status === 'paused' || engineRef.current.state.status === 'countdown')
+    ) {
+      engineRef.current.launchBall();
+    }
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -425,13 +411,21 @@ export const GameCanvas: React.FC = () => {
 
   const isDaily = selectedLevel ? isTodayDailyMission(selectedLevel.id, onlineLevels) : false;
   const isArcade = Boolean(selectedLevel && localLevels.some((l) => l.id === selectedLevel.id));
-  const gameMode: 'arcade' | 'arena' = isArcade ? 'arcade' : 'arena';
+  const isTestLevel = selectedLevel?.id === 'TEST';
+  const isStudioLevel = Boolean(
+    selectedLevel && (activeTab === 'create' || userCreatedLevels.some((l) => l.id === selectedLevel.id))
+  );
+  const gameMode: 'arcade' | 'arena' | 'studio' = isTestLevel || isStudioLevel ? 'studio' : isArcade ? 'arcade' : 'arena';
 
   const handleExit = () => {
     clearWinTimers();
     soundManager.stopBgMusic();
-    setActiveTab(isArcade ? 'local' : 'online');
-    setScreen('menu');
+    if (isTestLevel) {
+      setScreen('designer');
+      return;
+    }
+    const targetTab = isStudioLevel ? 'create' : isArcade ? 'local' : 'online';
+    setActiveTab(targetTab);
   };
 
   const handleNextLevel = () => {
@@ -468,11 +462,9 @@ export const GameCanvas: React.FC = () => {
         blocksDestroyed={liveScoreState?.blocksDestroyed ?? 0}
         coresEarned={rewards.coresEarned} isFirstClear={rewards.isFirstClear}
         starsEarned={rewards.starsEarned} previousStars={rewards.previousStars}
-        totalClaimedForLevel={rewards.totalClaimedForLevel}
-        maxCoresForLevel={rewards.maxCoresForLevel}
-        remainingCoresForLevel={rewards.remainingCoresForLevel}
-        totalCores={currencyService.getBalance()}
-        isDailyMission={isDaily} gameMode={gameMode}
+        totalClaimedForLevel={rewards.totalClaimedForLevel} maxCoresForLevel={rewards.maxCoresForLevel}
+        remainingCoresForLevel={rewards.remainingCoresForLevel} totalCores={currencyService.getBalance()}
+        isDailyMission={isDaily} gameMode={gameMode} isTestMode={isTestLevel}
       />
       <div
         className="relative flex-1 w-full flex flex-col items-center justify-center pointer-events-auto"
