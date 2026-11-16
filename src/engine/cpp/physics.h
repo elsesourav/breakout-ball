@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 struct Vector2 {
     float x;
@@ -46,14 +47,6 @@ CollisionResult checkCircleAABB(
     float vx, float vy,
     float bx, float by, float bw, float bh,
     int blockIndex
-);
-
-// Advanced paddle curvature collision with angular deflection
-CollisionResult checkPaddleCollision(
-    float ballX, float ballY, float ballR,
-    float ballVx, float ballVy,
-    float padX, float padY, float padW, float padH,
-    float padVx
 );
 
 #endif // PHYSICS_H

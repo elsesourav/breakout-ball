@@ -57,8 +57,10 @@ export const DEFAULT_USER: UserProfile = {
 
 export { INITIAL_LOCAL_LEVELS } from './levels';
 export { INITIAL_ONLINE_LEVELS } from './onlineLevels';
+import { ARENA_TOP_LEADERBOARDS } from './arenaLeaderboards';
 
 export const MOCK_LEADERBOARDS: Record<string, LeaderboardEntry[]> = {
+  ...ARENA_TOP_LEADERBOARDS,
   '1': [
     { rank: 1, username: 'cyber_ninja', displayName: 'Kenji Takahashi', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=cyber_ninja&size=64', time: 13.0, score: 769 },
     { rank: 2, username: 'speedy_sam', displayName: 'Samantha Speed', avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=speedy_sam&size=64', time: 13.3, score: 752 },

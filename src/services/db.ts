@@ -56,10 +56,12 @@ class CloudDatabaseService {
     } else {
       try {
         const parsed = JSON.parse(rawLeaderboards);
-        if (parsed && parsed.default) {
-          delete parsed.default;
-          localStorage.setItem(this.leaderboardsKey, JSON.stringify(parsed));
+        if (parsed && parsed.default) delete parsed.default;
+        let modified = false;
+        for (const [k, v] of Object.entries(MOCK_LEADERBOARDS)) {
+          if (!parsed[k]) { parsed[k] = v; modified = true; }
         }
+        if (modified) localStorage.setItem(this.leaderboardsKey, JSON.stringify(parsed));
       } catch {}
     }
 
@@ -341,7 +343,7 @@ class CloudDatabaseService {
     // 3. Local fallback (Only return curated leaderboard for explicit levelId, NEVER default mock users)
     const raw = localStorage.getItem(this.leaderboardsKey);
     const all: Record<string, LeaderboardEntry[]> = raw ? JSON.parse(raw) : MOCK_LEADERBOARDS;
-    return (all && all[levelId]) || [];
+    return (all && all[levelId]) || MOCK_LEADERBOARDS[levelId] || [];
   }
 
   public async submitScore(

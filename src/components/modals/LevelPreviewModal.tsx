@@ -17,6 +17,7 @@ import {
   Sparkles,
   Share2,
   ArrowLeft,
+  Flame,
 } from 'lucide-react';
 import { shareLevel } from '../../services/sharing';
 import {
@@ -170,10 +171,18 @@ export const LevelPreviewModal: React.FC = () => {
               >
                 {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
               </span>
-              {!isCampaign && selectedLevel.creator && (
-                <span className="font-ui text-[11px] text-slate-400 truncate">
-                  By @{selectedLevel.creator}
-                </span>
+              {!isCampaign && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  {selectedLevel.creator && (
+                    <span className="font-ui text-[11px] text-slate-400 truncate">
+                      By @{selectedLevel.creator}
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1 text-[11px] font-tech font-bold text-amber-300">
+                    <Flame className="w-3 h-3 fill-amber-400 text-amber-400" />
+                    <span>{(selectedLevel.playCount || 0).toLocaleString()}</span>
+                  </span>
+                </div>
               )}
             </div>
           </div>
@@ -310,10 +319,14 @@ export const LevelPreviewModal: React.FC = () => {
             }}
             className="flex items-center justify-between w-full"
           >
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-tech text-xs text-slate-300 uppercase tracking-wider font-bold">
-                ARENA BOUNTY
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-amber-300 font-tech font-bold text-xs">
+                <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span>{(selectedLevel.playCount || 0).toLocaleString()} Plays</span>
+              </span>
+              <span className="text-slate-600 text-xs">•</span>
+              <span className="font-tech text-xs text-cyan-300 font-bold">
+                {rankingList.length} Ranked
               </span>
             </div>
             <span

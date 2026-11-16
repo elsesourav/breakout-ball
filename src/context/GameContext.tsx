@@ -348,6 +348,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       achievementManager.setRestrictedContext(isRestricted);
       if (!isRestricted) {
         dbService.incrementPlayCount(level.id);
+        setOnlineLevels((prev) => prev.map((lvl) => (lvl.id === level.id ? { ...lvl, playCount: (lvl.playCount || 0) + 1 } : lvl)));
+        setSelectedLevel((curr) => (curr && curr.id === level.id ? { ...curr, playCount: (curr.playCount || 0) + 1 } : curr));
         if (level.isPublic || isNaN(parseInt(level.id, 10))) achievementManager.unlock('arena_challenger');
       }
       pushAppRoute(getRoutePath(activeTab, 'playing', level.id));

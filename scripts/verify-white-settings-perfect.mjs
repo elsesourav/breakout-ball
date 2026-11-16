@@ -4,8 +4,8 @@ import fs from 'fs';
 async function run() {
   const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
     '--headless=new',
-    '--remote-debugging-port=9308',
-    '--user-data-dir=/tmp/chrome_test_verify_white_settings_poll',
+    '--remote-debugging-port=9310',
+    '--user-data-dir=/tmp/chrome_test_verify_white_settings_done',
     '--window-size=412,915',
     '--no-first-run',
     '--no-default-browser-check',
@@ -16,7 +16,7 @@ async function run() {
     let listRes = null;
     for (let i = 0; i < 20; i++) {
       try {
-        listRes = await fetch('http://127.0.0.1:9308/json/list');
+        listRes = await fetch('http://127.0.0.1:9310/json/list');
         if (listRes.ok) break;
       } catch (e) {
         await new Promise(r => setTimeout(r, 500));
@@ -55,37 +55,41 @@ async function run() {
 
     await send('Page.navigate', { url: 'http://localhost:3000' });
 
-    // Poll until loading screen finishes and settings button is visible
-    let rect = null;
-    for (let i = 0; i < 30; i++) {
-      await new Promise(r => setTimeout(r, 500));
-      const evalRes = await send('Runtime.evaluate', {
+    // Wait until loading screen is completely gone
+    for (let i = 0; i < 40; i++) {
+      await new Promise(r => setTimeout(r, 400));
+      const loadingRes = await send('Runtime.evaluate', {
         expression: `
           (() => {
+            const loader = document.querySelector('.z-\\\\[9999\\\\]');
             const btn = document.querySelector('button[title="System Settings"]');
-            if (!btn) return null;
-            const style = window.getComputedStyle(btn);
-            const parent = btn.closest('.z-40');
-            const parentStyle = parent ? window.getComputedStyle(parent) : null;
-            if (style.display === 'none' || style.visibility === 'hidden') return null;
-            const r = btn.getBoundingClientRect();
-            if (r.width > 0 && r.height > 0) {
-              return { x: r.x, y: r.y, width: r.width, height: r.height };
-            }
-            return null;
+            return { hasLoader: !!loader, hasBtn: !!btn };
           })()
         `,
         returnByValue: true
       });
-      if (evalRes?.result?.value) {
-        rect = evalRes.result.value;
-        // Wait an extra second for fade-in animations to complete
-        await new Promise(r => setTimeout(r, 1200));
+      const st = loadingRes?.result?.value;
+      if (st && !st.hasLoader && st.hasBtn) {
+        console.log('App loaded successfully!');
+        await new Promise(r => setTimeout(r, 1500));
         break;
       }
     }
 
-    console.log('Button rect:', rect);
+    const evalRes = await send('Runtime.evaluate', {
+      expression: `
+        (() => {
+          const btn = document.querySelector('button[title="System Settings"]');
+          if (!btn) return null;
+          const r = btn.getBoundingClientRect();
+          return { x: r.x, y: r.y, width: r.width, height: r.height };
+        })()
+      `,
+      returnByValue: true
+    });
+
+    console.log('Button rect:', evalRes.result.value);
+    const rect = evalRes.result.value;
 
     // Full screen mobile screenshot
     const fullSnap = await send('Page.captureScreenshot', { format: 'png' });

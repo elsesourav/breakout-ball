@@ -33,72 +33,23 @@ CollisionResult checkCircleAABB(
             res.normalY = distY / dist;
             res.penetration = cr - dist;
         } else {
-            // Ball center is inside the box; push out along dominant velocity direction
-            res.normalX = (vx > 0) ? -1.0f : 1.0f;
-            res.normalY = (vy > 0) ? -1.0f : 1.0f;
-            res.penetration = cr;
+            // Circle center inside box; resolve along shallowest axis
+            float dLeft = std::abs(cx - bx);
+            float dRight = std::abs(bx + bw - cx);
+            float dTop = std::abs(cy - by);
+            float dBottom = std::abs(by + bh - cy);
+            float minD = std::min({dLeft, dRight, dTop, dBottom});
+
+            if (minD == dTop) {
+                res.normalX = 0.0f; res.normalY = -1.0f; res.penetration = cr + dTop;
+            } else if (minD == dBottom) {
+                res.normalX = 0.0f; res.normalY = 1.0f; res.penetration = cr + dBottom;
+            } else if (minD == dLeft) {
+                res.normalX = -1.0f; res.normalY = 0.0f; res.penetration = cr + dLeft;
+            } else {
+                res.normalX = 1.0f; res.normalY = 0.0f; res.penetration = cr + dRight;
+            }
         }
-
-        // Determine dominant collision side for game callbacks
-        float overlapLeft = (cx + cr) - bx;
-        float overlapRight = (bx + bw) - (cx - cr);
-        float overlapTop = (cy + cr) - by;
-        float overlapBottom = (by + bh) - (cy - cr);
-
-        float minOverlapX = std::min(overlapLeft, overlapRight);
-        float minOverlapY = std::min(overlapTop, overlapBottom);
-
-        if (std::abs(minOverlapX - minOverlapY) < 2.0f && closestX == bx || closestX == bx + bw) {
-            res.side = SIDE_CORNER;
-        } else if (minOverlapX < minOverlapY) {
-            res.side = (overlapLeft < overlapRight) ? SIDE_LEFT : SIDE_RIGHT;
-            res.normalX = (overlapLeft < overlapRight) ? -1.0f : 1.0f;
-            res.normalY = 0.0f;
-        } else {
-            res.side = (overlapTop < overlapBottom) ? SIDE_TOP : SIDE_BOTTOM;
-            res.normalX = 0.0f;
-            res.normalY = (overlapTop < overlapBottom) ? -1.0f : 1.0f;
-        }
-    }
-
-    return res;
-}
-
-CollisionResult checkPaddleCollision(
-    float ballX, float ballY, float ballR,
-    float ballVx, float ballVy,
-    float padX, float padY, float padW, float padH,
-    float padVx
-) {
-    CollisionResult res;
-    res.collided = false;
-    res.side = SIDE_NONE;
-    res.normalX = 0.0f;
-    res.normalY = -1.0f;
-    res.penetration = 0.0f;
-    res.blockIndex = -1;
-
-    // Paddle bounding box
-    float padLeft = padX - padW * 0.5f;
-    float padRight = padX + padW * 0.5f;
-    float padTop = padY;
-    float padBottom = padY + padH;
-
-    // Check if ball intersects paddle
-    float closestX = std::max(padLeft, std::min(ballX, padRight));
-    float closestY = std::max(padTop, std::min(ballY, padBottom));
-
-    float distX = ballX - closestX;
-    float distY = ballY - closestY;
-    float distSq = distX * distX + distY * distY;
-
-    // Only bounce if ball is falling towards paddle (vy > 0)
-    if (distSq <= ballR * ballR && ballVy > 0) {
-        res.collided = true;
-        res.side = SIDE_TOP;
-        res.normalX = 0.0f;
-        res.normalY = -1.0f;
-        res.penetration = std::max(0.0f, (ballY + ballR) - padTop);
     }
 
     return res;

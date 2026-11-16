@@ -36,12 +36,9 @@ export const OverallScoreLeaderboard: React.FC = () => {
           const res = await backendApi.getGlobalLeaderboard(50);
           if (isMounted && res && res.length > 0) {
             const mapped: ScoreLeaderboardEntry[] = res.map((e, idx) => {
-              const derivedStage =
-                e.levelsCompleted !== undefined
-                  ? e.levelsCompleted === 50
-                    ? Math.max(35, 50 - Math.floor(idx * 1.3))
-                    : Math.min(50, Math.max(1, e.levelsCompleted))
-                  : Math.max(35, 50 - idx);
+              const derivedStage = e.levelsCompleted !== undefined
+                ? Math.min(50, Math.max(1, e.levelsCompleted))
+                : Math.max(14, 50 - Math.floor(idx * 0.75));
 
               return {
                 rank: e.rank || idx + 1,
@@ -51,13 +48,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                 score: e.totalScore || e.score || 0,
                 stagesCleared: derivedStage,
                 badgeTitle:
-                  derivedStage >= 50
-                    ? 'Apex Legend'
-                    : derivedStage >= 40
-                    ? 'Void Master'
-                    : derivedStage >= 25
-                    ? 'Core Crusher'
-                    : 'Sector Player',
+                  derivedStage >= 50 ? 'Apex Legend' : derivedStage >= 40 ? 'Void Master' : derivedStage >= 25 ? 'Core Crusher' : 'Sector Player',
                 avatarUrl: getPilotAvatarUrl(e.username, e.avatarUrl, idx),
               };
             });
@@ -69,11 +60,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
           const firestoreData = await getOverallLeaderboard();
           if (isMounted && firestoreData && firestoreData.length > 0) {
             const mapped: ScoreLeaderboardEntry[] = firestoreData.map((e: any, idx: number) => {
-              const rawStage = e.levelsCompleted || e.coresCleared || 50;
-              const derivedStage =
-                rawStage === 50
-                  ? Math.max(35, 50 - Math.floor(idx * 1.3))
-                  : Math.min(50, Math.max(1, rawStage));
+              const derivedStage = e.levelsCompleted || e.stagesCleared || Math.max(14, 50 - Math.floor(idx * 0.75));
 
               return {
                 rank: e.rank || idx + 1,
@@ -83,7 +70,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                 score: e.totalScore || e.score || 0,
                 stagesCleared: derivedStage,
                 badgeTitle:
-                  e.badgeTitle || (derivedStage >= 40 ? 'Void Master' : 'Sector Player'),
+                  e.badgeTitle || (derivedStage >= 50 ? 'Apex Legend' : derivedStage >= 40 ? 'Void Master' : 'Sector Player'),
                 avatarUrl: getPilotAvatarUrl(e.username, e.avatarUrl, idx),
               };
             });
@@ -117,10 +104,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
         const fallback = activeTab === 'alltime' ? FALLBACK_GLOBAL_PILOTS : FALLBACK_WEEKLY_PILOTS;
         setLivePilots(
           fallback.map((p, idx) => {
-            const derivedStage =
-              activeTab === 'alltime'
-                ? Math.max(35, 50 - Math.floor(idx * 1.3))
-                : Math.max(5, p.coresCleared || 10);
+            const derivedStage = p.stagesCleared || (activeTab === 'alltime' ? Math.max(14, 50 - Math.floor(idx * 0.75)) : Math.max(5, p.coresCleared || 10));
             return {
               ...p,
               rank: idx + 1,
@@ -154,8 +138,8 @@ export const OverallScoreLeaderboard: React.FC = () => {
     Object.values(localProgress).forEach((p) => {
       if (p.completed) {
         completedStages++;
-        const timeBonus = p.bestTime ? Math.max(0, Math.round((60 - p.bestTime) * 80)) : 1200;
-        baseScore += 8500 + timeBonus;
+        const timeBonus = p.bestTime ? Math.max(200, Math.round((60 - p.bestTime) * 35)) : 800;
+        baseScore += 6800 + timeBonus;
       }
     });
 

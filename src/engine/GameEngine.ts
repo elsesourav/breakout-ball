@@ -2,6 +2,8 @@ import { WasmPhysicsBridge } from './wasmBridge';
 import { PhysicsWorld } from './physics';
 import { ParticleSystem } from './particles';
 import { GameRenderer } from './renderer';
+import { WebGLRenderer } from './webgl/WebGLRenderer';
+import { createWebGLContext } from './webgl/WebGLContext';
 import { AudioBridge } from './audioBridge';
 import { PowerUpManager } from './powerUps';
 import { ExplosionSystem } from './explosionSystem';
@@ -15,7 +17,9 @@ import { ScoreState, EngineCallbacks, CollisionEvent } from './types';
 
 export class GameEngine {
   private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private glRenderer: WebGLRenderer | null = null;
+  private useWebGL = false;
   private wasmBridge: WasmPhysicsBridge;
   private tsPhysics: PhysicsWorld;
   private particles: ParticleSystem;
@@ -43,9 +47,16 @@ export class GameEngine {
 
   constructor(canvas: HTMLCanvasElement, callbacks: EngineCallbacks = {}) {
     this.canvas = canvas;
-    const context = canvas.getContext('2d', { alpha: true });
-    if (!context) throw new Error('Could not get 2D canvas context');
-    this.ctx = context;
+    const glResult = createWebGLContext(canvas);
+    if (glResult) {
+      this.glRenderer = new WebGLRenderer(glResult.gl, CANVAS_WIDTH, CANVAS_HEIGHT);
+      this.useWebGL = true;
+    } else {
+      const context = canvas.getContext('2d', { alpha: true });
+      if (!context) throw new Error('Could not get 2D or WebGL canvas context');
+      this.ctx = context;
+      this.useWebGL = false;
+    }
 
     this.callbacks = callbacks;
     this.wasmBridge = new WasmPhysicsBridge();
@@ -70,7 +81,10 @@ export class GameEngine {
   }
 
   public setVibrate(enabled: boolean) { this.audio.setVibrate(enabled); }
-  public setPaddleTarget(targetX: number) { this.tsPhysics.setPaddleTarget(targetX); }
+  public setPaddleTarget(targetX: number) {
+    this.tsPhysics.setPaddleTarget(targetX);
+    if (this.useWasm && this.wasmBridge.ready) this.wasmBridge.setPaddleTarget(targetX);
+  }
   public getPaddleTarget(): number { return this.tsPhysics.paddle.targetX; }
   public getPaddleMaxSpeed(): number { return this.tsPhysics.paddle.maxSpeed ?? 1600; }
   public getPaddlePosition(): number { return this.tsPhysics.paddle.x; }
@@ -99,7 +113,7 @@ export class GameEngine {
       combo: 0, maxCombo: 0, timeUsed: 0, lives: 3, status: 'countdown',
     };
 
-    const { ballRad, ballSpd } = this.applyUpgrades();
+    const { padW, padSpd, ballRad, ballSpd } = this.applyUpgrades();
     const initialBallX = CANVAS_WIDTH / 2;
     const initialBallY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - ballRad - 5;
 
@@ -109,6 +123,12 @@ export class GameEngine {
       this.tsPhysics.balls[0].radius = ballRad;
       this.tsPhysics.balls[0].baseSpeed = ballSpd;
       this.tsPhysics.balls[0].speed = ballSpd;
+    }
+
+    if (this.useWasm && this.wasmBridge.ready) {
+      this.wasmBridge.initEngine(CANVAS_WIDTH, CANVAS_HEIGHT, padW, PADDLE_HEIGHT, ballRad, ballSpd, BLOCK_WIDTH, BLOCK_HEIGHT);
+      this.wasmBridge.loadBlocks(level.blocks, BLOCK_WIDTH, BLOCK_HEIGHT);
+      this.wasmBridge.resetBall(initialBallX, initialBallY, 0, 0);
     }
 
     this.callbacks.onLivesChange?.(this.state.lives);
@@ -132,7 +152,7 @@ export class GameEngine {
     if (this.state.status !== 'countdown' && this.state.status !== 'playing' && this.state.status !== 'paused') return;
     this.state.status = 'playing';
 
-    const { ballRad, ballSpd } = this.applyUpgrades();
+    const { padW, padSpd, ballRad, ballSpd } = this.applyUpgrades();
     const paddle = this.tsPhysics.paddle;
     const ballX = paddle.x;
     const ballY = paddle.y - ballRad - 4;
@@ -154,6 +174,10 @@ export class GameEngine {
       Object.assign(this.tsPhysics.balls[0], {
         radius: ballRad, baseSpeed: ballSpd, speed: ballSpd, prevX: ballX, prevY: ballY,
       });
+    }
+
+    if (this.useWasm && this.wasmBridge.ready) {
+      this.wasmBridge.resetBall(ballX, ballY, vx, vy);
     }
   }
 
@@ -197,11 +221,8 @@ export class GameEngine {
   }
 
   private fixedTick(dt: number) {
-    // 1. In non-playing states, keep ball glued to paddle with smooth interpolation
     if (this.state.status !== 'playing') {
       const halfPadW = this.tsPhysics.paddle.width / 2;
-
-      // Store previous physics state so sub-frame render interpolation never shakes
       this.tsPhysics.paddle.prevX = this.tsPhysics.paddle.x;
 
       const maxSpeed = this.tsPhysics.paddle.maxSpeed ?? 1600;
@@ -217,24 +238,13 @@ export class GameEngine {
         this.tsPhysics.paddle.vx = 0;
       }
 
-      if (this.tsPhysics.paddle.x < halfPadW) {
-        this.tsPhysics.paddle.x = halfPadW;
-        this.tsPhysics.paddle.vx = 0;
-      } else if (this.tsPhysics.paddle.x > this.tsPhysics.config.width - halfPadW) {
-        this.tsPhysics.paddle.x = this.tsPhysics.config.width - halfPadW;
-        this.tsPhysics.paddle.vx = 0;
-      }
+      this.tsPhysics.paddle.x = Math.max(halfPadW, Math.min(this.tsPhysics.config.width - halfPadW, this.tsPhysics.paddle.x));
 
       for (const b of this.tsPhysics.balls) {
-        b.prevX = b.x;
-        b.prevY = b.y;
-        b.x = this.tsPhysics.paddle.x;
-        b.y = this.tsPhysics.paddle.y - b.radius - 4;
-        b.vx = 0;
-        b.vy = 0;
-        b.isActive = false;
+        b.prevX = b.x; b.prevY = b.y;
+        b.x = this.tsPhysics.paddle.x; b.y = this.tsPhysics.paddle.y - b.radius - 4;
+        b.vx = 0; b.vy = 0; b.isActive = false;
       }
-
       this.particles.update(CANVAS_WIDTH, CANVAS_HEIGHT);
       this.explosions.update();
       return;
@@ -264,7 +274,19 @@ export class GameEngine {
     this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
     this.tsPhysics.ballImpactLevel = currencyService.getUpgradeLevel('ball_impact');
 
-    const events = this.tsPhysics.step(6);
+    let events: CollisionEvent[];
+    if (this.useWasm && this.wasmBridge.ready) {
+      this.wasmBridge.setModifiers(this.tsPhysics.hasShield, this.tsPhysics.isMegaBall, this.tsPhysics.ballImpactLevel, this.tsPhysics.paddle.maxSpeed);
+      this.wasmBridge.update(6);
+      this.tsPhysics.balls = this.wasmBridge.syncBallStates(this.tsPhysics.balls);
+      this.wasmBridge.getPaddleState(this.tsPhysics.paddle);
+      this.wasmBridge.syncBlockStates(this.tsPhysics.blocks);
+      this.tsPhysics.remainingBreakable = this.wasmBridge.getRemainingBreakable();
+      this.state.combo = this.wasmBridge.getCombo();
+      events = this.wasmBridge.pollEvents();
+    } else {
+      events = this.tsPhysics.step(6);
+    }
     const { collected, laserHits } = this.powerUps.update(this.tsPhysics.paddle, dt, this.tsPhysics.blocks);
 
     if (this.callbacks.onBuffsChange) {
@@ -285,7 +307,11 @@ export class GameEngine {
     for (const powerType of collected) {
       this.audio.triggerEvent('powerup_collect');
       if (powerType === 'multiball') {
-        this.tsPhysics.spawnExtraBalls(1 + currencyService.getUpgradeLevel('multi_power'));
+        const extraCount = 1 + currencyService.getUpgradeLevel('multi_power');
+        this.tsPhysics.spawnExtraBalls(extraCount);
+        if (this.useWasm && this.wasmBridge.ready) {
+          this.wasmBridge.spawnExtraBalls(extraCount);
+        }
         this.particles.spawnVictoryConfetti(CANVAS_WIDTH, CANVAS_HEIGHT);
         this.audio.unlockAchievement('multiball_chaos');
       } else if (powerType === 'shield') {
@@ -298,6 +324,9 @@ export class GameEngine {
       const block = this.tsPhysics.blocks[hit.blockIndex];
       if (block && !block.isDead) {
         block.hitAnim = 1.0;
+        if (this.useWasm && this.wasmBridge.ready) {
+          this.wasmBridge.damageBlock(hit.blockIndex, 1);
+        }
         if (block.health >= 1 && block.health <= 5) {
           block.health--;
           if (block.health <= 0) {
@@ -324,12 +353,12 @@ export class GameEngine {
       } else if (ev.type === 'portal_warp') {
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
         this.particles.addFloatingText('🌀 PORTAL WARP', ev.hitX, ev.hitY, '#00f7ff');
-        this.renderer.triggerShake(2.0);
+        this.triggerCameraShake(2.0);
       } else if (ev.type === 'emp_explode') {
         this.explosions.spawnExplosion(ev.hitX, ev.hitY, this.tsPhysics.config.blockWidth * 2.3);
         this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, '#ff9900', true);
         this.particles.addFloatingText('💥 EMP DETONATION!', ev.hitX, ev.hitY, '#ff3b00');
-        this.renderer.triggerShake(14.0);
+        this.triggerCameraShake(14.0);
         this.state.blocksDestroyed++;
         this.recordScore(ev.combo, 500);
         if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
@@ -341,7 +370,7 @@ export class GameEngine {
         this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
         this.particles.addFloatingText('🛡️ FORCEFIELD SAVED', ev.hitX, ev.hitY, '#10b981');
-        this.renderer.triggerShake(3.0);
+        this.triggerCameraShake(3.0);
       } else if (ev.type === 'block_damage' || ev.type === 'crit_damage' || ev.type === 'block_destroy') {
         const block = this.tsPhysics.blocks[ev.blockIndex];
         const isCrit = ev.type === 'crit_damage';
@@ -357,7 +386,7 @@ export class GameEngine {
           this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, isCrit || isDestroy);
         }
 
-        this.renderer.triggerShake((isCrit || isDestroy ? 3.5 : 1.5) * impactShakeMult);
+        this.triggerCameraShake((isCrit || isDestroy ? 3.5 : 1.5) * impactShakeMult);
 
         let pts = 50 * (1 + Math.floor(ev.combo / 3));
         let text = `+${pts}`;
@@ -372,43 +401,31 @@ export class GameEngine {
         }
         this.particles.addFloatingText(text, ev.hitX, ev.hitY, isCrit ? '#fbbf24' : color);
         this.recordScore(ev.combo, pts);
-
         if (isDestroy && this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
           this.handleWin();
           return;
         }
       } else if (ev.type === 'ball_lost') {
-        this.renderer.triggerShake(10.0);
+        this.triggerCameraShake(10.0);
         this.handleLifeLost();
         return;
       }
     }
 
-    // Synchronize destroyed breakables and remaining targets with ground-truth block state
-    let deadCount = 0;
-    let remCount = 0;
+    let deadCount = 0, remCount = 0;
     for (const b of this.tsPhysics.blocks) {
       if ((b.initialHealth >= 1 && b.initialHealth <= 5) || b.initialHealth === 8) {
-        if (b.isDead) deadCount++;
-        else remCount++;
+        if (b.isDead) deadCount++; else remCount++;
       }
     }
     this.state.blocksDestroyed = Math.max(this.state.blocksDestroyed, deadCount);
     this.tsPhysics.remainingBreakable = remCount;
-    if (remCount <= 0 && this.state.status === 'playing') {
-      this.handleWin();
-      return;
-    }
+    if (remCount <= 0 && this.state.status === 'playing') { this.handleWin(); return; }
 
     // 5. Update Ball Motion Trails
     for (const b of this.tsPhysics.balls) {
       if (b.isActive) {
-        b.trail.unshift({
-          x: b.x,
-          y: b.y,
-          alpha: 1.0,
-          size: b.radius * 0.85,
-        });
+        b.trail.unshift({ x: b.x, y: b.y, alpha: 1.0, size: b.radius * 0.85 });
         if (b.trail.length > 8) b.trail.pop();
         for (let i = 0; i < b.trail.length; i++) {
           b.trail[i].alpha *= 0.72;
@@ -418,8 +435,6 @@ export class GameEngine {
         b.trail = [];
       }
     }
-
-    // 6. Update Particle & Explosion Engines
     this.particles.update(CANVAS_WIDTH, CANVAS_HEIGHT);
     this.explosions.update();
   }
@@ -443,19 +458,13 @@ export class GameEngine {
     const { ballRad } = this.applyUpgrades();
     const paddleX = this.tsPhysics.paddle.x;
     const resetY = this.tsPhysics.paddle.y - ballRad - 4;
-
     this.tsPhysics.paddle.prevX = paddleX;
     this.tsPhysics.resetBall(paddleX, resetY, 0, 0);
-    if (this.tsPhysics.balls[0]) {
-      this.tsPhysics.balls[0].radius = ballRad;
-      this.tsPhysics.balls[0].prevX = paddleX;
-      this.tsPhysics.balls[0].prevY = resetY;
-    }
+    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, prevX: paddleX, prevY: resetY });
+    if (this.useWasm && this.wasmBridge.ready) this.wasmBridge.resetBall(paddleX, resetY, 0, 0);
 
     setTimeout(() => {
-      if (this.state.lives > 0 && (this.state.status === 'paused' || this.state.status === 'countdown')) {
-        this.launchBall();
-      }
+      if (this.state.lives > 0 && (this.state.status === 'paused' || this.state.status === 'countdown')) this.launchBall();
     }, 700);
   }
 
@@ -463,27 +472,24 @@ export class GameEngine {
     this.state.status = 'win';
     this.state.blocksDestroyed = this.state.totalBreakable;
     this.audio.playWin();
-
     const timeBonus = Math.max(0, Math.floor(1000 - this.state.timeUsed * 25));
     const lifeBonus = this.state.lives * 250;
     this.state.score += timeBonus + lifeBonus;
-
     this.particles.spawnVictoryConfetti(CANVAS_WIDTH, CANVAS_HEIGHT);
     this.particles.addFloatingText('LEVEL CLEARED!', CANVAS_WIDTH / 2, CANVAS_HEIGHT * 0.42, '#00f7ff');
     this.callbacks.onLevelWin?.(this.state);
   }
 
+  private triggerCameraShake(intensity: number) {
+    if (this.useWebGL && this.glRenderer) this.glRenderer.triggerShake(intensity);
+    else this.renderer.triggerShake(intensity);
+  }
+
   public render(alpha: number = 1.0) {
-    this.renderer.render(
-      this.ctx,
-      this.tsPhysics.balls,
-      this.tsPhysics.paddle,
-      this.tsPhysics.blocks,
-      this.particles,
-      this.powerUps,
-      this.ballSkin,
-      alpha,
-      this.explosions
-    );
+    if (this.useWebGL && this.glRenderer) {
+      this.glRenderer.render(this.tsPhysics.balls, this.tsPhysics.paddle, this.tsPhysics.blocks, this.particles, this.powerUps, this.ballSkin, alpha, this.explosions);
+    } else if (this.ctx) {
+      this.renderer.render(this.ctx, this.tsPhysics.balls, this.tsPhysics.paddle, this.tsPhysics.blocks, this.particles, this.powerUps, this.ballSkin, alpha, this.explosions);
+    }
   }
 }

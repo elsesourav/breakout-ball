@@ -6,19 +6,25 @@ CPP_DIR="$DIR/../cpp"
 
 echo "Compiling Standalone C++ WebAssembly Physics Engine..."
 
-em++ -std=c++14 -O3 -sSTANDALONE_WASM=1 --no-entry \
+em++ -std=c++17 -O3 -sSTANDALONE_WASM=1 --no-entry \
   -Wl,--export=engine_init \
   -Wl,--export=engine_load_blocks \
+  -Wl,--export=engine_pair_portals \
   -Wl,--export=engine_reset_ball \
   -Wl,--export=engine_set_paddle_pos \
+  -Wl,--export=engine_set_modifiers \
+  -Wl,--export=engine_spawn_extra_balls \
   -Wl,--export=engine_update \
-  -Wl,--export=engine_get_ball_state \
+  -Wl,--export=engine_get_ball_count \
+  -Wl,--export=engine_get_ball_states \
   -Wl,--export=engine_get_paddle_state \
   -Wl,--export=engine_get_block_count \
-  -Wl,--export=engine_get_block_state \
+  -Wl,--export=engine_get_block_states \
   -Wl,--export=engine_get_remaining_breakable \
   -Wl,--export=engine_get_combo \
-  -Wl,--export=engine_get_events \
+  -Wl,--export=engine_get_events_v2 \
+  -Wl,--export=engine_damage_block \
+  -Wl,--export=engine_detonate_emp \
   -Wl,--export=malloc \
   -Wl,--export=free \
   -o "$DIR/physics.wasm" \

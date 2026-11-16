@@ -112,14 +112,24 @@ export function seedDatabase() {
   PRE_PLAYERS.forEach((player, pIdx) => {
     const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(player.username)}&size=64`;
     
-    // Top 12 players have conquered all 50 campaign levels
+    // Stages completed gracefully scales: top 3 have completed all 50 campaign levels
     let levelsToComplete = 50;
-    if (pIdx >= 12 && pIdx < 27) {
-      levelsToComplete = 38 + (pIdx % 11); // 38 to 48 levels
-    } else if (pIdx >= 27 && pIdx < 42) {
-      levelsToComplete = 24 + (pIdx % 12); // 24 to 35 levels
-    } else if (pIdx >= 42) {
-      levelsToComplete = 12 + (pIdx % 10); // 12 to 21 levels
+    if (pIdx < 3) {
+      levelsToComplete = 50;
+    } else if (pIdx < 5) {
+      levelsToComplete = 49;
+    } else if (pIdx < 7) {
+      levelsToComplete = 48;
+    } else if (pIdx < 9) {
+      levelsToComplete = 47;
+    } else if (pIdx < 12) {
+      levelsToComplete = 46 - (pIdx - 9);
+    } else if (pIdx < 20) {
+      levelsToComplete = 44 - Math.floor((pIdx - 12) * 0.6);
+    } else if (pIdx < 35) {
+      levelsToComplete = 39 - Math.floor((pIdx - 20) * 0.85);
+    } else {
+      levelsToComplete = Math.max(14, 26 - Math.floor((pIdx - 35) * 0.85));
     }
 
     const joinOffsetDays = 35 + (50 - pIdx) * 0.4;
@@ -157,9 +167,9 @@ export function seedDatabase() {
       
       const lives = player.baseSkill > 0.75 || (lvl + pIdx) % 3 !== 0 ? 3 : ((lvl + pIdx) % 2 === 0 ? 2 : 1);
       const stars = lives === 3 ? 3 : (lives === 2 ? 2 : 1);
-      const basePts = 2000 + lvl * 380;
-      const timeBonus = Math.max(250, Math.floor(1100 - timeUsed * 19));
-      const score = Math.floor((basePts + timeBonus + lives * 260) * (0.92 + player.baseSkill * 0.26));
+      const basePts = 5800 + (lvl % 5) * 120;
+      const timeBonus = Math.max(250, Math.floor(1000 - timeUsed * 14));
+      const score = Math.floor((basePts + timeBonus + lives * 220) * (0.90 + player.baseSkill * 0.18));
 
       cumulativeScore += score;
 
@@ -262,7 +272,148 @@ export function seedDatabase() {
     );
   });
 
-  console.log(`[Seed] Successfully populated ${PRE_PLAYERS.length} cyber pre-players across 30 campaign levels with real individual user activities!`);
+  // 3. Seed Registered Demo Pilots for Top Arena Stages
+  const ARENA_SEED_COMPLETIONS = {
+    CHAMP: [
+      { username: 'cyber_ninja', time: 43.8, score: 9420 },
+      { username: 'speedy_sam', time: 47.2, score: 9180 },
+      { username: 'hyper_dash', time: 51.5, score: 8850 },
+      { username: 'neon_striker', time: 56.1, score: 8520 },
+      { username: 'void_walker', time: 61.4, score: 8140 },
+      { username: 'arcade_queen', time: 67.8, score: 7760 },
+      { username: 'breakout_pro', time: 74.2, score: 7390 },
+      { username: 'pixel_guy', time: 82.0, score: 6980 },
+      { username: 'quantum_ace', time: 91.5, score: 6540 },
+      { username: 'solar_flare', time: 103.2, score: 6100 },
+    ],
+    ELS01: [
+      { username: 'quantum_ace', time: 42.1, score: 9550 },
+      { username: 'nova_cadet', time: 46.5, score: 9230 },
+      { username: 'laser_runner', time: 52.0, score: 8810 },
+      { username: 'speedy_sam', time: 57.8, score: 8440 },
+      { username: 'crypto_striker', time: 64.3, score: 8020 },
+      { username: 'echo_pulse', time: 72.1, score: 7580 },
+      { username: 'zero_gravity', time: 81.6, score: 7120 },
+      { username: 'cyber_ninja', time: 94.0, score: 6640 },
+    ],
+    ELS02: [
+      { username: 'retro_pilot', time: 44.6, score: 9380 },
+      { username: 'plasma_storm', time: 49.2, score: 9020 },
+      { username: 'nebula_rider', time: 54.8, score: 8650 },
+      { username: 'arcade_queen', time: 60.5, score: 8290 },
+      { username: 'breakout_pro', time: 68.0, score: 7850 },
+      { username: 'titan_vanguard', time: 76.4, score: 7420 },
+      { username: 'pixel_guy', time: 86.2, score: 6940 },
+      { username: 'blaze_core', time: 98.5, score: 6410 },
+    ],
+    ELS03: [
+      { username: 'hyper_dash', time: 46.2, score: 9280 },
+      { username: 'blaze_core', time: 50.8, score: 8940 },
+      { username: 'shadow_pulse', time: 55.9, score: 8590 },
+      { username: 'flux_runner', time: 62.1, score: 8210 },
+      { username: 'vortex_pilot', time: 69.4, score: 7780 },
+      { username: 'stellar_hawk', time: 77.8, score: 7350 },
+      { username: 'glitch_hunter', time: 86.5, score: 6910 },
+      { username: 'byte_striker', time: 96.0, score: 6480 },
+      { username: 'cyber_ninja', time: 107.5, score: 6050 },
+    ],
+    CYB01: [
+      { username: 'byte_striker', time: 39.5, score: 9680 },
+      { username: 'warp_driver', time: 43.2, score: 9410 },
+      { username: 'chrono_speeder', time: 47.8, score: 9100 },
+      { username: 'drift_master', time: 53.0, score: 8750 },
+      { username: 'aero_blade', time: 59.2, score: 8360 },
+      { username: 'pulse_forge', time: 66.5, score: 7920 },
+      { username: 'prism_strike', time: 74.8, score: 7490 },
+      { username: 'photon_wave', time: 83.9, score: 7040 },
+      { username: 'sonic_rebound', time: 94.2, score: 6580 },
+      { username: 'speedy_sam', time: 106.0, score: 6120 },
+    ],
+    ARC88: [
+      { username: 'pixel_guy', time: 45.4, score: 9340 },
+      { username: 'arc_reactor', time: 49.8, score: 9050 },
+      { username: 'vector_dash', time: 55.1, score: 8680 },
+      { username: 'zenith_star', time: 61.2, score: 8310 },
+      { username: 'cosmo_seeker', time: 68.6, score: 7890 },
+      { username: 'arcade_queen', time: 76.9, score: 7450 },
+      { username: 'hyper_ion', time: 86.0, score: 6980 },
+      { username: 'star_glider', time: 96.5, score: 6510 },
+      { username: 'orbit_knight', time: 108.4, score: 6050 },
+    ],
+    VORTX: [
+      { username: 'void_walker', time: 47.0, score: 9240 },
+      { username: 'matrix_cadet', time: 52.4, score: 8890 },
+      { username: 'spark_runner', time: 58.6, score: 8510 },
+      { username: 'aegis_core', time: 65.9, score: 8080 },
+      { username: 'flux_cadet', time: 74.0, score: 7620 },
+      { username: 'quantum_ace', time: 83.2, score: 7180 },
+      { username: 'nano_striker', time: 93.8, score: 6690 },
+      { username: 'beacon_prime', time: 106.0, score: 6200 },
+    ],
+    STEEL: [
+      { username: 'titan_vanguard', time: 48.9, score: 9140 },
+      { username: 'vanguard_zero', time: 54.3, score: 8780 },
+      { username: 'breakout_pro', time: 61.0, score: 8380 },
+      { username: 'retro_pilot', time: 69.5, score: 7920 },
+      { username: 'cyber_ninja', time: 79.2, score: 7450 },
+      { username: 'nova_cadet', time: 90.4, score: 6950 },
+      { username: 'laser_runner', time: 103.8, score: 6420 },
+    ],
+    PYRAM: [
+      { username: 'solar_flare', time: 44.8, score: 9380 },
+      { username: 'crypto_striker', time: 50.1, score: 9030 },
+      { username: 'speedy_sam', time: 56.4, score: 8640 },
+      { username: 'arcade_queen', time: 64.0, score: 8200 },
+      { username: 'echo_pulse', time: 73.2, score: 7720 },
+      { username: 'zero_gravity', time: 84.5, score: 7210 },
+      { username: 'plasma_storm', time: 98.0, score: 6650 },
+    ],
+    FLASH: [
+      { username: 'speedy_sam', time: 38.6, score: 9750 },
+      { username: 'hyper_dash', time: 42.9, score: 9460 },
+      { username: 'chrono_speeder', time: 48.0, score: 9120 },
+      { username: 'laser_runner', time: 54.2, score: 8720 },
+      { username: 'drift_master', time: 61.8, score: 8280 },
+      { username: 'aero_blade', time: 71.0, score: 7800 },
+      { username: 'spark_runner', time: 82.5, score: 7310 },
+      { username: 'vector_dash', time: 95.8, score: 6780 },
+    ],
+    COSMO: [
+      { username: 'cosmo_seeker', time: 46.8, score: 9240 },
+      { username: 'star_glider', time: 52.0, score: 8910 },
+      { username: 'zenith_star', time: 58.4, score: 8530 },
+      { username: 'quantum_ace', time: 66.2, score: 8100 },
+      { username: 'nebula_rider', time: 75.8, score: 7640 },
+      { username: 'vortex_pilot', time: 87.0, score: 7150 },
+      { username: 'orbit_knight', time: 100.5, score: 6620 },
+    ],
+    PRISM: [
+      { username: 'prism_strike', time: 45.2, score: 9350 },
+      { username: 'photon_wave', time: 50.8, score: 8990 },
+      { username: 'pulse_forge', time: 57.5, score: 8590 },
+      { username: 'blaze_core', time: 65.6, score: 8140 },
+      { username: 'plasma_storm', time: 75.0, score: 7680 },
+      { username: 'neon_striker', time: 86.4, score: 7190 },
+      { username: 'arc_reactor', time: 99.8, score: 6680 },
+    ],
+  };
+
+  for (const [arenaLevelId, entries] of Object.entries(ARENA_SEED_COMPLETIONS)) {
+    entries.forEach((entry, eIdx) => {
+      const lcId = `lc_${entry.username}_${arenaLevelId}`;
+      const completionTime = new Date(now - (12 - eIdx * 0.4) * 24 * 3600 * 1000).toISOString();
+      db.prepare(`
+        INSERT INTO level_completions (id, username, level_id, time_used, lives_remaining, score, stars, completed_at)
+        VALUES (?, ?, ?, ?, 3, ?, 3, ?)
+        ON CONFLICT(username, level_id) DO UPDATE SET
+          time_used = excluded.time_used,
+          score = excluded.score,
+          stars = excluded.stars
+      `).run(lcId, entry.username, arenaLevelId, entry.time, entry.score, completionTime);
+    });
+  }
+
+  console.log(`[Seed] Successfully populated ${PRE_PLAYERS.length} cyber pre-players across 50 campaign levels and top arena stages!`);
 }
 
 // Auto-run if executed directly via node
