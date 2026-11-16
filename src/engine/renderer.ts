@@ -203,8 +203,8 @@ export class GameRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // ONLY display when collision is feasible with paddle (NO red miss lines)
-      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
+      // ONLY display when ball is descending into range (always shows incoming path)
+      if (guideline.visible && guideline.alpha > 0.01) {
         ctx.save();
         const gAlpha = guideline.alpha;
 
@@ -222,18 +222,20 @@ export class GameRenderer {
           ctx.stroke();
         }
 
-        // Impact Reticle (Emerald Center with White Rim)
+        // Impact Reticle (Emerald when paddle aligned, Cyan otherwise)
         ctx.setLineDash([]);
         ctx.beginPath();
         ctx.arc(guideline.hitX, guideline.hitY, 8, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(16, 185, 129, ${gAlpha * 0.9})`;
+        ctx.fillStyle = guideline.isHit
+          ? `rgba(16, 185, 129, ${gAlpha * 0.9})`
+          : `rgba(0, 247, 255, ${gAlpha * 0.9})`;
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Outgoing Reflected Ray (Emerald Green with Arrowhead)
-        if (guideline.outgoingSegments.length > 0) {
+        // Outgoing Reflected Ray (Emerald Green with Arrowhead, when paddle intercepts)
+        if (guideline.isHit && guideline.outgoingSegments.length > 0) {
           ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.9})`;
           ctx.shadowColor = '#10b981';
           ctx.shadowBlur = 10;

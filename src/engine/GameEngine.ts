@@ -123,7 +123,8 @@ export class GameEngine {
 
     if (this.useWasm && this.wasmBridge.ready) {
       this.wasmBridge.initEngine(CANVAS_WIDTH, CANVAS_HEIGHT, padW, PADDLE_HEIGHT, ballRad, ballSpd, BLOCK_WIDTH, BLOCK_HEIGHT);
-      this.wasmBridge.loadBlocks(level.blocks, BLOCK_WIDTH, BLOCK_HEIGHT);
+      const synced = this.tsPhysics.blocks.map((b) => ({ x: b.col, y: b.row, h: b.health, portalPairId: b.portalPairId }));
+      this.wasmBridge.loadBlocks(synced, BLOCK_WIDTH, BLOCK_HEIGHT);
       this.wasmBridge.resetBall(initialBallX, initialBallY, 0, 0);
     }
 

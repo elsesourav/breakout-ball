@@ -4,6 +4,7 @@ export function pairPortals(blocks: BlockEngineState[], portalIndices: number[])
   const pairMap = new Map<number, number[]>();
   portalIndices.forEach((idx, i) => {
     const pid = blocks[idx].portalPairId ?? Math.floor(i / 2) + 1;
+    blocks[idx].portalPairId = pid;
     if (!pairMap.has(pid)) pairMap.set(pid, []);
     pairMap.get(pid)!.push(idx);
   });
@@ -25,6 +26,9 @@ export function pairPortals(blocks: BlockEngineState[], portalIndices: number[])
     const idxB = orphanIndices[o + 1];
     blocks[idxA].portalPairIndex = idxB;
     blocks[idxB].portalPairIndex = idxA;
+    const fallbackPairId = Math.min(4, Math.floor(o / 2) + 1);
+    blocks[idxA].portalPairId = fallbackPairId;
+    blocks[idxB].portalPairId = fallbackPairId;
   }
 
   if (orphanIndices.length % 2 === 1) {
