@@ -214,6 +214,35 @@ export function drawLevelPreviewOnCanvas(
   const gridW = GRID_ROWS * cellW;
   const startX = Math.round((w - gridW) / 2);
 
+  // Draw connecting dashed lines between complete portal pairs in preview
+  const portalPairs = new Map<number, { x: number; y: number }[]>();
+  validBlocks.forEach((b) => {
+    if (b.h === 7 && b.portalPairId) {
+      if (!portalPairs.has(b.portalPairId)) portalPairs.set(b.portalPairId, []);
+      portalPairs.get(b.portalPairId)!.push({ x: b.x, y: b.y });
+    }
+  });
+
+  portalPairs.forEach((pts, pairId) => {
+    if (pts.length === 2) {
+      const p1x = startX + pts[0].x * cellW + cellW / 2;
+      const p1y = startY + pts[0].y * cellH + cellH / 2;
+      const p2x = startX + pts[1].x * cellW + cellW / 2;
+      const p2y = startY + pts[1].y * cellH + cellH / 2;
+      const pairColor =
+        pairId === 1 ? '#00f7ff' : pairId === 2 ? '#b773ff' : pairId === 3 ? '#ffaa00' : '#10b981';
+      ctx.save();
+      ctx.strokeStyle = pairColor;
+      ctx.lineWidth = Math.max(1.5, cellW * 0.08);
+      ctx.setLineDash([Math.max(3, cellW * 0.18), Math.max(3, cellW * 0.15)]);
+      ctx.beginPath();
+      ctx.moveTo(p1x, p1y);
+      ctx.lineTo(p2x, p2y);
+      ctx.stroke();
+      ctx.restore();
+    }
+  });
+
   blocks.forEach((block) => {
     if (block.h <= 0) return;
     const bx = startX + block.x * cellW + padding;

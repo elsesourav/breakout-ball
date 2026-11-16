@@ -1,9 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { Lock, Globe, Check, AlertTriangle, ShieldCheck, AlertCircle } from 'lucide-react';
-import { draw3DBlock } from '../../utils/helpers';
-import { GRID_ROWS, GRID_COLS } from '../../constants/game';
-import { GridCell, PORTAL_COLORS } from './DesignerTypes';
-import { LevelData } from '../../types/game';
+import { drawLevelPreviewOnCanvas } from '../../utils/helpers';
+import { GridCell } from './DesignerTypes';
+import { BlockData, LevelData } from '../../types/game';
 
 interface DesignerSaveModalProps {
   grid: GridCell[][];
@@ -51,54 +50,34 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
     ? 'Another arena has this name. Enter a unique name.'
     : null;
 
-  // Render Mini Preview for Save Dialog
+  // Render Centered, High-DPI Matrix Preview for Save Dialog
   useEffect(() => {
     const canvas = savePreviewCanvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const displayW = canvas.clientWidth || 300;
+    const displayH = canvas.clientHeight || 140;
+    canvas.width = Math.round(displayW * dpr);
+    canvas.height = Math.round(displayH * dpr);
 
-    ctx.fillStyle = '#050716';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const cellW = canvas.width / GRID_ROWS;
-    const cellH = canvas.height / GRID_COLS;
-    const pad = 1.5;
-
-    activePairs.forEach((pair) => {
-      if (pair.blocks.length === 2) {
-        const p1 = pair.blocks[0];
-        const p2 = pair.blocks[1];
-        ctx.strokeStyle = PORTAL_COLORS[pair.pairId]?.border || '#00f7ff';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(p1.x * cellW + cellW / 2, p1.y * cellH + cellH / 2);
-        ctx.lineTo(p2.x * cellW + cellW / 2, p2.y * cellH + cellH / 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-    });
-
+    const placedBlocks: BlockData[] = [];
     grid.forEach((row, y) => {
       row.forEach((cell, x) => {
-        if (cell.h <= 0) return;
-        draw3DBlock(
-          ctx,
-          x * cellW + pad,
-          y * cellH + pad,
-          cellW - pad * 2,
-          cellH - pad * 2,
-          cell.h,
-          1.0,
-          undefined,
-          undefined,
-          undefined,
-          cell.portalPairId
-        );
+        if (cell.h > 0) {
+          placedBlocks.push({
+            x,
+            y,
+            h: cell.h,
+            ...(cell.portalPairId !== undefined ? { portalPairId: cell.portalPairId } : {}),
+          });
+        }
       });
     });
-  }, [grid, activePairs]);
+
+    drawLevelPreviewOnCanvas(canvas, placedBlocks, canvas.width, canvas.height, {
+      showGrid: true,
+    });
+  }, [grid]);
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in p-3 sm:p-5">
@@ -152,12 +131,10 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
 
         {/* Canvas Thumbnail Preview */}
         <div className="w-full flex flex-col items-center gap-1">
-          <div className="w-full h-28 rounded-xl bg-[#030514] border border-cyan-500/30 overflow-hidden flex items-center justify-center p-1 shadow-inner">
+          <div className="w-full h-32 rounded-xl bg-[#030514] border border-cyan-500/30 overflow-hidden flex items-center justify-center shadow-inner">
             <canvas
               ref={savePreviewCanvasRef}
-              width={270}
-              height={135}
-              className="w-full h-full object-contain block"
+              className="w-full h-full block rounded-xl"
             />
           </div>
         </div>

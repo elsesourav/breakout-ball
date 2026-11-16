@@ -31,7 +31,15 @@ export const LevelModifierModal: React.FC = () => {
       setIsPublic(!!editingLevel.isPublic);
       setArenaName(editingLevel.name || `Core #${editingLevel.id}`);
       if (canvasRef.current) {
-        drawLevelPreviewOnCanvas(canvasRef.current, editingLevel.blocks, 260, 260);
+        const canvas = canvasRef.current;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const displayW = canvas.clientWidth || 300;
+        const displayH = canvas.clientHeight || 160;
+        canvas.width = Math.round(displayW * dpr);
+        canvas.height = Math.round(displayH * dpr);
+        drawLevelPreviewOnCanvas(canvas, editingLevel.blocks, canvas.width, canvas.height, {
+          showGrid: true,
+        });
       }
     }
   }, [editingLevel]);
@@ -152,8 +160,7 @@ export const LevelModifierModal: React.FC = () => {
           <canvas
             ref={canvasRef}
             id="cvsModifier"
-            width={CANVAS_WIDTH}
-            height={CANVAS_WIDTH * 0.9}
+            className="w-full h-full block rounded"
           />
         </div>
 

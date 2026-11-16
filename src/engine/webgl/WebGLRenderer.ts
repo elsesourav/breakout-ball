@@ -318,8 +318,8 @@ export class WebGLRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // ONLY display when collision is feasible with paddle (NO red miss lines)
-      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
+      // ALWAYS display incoming path when descending in range
+      if (guideline.visible && guideline.alpha > 0.01) {
         const gAlpha = guideline.alpha;
         const inR = 0.0;
         const inG = 0.97;
@@ -346,10 +346,13 @@ export class WebGLRenderer {
 
         // 2. Draw Target Impact Reticle on Paddle Horizon
         const reticleSize = 24;
-        this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, inR, inG, inB, gAlpha * 0.95);
+        const reticleR = guideline.isHit ? 0.06 : inR;
+        const reticleG = guideline.isHit ? 0.98 : inG;
+        const reticleB = guideline.isHit ? 0.65 : inB;
+        this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, reticleR, reticleG, reticleB, gAlpha * 0.95);
 
         // 3. Draw Outgoing Deflected Guideline (Emerald Green with Arrowhead)
-        if (guideline.outgoingSegments.length > 0) {
+        if (guideline.isHit && guideline.outgoingSegments.length > 0) {
           const outR = 0.06;
           const outG = 0.98;
           const outB = 0.65;
