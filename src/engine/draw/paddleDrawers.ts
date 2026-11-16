@@ -150,11 +150,8 @@ export function drawMechTitanPaddle(
   // Armored Steel Border
   ctx.strokeStyle = tier === 3 ? '#38bdf8' : tier === 2 ? '#94a3b8' : '#64748b';
   ctx.lineWidth = tier === 3 ? 2.8 : 2.2;
-  ctx.shadowColor = tier === 3 ? '#38bdf8' : 'rgba(0,0,0,0)';
-  ctx.shadowBlur = tier === 3 ? 10 : 0;
   drawChamfer(ctx, px, py, pw, ph, chamfer);
   ctx.stroke();
-  ctx.shadowBlur = 0;
 
   // 4. Heat Dissipation Exhaust Vents
   const ventCount = tier >= 2 ? 4 : 2;
@@ -175,14 +172,11 @@ export function drawMechTitanPaddle(
     const heatColor =
       tier === 3 ? `rgba(255, 140, 0, ${ventPulse})` : `rgba(249, 115, 22, ${ventPulse})`;
     ctx.fillStyle = heatColor;
-    ctx.shadowColor = tier === 3 ? '#ff9900' : '#f97316';
-    ctx.shadowBlur = tier === 3 ? 12 : 8;
 
     const ribStep = ventW / 4;
     for (let r = vx + 2.5; r < vx + ventW - 1; r += ribStep) {
       ctx.fillRect(r, ventY + 1.5, 2.2, ventH - 3);
     }
-    ctx.shadowBlur = 0;
   });
 
   // 5. Center Reinforced Titanium Bumper Plate & Hazard Chevrons
@@ -218,25 +212,19 @@ export function drawMechTitanPaddle(
     coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
     ctx.fillStyle = coreGrad;
-    ctx.shadowColor = tier === 3 ? '#00f7ff' : '#f59e0b';
-    ctx.shadowBlur = tier === 3 ? 14 : 8;
     ctx.beginPath();
     ctx.arc(paddle.x, py + ph * 0.55, coreR, 0, Math.PI * 2);
     ctx.fill();
-    ctx.shadowBlur = 0;
   }
 
   // Tier 3: Kinetic Deflector Forcefield Rail along Top Bumper
   if (tier === 3) {
     ctx.strokeStyle = 'rgba(0, 247, 255, 0.7)';
-    ctx.shadowColor = '#00f7ff';
-    ctx.shadowBlur = 12;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(px + 14, py + 1);
     ctx.lineTo(px + pw - 14, py + 1);
     ctx.stroke();
-    ctx.shadowBlur = 0;
   }
 
   // 6. INTEGRATED RAIL TURRETS (The user's chosen top weapon mounts)
@@ -265,14 +253,11 @@ export function drawMechTitanPaddle(
       // Central High-Energy Plasma Conduit
       const railGlow = tier === 3 ? '#00f7ff' : '#38bdf8';
       ctx.fillStyle = railGlow;
-      ctx.shadowColor = railGlow;
-      ctx.shadowBlur = 10;
       ctx.fillRect(cx - 2, casingY - 2, 4, casingH - 3);
 
       // Top Collimator Bore Tip
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(cx - 1.5, casingY - 5, 3, 3);
-      ctx.shadowBlur = 0;
     });
   }
 

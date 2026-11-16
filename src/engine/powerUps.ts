@@ -250,12 +250,10 @@ export class PowerUpManager {
     canvasWidth: number,
     canvasHeight: number
   ) {
-    // 1. Bottom Forcefield Laser Barrier
+    // 1. Bottom Forcefield Laser Barrier (Zero shadowBlur for locked 60fps)
     if (this.buffs.hasShield || this.buffs.shieldCharges > 0) {
       const shieldY = canvasHeight - 35;
       ctx.save();
-      ctx.shadowColor = '#10b981';
-      ctx.shadowBlur = 18;
       ctx.strokeStyle = '#34d399';
       ctx.lineWidth = 4;
       ctx.beginPath();
@@ -442,8 +440,6 @@ export class PowerUpManager {
 
       // Dark cyber circular backing with neon aura
       ctx.fillStyle = 'rgba(5, 9, 28, 0.92)';
-      ctx.shadowColor = item.meta.glow;
-      ctx.shadowBlur = 12;
       ctx.beginPath();
       ctx.arc(cx, cy, ringRadius + 5, 0, Math.PI * 2);
       ctx.fill();
@@ -463,14 +459,11 @@ export class PowerUpManager {
       // Depleting Progress Ring (clockwise from top -Math.PI / 2)
       ctx.lineWidth = 4.5;
       ctx.strokeStyle = item.meta.color;
-      ctx.shadowColor = item.meta.glow;
-      ctx.shadowBlur = 10;
       ctx.beginPath();
       ctx.arc(cx, cy, ringRadius, -Math.PI / 2, -Math.PI / 2 + ratio * Math.PI * 2, false);
       ctx.stroke();
 
       // Center Glyph / Symbol (Crisp, proportional font)
-      ctx.shadowBlur = 8;
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 22px "Chakra Petch", monospace';
       ctx.textAlign = 'center';
@@ -484,14 +477,11 @@ export class PowerUpManager {
       ctx.fillStyle = 'rgba(4, 7, 22, 0.92)';
       ctx.strokeStyle = item.meta.color;
       ctx.lineWidth = 1.0;
-      ctx.shadowColor = item.meta.glow;
-      ctx.shadowBlur = 6;
       ctx.beginPath();
       ctx.roundRect(cx - 26, pillY - 10, 52, 20, 6);
       ctx.fill();
       ctx.stroke();
 
-      ctx.shadowBlur = 4;
       ctx.fillStyle = item.meta.color;
       ctx.font = 'bold 14px "Orbitron", monospace';
       ctx.fillText(labelText, cx, pillY);

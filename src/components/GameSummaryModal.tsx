@@ -12,7 +12,6 @@ import {
   Timer,
   ShieldAlert,
   Zap,
-  Sparkles,
 } from 'lucide-react';
 import { ScoreState } from '../engine/types';
 import { CoreIcon } from './CoreIcon';
@@ -39,12 +38,7 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
   summaryState,
   levelNumber,
   coresEarned = 0,
-  isFirstClear = false,
   starsEarned = 3,
-  previousStars = 0,
-  totalClaimedForLevel = 0,
-  maxCoresForLevel = 0,
-  remainingCoresForLevel = 0,
   hasNextLevel,
   onRetry,
   onNextLevel,
@@ -283,79 +277,41 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
 
         {/* Currency Reward Banner */}
         {isWin && (
-          <div className="flex flex-col mb-3.5">
+          <div className="mb-3.5">
             <div
               style={{
                 background:
-                  'linear-gradient(135deg, rgba(6, 182, 212, 0.18) 0%, rgba(99, 102, 241, 0.22) 100%)',
-                border: '1.2px solid rgba(0, 247, 255, 0.45)',
-                boxShadow: '0 0 15px rgba(0, 247, 255, 0.2)',
+                  'linear-gradient(135deg, rgba(6, 182, 212, 0.14) 0%, rgba(99, 102, 241, 0.18) 100%)',
+                border: '1.2px solid rgba(0, 247, 255, 0.35)',
+                boxShadow: '0 0 15px rgba(0, 247, 255, 0.15)',
                 borderRadius: '14px',
                 padding: '12px 18px',
               }}
               className="flex items-center justify-between"
             >
-              <div className="flex items-center gap-2">
-                <span className="font-tech text-xs text-slate-300 font-bold uppercase tracking-wider">
-                  REWARD
-                </span>
-                {gameMode === 'arcade' ? (
-                  coresEarned > 0 ? (
-                    isFirstClear ? (
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-[9px] font-tech font-bold uppercase tracking-widest flex items-center gap-1 shadow-[0_0_8px_rgba(0,247,255,0.3)]">
-                        <Sparkles className="w-2.5 h-2.5 text-cyan-400" />
-                        <span>{effectiveStars === 3 ? 'BONUS (100%)' : effectiveStars === 2 ? 'CLEAR (67%)' : 'CLEAR (33%)'}</span>
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-[9px] font-tech font-bold uppercase tracking-widest flex items-center gap-1 shadow-[0_0_8px_rgba(0,247,255,0.3)]">
-                        <Sparkles className="w-2.5 h-2.5 text-cyan-400" />
-                        +{coresEarned} REWARD DELTA
-                      </span>
-                    )
-                  ) : (
-                    <span className="px-2 py-0.5 rounded-full bg-slate-800/80 text-slate-400 border border-slate-700/60 text-[9px] font-tech font-bold uppercase tracking-wider">
-                      {previousStars >= 3 ? 'ALL CLAIMED' : 'NO NEW REWARDS'}
-                    </span>
-                  )
-                ) : (
-                  // Arena Mode
-                  coresEarned > 0 ? (
-                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-[9px] font-tech font-bold uppercase tracking-widest flex items-center gap-1 shadow-[0_0_8px_rgba(0,247,255,0.3)]">
-                      <Sparkles className="w-2.5 h-2.5 text-cyan-400" />
-                      ARENA BOUNTY
-                    </span>
-                  ) : (
-                    <span className="px-2 py-0.5 rounded-full bg-slate-800/80 text-slate-400 border border-slate-700/60 text-[9px] font-tech font-bold uppercase tracking-wider">
-                      CLAIMED (1-TIME ONLY)
-                    </span>
-                  )
-                )}
-              </div>
+              <span className="font-tech text-xs text-slate-300 font-bold uppercase tracking-wider">
+                REWARD
+              </span>
 
-              <div className="flex items-center gap-1.5">
-                <CoreIcon size={18} glow variant="cyan" />
-                <span
-                  className="font-display font-black text-lg tracking-wider text-cyan-300"
-                  style={{ textShadow: '0 0 12px rgba(0, 247, 255, 0.7)' }}
-                >
-                  +{coresEarned && coresEarned > 0 ? coresEarned : 0}
-                </span>
-              </div>
-            </div>
-
-            {/* Arcade Cores Progression Helper */}
-            {gameMode === 'arcade' && maxCoresForLevel > 0 && (
-              <div className="flex items-center justify-between text-[10px] font-tech text-slate-400 px-2 pt-1.5">
-                <span>Stage Total: {totalClaimedForLevel} / {maxCoresForLevel} Cores</span>
-                {remainingCoresForLevel > 0 ? (
-                  <span className="text-amber-300/90 font-bold">
-                    {remainingCoresForLevel} left with 3★
+              {coresEarned > 0 ? (
+                <div className="flex items-center gap-1.5">
+                  <CoreIcon size={18} glow variant="cyan" />
+                  <span
+                    className="font-display font-black text-lg tracking-wider text-cyan-300"
+                    style={{ textShadow: '0 0 12px rgba(0, 247, 255, 0.7)' }}
+                  >
+                    +{coresEarned}
                   </span>
-                ) : (
-                  <span className="text-emerald-400 font-bold">100% Claimed</span>
-                )}
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <CoreIcon size={16} variant="cyan" glow={false} className="opacity-40" />
+                  <span className="font-tech text-xs font-semibold text-slate-400 tracking-wider">
+                    CLAIMED
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -397,53 +353,32 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                   boxShadow: '0 0 25px rgba(0, 247, 255, 0.5)',
                   borderRadius: '12px',
                   color: '#ffffff',
-                  padding: '0 16px',
                 }}
-                className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer group"
+                className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer group px-4"
               >
                 <span>NEXT MISSION</span>
                 <ChevronRight className="w-4 h-4 stroke-[3] group-hover:translate-x-1 transition-transform" />
               </button>
-            ) : gameMode === 'arena' ? (
-              <div
-                style={{
-                  background:
-                    'linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%)',
-                  border: '1.5px solid rgba(0, 247, 255, 0.4)',
-                  borderRadius: '12px',
-                  padding: '8px 12px',
-                }}
-                className="flex flex-col items-center gap-0.5 text-center"
-              >
-                <div className="flex items-center gap-1.5 text-cyan-300">
-                  <Award className="w-4 h-4" />
-                  <span className="font-display font-black text-xs tracking-widest uppercase">
-                    ARENA STAGE CLEARED!
-                  </span>
-                </div>
-                <span className="font-tech text-[10px] text-slate-300">
-                  Community challenge mastered. High score recorded!
-                </span>
-              </div>
             ) : (
               <div
                 style={{
-                  background:
-                    'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(16, 185, 129, 0.15) 100%)',
-                  border: '1.5px solid rgba(251, 191, 36, 0.5)',
+                  background: gameMode === 'arena'
+                    ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%)'
+                    : 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(16, 185, 129, 0.15) 100%)',
+                  border: gameMode === 'arena' ? '1.5px solid rgba(0, 247, 255, 0.4)' : '1.5px solid rgba(251, 191, 36, 0.5)',
                   borderRadius: '12px',
                   padding: '8px 12px',
                 }}
                 className="flex flex-col items-center gap-0.5 text-center"
               >
-                <div className="flex items-center gap-1.5 text-amber-300">
+                <div className={`flex items-center gap-1.5 ${gameMode === 'arena' ? 'text-cyan-300' : 'text-amber-300'}`}>
                   <Award className="w-4 h-4" />
                   <span className="font-display font-black text-xs tracking-widest uppercase">
-                    ARCADE CAMPAIGN CONQUERED!
+                    {gameMode === 'arena' ? 'ARENA STAGE CLEARED!' : 'ARCADE CAMPAIGN CONQUERED!'}
                   </span>
                 </div>
                 <span className="font-tech text-[10px] text-slate-300">
-                  All arcade missions completed. You are the Apex Champion!
+                  {gameMode === 'arena' ? 'Community challenge mastered. High score recorded!' : 'All arcade missions completed. You are the Apex Champion!'}
                 </span>
               </div>
             )}
@@ -457,15 +392,11 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                     background: 'linear-gradient(135deg, #00f7ff 0%, #0099ff 100%)',
                     borderRadius: '12px',
                     boxShadow: '0 0 20px rgba(0, 247, 255, 0.45)',
-                    color: '#050714',
-                    padding: '0 16px',
                   }}
-                  className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer shadow-lg"
+                  className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer shadow-lg px-4 text-[#050714]"
                 >
-                  <Home className="w-4 h-4 stroke-[2.5]" style={{ color: '#050714' }} />
-                  <span style={{ color: '#050714', fontWeight: 900, letterSpacing: '0.06em' }}>
-                    RETURN TO ARENA
-                  </span>
+                  <Home className="w-4 h-4 stroke-[2.5] text-[#050714]" />
+                  <span className="text-[#050714] font-black tracking-wider">RETURN TO ARENA</span>
                 </button>
                 <span className="font-tech text-[10.5px] text-slate-400 text-center">
                   Daily Apex Mission claimed • Next mission unlocks at midnight
@@ -477,14 +408,8 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                   <button
                     type="button"
                     onClick={onRetry}
-                    style={{
-                      backgroundColor: 'rgba(12, 18, 42, 0.85)',
-                      border: '1.5px solid rgba(0, 247, 255, 0.28)',
-                      borderRadius: '12px',
-                      color: '#ffffff',
-                      padding: '0 12px',
-                    }}
-                    className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-cyan-500/15 transition-all cursor-pointer"
+                    style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(0, 247, 255, 0.28)', borderRadius: '12px' }}
+                    className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-cyan-500/15 transition-all cursor-pointer text-white px-3"
                   >
                     <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
                     <span>RETRY</span>
@@ -494,14 +419,8 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                 <button
                   type="button"
                   onClick={onExit}
-                  style={{
-                    backgroundColor: 'rgba(12, 18, 42, 0.85)',
-                    border: '1.5px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '12px',
-                    color: '#cbd5e1',
-                    padding: '0 12px',
-                  }}
-                  className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+                  style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}
+                  className="h-11 flex items-center justify-center gap-1.5 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer text-slate-300 px-3"
                 >
                   <Home className="w-3.5 h-3.5 text-slate-400" />
                   <span>{gameMode === 'arena' ? 'ARENA' : 'ARCADE'}</span>
@@ -520,10 +439,8 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
                   border: '1.5px solid #fca5a5',
                   boxShadow: '0 0 25px rgba(239, 68, 68, 0.5)',
                   borderRadius: '12px',
-                  color: '#ffffff',
-                  padding: '0 16px',
                 }}
-                className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer"
+                className="w-full h-12 flex items-center justify-center gap-2 font-display font-black text-xs tracking-wider active:scale-[0.98] transition-all cursor-pointer text-white px-4"
               >
                 <RotateCcw className="w-4 h-4 stroke-[2.5]" />
                 <span>TRY AGAIN</span>
@@ -533,14 +450,8 @@ export const GameSummaryModal: React.FC<GameSummaryModalProps> = ({
             <button
               type="button"
               onClick={onExit}
-              style={{
-                backgroundColor: 'rgba(12, 18, 42, 0.85)',
-                border: '1.5px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '12px',
-                color: '#94a3b8',
-                padding: '0 16px',
-              }}
-              className="w-full h-11 flex items-center justify-center gap-2 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+              style={{ backgroundColor: 'rgba(12, 18, 42, 0.85)', border: '1.5px solid rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}
+              className="w-full h-11 flex items-center justify-center gap-2 font-tech font-bold text-xs tracking-wider active:scale-[0.98] hover:bg-white/10 hover:text-white transition-all cursor-pointer text-slate-400 px-4"
             >
               <Home className="w-3.5 h-3.5 text-slate-400" />
               <span>{gameMode === 'arena' ? 'EXIT TO ARENA' : 'EXIT TO ARCADE'}</span>

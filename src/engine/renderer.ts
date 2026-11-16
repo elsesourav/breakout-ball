@@ -88,25 +88,6 @@ export class GameRenderer {
     ctx.fillStyle = botGlow;
     ctx.fillRect(0, 0, w, h);
 
-    // Perspective cyber grid lines
-    ctx.save();
-    ctx.strokeStyle = 'rgba(0, 247, 255, 0.04)';
-    ctx.lineWidth = 1;
-    const step = 80;
-    for (let x = 0; x <= w; x += step) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= h; y += step) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-      ctx.stroke();
-    }
-    ctx.restore();
-
     // 2. Background Stars
     particles.render(ctx);
 

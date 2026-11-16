@@ -14,8 +14,6 @@ export function renderFallingTrailSparks(
     const alpha = Math.max(0, 1.0 - offset);
 
     ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.arc(tx, ty, 2.5 * alpha, 0, Math.PI * 2);
     ctx.fill();

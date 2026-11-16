@@ -73,10 +73,8 @@ export function drawPlanarDeltaVortex(
   ctx.fillStyle = grad;
   ctx.fill();
 
-  // Glowing neon borders
+  // Crisp neon borders (zero shadow blur for locked 60fps)
   ctx.strokeStyle = meta.color;
-  ctx.shadowColor = meta.glow;
-  ctx.shadowBlur = 14;
   ctx.lineWidth = 2.4 * userScale;
   ctx.lineJoin = 'round';
   ctx.stroke();
@@ -93,7 +91,6 @@ export function drawPlanarDeltaVortex(
   }
   ctx.closePath();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-  ctx.shadowBlur = 6;
   ctx.lineWidth = 1.0;
   ctx.stroke();
 
@@ -103,8 +100,6 @@ export function drawPlanarDeltaVortex(
     const x = Math.cos(angle) * R;
     const y = Math.sin(angle) * R;
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = meta.glow;
-    ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.arc(x, y, 3 * userScale, 0, Math.PI * 2);
     ctx.fill();
@@ -121,8 +116,6 @@ export function drawPlanarDeltaVortex(
     const my = Math.sin(angle) * dist;
 
     ctx.save();
-    ctx.shadowColor = meta.glow;
-    ctx.shadowBlur = 10;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(mx, my, 2.4 * userScale, 0, Math.PI * 2);
@@ -134,8 +127,6 @@ export function drawPlanarDeltaVortex(
   ctx.save();
   const hover = Math.sin(animTick * 3) * 1.5;
   ctx.translate(0, hover);
-  ctx.shadowColor = 'rgba(0,0,0,0.85)';
-  ctx.shadowBlur = 8;
   renderCustomPowerUpIcon(ctx, meta.type, 38 * userScale, meta.color);
   ctx.restore();
 

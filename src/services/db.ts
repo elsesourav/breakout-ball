@@ -444,7 +444,7 @@ class CloudDatabaseService {
           };
         }
         const nextLevel = maxCompleted + 1;
-        if (nextLevel <= 10 && !progress[String(nextLevel)]) {
+        if (nextLevel <= 50 && !progress[String(nextLevel)]) {
           progress[String(nextLevel)] = { levelNumber: nextLevel, completed: false, rank: null, bestTime: null };
         }
       }

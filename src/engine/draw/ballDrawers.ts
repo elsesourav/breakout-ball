@@ -74,11 +74,7 @@ export function draw3DStardustCoreBall(
 
   ctx.save();
 
-  // 1. Subtle Outer Border Glow (Strictly on rim)
-  ctx.shadowColor = palette.glow;
-  ctx.shadowBlur = isMega ? 22 : tier === 3 ? 18 : tier === 2 ? 14 : 10;
-
-  // 2. Base Spherical 3D Volume Gradient
+  // 1. Base Spherical 3D Volume Gradient (Zero shadowBlur for locked 60 FPS)
   const lightX = bx - br * 0.35;
   const lightY = by - br * 0.35;
   const baseGrad = ctx.createRadialGradient(lightX, lightY, br * 0.05, bx, by, br);

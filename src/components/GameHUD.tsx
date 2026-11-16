@@ -118,14 +118,14 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           <div className="flex items-center gap-1.5 pointer-events-auto shrink-0">
             <button
               onClick={handleHomeClick}
-              className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#090d24]/90 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all shadow-sm backdrop-blur-md cursor-pointer"
+              className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#090d24] border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 active:scale-95 transition-all cursor-pointer"
               title={gameMode === 'arena' ? 'Exit to Arena' : 'Exit to Arcade'}
             >
               <Home className="w-4 h-4" />
             </button>
 
-            {/* Micro-Hearts (Reduced shadow for 60 FPS) */}
-            <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#06091c]/85 border border-white/10 shadow-sm backdrop-blur-md">
+            {/* Micro-Hearts (High-performance opaque background, zero blur) */}
+            <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#06091c] border border-white/10">
               {[1, 2, 3].map((heartIndex) => {
                 const isAlive = heartIndex <= lives;
                 return (
@@ -143,7 +143,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           </div>
 
           {/* Center Section: Compact Cyber Score Display */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#06091c]/85 border border-white/10 shadow-sm backdrop-blur-md shrink-0">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#06091c] border border-white/10 shrink-0">
             <span className="font-tech text-[10px] font-bold text-slate-400 tracking-wider">
               LVL {levelNumber}
             </span>
@@ -156,7 +156,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           {/* Right Section: Compact Targets & Cores / Combo */}
           <div className="flex items-center gap-1.5 justify-end shrink-0 pointer-events-auto">
             {totalBreakable > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c]/85 border border-cyan-500/30 shadow-sm backdrop-blur-md">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c] border border-cyan-500/30">
                 <Boxes className="w-3.5 h-3.5 text-cyan-400" />
                 <span className="font-tech font-bold text-xs text-cyan-300">
                   {remainingTargets}
@@ -166,12 +166,12 @@ export const GameHUD: React.FC<GameHUDProps> = ({
 
             {/* Cores or Combo */}
             {combo > 1 ? (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/20 to-red-500/20 border border-amber-400/50 shadow-sm animate-pulse backdrop-blur-md">
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/30 to-red-500/30 border border-amber-400/50 animate-pulse">
                 <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
                 <span className="font-tech font-black text-xs text-amber-300">{combo}x</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c]/85 border border-cyan-500/30 shadow-sm backdrop-blur-md">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#06091c] border border-cyan-500/30">
                 <CoreIcon size={12} variant="cyan" />
                 <span className="font-tech font-bold text-xs text-cyan-200">
                   {totalCores.toLocaleString()}
@@ -191,7 +191,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
               return (
                 <div
                   key={buff.type}
-                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#06091c]/90 border backdrop-blur-md transition-all text-[10px] font-tech font-bold shadow-sm"
+                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#06091c] border transition-all text-[10px] font-tech font-bold"
                   style={{
                     borderColor: buff.color,
                   }}
@@ -228,16 +228,16 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 pointer-events-auto select-none"
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-4 pointer-events-auto select-none"
           >
             <motion.div
               initial={{ scale: 0.9, y: 12, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 12, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-              className="w-full max-w-sm rounded-2xl bg-[#070b1e]/98 border border-cyan-500/40 p-5 shadow-[0_0_35px_rgba(0,247,255,0.3)] flex flex-col gap-4 text-center"
+              className="w-full max-w-sm rounded-2xl bg-[#070b1e] border border-cyan-500/40 p-5 shadow-2xl flex flex-col gap-4 text-center"
             >
-              <div className="w-12 h-12 rounded-xl bg-cyan-950/80 border border-cyan-400/50 flex items-center justify-center mx-auto text-cyan-400 shadow-[0_0_15px_rgba(0,247,255,0.3)]">
+              <div className="w-12 h-12 rounded-xl bg-cyan-950/80 border border-cyan-400/50 flex items-center justify-center mx-auto text-cyan-400">
                 <Home className="w-6 h-6" />
               </div>
               <div className="space-y-1">
@@ -259,7 +259,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
                 <button
                   type="button"
                   onClick={handleConfirmExit}
-                  className="flex-1 py-2.5 rounded-xl border border-rose-500/60 bg-rose-600/90 hover:bg-rose-600 font-display font-black text-xs text-white shadow-[0_0_14px_rgba(244,63,94,0.45)] transition-all cursor-pointer active:scale-95"
+                  className="flex-1 py-2.5 rounded-xl border border-rose-500/60 bg-rose-600/90 hover:bg-rose-600 font-display font-black text-xs text-white shadow-lg transition-all cursor-pointer active:scale-95"
                 >
                   EXIT TO MENU
                 </button>
@@ -291,11 +291,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({
                     stiffness: 400,
                   }}
                   style={{
-                    backgroundColor: 'rgba(6, 9, 24, 0.55)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+                    backgroundColor: 'rgba(6, 9, 28, 0.95)',
+                    border: '1.5px solid rgba(0, 247, 255, 0.35)',
                     borderRadius: '20px',
-                    backdropFilter: 'blur(8px)',
                   }}
                   className="flex flex-col items-center justify-center px-8 py-4 min-w-[140px] relative overflow-hidden"
                 >

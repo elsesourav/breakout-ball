@@ -7,15 +7,8 @@ import { PowerUpManager } from './powerUps';
 import { currencyService } from '../services/currency';
 import { LevelData, BlockData } from '../types/game';
 import {
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  BLOCK_WIDTH,
-  BLOCK_HEIGHT,
-  PADDLE_WIDTH,
-  PADDLE_HEIGHT,
-  BALL_RADIUS,
-  BALL_SPEED,
-  BLOCK_COLORS,
+  CANVAS_WIDTH, CANVAS_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT,
+  PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BALL_SPEED, BLOCK_COLORS,
 } from '../constants/game';
 import { ScoreState, EngineCallbacks, CollisionEvent } from './types';
 
@@ -43,14 +36,8 @@ export class GameEngine {
   private readonly MAX_FRAME_DELTA: number = 0.1; // 100ms cap to prevent spiral of death
 
   public state: ScoreState = {
-    score: 0,
-    blocksDestroyed: 0,
-    totalBreakable: 0,
-    combo: 0,
-    maxCombo: 0,
-    timeUsed: 0,
-    lives: 3,
-    status: 'countdown',
+    score: 0, blocksDestroyed: 0, totalBreakable: 0,
+    combo: 0, maxCombo: 0, timeUsed: 0, lives: 3, status: 'countdown',
   };
 
   private currentLevel: LevelData | null = null;
@@ -65,14 +52,10 @@ export class GameEngine {
     this.callbacks = callbacks;
     this.wasmBridge = new WasmPhysicsBridge();
     this.tsPhysics = new PhysicsWorld({
-      width: CANVAS_WIDTH,
-      height: CANVAS_HEIGHT,
-      paddleWidth: PADDLE_WIDTH,
-      paddleHeight: PADDLE_HEIGHT,
-      ballRadius: BALL_RADIUS,
-      ballSpeed: BALL_SPEED,
-      blockWidth: BLOCK_WIDTH,
-      blockHeight: BLOCK_HEIGHT,
+      width: CANVAS_WIDTH, height: CANVAS_HEIGHT,
+      paddleWidth: PADDLE_WIDTH, paddleHeight: PADDLE_HEIGHT,
+      ballRadius: BALL_RADIUS, ballSpeed: BALL_SPEED,
+      blockWidth: BLOCK_WIDTH, blockHeight: BLOCK_HEIGHT,
       substeps: 6,
     });
 
@@ -99,14 +82,8 @@ export class GameEngine {
 
     const breakables = level.blocks.filter((b) => (b.h >= 1 && b.h <= 5) || b.h === 8).length;
     this.state = {
-      score: 0,
-      blocksDestroyed: 0,
-      totalBreakable: breakables,
-      combo: 0,
-      maxCombo: 0,
-      timeUsed: 0,
-      lives: 3,
-      status: 'countdown',
+      score: 0, blocksDestroyed: 0, totalBreakable: breakables,
+      combo: 0, maxCombo: 0, timeUsed: 0, lives: 3, status: 'countdown',
     };
 
     const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
@@ -168,9 +145,15 @@ export class GameEngine {
 
     this.lastTime = performance.now();
     this.accumulator = 0;
+    let isFirstFrame = true;
 
     const loop = (timestamp: number) => {
       const now = performance.now();
+      if (isFirstFrame) {
+        this.lastTime = now;
+        this.accumulator = 0;
+        isFirstFrame = false;
+      }
       let dt = (now - this.lastTime) / 1000;
       this.lastTime = now;
 

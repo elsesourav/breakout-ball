@@ -1,11 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { useGame } from '../context/GameContext';
-import {
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  PADDLE_WIDTH,
-} from '../constants/game';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, PADDLE_WIDTH } from '../constants/game';
 import { soundManager } from '../utils/audio';
 import { currencyService } from '../services/currency';
 import { GameHUD } from './GameHUD';
@@ -24,39 +20,19 @@ interface CanvasDisplaySize {
 }
 
 function computeGameCanvasSize(containerW: number, containerH: number): CanvasDisplaySize {
-  const GAME_ASPECT = CANVAS_WIDTH / CANVAS_HEIGHT; // 9:16 = 0.5625
-
-  // Top padding reserves space for the HUD buttons (~48px) so blocks never collide with them
+  const GAME_ASPECT = CANVAS_WIDTH / CANVAS_HEIGHT;
   const topPadding = Math.max(54, Math.min(68, Math.round(containerH * 0.075)));
   const bottomPadding = Math.max(18, Math.min(28, Math.round(containerH * 0.035)));
   const horizontalMargin = containerW < 360 ? 6 : 14;
-
-  const maxAvailableH = Math.max(160, containerH - topPadding - bottomPadding);
-  const maxAvailableW = Math.max(120, containerW - horizontalMargin * 2);
-
-  // Maximum display height requested by user: ~600px ceiling with matching width
-  const MAX_DISPLAY_HEIGHT = 600;
-  const MAX_DISPLAY_WIDTH = Math.round(MAX_DISPLAY_HEIGHT * GAME_ASPECT); // 338
-
-  const boundH = Math.min(maxAvailableH, MAX_DISPLAY_HEIGHT);
-  const boundW = Math.min(maxAvailableW, MAX_DISPLAY_WIDTH);
-
-  // Strictly preserve 9:16 aspect ratio across all devices:
-  // "If height is greater and width doesn't match -> make width small and height small.
-  //  If width is big but height is small -> make height small and width small."
+  const boundH = Math.min(Math.max(160, containerH - topPadding - bottomPadding), 600);
+  const boundW = Math.min(Math.max(120, containerW - horizontalMargin * 2), Math.round(600 * GAME_ASPECT));
   let width = boundW;
   let height = Math.round(width / GAME_ASPECT);
-
   if (height > boundH) {
     height = boundH;
     width = Math.round(height * GAME_ASPECT);
   }
-
-  // Force even integers for sharp display
-  width = Math.round(width / 2) * 2;
-  height = Math.round(height / 2) * 2;
-
-  return { width, height, topPadding, bottomPadding };
+  return { width: Math.round(width / 2) * 2, height: Math.round(height / 2) * 2, topPadding, bottomPadding };
 }
 
 export const GameCanvas: React.FC = () => {
@@ -498,21 +474,15 @@ export const GameCanvas: React.FC = () => {
       />
       <div
         className="relative flex-1 w-full flex flex-col items-center justify-center pointer-events-auto"
-        style={{
-          paddingTop: `${displaySize.topPadding}px`,
-          paddingBottom: `${displaySize.bottomPadding}px`,
-        }}
+        style={{ paddingTop: `${displaySize.topPadding}px`, paddingBottom: `${displaySize.bottomPadding}px` }}
       >
         <canvas
           ref={canvasRef}
           id="mainCanvas"
-          className="block active cursor-crosshair touch-none rounded-xl border border-cyan-500/30 shadow-[0_0_24px_rgba(0,247,255,0.2)]"
+          className="block active cursor-crosshair touch-none rounded-xl border border-cyan-500/20"
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
-          style={{
-            width: `${displaySize.width}px`,
-            height: `${displaySize.height}px`,
-          }}
+          style={{ width: `${displaySize.width}px`, height: `${displaySize.height}px` }}
           onMouseDown={handlePointerMove}
           onMouseMove={handlePointerMove}
           onTouchStart={handlePointerMove}

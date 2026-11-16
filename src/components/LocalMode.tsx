@@ -5,8 +5,8 @@ import { LevelData } from '../types/game';
 export const LocalMode: React.FC = () => {
   const { localLevels, localProgress, openPreview } = useGame();
 
-  // Show 30 levels in the grid
-  const totalLevels = 30;
+  // Show 50 levels in the grid
+  const totalLevels = 50;
 
   const handleLevelClick = (levelNumber: number) => {
     const isUnlocked = localProgress[String(levelNumber)] !== undefined;

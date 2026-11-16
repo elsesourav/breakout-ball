@@ -70,8 +70,6 @@ export function drawBlackHoleFloor(
   // Outer faint violet ring
   ctx.strokeStyle = 'rgba(168, 85, 247, 0.45)';
   ctx.lineWidth = 1.8;
-  ctx.shadowColor = '#a855f7';
-  ctx.shadowBlur = 10;
   ctx.beginPath();
   ctx.ellipse(cx, cy, baseRx * 0.96 + pulse, baseRy * 0.92, 0, 0, Math.PI * 2);
   ctx.stroke();
@@ -85,8 +83,6 @@ export function drawBlackHoleFloor(
 
   ctx.strokeStyle = diskGrad;
   ctx.lineWidth = 3.0;
-  ctx.shadowColor = '#00f7ff';
-  ctx.shadowBlur = 15;
 
   // Relativistic orbital dashes that visibly spin around the horizontal disk
   ctx.setLineDash([30, 16, 14, 16]);
@@ -97,7 +93,7 @@ export function drawBlackHoleFloor(
   ctx.setLineDash([]);
   ctx.restore();
 
-  // 3. Orbiting Relativistic Accretion Embers (Strictly bounded within horizontal disk plane)
+  // 3. Orbiting Relativistic Accretion Embers (Strictly bounded within horizontal disk plane, zero blur for 60fps)
   ctx.save();
   for (let i = 0; i < ACCRETION_EMBERS.length; i++) {
     const ember = ACCRETION_EMBERS[i];
@@ -120,8 +116,6 @@ export function drawBlackHoleFloor(
 
     ctx.globalAlpha = finalAlpha;
     ctx.fillStyle = color;
-    ctx.shadowColor = isCyan ? '#00f7ff' : '#a855f7';
-    ctx.shadowBlur = 6;
 
     ctx.beginPath();
     // Stretched along orbital motion direction
@@ -137,8 +131,6 @@ export function drawBlackHoleFloor(
 
   ctx.save();
   ctx.strokeStyle = '#ffffff';
-  ctx.shadowColor = '#00f7ff';
-  ctx.shadowBlur = 18;
   ctx.lineWidth = 2.4;
   ctx.beginPath();
   ctx.ellipse(cx, cy, horizonRx, horizonRy, 0, 0, Math.PI * 2);
@@ -195,8 +187,6 @@ export function drawBlackHoleFloor(
 
   ctx.strokeStyle = alertGrad;
   ctx.lineWidth = 1.6;
-  ctx.shadowColor = '#00f7ff';
-  ctx.shadowBlur = 10;
   ctx.beginPath();
   ctx.moveTo(w * 0.16, alertY);
   // Gentle gravitational curvature dipping towards the center
