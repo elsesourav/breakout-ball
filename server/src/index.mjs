@@ -96,7 +96,7 @@ app.get('/api/trophies/user/:username', (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 app.post('/api/levels/complete', (req, res) => {
   try {
-    const { username, levelId, timeUsed, livesRemaining, score, stars } = req.body;
+    const { username, levelId, timeUsed, livesRemaining, score, stars, fullName, avatarUrl } = req.body;
     if (!username || levelId === undefined || timeUsed === undefined) {
       return res.status(400).json({ error: 'Missing username, levelId, or timeUsed' });
     }
@@ -106,7 +106,9 @@ app.post('/api/levels/complete', (req, res) => {
       timeUsed: Number(timeUsed),
       livesRemaining: Number(livesRemaining || 3),
       score: Number(score || 1000),
-      stars: Number(stars || 3)
+      stars: Number(stars || 3),
+      fullName,
+      avatarUrl
     });
 
     res.json({ success: true, ...result });

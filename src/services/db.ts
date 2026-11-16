@@ -376,6 +376,8 @@ class CloudDatabaseService {
       livesRemaining,
       score: Math.max(1000, Math.floor(10000 - time * 120)),
       stars: Math.min(3, Math.max(1, livesRemaining)),
+      fullName: userProfile.fullName || username,
+      avatarUrl: userProfile.avatarUrl,
     }).catch(() => {});
 
     const userEntry = finalLeaderboard.find((e) => e.username.toLowerCase() === username.toLowerCase());

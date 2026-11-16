@@ -118,7 +118,15 @@ class BackendApiService {
   /** Background Level Completion: Records score, time, stars and increments user progress */
   public async recordLevelCompletion(
     username: string,
-    data: { levelId: string | number; timeUsed: number; livesRemaining: number; score: number; stars: number }
+    data: {
+      levelId: string | number;
+      timeUsed: number;
+      livesRemaining: number;
+      score: number;
+      stars: number;
+      fullName?: string;
+      avatarUrl?: string;
+    }
   ): Promise<{ success: boolean; isFirstClear?: boolean } | null> {
     try {
       const res = await fetch(`${this.baseUrl}/api/levels/complete`, {

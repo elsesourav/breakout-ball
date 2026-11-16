@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import {
   ActiveTab,
   GameScreen,
@@ -60,6 +60,8 @@ interface GameContextType {
   deleteUserLevel: (id: string) => Promise<void>;
   updateLevelPrivacy: (id: string, isPublic: boolean) => Promise<void>;
   isInitialLoading: boolean;
+  isOpeningLevel: boolean;
+  loadingLeaderboardLevelId: string | null;
   logoutUser: () => Promise<void>;
   recordLevelCompletion: (
     levelId: string,
@@ -131,6 +133,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
+  const [isOpeningLevel, setIsOpeningLevel] = useState<boolean>(false);
+  const [loadingLeaderboardLevelId, setLoadingLeaderboardLevelId] = useState<string | null>(null);
+  const isOpeningLevelRef = useRef<boolean>(false);
 
   // Load from database on mount & synchronize initial URL route
   useEffect(() => {
@@ -268,6 +273,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setScreenState(newScreen);
       if (newScreen === 'menu') {
+        isOpeningLevelRef.current = false;
+        setIsOpeningLevel(false);
+        setLoadingLeaderboardLevelId(null);
         pushAppRoute(getRoutePath(activeTab, 'menu'));
       }
     },
@@ -345,12 +353,28 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const openPreview = useCallback(
     async (level: LevelData) => {
+      if (isOpeningLevelRef.current) return;
+      isOpeningLevelRef.current = true;
+      setIsOpeningLevel(true);
       soundManager.playClick();
       setSelectedLevel(level);
-      const board = await dbService.getLeaderboard(level.id);
-      setLeaderboards((prev) => ({ ...prev, [level.id]: board }));
       setScreenState('preview');
       pushAppRoute(getRoutePath(activeTab, 'preview', level.id));
+      setLoadingLeaderboardLevelId(level.id);
+
+      try {
+        const [board] = await Promise.all([
+          dbService.getLeaderboard(level.id),
+          new Promise((resolve) => setTimeout(resolve, 350)),
+        ]);
+        setLeaderboards((prev) => ({ ...prev, [level.id]: board }));
+      } catch (err) {
+        console.warn('Leaderboard fetch error:', err);
+      } finally {
+        setLoadingLeaderboardLevelId((curr) => (curr === level.id ? null : curr));
+        isOpeningLevelRef.current = false;
+        setIsOpeningLevel(false);
+      }
     },
     [activeTab]
   );
@@ -441,41 +465,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <GameContext.Provider
       value={{
-        activeTab,
-        setActiveTab,
-        screen,
-        setScreen,
-        selectedLevel,
-        setSelectedLevel,
-        editingLevel,
-        setEditingLevel,
-        localLevels,
-        localProgress,
-        onlineLevels,
-        userCreatedLevels,
-        settings,
-        updateSettings,
-        user,
-        updateUser,
-        leaderboards,
-        alertConfig,
-        showAlert,
-        hideAlert,
-        isAuthModalOpen,
-        setIsAuthModalOpen,
-        authMode,
-        setAuthMode,
-        startPlayLevel,
-        openPreview,
-        openDesigner,
-        openModifier,
-        closeModifier,
-        saveUserLevel,
-        deleteUserLevel,
-        updateLevelPrivacy,
-        isInitialLoading,
-        logoutUser,
-        recordLevelCompletion,
+        activeTab, setActiveTab, screen, setScreen,
+        selectedLevel, setSelectedLevel, editingLevel, setEditingLevel,
+        localLevels, localProgress, onlineLevels, userCreatedLevels,
+        settings, updateSettings, user, updateUser, leaderboards,
+        alertConfig, showAlert, hideAlert,
+        isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode,
+        startPlayLevel, openPreview, openDesigner, openModifier, closeModifier,
+        saveUserLevel, deleteUserLevel, updateLevelPrivacy,
+        isInitialLoading, isOpeningLevel, loadingLeaderboardLevelId,
+        logoutUser, recordLevelCompletion,
       }}
     >
       {children}

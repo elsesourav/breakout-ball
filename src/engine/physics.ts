@@ -1,5 +1,11 @@
 import { BallState, PaddleState, BlockEngineState, CollisionEvent, CollisionEventType } from './types';
 import { BlockData } from '../types/game';
+import {
+  pairPortals,
+  resolvePaddleBounce,
+  handlePortalCollision,
+  detonateEmpExplosion,
+} from './physicsHelpers';
 
 export interface PhysicsWorldConfig {
   width: number;
@@ -103,41 +109,8 @@ export class PhysicsWorld {
       this.blocks.push(blockState);
     });
 
-    // Robust Portal Pairing: Match portals by portalPairId, with fallback sequential/ring pairing
-    const pairMap = new Map<number, number[]>();
-    portalIndices.forEach((idx, i) => {
-      const pid = this.blocks[idx].portalPairId ?? Math.floor(i / 2) + 1;
-      if (!pairMap.has(pid)) pairMap.set(pid, []);
-      pairMap.get(pid)!.push(idx);
-    });
-
-    const orphanIndices: number[] = [];
-    pairMap.forEach((indices) => {
-      if (indices.length >= 2) {
-        for (let p = 0; p < indices.length; p++) {
-          const nextIdx = indices[(p + 1) % indices.length];
-          this.blocks[indices[p]].portalPairIndex = nextIdx;
-        }
-      } else if (indices.length === 1) {
-        orphanIndices.push(indices[0]);
-      }
-    });
-
-    // Pair up any leftover orphan portals across different groups
-    for (let o = 0; o < orphanIndices.length - 1; o += 2) {
-      const idxA = orphanIndices[o];
-      const idxB = orphanIndices[o + 1];
-      this.blocks[idxA].portalPairIndex = idxB;
-      this.blocks[idxB].portalPairIndex = idxA;
-    }
-
-    // If an odd single portal remains completely alone in the entire level:
-    // It remains a portal (health = 7) and acts as an indestructible quantum reflector!
-    // It NEVER transforms into a Titanium block or changes appearance.
-    if (orphanIndices.length % 2 === 1) {
-      const loneIdx = orphanIndices[orphanIndices.length - 1];
-      this.blocks[loneIdx].portalPairIndex = undefined;
-    }
+    // Robust Portal Pairing
+    pairPortals(this.blocks, portalIndices);
   }
 
   public resetBall(x: number, y: number, vx: number, vy: number) {
@@ -160,24 +133,36 @@ export class PhysicsWorld {
     this.combo = 0;
   }
 
-  public spawnExtraBalls() {
+  public spawnExtraBalls(extraCount: number = 2) {
     const active = this.balls.filter((b) => b.isActive);
     if (active.length === 0) return;
 
     const newBalls: BallState[] = [];
-    const spread = (26 * Math.PI) / 180;
+    const maxAllowed = 8;
+    const maxSpread = (32 * Math.PI) / 180;
 
     for (const b of active) {
-      if (this.balls.length + newBalls.length >= 8) break;
-      const angle = Math.atan2(b.vy, b.vx);
+      if (this.balls.length + newBalls.length >= maxAllowed) break;
+      const baseAngle = Math.atan2(b.vy, b.vx);
       const spd = b.speed || this.config.ballSpeed;
 
-      [spread, -spread].forEach((offset) => {
+      const offsets: number[] = [];
+      if (extraCount <= 1) {
+        offsets.push(maxSpread * 0.5);
+      } else {
+        const step = (maxSpread * 2) / (extraCount - 1);
+        for (let i = 0; i < extraCount; i++) {
+          offsets.push(-maxSpread + i * step);
+        }
+      }
+
+      for (const offset of offsets) {
+        if (this.balls.length + newBalls.length >= maxAllowed) break;
         newBalls.push({
           x: b.x,
           y: b.y,
-          vx: Math.cos(angle + offset) * spd,
-          vy: Math.sin(angle + offset) * spd,
+          vx: Math.cos(baseAngle + offset) * spd,
+          vy: Math.sin(baseAngle + offset) * spd,
           radius: b.radius,
           speed: spd,
           baseSpeed: b.baseSpeed,
@@ -188,7 +173,7 @@ export class PhysicsWorld {
           lastHitBlockCooldown: 0,
           trail: [],
         });
-      });
+      }
     }
 
     this.balls.push(...newBalls);
@@ -218,10 +203,10 @@ export class PhysicsWorld {
     const dist = Math.abs(dx);
 
     if (dist > 0.01) {
-      // Direct tracking capped by current upgrade max speed:
+      // Direct tracking strictly capped by current upgrade max speed:
       // If distance exceeds maxStep, travel at maximum physical speed;
-      // If distance is within reach, smoothly snap into target without overshooting
-      const step = dist >= maxStep ? Math.sign(dx) * maxStep : dx * 0.55;
+      // If distance is within reach of current frame, snap cleanly to target with zero artificial delay
+      const step = dist >= maxStep ? Math.sign(dx) * maxStep : dx;
       this.paddle.vx = step / dt;
       this.paddle.x += step;
     } else {
@@ -294,95 +279,23 @@ export class PhysicsWorld {
         }
 
         // Bottom Out or Shield Barrier
-        if (ball.y - ball.radius >= this.config.height) {
-          if (this.hasShield) {
-            this.hasShield = false;
-            ball.vy = -Math.abs(ball.vy);
-            ball.y = this.config.height - 40;
-            this.events.push({ type: 'shield_bounce', blockIndex: -1, hitX: ball.x, hitY: ball.y, combo: this.combo });
-            break;
-          } else {
-            ball.isActive = false;
-            const aliveCount = this.balls.filter((b) => b.isActive).length;
-            if (aliveCount === 0) {
-              this.events.push({ type: 'ball_lost', blockIndex: -1, hitX: ball.x, hitY: ball.y, combo: this.combo });
-            }
-            break;
+        const shieldY = this.config.height - 35;
+        if (this.hasShield && ball.y + ball.radius >= shieldY && ball.vy > 0) {
+          ball.vy = -Math.abs(ball.vy);
+          ball.y = shieldY - ball.radius;
+          this.events.push({ type: 'shield_bounce', blockIndex: -1, hitX: ball.x, hitY: shieldY, combo: this.combo });
+        } else if (ball.y - ball.radius >= this.config.height) {
+          ball.isActive = false;
+          const aliveCount = this.balls.filter((b) => b.isActive).length;
+          if (aliveCount === 0) {
+            this.events.push({ type: 'ball_lost', blockIndex: -1, hitX: ball.x, hitY: ball.y, combo: this.combo });
           }
+          break;
         }
 
         // 2. High-Precision Paddle Collision & Dynamic Angular Deflection
-        const padLeft = this.paddle.x - halfPadW;
-        const padRight = this.paddle.x + halfPadW;
-        const padTop = this.paddle.y;
-        const padBottom = this.paddle.y + this.paddle.height;
-
-        const closestPadX = Math.max(padLeft, Math.min(ball.x, padRight));
-        const closestPadY = Math.max(padTop, Math.min(ball.y, padBottom));
-        const padDistSq = (ball.x - closestPadX) ** 2 + (ball.y - closestPadY) ** 2;
-
-        // Continuous swept check: Did the ball pass through the top paddle line this substep?
-        const crossedPaddleTop = prevBallY <= padTop + ball.radius && ball.y + ball.radius >= padTop;
-        const withinPaddleWidth = ball.x >= padLeft - ball.radius && ball.x <= padRight + ball.radius;
-        const isNearPaddle = padDistSq <= ball.radius ** 2 || (crossedPaddleTop && withinPaddleWidth && ball.vy > 0);
-        const isNotOnCooldown = !ball.paddleCooldown || ball.paddleCooldown <= 0;
-        const isMovingTowardsPaddle = ball.vy > 0 || ball.y <= padTop + this.paddle.height * 0.5;
-
-        if (isNearPaddle && isNotOnCooldown && isMovingTowardsPaddle) {
-          const hitOffset = Math.max(-1, Math.min(1, (ball.x - this.paddle.x) / halfPadW));
-          const currentSpeed = ball.speed || this.config.ballSpeed;
-
-          // 15-degree minimum bounce angle enforcement (0.2618 rad):
-          // Ball must NEVER bounce at less than 15 degrees from vertical (no straight-up loops)
-          // and NEVER flatter than 15 degrees from the paddle surface (no flat skimming)
-          const MIN_BOUNCE_ANGLE = (15 * Math.PI) / 180; // 15 degrees
-          const MAX_BASE_ANGLE = (68 * Math.PI) / 180;   // 68 degrees at extreme paddle edges
-          const MAX_ALLOWED_ANGLE = (75 * Math.PI) / 180; // 75 degrees (leaving >= 15 degrees above paddle)
-
-          // Determine deflection direction: offset position -> paddle velocity -> ball momentum -> fallback right (+1)
-          const deflectDir =
-            hitOffset !== 0
-              ? Math.sign(hitOffset)
-              : Math.sign(this.paddle.vx) || Math.sign(ball.vx) || 1;
-
-          // Base angle scales progressively from minimum 15 degrees at dead center up to 68 degrees at edges
-          const baseAngleMag = MIN_BOUNCE_ANGLE + Math.abs(hitOffset) * (MAX_BASE_ANGLE - MIN_BOUNCE_ANGLE);
-          const bounceAngle = deflectDir * baseAngleMag;
-
-          // Paddle spin from lateral movement adds dynamic slice
-          const spin = this.paddle.vx * 0.28;
-          const rawVx = currentSpeed * Math.sin(bounceAngle) + spin;
-          const rawVy = -currentSpeed * Math.cos(bounceAngle);
-
-          // Calculate resulting angle from vertical normal
-          let angleFromVertical = Math.atan2(rawVx, -rawVy);
-          let finalAngleMag = Math.abs(angleFromVertical);
-          const finalAngleSign = Math.sign(angleFromVertical) || deflectDir;
-
-          // Enforce bounds: minimum 15 degrees from vertical, and minimum 15 degrees from horizontal
-          if (finalAngleMag < MIN_BOUNCE_ANGLE) {
-            finalAngleMag = MIN_BOUNCE_ANGLE;
-          } else if (finalAngleMag > MAX_ALLOWED_ANGLE) {
-            finalAngleMag = MAX_ALLOWED_ANGLE;
-          }
-
-          const finalAngle = finalAngleSign * finalAngleMag;
-          ball.vx = currentSpeed * Math.sin(finalAngle);
-          ball.vy = -currentSpeed * Math.cos(finalAngle);
-
-          // Position cleanly above paddle surface to prevent penetration
-          ball.y = padTop - ball.radius - 1;
-          ball.paddleCooldown = 8;
-          ball.lastHitBlockIndex = undefined;
+        if (resolvePaddleBounce(ball, this.paddle, halfPadW, this.config, prevBallY, this.events)) {
           this.combo = 0;
-
-          this.events.push({
-            type: 'paddle',
-            blockIndex: -1,
-            hitX: ball.x,
-            hitY: padTop,
-            combo: 0,
-          });
           continue;
         }
 
@@ -407,76 +320,9 @@ export class PhysicsWorld {
 
             // SPECIAL A: Quantum Portal Warp (Type 7)
             if (block.health === 7) {
-              // 1. Post-warp transit: allow ball to move freely away from portals without re-triggering or getting snagged
-              if (ball.warpCooldown && ball.warpCooldown > 0) {
-                continue;
-              }
-
-              // 2. Recharge Break (3 seconds): Portal acts like "a normal nothing" (transparent pass-through) while cooling down
-              if (block.portalRechargeTimer && block.portalRechargeTimer > 0) {
-                continue;
-              }
-
-              // 3. 50% Penetration Rule: Ball must be at least 50% inside the portal block rectangle
-              // (Ball center (ball.x, ball.y) has crossed inside [block.x, block.x + block.w] x [block.y, block.y + block.h])
-              const isCenterInside =
-                ball.x >= block.x &&
-                ball.x <= block.x + block.w &&
-                ball.y >= block.y &&
-                ball.y <= block.y + block.h;
-
-              if (isCenterInside) {
-                if (
-                  block.portalPairIndex !== undefined &&
-                  this.blocks[block.portalPairIndex] &&
-                  this.blocks[block.portalPairIndex].health === 7 &&
-                  !this.blocks[block.portalPairIndex].isDead
-                ) {
-                  const targetPortal = this.blocks[block.portalPairIndex];
-                  if (typeof targetPortal.x === 'number' && typeof targetPortal.y === 'number') {
-                    // Safe exit placement completely clear of destination portal block
-                    const clearance = ball.radius + 8;
-                    const exitDown = targetPortal.y < this.config.blockHeight * 2 || ball.vy > 0;
-                    ball.x = Math.max(
-                      ball.radius + 6,
-                      Math.min(this.config.width - ball.radius - 6, targetPortal.x + targetPortal.w / 2)
-                    );
-                    ball.y = exitDown 
-                      ? targetPortal.y + targetPortal.h + clearance 
-                      : targetPortal.y - clearance;
-                    ball.vy = exitDown ? Math.abs(ball.vy) : -Math.abs(ball.vy);
-                    
-                    // Anti-looping cooldown: 35 ticks (~0.58s) guarantees ball escapes portal zone
-                    ball.warpCooldown = 35;
-
-                    // 3-Second Recharge Break: Both input and output portals enter 3.0s recharge break (180 ticks)
-                    // They turn transparent and act like nothing, while any other connected portal pairs remain active!
-                    block.portalRechargeTimer = 180;
-                    targetPortal.portalRechargeTimer = 180;
-
-                    this.events.push({
-                      type: 'portal_warp',
-                      blockIndex: b,
-                      hitX: hitCenterX,
-                      hitY: hitCenterY,
-                      combo: this.combo,
-                    });
-                    break;
-                  }
-                }
-              } else {
-                // Ball touches outer edge of portal (< 50% inside):
-                // Transportation does NOT apply yet.
-                // If the ball is moving inward toward the portal center, allow it to enter without outer perimeter bounce
-                const toCenterX = (block.x + block.w / 2) - ball.x;
-                const toCenterY = (block.y + block.h / 2) - ball.y;
-                const isMovingInward = (ball.vx * toCenterX + ball.vy * toCenterY) > 0;
-
-                if (isMovingInward && block.portalPairIndex !== undefined) {
-                  continue; // Permit smooth entrance into event horizon so center reaches 50%
-                }
-                // Otherwise (glancing away or lone portal): reflect normally below
-              }
+              const res = handlePortalCollision(ball, block, this.blocks, b, this.config, this.events, this.combo);
+              if (res === 'continue') continue;
+              if (res === 'break') break;
             }
 
             // Normal reflection & physically accurate collision normal
@@ -632,55 +478,6 @@ export class PhysicsWorld {
   }
 
   public detonateEmpReactor(b: number) {
-    const block = this.blocks[b];
-    if (block.isDead) return;
-
-    block.isDead = true;
-    this.remainingBreakable = Math.max(0, this.remainingBreakable - 1);
-    const hitCenterX = block.x + block.w / 2;
-    const hitCenterY = block.y + block.h / 2;
-
-    this.events.push({
-      type: 'emp_explode',
-      blockIndex: b,
-      hitX: hitCenterX,
-      hitY: hitCenterY,
-      combo: ++this.combo,
-    });
-
-    // Kinetic Shockwave radius (2.2 * blockWidth)
-    const blastRadius = this.config.blockWidth * 2.2;
-    const blastSq = blastRadius * blastRadius;
-
-    for (let ob = 0; ob < this.blocks.length; ob++) {
-      const other = this.blocks[ob];
-      if (other.isDead || other.health === 6 || other.health === 7) continue;
-      const ox = other.x + other.w / 2;
-      const oy = other.y + other.h / 2;
-      const dSq = (ox - hitCenterX) ** 2 + (oy - hitCenterY) ** 2;
-
-      if (dSq <= blastSq) {
-        if (other.health === 8) {
-          // Chain reaction detonation
-          this.detonateEmpReactor(ob);
-          continue;
-        }
-        if (other.health >= 1 && other.health <= 5) {
-          other.health = Math.max(0, other.health - 2);
-          other.hitAnim = 1.0;
-          if (other.health <= 0) {
-            other.isDead = true;
-            this.remainingBreakable = Math.max(0, this.remainingBreakable - 1);
-            this.events.push({
-              type: 'block_destroy',
-              blockIndex: ob,
-              hitX: ox,
-              hitY: oy,
-              combo: ++this.combo,
-            });
-          }
-        }
-      }
-    }
+    detonateEmpExplosion(this.blocks, b, this.config, this.events, this);
   }
 }

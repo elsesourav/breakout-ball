@@ -15,25 +15,21 @@ import { ScoreState, EngineCallbacks, CollisionEvent } from './types';
 export class GameEngine {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-
   private wasmBridge: WasmPhysicsBridge;
   private tsPhysics: PhysicsWorld;
   private particles: ParticleSystem;
   private renderer: GameRenderer;
   private audio: AudioBridge;
   public powerUps: PowerUpManager;
-  private ballSkin: string = 'cyan';
-
-  private useWasm: boolean = false;
+  private ballSkin = 'cyan';
+  private useWasm = false;
   private animFrameId: number | null = null;
-  private lastTime: number = 0;
-  private accumulator: number = 0;
-  private isPaused: boolean = false;
-  private buffsEmitTimer: number = 0;
-
-  // Fixed 60Hz physics timestep (0.016667s) guarantees identical speed on all devices (60Hz, 120Hz, 144Hz, 240Hz, mobile, tablet)
-  private readonly FIXED_STEP: number = 1 / 60;
-  private readonly MAX_FRAME_DELTA: number = 0.1; // 100ms cap to prevent spiral of death
+  private lastTime = 0;
+  private accumulator = 0;
+  private isPaused = false;
+  private buffsEmitTimer = 0;
+  private readonly FIXED_STEP = 1 / 60;
+  private readonly MAX_FRAME_DELTA = 0.1;
 
   public state: ScoreState = {
     score: 0, blocksDestroyed: 0, totalBreakable: 0,
@@ -70,8 +66,21 @@ export class GameEngine {
     this.useWasm = wasmSuccess;
   }
 
-  public setVibrate(enabled: boolean) {
-    this.audio.setVibrate(enabled);
+  public setVibrate(enabled: boolean) { this.audio.setVibrate(enabled); }
+  public setPaddleTarget(targetX: number) { this.tsPhysics.setPaddleTarget(targetX); }
+  public getPaddleTarget(): number { return this.tsPhysics.paddle.targetX; }
+  public getPaddleMaxSpeed(): number { return this.tsPhysics.paddle.maxSpeed ?? 1600; }
+  public getPaddlePosition(): number { return this.tsPhysics.paddle.x; }
+  public pause() { this.isPaused = true; }
+  public resume() { this.isPaused = false; this.lastTime = performance.now(); this.accumulator = 0; }
+  public getIsPaused(): boolean { return this.isPaused; }
+  public stopLoop() { if (this.animFrameId) { cancelAnimationFrame(this.animFrameId); this.animFrameId = null; } }
+  public setBallSkin(skin?: string) { if (skin) this.ballSkin = skin; }
+  public destroy() { this.stopLoop(); }
+
+  public movePaddleRelative(deltaX: number) {
+    const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
+    this.setPaddleTarget(this.tsPhysics.paddle.targetX + deltaX * (1 + (padSpeedLvl - 1) * 0.12));
   }
 
   public startLevel(level: LevelData) {
@@ -86,54 +95,53 @@ export class GameEngine {
       combo: 0, maxCombo: 0, timeUsed: 0, lives: 3, status: 'countdown',
     };
 
-    const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
-    const basePadW = PADDLE_WIDTH * (1 + (padWidthLvl - 1) * 0.08);
-    this.tsPhysics.paddle.width = basePadW;
-
-    const ballSizeLvl = currencyService.getUpgradeLevel('ball_size');
-    const ballRad = BALL_RADIUS * (1 + (ballSizeLvl - 1) * 0.05);
-
+    const { ballRad, ballSpd } = this.applyUpgrades();
     const initialBallX = CANVAS_WIDTH / 2;
     const initialBallY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - ballRad - 5;
 
     this.tsPhysics.loadBlocks(level.blocks);
     this.tsPhysics.resetBall(initialBallX, initialBallY, 0, 0);
+    if (this.tsPhysics.balls[0]) {
+      this.tsPhysics.balls[0].radius = ballRad;
+      this.tsPhysics.balls[0].baseSpeed = ballSpd;
+      this.tsPhysics.balls[0].speed = ballSpd;
+    }
 
     this.callbacks.onLivesChange?.(this.state.lives);
     this.callbacks.onComboChange?.(0);
     this.callbacks.onScoreUpdate?.(this.state);
   }
 
+  private applyUpgrades() {
+    const padW = PADDLE_WIDTH * (1 + (currencyService.getUpgradeLevel('paddle_width') - 1) * 0.08);
+    const padSpd = 1600 * (1 + (currencyService.getUpgradeLevel('paddle_speed') - 1) * 0.12);
+    const ballRad = BALL_RADIUS * (1 + (currencyService.getUpgradeLevel('ball_size') - 1) * 0.05);
+    const ballSpd = BALL_SPEED * (1 + (currencyService.getUpgradeLevel('ball_speed') - 1) * 0.035);
+    this.tsPhysics.paddle.width = padW;
+    this.tsPhysics.paddle.maxSpeed = padSpd;
+    this.tsPhysics.config.ballRadius = ballRad;
+    this.tsPhysics.config.ballSpeed = ballSpd;
+    return { padW, padSpd, ballRad, ballSpd };
+  }
+
   public launchBall() {
     if (this.state.status !== 'countdown' && this.state.status !== 'playing') return;
-
     this.state.status = 'playing';
 
-    const ballSpeedLvl = currencyService.getUpgradeLevel('ball_speed');
-    const currentSpeed = BALL_SPEED * (1 + (ballSpeedLvl - 1) * 0.035);
-
+    const { ballRad, ballSpd } = this.applyUpgrades();
     const angle = (Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1) + (Math.random() * 0.2 - 0.1);
-    const vx = Math.sin(angle) * currentSpeed;
-    const vy = -Math.cos(angle) * currentSpeed;
-
-    const ballSizeLvl = currencyService.getUpgradeLevel('ball_size');
-    const ballRad = BALL_RADIUS * (1 + (ballSizeLvl - 1) * 0.05);
+    const vx = Math.sin(angle) * ballSpd;
+    const vy = -Math.cos(angle) * ballSpd;
 
     const ballX = CANVAS_WIDTH / 2;
     const ballY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - ballRad - 5;
 
     this.tsPhysics.resetBall(ballX, ballY, vx, vy);
-  }
-
-  public setPaddleTarget(targetX: number) {
-    this.tsPhysics.setPaddleTarget(targetX);
-  }
-
-  public movePaddleRelative(deltaX: number) {
-    const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
-    const speedMultiplier = 1 + (padSpeedLvl - 1) * 0.12;
-    const currentTarget = this.tsPhysics.paddle.targetX + deltaX * speedMultiplier;
-    this.setPaddleTarget(currentTarget);
+    if (this.tsPhysics.balls[0]) {
+      this.tsPhysics.balls[0].radius = ballRad;
+      this.tsPhysics.balls[0].baseSpeed = ballSpd;
+      this.tsPhysics.balls[0].speed = ballSpd;
+    }
   }
 
   /**
@@ -181,27 +189,6 @@ export class GameEngine {
     this.animFrameId = requestAnimationFrame(loop);
   }
 
-  public pause() {
-    this.isPaused = true;
-  }
-
-  public resume() {
-    this.isPaused = false;
-    this.lastTime = performance.now();
-    this.accumulator = 0;
-  }
-
-  public getIsPaused(): boolean {
-    return this.isPaused;
-  }
-
-  public stopLoop() {
-    if (this.animFrameId) {
-      cancelAnimationFrame(this.animFrameId);
-      this.animFrameId = null;
-    }
-  }
-
   private recordScore(combo: number, pts: number) {
     this.state.combo = combo;
     if (this.state.combo > this.state.maxCombo) this.state.maxCombo = this.state.combo;
@@ -238,7 +225,13 @@ export class GameEngine {
     // Apply Active Modifiers
     const isSlowMo = this.powerUps.buffs.slowMo > 0;
     for (const b of this.tsPhysics.balls) {
-      b.speed = isSlowMo ? b.baseSpeed * 0.55 : b.baseSpeed;
+      const targetSpeed = isSlowMo ? b.baseSpeed * 0.55 : b.baseSpeed;
+      b.speed = targetSpeed;
+      const curV = Math.hypot(b.vx, b.vy);
+      if (curV > 0.01 && Math.abs(curV - targetSpeed) > 1.0) {
+        b.vx = (b.vx / curV) * targetSpeed;
+        b.vy = (b.vy / curV) * targetSpeed;
+      }
     }
 
     const isExpand = this.powerUps.buffs.expand > 0;
@@ -254,7 +247,7 @@ export class GameEngine {
     this.tsPhysics.paddle.maxSpeed = 1600 * speedMultiplier;
 
     this.tsPhysics.isMegaBall = this.powerUps.buffs.megaBall > 0;
-    this.tsPhysics.hasShield = this.powerUps.buffs.hasShield;
+    this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
     this.tsPhysics.ballImpactLevel = currencyService.getUpgradeLevel('ball_impact');
 
     // 2. Physics Simulation Step
@@ -272,7 +265,20 @@ export class GameEngine {
       this.buffsEmitTimer = (this.buffsEmitTimer || 0) + 1;
       if (this.buffsEmitTimer >= 6 || collected.length > 0) {
         this.buffsEmitTimer = 0;
-        this.callbacks.onBuffsChange(this.powerUps.getActiveBuffs());
+        const activeList = this.powerUps.getActiveBuffs();
+        const activeBalls = this.tsPhysics.balls.filter((b) => b.isActive).length;
+        if (activeBalls > 1) {
+          activeList.unshift({
+            type: 'multiball',
+            name: `MULTI-BALL (${activeBalls}x)`,
+            current: activeBalls,
+            max: 8,
+            color: '#00f7ff',
+            glow: 'rgba(0, 247, 255, 0.4)',
+            isShield: true,
+          });
+        }
+        this.callbacks.onBuffsChange(activeList);
       }
     }
 
@@ -280,10 +286,12 @@ export class GameEngine {
     for (const powerType of collected) {
       this.audio.triggerEvent('powerup_collect');
       if (powerType === 'multiball') {
-        this.tsPhysics.spawnExtraBalls();
+        const multiLvl = currencyService.getUpgradeLevel('multi_power');
+        const extraBalls = 1 + multiLvl; // Lvl 1: 2 extra, Lvl 2: 3 extra, ... Lvl 5: 6 extra
+        this.tsPhysics.spawnExtraBalls(extraBalls);
         this.particles.spawnVictoryConfetti(CANVAS_WIDTH, CANVAS_HEIGHT);
       } else if (powerType === 'shield') {
-        this.tsPhysics.hasShield = true;
+        this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
       }
       this.particles.addFloatingText(
         `${powerType.toUpperCase()}`,
@@ -342,37 +350,35 @@ export class GameEngine {
           return;
         }
       } else if (ev.type === 'shield_bounce') {
+        this.powerUps.consumeShield();
+        this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
         this.particles.addFloatingText('🛡️ FORCEFIELD SAVED', ev.hitX, ev.hitY, '#10b981');
         this.renderer.triggerShake(3.0);
-      } else if (ev.type === 'block_damage') {
+      } else if (ev.type === 'block_damage' || ev.type === 'crit_damage' || ev.type === 'block_destroy') {
         const block = this.tsPhysics.blocks[ev.blockIndex];
-        const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#00f7ff' : '#00f7ff';
-        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, false);
-        this.renderer.triggerShake(1.5 * impactShakeMult);
-        const pts = 50 * (1 + Math.floor(ev.combo / 3));
-        this.particles.addFloatingText(`+${pts}`, ev.hitX, ev.hitY, color);
+        const isCrit = ev.type === 'crit_damage';
+        const isDestroy = ev.type === 'block_destroy';
+        const fallback = isCrit ? '#fbbf24' : isDestroy ? '#ff0844' : '#00f7ff';
+        const color = block ? BLOCK_COLORS[block.initialHealth]?.border || fallback : fallback;
+        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, isCrit || isDestroy);
+        this.renderer.triggerShake((isCrit || isDestroy ? 3.5 : 1.5) * impactShakeMult);
+
+        let pts = 50 * (1 + Math.floor(ev.combo / 3));
+        let text = `+${pts}`;
+        if (isCrit) {
+          pts = 100 * (1 + Math.floor(ev.combo / 2));
+          text = `💥 CRIT +${pts}`;
+        } else if (isDestroy) {
+          this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.32);
+          this.state.blocksDestroyed++;
+          pts = 100 * (1 + ev.combo);
+          text = ev.combo > 1 ? `+${pts} (${ev.combo}x)` : `+${pts}`;
+        }
+        this.particles.addFloatingText(text, ev.hitX, ev.hitY, isCrit ? '#fbbf24' : color);
         this.recordScore(ev.combo, pts);
-      } else if (ev.type === 'crit_damage') {
-        const block = this.tsPhysics.blocks[ev.blockIndex];
-        const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#fbbf24' : '#fbbf24';
-        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, true);
-        this.renderer.triggerShake(3.5 * impactShakeMult);
-        const pts = 100 * (1 + Math.floor(ev.combo / 2));
-        this.particles.addFloatingText(`💥 CRIT +${pts}`, ev.hitX, ev.hitY, '#fbbf24');
-        this.recordScore(ev.combo, pts);
-      } else if (ev.type === 'block_destroy') {
-        const block = this.tsPhysics.blocks[ev.blockIndex];
-        const color = block ? BLOCK_COLORS[block.initialHealth]?.border || '#ff0844' : '#ff0844';
-        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, true);
-        this.renderer.triggerShake(3.5 * impactShakeMult);
-        this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.32);
-        this.state.blocksDestroyed++;
-        const pts = 100 * (1 + ev.combo);
-        const comboText = ev.combo > 1 ? `+${pts} (${ev.combo}x)` : `+${pts}`;
-        this.particles.addFloatingText(comboText, ev.hitX, ev.hitY, ev.combo > 2 ? '#eeff01' : color);
-        this.recordScore(ev.combo, pts);
-        if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
+
+        if (isDestroy && this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
           this.handleWin();
           return;
         }
@@ -438,20 +444,18 @@ export class GameEngine {
     }
 
     this.state.status = 'paused';
-    const resetY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - BALL_RADIUS - 5;
+    const ballRad = this.tsPhysics.config.ballRadius || BALL_RADIUS;
+    const resetY = CANVAS_HEIGHT - PADDLE_HEIGHT * 3.5 - ballRad - 5;
     const paddleX = this.tsPhysics.paddle.x;
 
     this.tsPhysics.resetBall(paddleX, resetY, 0, 0);
+    if (this.tsPhysics.balls[0]) {
+      this.tsPhysics.balls[0].radius = ballRad;
+    }
 
     setTimeout(() => {
       if (this.state.lives > 0 && this.state.status === 'paused') {
-        this.state.status = 'playing';
-        const angle = (Math.PI / 4) * (Math.random() > 0.5 ? 1 : -1);
-        const ballSpeedLvl = currencyService.getUpgradeLevel('ball_speed');
-        const currentSpeed = BALL_SPEED * (1 + (ballSpeedLvl - 1) * 0.035);
-        const vx = Math.sin(angle) * currentSpeed;
-        const vy = -Math.cos(angle) * currentSpeed;
-        this.tsPhysics.resetBall(paddleX, resetY, vx, vy);
+        this.launchBall();
       }
     }, 700);
   }
@@ -470,10 +474,6 @@ export class GameEngine {
     this.callbacks.onLevelWin?.(this.state);
   }
 
-  public setBallSkin(skin?: string) {
-    if (skin) this.ballSkin = skin;
-  }
-
   public render() {
     this.renderer.render(
       this.ctx,
@@ -484,9 +484,5 @@ export class GameEngine {
       this.powerUps,
       this.ballSkin
     );
-  }
-
-  public destroy() {
-    this.stopLoop();
   }
 }

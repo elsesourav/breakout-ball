@@ -76,6 +76,7 @@ export interface ActiveBuffs {
   slowMo: number;
   expand: number;
   hasShield: boolean;
+  shield: number;
   shieldCharges: number;
 }
 

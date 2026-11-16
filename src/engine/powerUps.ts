@@ -32,6 +32,7 @@ export class PowerUpManager {
     slowMo: 0,
     expand: 0,
     hasShield: false,
+    shield: 0,
     shieldCharges: 0,
   };
 
@@ -40,6 +41,7 @@ export class PowerUpManager {
     laser: 6.0,
     slowmo: 4.0,
     expand: 6.0,
+    shield: 8.0,
   };
 
   private nextId = 1;
@@ -55,6 +57,7 @@ export class PowerUpManager {
       slowMo: 0,
       expand: 0,
       hasShield: false,
+      shield: 0,
       shieldCharges: 0,
     };
     this.laserFireTimer = 0;
@@ -121,6 +124,13 @@ export class PowerUpManager {
     if (this.buffs.megaBall > 0) this.buffs.megaBall = Math.max(0, this.buffs.megaBall - dt);
     if (this.buffs.slowMo > 0) this.buffs.slowMo = Math.max(0, this.buffs.slowMo - dt);
     if (this.buffs.expand > 0) this.buffs.expand = Math.max(0, this.buffs.expand - dt);
+    if (this.buffs.shield > 0) {
+      this.buffs.shield = Math.max(0, this.buffs.shield - dt);
+      if (this.buffs.shield <= 0) {
+        this.buffs.hasShield = false;
+        this.buffs.shieldCharges = 0;
+      }
+    }
 
     // 3. Laser cannons handling (scales with upgrade level)
     if (this.buffs.laser > 0) {
@@ -222,8 +232,11 @@ export class PowerUpManager {
         break;
       }
       case 'shield': {
+        const dur = 8.0 + (shieldLvl - 1) * 2.5;
+        this.maxDurations.shield = dur;
+        this.buffs.shield = dur;
         this.buffs.hasShield = true;
-        this.buffs.shieldCharges = Math.min(3, (this.buffs.shieldCharges || 0) + shieldLvl);
+        this.buffs.shieldCharges = Math.min(6, (this.buffs.shieldCharges || 0) + shieldLvl);
         break;
       }
       case 'multiball':
@@ -239,9 +252,14 @@ export class PowerUpManager {
     if (this.buffs.hasShield || this.buffs.shieldCharges === 1) {
       this.buffs.hasShield = false;
       this.buffs.shieldCharges = 0;
+      this.buffs.shield = 0;
       return true;
     }
     return false;
+  }
+
+  public hasActiveShield(): boolean {
+    return this.buffs.hasShield && this.buffs.shield > 0 && this.buffs.shieldCharges > 0;
   }
 
   public render(
@@ -251,7 +269,7 @@ export class PowerUpManager {
     canvasHeight: number
   ) {
     // 1. Bottom Forcefield Laser Barrier (Zero shadowBlur for locked 60fps)
-    if (this.buffs.hasShield || this.buffs.shieldCharges > 0) {
+    if (this.hasActiveShield()) {
       const shieldY = canvasHeight - 35;
       ctx.save();
       ctx.strokeStyle = '#34d399';
@@ -337,156 +355,17 @@ export class PowerUpManager {
         glow: POWER_UP_CONFIGS.expand.glow,
       });
     }
-    if (this.buffs.shieldCharges > 0) {
+    if (this.hasActiveShield()) {
       list.push({
         type: 'shield',
-        name: 'SHIELD',
-        current: this.buffs.shieldCharges,
-        max: 3,
+        name: this.buffs.shieldCharges > 1 ? `SHIELD (${this.buffs.shieldCharges}x)` : 'SHIELD',
+        current: Math.round(this.buffs.shield * 10) / 10,
+        max: this.maxDurations.shield || 8.0,
         color: POWER_UP_CONFIGS.shield.color,
         glow: POWER_UP_CONFIGS.shield.glow,
-        isShield: true,
       });
     }
 
     return list;
-  }
-
-  private renderActiveBuffRings(
-    ctx: CanvasRenderingContext2D,
-    paddle: PaddleState,
-    canvasWidth: number,
-    canvasHeight: number
-  ) {
-    const activeItems: {
-      type: PowerUpType;
-      current: number;
-      max: number;
-      meta: PowerUpMeta;
-      isShield?: boolean;
-    }[] = [];
-
-    if (this.buffs.laser > 0) {
-      activeItems.push({
-        type: 'laser',
-        current: this.buffs.laser,
-        max: this.maxDurations.laser || 6.0,
-        meta: POWER_UP_CONFIGS.laser,
-      });
-    }
-    if (this.buffs.megaBall > 0) {
-      activeItems.push({
-        type: 'megaball',
-        current: this.buffs.megaBall,
-        max: this.maxDurations.megaball || 5.0,
-        meta: POWER_UP_CONFIGS.megaball,
-      });
-    }
-    if (this.buffs.slowMo > 0) {
-      activeItems.push({
-        type: 'slowmo',
-        current: this.buffs.slowMo,
-        max: this.maxDurations.slowmo || 4.0,
-        meta: POWER_UP_CONFIGS.slowmo,
-      });
-    }
-    if (this.buffs.expand > 0) {
-      activeItems.push({
-        type: 'expand',
-        current: this.buffs.expand,
-        max: this.maxDurations.expand || 6.0,
-        meta: POWER_UP_CONFIGS.expand,
-      });
-    }
-    if (this.buffs.shieldCharges > 0) {
-      activeItems.push({
-        type: 'shield',
-        current: this.buffs.shieldCharges,
-        max: 3,
-        meta: POWER_UP_CONFIGS.shield,
-        isShield: true,
-      });
-    }
-
-    if (activeItems.length === 0) return;
-
-    const ringRadius = 34;
-    const ringSpacing = 86;
-    const totalWidth = (activeItems.length - 1) * ringSpacing;
-
-    // Smoothly tracks paddle horizontally with screen edge bounds
-    const rawStartX = paddle.x - totalWidth / 2;
-    const minX = ringRadius + 28;
-    const maxX = canvasWidth - ringRadius - 28;
-    const startX = Math.max(minX, Math.min(maxX - totalWidth, rawStartX));
-
-    // Anchored directly above paddle with a comfortable 24px gap
-    const ringY = paddle.y - 78;
-
-    ctx.save();
-
-    for (let i = 0; i < activeItems.length; i++) {
-      const item = activeItems[i];
-      const cx = startX + i * ringSpacing;
-      const cy = ringY;
-      const ratio = item.isShield ? item.current / item.max : Math.max(0, item.current / item.max);
-
-      // Urgency pulse if remaining time <= 2.0s
-      let alpha = 1.0;
-      if (!item.isShield && item.current <= 2.0) {
-        alpha = 0.45 + 0.55 * Math.abs(Math.sin(Date.now() * 0.015));
-      }
-      ctx.globalAlpha = alpha;
-
-      // Dark cyber circular backing with neon aura
-      ctx.fillStyle = 'rgba(5, 9, 28, 0.92)';
-      ctx.beginPath();
-      ctx.arc(cx, cy, ringRadius + 5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Outer bezel border
-      ctx.strokeStyle = 'rgba(0, 247, 255, 0.35)';
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
-      // Background Progress Track
-      ctx.lineWidth = 4.5;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
-      ctx.beginPath();
-      ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Depleting Progress Ring (clockwise from top -Math.PI / 2)
-      ctx.lineWidth = 4.5;
-      ctx.strokeStyle = item.meta.color;
-      ctx.beginPath();
-      ctx.arc(cx, cy, ringRadius, -Math.PI / 2, -Math.PI / 2 + ratio * Math.PI * 2, false);
-      ctx.stroke();
-
-      // Center Glyph / Symbol (Crisp, proportional font)
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 22px "Chakra Petch", monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(item.meta.symbol, cx, cy - 1);
-
-      // Timer Pill Badge below ring (Clear, highly legible, 0px overlap with paddle)
-      const labelText = item.isShield ? `${item.current}x` : `${item.current.toFixed(1)}s`;
-      const pillY = cy + ringRadius + 18;
-
-      ctx.fillStyle = 'rgba(4, 7, 22, 0.92)';
-      ctx.strokeStyle = item.meta.color;
-      ctx.lineWidth = 1.0;
-      ctx.beginPath();
-      ctx.roundRect(cx - 26, pillY - 10, 52, 20, 6);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = item.meta.color;
-      ctx.font = 'bold 14px "Orbitron", monospace';
-      ctx.fillText(labelText, cx, pillY);
-    }
-
-    ctx.restore();
   }
 }

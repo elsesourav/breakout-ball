@@ -7,11 +7,12 @@ interface RoadmapNodeItemProps {
   node: RoadmapNode;
   progress?: LocalLevelProgress;
   isCurrent: boolean;
+  disabled?: boolean;
   onLevelClick: (levelId: number) => void;
 }
 
 export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
-  ({ node, progress, isCurrent, onLevelClick }, ref) => {
+  ({ node, progress, isCurrent, disabled = false, onLevelClick }, ref) => {
     const isUnlocked = progress !== undefined;
     const isComplete = progress?.completed;
 
@@ -81,6 +82,8 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
         {/* 3D Celestial Cyber Globe (High-tech Arcade Stage Node) */}
         <button
           type="button"
+          id={`roadmap-level-node-${node.id}`}
+          disabled={disabled}
           onClick={() => onLevelClick(node.id)}
           aria-label={`Level ${node.id} ${isUnlocked ? (isComplete ? 'Completed' : 'Unlocked') : 'Locked'}`}
           style={{
@@ -89,7 +92,11 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             WebkitTapHighlightColor: 'transparent',
             outline: 'none',
           }}
-          className={`relative rounded-full flex items-center justify-center transition-all duration-200 select-none cursor-pointer ${
+          className={`relative rounded-full flex items-center justify-center transition-all duration-200 select-none ${
+            disabled
+              ? 'opacity-80 pointer-events-none cursor-default'
+              : 'cursor-pointer'
+          } ${
             isUnlocked
               ? isCurrent
                 ? 'scale-105'

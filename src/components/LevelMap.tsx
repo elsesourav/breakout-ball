@@ -1,12 +1,8 @@
 import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react';
-import { motion } from 'framer-motion';
 import { useGame } from '../context/GameContext';
-import { CyberSectionHeader } from './CyberSectionHeader';
-import { CoreIcon } from './CoreIcon';
 import { currencyService, DailyCollectStatus } from '../services/currency';
 import { soundManager } from '../utils/audio';
 import { cyberToast } from './common/CyberToast';
-import { Star, Clock } from 'lucide-react';
 import {
   TOTAL_LEVELS,
   SPACING,
@@ -23,13 +19,9 @@ import { LevelPathSvg } from './roadmap/LevelPathSvg';
 import { RoadmapObstacles } from './roadmap/RoadmapObstacles';
 import { RoadmapSectorBanner } from './roadmap/RoadmapSectorBanner';
 import { RoadmapNodeItem } from './roadmap/RoadmapNodeItem';
+import { LevelMapHeader } from './roadmap/LevelMapHeader';
 
 // ─── Scroll-linked perspective scale ─────────────────────────────────────────
-// Screen-linked perspective depth with strict foreground size ceiling:
-//   normalizedY = 0  → top of viewport (far / vanishing point)  → SCALE_MIN
-//   normalizedY >= FOREGROUND_LIMIT_Y → closer objects          → capped at SCALE_MAX
-// Objects smoothly scale from distant horizon size up to actual size (1.0)
-// in the closer foreground and summit, ensuring comfortable legibility.
 const SCALE_MIN = 0.50;          // horizon vanishing size limit
 const SCALE_MAX = 1.0;           // actual size (100%) for foreground and summit
 const FOREGROUND_LIMIT_Y = 0.48; // foreground threshold where size growth reaches its limit
@@ -38,75 +30,27 @@ const FADE_ZONE = 0.08;          // top 8% of viewport dissolves into horizon ha
 // Retain user's current scroll position across tab navigation (no jarring auto-scroll)
 let savedArcadeScrollTop: number | null = null;
 
-const formatRemainingTime = (ms: number): string => {
-  if (ms <= 0) return '0h 00m 00s';
-  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${hours}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-};
-
 export const LevelMap: React.FC = () => {
-  const { localLevels, localProgress, openPreview, showAlert, user, setActiveTab } = useGame();
-  const [cores, setCores] = useState<number>(() => currencyService.getBalance());
+  const { localLevels, localProgress, openPreview, user, setActiveTab, isOpeningLevel } = useGame();
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() => currencyService.getDailyCollectStatus());
-  const [remainingMs, setRemainingMs] = useState<number>(() => currencyService.getDailyCollectStatus().remainingMs);
-  const [isPulsing, setIsPulsing] = useState<boolean>(false);
+  const [isPulsing] = useState<boolean>(false);
   const scrollRef    = useRef<HTMLDivElement>(null);
   const activeRef    = useRef<HTMLDivElement | null>(null);
   const hazeRef      = useRef<HTMLDivElement>(null);
   const rafRef       = useRef<number>(0);
-  const countUpRef   = useRef<number | null>(null);
-  const isClaimLockedRef = useRef<boolean>(false);
-
-  // Smooth count-up counter timed with flying particle arrivals
-  const startCountUp = useCallback((target: number) => {
-    if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
-
-    const startVal = displayCores;
-    const diff = target - startVal;
-    if (diff <= 0) {
-      setDisplayCores(target);
-      return;
-    }
-
-    const duration = 900; // ms
-    const startTime = performance.now();
-
-    const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / duration);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      const current = Math.round(startVal + diff * ease);
-
-      setDisplayCores(current);
-
-      if (progress < 1) {
-        countUpRef.current = requestAnimationFrame(tick);
-      } else {
-        setDisplayCores(target);
-        countUpRef.current = null;
-      }
-    };
-
-    countUpRef.current = requestAnimationFrame(tick);
-  }, [displayCores]);
 
   // Sync available cores and live daily bonus ticker
   useEffect(() => {
     const updateDaily = () => {
       const status = currencyService.getDailyCollectStatus();
       setDailyStatus(status);
-      setRemainingMs(status.remainingMs);
     };
 
     updateDaily();
 
     const handleCurrencyChange = () => {
       const b = currencyService.getBalance();
-      setCores(b);
       setDisplayCores(b);
       updateDaily();
     };
@@ -114,7 +58,6 @@ export const LevelMap: React.FC = () => {
 
     currencyService.load(user.username).then(() => {
       const b = currencyService.getBalance();
-      setCores(b);
       setDisplayCores(b);
       updateDaily();
     });
@@ -129,8 +72,8 @@ export const LevelMap: React.FC = () => {
     };
   }, [user.username]);
 
-  // When FREE button is clicked on Level Map, redirect directly to Core Shop
-  const handleDailyFreeClick = () => {
+  // When FREE or Cores button is clicked, redirect directly to Core Shop
+  const handleOpenShop = () => {
     soundManager.playClick('cyber');
     setActiveTab('armory');
     if (typeof window !== 'undefined') {
@@ -407,6 +350,9 @@ export const LevelMap: React.FC = () => {
 
   // ── Interaction handlers ──────────────────────────────────────────────────────
   const handleLevelClick = (levelId: number) => {
+    // Block the click if a one-time click is made until the level is open!
+    if (isOpeningLevel) return;
+
     if (!localProgress[String(levelId)]) {
       soundManager.playLockTap();
       const prevLevel = levelId - 1;
@@ -435,121 +381,15 @@ export const LevelMap: React.FC = () => {
         `,
       }}
     >
-      {/* ── Top Cyber Section Header (Profile & Cores) ──────────────────── */}
-      <div
-        className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-[#06081c]/95 backdrop-blur-md shadow-lg"
-        style={{
-          borderBottom: '1px solid rgba(0, 247, 255, 0.22)',
-          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
-        }}
-      >
-        <CyberSectionHeader
-          title={user.fullName || user.username.toUpperCase() || 'CYBER PLAYER'}
-          subtitle={`@${user.username || 'player'}`}
-          rightSlot={
-            <button
-              type="button"
-              id="header-cores-badge"
-              onClick={() => { setActiveTab('armory'); if (typeof window !== 'undefined') { window.history.pushState(null, '', '/shop'); window.dispatchEvent(new CustomEvent('open-core-shop')); } }}
-              title="View Cores & Shop"
-              style={{
-                background: isPulsing
-                  ? 'linear-gradient(135deg, rgba(0, 247, 255, 0.28) 0%, rgba(99, 102, 241, 0.32) 100%)'
-                  : 'linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%)',
-                border: isPulsing
-                  ? '1.2px solid #00f7ff'
-                  : '1.2px solid rgba(0, 247, 255, 0.45)',
-                boxShadow: isPulsing
-                  ? '0 0 14px rgba(0, 247, 255, 0.5)'
-                  : '0 0 12px rgba(0, 247, 255, 0.25)',
-                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-              }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full cursor-pointer hover:border-cyan-300 hover:shadow-[0_0_16px_rgba(0,247,255,0.4)] active:scale-95 group transition-all"
-            >
-              <CoreIcon
-                size={15}
-                glow
-                variant="cyan"
-                className="transition-transform duration-300 group-hover:rotate-12"
-              />
-              <span className={`font-tech font-bold text-xs transition-colors ${isPulsing ? 'text-white' : 'text-cyan-200'}`}>
-                {displayCores.toLocaleString()}
-              </span>
-              <span className="font-tech text-[9px] text-cyan-400 uppercase tracking-wider font-semibold">
-                CORES
-              </span>
-              <span className="w-3.5 h-3.5 rounded-full bg-cyan-400/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center text-[10px] font-bold group-hover:bg-cyan-400 group-hover:text-black transition-colors ml-0.5">
-                +
-              </span>
-            </button>
-          }
-        />
-      </div>
-
-      {/* ── Floating Controls Layer: Left (FREE Rounded Button) & Right (STAR Fixed Badge) ─ */}
-      <div className="absolute top-[58px] inset-x-0 z-50 pointer-events-none flex justify-center">
-        <div className="w-full max-w-[440px] px-3 sm:px-4 flex items-center justify-between">
-          {/* Left: Compact, stationary FREE Button with rounded-xl corners & continuous shine */}
-          {dailyStatus.canCollect ||
-          (typeof window !== 'undefined' &&
-            (window.location.search.includes('forceFree') ||
-              window.sessionStorage?.getItem('forceFree') === '1')) ? (
-            <div className="relative pointer-events-auto">
-              <motion.button
-                type="button"
-                id="daily-free-collect-button"
-                onClick={handleDailyFreeClick}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{
-                  background:
-                    'linear-gradient(135deg, rgba(6, 182, 212, 0.28) 0%, rgba(14, 25, 54, 0.95) 100%)',
-                  border: '1.2px solid rgba(0, 247, 255, 0.65)',
-                  boxShadow:
-                    '0 0 14px rgba(0, 247, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-                }}
-                className="h-8 sm:h-9 px-3 flex items-center gap-1.5 rounded-xl cursor-pointer select-none relative group overflow-hidden btn-shine-sweep"
-                title="Claim Free Cores in Core Shop!"
-              >
-                <span className="text-base leading-none filter drop-shadow select-none">🎁</span>
-                <span className="font-tech font-black text-xs text-cyan-100 tracking-wider leading-none">
-                  FREE
-                </span>
-                <CoreIcon size={12} variant="cyan" glow />
-              </motion.button>
-            </div>
-          ) : (
-            <div />
-          )}
-
-          {/* Right: Fixed Star Badge */}
-          <div
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(24, 18, 5, 0.94) 100%)',
-              border: '1.2px solid rgba(251, 191, 36, 0.45)',
-              boxShadow:
-                '0 0 14px rgba(251, 191, 36, 0.25), 0 4px 12px rgba(0, 0, 0, 0.5)',
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-amber-300 font-tech font-bold text-xs pointer-events-auto select-none"
-            title={`${totalStars} Stars Collected in Arcade`}
-          >
-            <Star className="w-4 h-4 fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
-            <span className="text-sm font-black text-amber-300 tracking-wide">{totalStars}</span>
-            <span className="text-[10px] text-amber-400/70 font-normal">/ {TOTAL_LEVELS * 3}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Distance-haze gradient at top (vanishing-point zone) */}
-      <div
-        ref={hazeRef}
-        className="absolute top-0 inset-x-0 h-32 pointer-events-none z-30 transition-opacity duration-150"
-        style={{
-          background:
-            'radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0,247,255,0.10) 0%, transparent 80%),' +
-            'linear-gradient(to bottom, #03040c 0%, rgba(3,4,12,0.90) 38%, rgba(3,4,12,0.4) 68%, transparent 100%)',
-        }}
+      {/* ── Top Cyber Section Header & Floating Controls ────────────────── */}
+      <LevelMapHeader
+        user={user}
+        displayCores={displayCores}
+        isPulsing={isPulsing}
+        dailyStatus={dailyStatus}
+        totalStars={totalStars}
+        onOpenShop={handleOpenShop}
+        hazeRef={hazeRef}
       />
 
       {/* ── Scroll container ────────────────────────────────────────────────── */}
@@ -561,6 +401,7 @@ export const LevelMap: React.FC = () => {
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
           overscrollBehaviorY: 'contain',
+          pointerEvents: isOpeningLevel ? 'none' : 'auto',
           paddingTop: '72px',
           paddingBottom: '140px',
           backgroundImage: `
@@ -630,6 +471,7 @@ export const LevelMap: React.FC = () => {
                 node={node}
                 progress={progress}
                 isCurrent={isCurrent}
+                disabled={isOpeningLevel}
                 onLevelClick={handleLevelClick}
               />
             );

@@ -37,6 +37,7 @@ export const LevelPreviewModal: React.FC = () => {
     onlineLevels,
     localProgress,
     leaderboards,
+    loadingLeaderboardLevelId,
     user,
   } = useGame();
 
@@ -82,7 +83,8 @@ export const LevelPreviewModal: React.FC = () => {
   };
 
   // Prepare clean ranking items with User Name, Username, and User Profile
-  const rankingList = leaderboards[selectedLevel.id] || leaderboards.default || [];
+  const isLeaderboardLoading = loadingLeaderboardLevelId === selectedLevel.id || !leaderboards[selectedLevel.id];
+  const rankingList = leaderboards[selectedLevel.id] || [];
   const leaderboardEntries: RankingEntry[] = useMemo(() => {
     const list: RankingEntry[] = rankingList.map((entry, idx) => {
       const isCurr = user.isLoggedIn && entry.username.toLowerCase() === user.username.toLowerCase();
@@ -404,6 +406,7 @@ export const LevelPreviewModal: React.FC = () => {
             entries={leaderboardEntries}
             title="CORE RANKINGS"
             currentUser={user.username}
+            isLoading={isLeaderboardLoading}
           />
         </div>
       </div>

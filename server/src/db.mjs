@@ -206,8 +206,8 @@ export const trophyRepository = {
 };
 
 export const completionRepository = {
-  record(username, { levelId, timeUsed, livesRemaining, score, stars }) {
-    userRepository.upsert({ username });
+  record(username, { levelId, timeUsed, livesRemaining, score, stars, fullName, avatarUrl }) {
+    userRepository.upsert({ username, fullName, avatarUrl });
     const now = new Date().toISOString();
     const checkStmt = db.prepare('SELECT id, time_used, score FROM level_completions WHERE LOWER(username) = LOWER(?) AND level_id = ?');
     const existing = checkStmt.get(username, String(levelId));

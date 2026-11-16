@@ -17,12 +17,17 @@ interface CyberRankingTableProps {
   entries: RankingEntry[];
   title?: string;
   currentUser?: string;
+  isLoading?: boolean;
 }
+
+const SKELETON_NAME_WIDTHS = ['w-24', 'w-20', 'w-28', 'w-22', 'w-26', 'w-20', 'w-24', 'w-18', 'w-26', 'w-22'];
+const SKELETON_SCORE_WIDTHS = ['w-12', 'w-11', 'w-14', 'w-10', 'w-12', 'w-11', 'w-13', 'w-10', 'w-12', 'w-11'];
 
 export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
   entries,
   title = 'ARCADE LEADERBOARD',
   currentUser,
+  isLoading = false,
 }) => {
   return (
     <div
@@ -77,7 +82,56 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
         }}
         className="flex flex-col divide-y divide-white/5 no-scrollbar"
       >
-        {entries.length === 0 ? (
+        {isLoading ? (
+          Array.from({ length: 10 }).map((_, idx) => {
+            const rank = idx + 1;
+            const nameWidth = SKELETON_NAME_WIDTHS[idx % SKELETON_NAME_WIDTHS.length];
+            const scoreWidth = SKELETON_SCORE_WIDTHS[idx % SKELETON_SCORE_WIDTHS.length];
+            return (
+              <div
+                key={`skeleton-rank-${rank}`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '40px 1fr 64px 54px',
+                  alignItems: 'center',
+                }}
+                className="px-3 py-2 transition-colors hover:bg-white/[0.02]"
+              >
+                {/* Rank Badge Skeleton */}
+                <div className="flex items-center justify-center">
+                  {rank <= 3 ? (
+                    <div className="w-7 h-5 rounded-full bg-white/10 border border-white/15 animate-pulse flex items-center justify-center text-[10px] font-tech font-bold text-slate-400">
+                      {rank}
+                    </div>
+                  ) : (
+                    <span className="font-tech font-bold text-xs text-slate-600 animate-pulse">
+                      #{rank}
+                    </span>
+                  )}
+                </div>
+
+                {/* Pilot Avatar + Name Skeleton */}
+                <div className="flex items-center gap-2 min-w-0 pl-1 overflow-hidden">
+                  <div className="w-7 h-7 rounded-full bg-slate-800/80 border border-cyan-500/20 animate-pulse flex-shrink-0" />
+                  <div className="flex flex-col min-w-0 truncate">
+                    <div className={`h-3 ${nameWidth} rounded bg-white/15 animate-pulse`} />
+                    <div className="h-2 w-14 rounded bg-white/10 animate-pulse mt-1" />
+                  </div>
+                </div>
+
+                {/* Score Skeleton */}
+                <div className="text-right">
+                  <div className={`h-3 ${scoreWidth} rounded bg-cyan-400/20 animate-pulse ml-auto`} />
+                </div>
+
+                {/* Time Skeleton */}
+                <div className="text-right pr-1">
+                  <div className="h-3 w-9 rounded bg-slate-400/20 animate-pulse ml-auto" />
+                </div>
+              </div>
+            );
+          })
+        ) : entries.length === 0 ? (
           <div className="py-3 text-center text-xs font-ui text-slate-400">
             No rankings yet. Be the first to clear this level!
           </div>
@@ -253,8 +307,16 @@ export const CyberRankingTable: React.FC<CyberRankingTableProps> = ({
         )}
       </div>
 
-      {/* Scrollable Indicator Pill for Top 10 Leaderboard */}
-      {entries.length > 6 && (
+      {/* Scrollable / Loading Indicator Pill for Top 10 Leaderboard */}
+      {isLoading ? (
+        <div className="py-1 px-3 bg-black/60 border-t border-white/5 flex items-center justify-between text-[9px] font-tech text-slate-400">
+          <span>TOP 10 PLAYERS</span>
+          <span className="text-cyan-400/90 font-bold animate-pulse tracking-wider flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping inline-block" />
+            LOADING LEADERBOARD...
+          </span>
+        </div>
+      ) : entries.length > 6 && (
         <div className="py-1 px-3 bg-black/60 border-t border-white/5 flex items-center justify-between text-[9px] font-tech text-slate-400">
           <span>TOP 10 PLAYERS</span>
           <span className="text-cyan-400/90 font-bold animate-pulse tracking-wider">SCROLL FOR MORE ▼</span>

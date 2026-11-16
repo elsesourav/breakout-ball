@@ -37,14 +37,8 @@ function computeGameCanvasSize(containerW: number, containerH: number): CanvasDi
 
 export const GameCanvas: React.FC = () => {
   const {
-    selectedLevel,
-    localLevels,
-    onlineLevels,
-    setScreen,
-    setActiveTab,
-    settings,
-    recordLevelCompletion,
-    startPlayLevel,
+    selectedLevel, localLevels, onlineLevels, setScreen,
+    setActiveTab, settings, recordLevelCompletion, startPlayLevel,
   } = useGame();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -84,44 +78,28 @@ export const GameCanvas: React.FC = () => {
   const [liveScoreState, setLiveScoreState] = useState<ScoreState | null>(null);
   const [activeBuffs, setActiveBuffs] = useState<ActiveBuffInfo[]>([]);
   const [attemptId, setAttemptId] = useState<number>(0);
+  const [rewards, setRewards] = useState({
+    coresEarned: 0, isFirstClear: false, starsEarned: 3, previousStars: 0,
+    totalClaimedForLevel: 0, maxCoresForLevel: 0, remainingCoresForLevel: 0,
+  });
 
   // Key tracking
   const keysPressed = useRef<{ ArrowLeft: boolean; ArrowRight: boolean; KeyA: boolean; KeyD: boolean }>({
-    ArrowLeft: false,
-    ArrowRight: false,
-    KeyA: false,
-    KeyD: false,
+    ArrowLeft: false, ArrowRight: false, KeyA: false, KeyD: false,
   });
 
   // Check if there is a next level in campaign
-  const currentLevelIndex = selectedLevel
-    ? localLevels.findIndex((l) => l.id === selectedLevel.id)
-    : -1;
-  const hasNextLevel =
-    currentLevelIndex >= 0 && currentLevelIndex < localLevels.length - 1;
+  const currentLevelIndex = selectedLevel ? localLevels.findIndex((l) => l.id === selectedLevel.id) : -1;
+  const hasNextLevel = currentLevelIndex >= 0 && currentLevelIndex < localLevels.length - 1;
   const levelNumber = currentLevelIndex >= 0 ? currentLevelIndex + 1 : 1;
-
-  const [coresEarned, setCoresEarned] = useState<number>(0);
-  const [isFirstClear, setIsFirstClear] = useState<boolean>(false);
-  const [starsEarned, setStarsEarned] = useState<number>(3);
-  const [previousStars, setPreviousStars] = useState<number>(0);
-  const [totalClaimedForLevel, setTotalClaimedForLevel] = useState<number>(0);
-  const [maxCoresForLevel, setMaxCoresForLevel] = useState<number>(0);
-  const [remainingCoresForLevel, setRemainingCoresForLevel] = useState<number>(0);
 
   // Win presentation timers to gracefully reveal summary window over 2-3 seconds
   const winTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const confettiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearWinTimers = useCallback(() => {
-    if (winTimeoutRef.current) {
-      clearTimeout(winTimeoutRef.current);
-      winTimeoutRef.current = null;
-    }
-    if (confettiTimeoutRef.current) {
-      clearTimeout(confettiTimeoutRef.current);
-      confettiTimeoutRef.current = null;
-    }
+    if (winTimeoutRef.current) { clearTimeout(winTimeoutRef.current); winTimeoutRef.current = null; }
+    if (confettiTimeoutRef.current) { clearTimeout(confettiTimeoutRef.current); confettiTimeoutRef.current = null; }
   }, []);
 
   // Handle Level Victory
@@ -157,18 +135,16 @@ export const GameCanvas: React.FC = () => {
       }
 
       try {
-        const result = await recordLevelCompletion(
-          selectedLevel.id,
-          finalScore.timeUsed,
-          finalScore.lives
-        );
-        setCoresEarned(result?.coresEarned ?? 0);
-        setIsFirstClear(result?.isFirstClear ?? false);
-        setStarsEarned(result?.starsEarned ?? Math.min(3, Math.max(1, finalScore.lives)));
-        setPreviousStars(result?.previousStars ?? 0);
-        setTotalClaimedForLevel(result?.totalClaimedForLevel ?? 0);
-        setMaxCoresForLevel(result?.maxCoresForLevel ?? 0);
-        setRemainingCoresForLevel(result?.remainingCoresForLevel ?? 0);
+        const result = await recordLevelCompletion(selectedLevel.id, finalScore.timeUsed, finalScore.lives);
+        setRewards({
+          coresEarned: result?.coresEarned ?? 0,
+          isFirstClear: result?.isFirstClear ?? false,
+          starsEarned: result?.starsEarned ?? Math.min(3, Math.max(1, finalScore.lives)),
+          previousStars: result?.previousStars ?? 0,
+          totalClaimedForLevel: result?.totalClaimedForLevel ?? 0,
+          maxCoresForLevel: result?.maxCoresForLevel ?? 0,
+          remainingCoresForLevel: result?.remainingCoresForLevel ?? 0,
+        });
       } catch (err) {
         console.error('Error saving score:', err);
       }
@@ -315,78 +291,127 @@ export const GameCanvas: React.FC = () => {
   // Keyboard navigation loop
   useEffect(() => {
     let keyFrameId: number;
-
     const handleKeyLoop = () => {
       const engine = engineRef.current;
       if (engine) {
-        const keySpeed = 22;
-        if (keysPressed.current.ArrowLeft || keysPressed.current.KeyA) {
-          engine.movePaddleRelative(-keySpeed);
-        }
-        if (keysPressed.current.ArrowRight || keysPressed.current.KeyD) {
-          engine.movePaddleRelative(keySpeed);
-        }
+        if (keysPressed.current.ArrowLeft || keysPressed.current.KeyA) engine.movePaddleRelative(-22);
+        if (keysPressed.current.ArrowRight || keysPressed.current.KeyD) engine.movePaddleRelative(22);
       }
       keyFrameId = requestAnimationFrame(handleKeyLoop);
     };
-
     keyFrameId = requestAnimationFrame(handleKeyLoop);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'ArrowLeft') keysPressed.current.ArrowLeft = true;
-      if (e.code === 'ArrowRight') keysPressed.current.ArrowRight = true;
-      if (e.code === 'KeyA') keysPressed.current.KeyA = true;
-      if (e.code === 'KeyD') keysPressed.current.KeyD = true;
+    const setKey = (code: string, val: boolean) => {
+      if (code === 'ArrowLeft' || code === 'KeyA') keysPressed.current[code] = val;
+      if (code === 'ArrowRight' || code === 'KeyD') keysPressed.current[code] = val;
     };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'ArrowLeft') keysPressed.current.ArrowLeft = false;
-      if (e.code === 'ArrowRight') keysPressed.current.ArrowRight = false;
-      if (e.code === 'KeyA') keysPressed.current.KeyA = false;
-      if (e.code === 'KeyD') keysPressed.current.KeyD = false;
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
+    const onDown = (e: KeyboardEvent) => setKey(e.code, true);
+    const onUp = (e: KeyboardEvent) => setKey(e.code, false);
+    window.addEventListener('keydown', onDown);
+    window.addEventListener('keyup', onUp);
     return () => {
       cancelAnimationFrame(keyFrameId);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', onDown);
+      window.removeEventListener('keyup', onUp);
     };
   }, []);
 
-  // Gyroscope tilt control
+  // Cached canvas bounding box for zero-reflow 120Hz touch/pointer tracking
+  const canvasRectRef = useRef<{ left: number; width: number } | null>(null);
+  const updateCanvasBounds = useCallback(() => {
+    if (canvasRef.current) {
+      const r = canvasRef.current.getBoundingClientRect();
+      canvasRectRef.current = { left: r.left, width: r.width };
+    }
+  }, []);
+
+  useEffect(() => {
+    updateCanvasBounds();
+    window.addEventListener('resize', updateCanvasBounds);
+    window.addEventListener('orientationchange', updateCanvasBounds);
+    window.addEventListener('scroll', updateCanvasBounds, true);
+    return () => {
+      window.removeEventListener('resize', updateCanvasBounds);
+      window.removeEventListener('orientationchange', updateCanvasBounds);
+      window.removeEventListener('scroll', updateCanvasBounds, true);
+    };
+  }, [updateCanvasBounds]);
+
+  // Gyroscope Rate-Based Steering Tilt Control
   useEffect(() => {
     if (!settings.gyroscope || typeof window === 'undefined') return;
-
+    let lastGyroTime = performance.now();
     const handleDeviceOrientation = (e: DeviceOrientationEvent) => {
       if (e.gamma === null || !engineRef.current) return;
-      const range = 45 * (1 - settings.gyroSensitivity);
-      const normalized = Math.max(-range, Math.min(range, e.gamma)) / range;
-      const target = CANVAS_WIDTH / 2 + normalized * (CANVAS_WIDTH / 2);
-      engineRef.current.setPaddleTarget(
-        Math.max(PADDLE_WIDTH / 2, Math.min(CANVAS_WIDTH - PADDLE_WIDTH / 2, target))
-      );
+      const now = performance.now();
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastGyroTime) / 1000));
+      lastGyroTime = now;
+      let tilt = e.gamma ?? 0;
+      const orient = window.screen?.orientation?.angle ?? (window.orientation as number) ?? 0;
+      if (orient === 90) tilt = e.beta ?? e.gamma ?? 0;
+      else if (orient === -90 || orient === 270) tilt = -(e.beta ?? e.gamma ?? 0);
+      else if (orient === 180) tilt = -tilt;
+      const deadzone = 2.5;
+      if (Math.abs(tilt) <= deadzone) return;
+      const sign = Math.sign(tilt);
+      const mag = Math.min(1.0, (Math.abs(tilt) - deadzone) / 23.5);
+      const rate = sign * (mag * 0.45 + mag * mag * 0.55) * (settings.gyroSensitivity ?? 0.4) * 2.2;
+      const deltaX = rate * engineRef.current.getPaddleMaxSpeed() * dt;
+      const halfPadW = PADDLE_WIDTH / 2;
+      engineRef.current.setPaddleTarget(Math.max(halfPadW, Math.min(CANVAS_WIDTH - halfPadW, engineRef.current.getPaddleTarget() + deltaX)));
     };
-
     window.addEventListener('deviceorientation', handleDeviceOrientation);
     return () => window.removeEventListener('deviceorientation', handleDeviceOrientation);
   }, [settings.gyroscope, settings.gyroSensitivity]);
 
-  // Touch and mouse control handlers
-  const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas || !engineRef.current) return;
+  // Zero-Reflow Touch & Pointer Control:
+  // Reads cached canvas dimensions without triggering synchronous layout thrashing
+  const processPointerPosition = useCallback((clientX: number) => {
+    if (!engineRef.current) return;
+    if (!canvasRectRef.current && canvasRef.current) {
+      updateCanvasBounds();
+    }
+    const rect = canvasRectRef.current;
+    if (!rect || rect.width <= 0) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const scaleX = CANVAS_WIDTH / rect.width;
     const canvasX = (clientX - rect.left) * scaleX;
+    const halfPadW = PADDLE_WIDTH / 2;
 
     engineRef.current.setPaddleTarget(
-      Math.max(PADDLE_WIDTH / 2, Math.min(CANVAS_WIDTH - PADDLE_WIDTH / 2, canvasX))
+      Math.max(halfPadW, Math.min(CANVAS_WIDTH - halfPadW, canvasX))
     );
+  }, [updateCanvasBounds]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    updateCanvasBounds();
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Ignore fallback
+    }
+    processPointerPosition(e.clientX);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    // If coalesced events exist (high-frequency 120Hz touch sampling), use the latest sub-frame touch
+    const native = e.nativeEvent as PointerEvent;
+    if ('getCoalescedEvents' in native && typeof native.getCoalescedEvents === 'function') {
+      const coalesced = native.getCoalescedEvents();
+      if (coalesced.length > 0) {
+        processPointerPosition(coalesced[coalesced.length - 1].clientX);
+        return;
+      }
+    }
+    processPointerPosition(e.clientX);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignore
+    }
   };
 
   // Replay Current Level
@@ -399,24 +424,16 @@ export const GameCanvas: React.FC = () => {
   };
 
   const isDaily = selectedLevel ? isTodayDailyMission(selectedLevel.id, onlineLevels) : false;
-
-  const isArcade = Boolean(
-    selectedLevel && localLevels.some((l) => l.id === selectedLevel.id)
-  );
+  const isArcade = Boolean(selectedLevel && localLevels.some((l) => l.id === selectedLevel.id));
   const gameMode: 'arcade' | 'arena' = isArcade ? 'arcade' : 'arena';
 
   const handleExit = () => {
     clearWinTimers();
     soundManager.stopBgMusic();
-    if (isArcade) {
-      setActiveTab('local');
-    } else {
-      setActiveTab('online');
-    }
+    setActiveTab(isArcade ? 'local' : 'online');
     setScreen('menu');
   };
 
-  // Advance to Next Mission
   const handleNextLevel = () => {
     clearWinTimers();
     if (hasNextLevel && localLevels[currentLevelIndex + 1]) {
@@ -434,43 +451,28 @@ export const GameCanvas: React.FC = () => {
       style={{
         width: '100%',
         height: '100%',
-        backgroundImage: `
-          radial-gradient(ellipse 95% 20% at 50% 0%,   rgba(255,215,0,0.12)   0%, transparent 75%),
-          radial-gradient(ellipse 90% 20% at 50% 30%,  rgba(244,63,94,0.10)   0%, transparent 75%),
-          radial-gradient(ellipse 90% 20% at 50% 65%,  rgba(183,115,255,0.10) 0%, transparent 75%),
-          radial-gradient(ellipse 95% 25% at 50% 100%, rgba(0,247,255,0.14)   0%, transparent 75%)
-        `,
+        backgroundImage: 'radial-gradient(ellipse 95% 20% at 50% 0%, rgba(255,215,0,0.12) 0%, transparent 75%), radial-gradient(ellipse 90% 20% at 50% 30%, rgba(244,63,94,0.10) 0%, transparent 75%), radial-gradient(ellipse 90% 20% at 50% 65%, rgba(183,115,255,0.10) 0%, transparent 75%), radial-gradient(ellipse 95% 25% at 50% 100%, rgba(0,247,255,0.14) 0%, transparent 75%)',
       }}
-      onMouseMove={handlePointerMove}
-      onTouchMove={handlePointerMove}
     >
       <GameHUD
-        lives={lives}
-        timeUsed={timeUsed}
-        countdown={countdownText}
-        score={score}
-        combo={combo}
-        activeBuffs={activeBuffs}
+        lives={lives} timeUsed={timeUsed} countdown={countdownText}
+        score={score} combo={combo} activeBuffs={activeBuffs}
         onExit={handleExit}
         onPause={() => engineRef.current?.pause()}
         onResume={() => engineRef.current?.resume()}
         summaryState={summaryState}
         onRetry={isDaily && summaryState?.status === 'win' ? undefined : handleRetry}
-        onNextLevel={handleNextLevel}
-        hasNextLevel={hasNextLevel}
+        onNextLevel={handleNextLevel} hasNextLevel={hasNextLevel}
         levelNumber={levelNumber}
         totalBreakable={liveScoreState?.totalBreakable ?? 0}
         blocksDestroyed={liveScoreState?.blocksDestroyed ?? 0}
-        coresEarned={coresEarned}
-        isFirstClear={isFirstClear}
-        starsEarned={starsEarned}
-        previousStars={previousStars}
-        totalClaimedForLevel={totalClaimedForLevel}
-        maxCoresForLevel={maxCoresForLevel}
-        remainingCoresForLevel={remainingCoresForLevel}
+        coresEarned={rewards.coresEarned} isFirstClear={rewards.isFirstClear}
+        starsEarned={rewards.starsEarned} previousStars={rewards.previousStars}
+        totalClaimedForLevel={rewards.totalClaimedForLevel}
+        maxCoresForLevel={rewards.maxCoresForLevel}
+        remainingCoresForLevel={rewards.remainingCoresForLevel}
         totalCores={currencyService.getBalance()}
-        isDailyMission={isDaily}
-        gameMode={gameMode}
+        isDailyMission={isDaily} gameMode={gameMode}
       />
       <div
         className="relative flex-1 w-full flex flex-col items-center justify-center pointer-events-auto"
@@ -483,10 +485,10 @@ export const GameCanvas: React.FC = () => {
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
           style={{ width: `${displaySize.width}px`, height: `${displaySize.height}px` }}
-          onMouseDown={handlePointerMove}
-          onMouseMove={handlePointerMove}
-          onTouchStart={handlePointerMove}
-          onTouchMove={handlePointerMove}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
         />
       </div>
     </div>
