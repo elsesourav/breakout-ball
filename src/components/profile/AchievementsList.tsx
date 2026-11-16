@@ -17,12 +17,13 @@ export const AchievementsList: React.FC<AchievementsListProps> = ({ onClaimSucce
   const [achievements, setAchievements] = useState<Achievement[]>([]);
 
   useEffect(() => {
+    achievementManager.loadForUser(user.username);
     setAchievements(achievementManager.getAll());
     const unsub = achievementManager.onUnlock(() => {
       setAchievements(achievementManager.getAll());
     });
     return unsub;
-  }, []);
+  }, [user.username]);
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const progressPercent = Math.round((unlockedCount / Math.max(1, achievements.length)) * 100);

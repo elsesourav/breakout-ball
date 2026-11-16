@@ -94,22 +94,12 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
     });
     setParticles(items);
 
-    // 3. Play EXACTLY ONE crisp collection chime when cores land at destination
-    // (Protected by hasPlayedSoundRef to guarantee it never repeats or loops)
-    const soundTimer = setTimeout(() => {
-      if (!hasPlayedSoundRef.current) {
-        hasPlayedSoundRef.current = true;
-        soundManager.playCollectCore();
-      }
-    }, 750);
-
-    // 4. Complete whole animation sequence smoothly at 1.6s
+    // 3. Complete whole animation sequence smoothly at 1.6s
     const completeTimer = setTimeout(() => {
       onCompleteRef.current();
     }, 1600);
 
     return () => {
-      clearTimeout(soundTimer);
       clearTimeout(completeTimer);
     };
   }, [active]);

@@ -78,6 +78,31 @@ function drawBallAsset(
       c2: '#fb7185',
       c3: '#881337',
     };
+  } else if (upgradeId === 'ball_trajectory') {
+    palette = {
+      glow: '#10b981',
+      c1: '#ffffff',
+      c2: '#34d399',
+      c3: '#065f46',
+    };
+  }
+
+  // Draw decorative predictive guideline ring on thumbnail for trajectory matrix
+  if (upgradeId === 'ball_trajectory') {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + 5, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Directional ray preview
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy + 10);
+    ctx.lineTo(cx + 10, cy - 10);
+    ctx.stroke();
+    ctx.restore();
   }
 
   draw3DStardustCoreBall(
@@ -198,8 +223,8 @@ export function prewarmAssetThumbnails(): void {
   getAssetThumbnail('power', 1);
 
   // Ball Modules
-  ['ball_size', 'ball_speed', 'ball_impact'].forEach((id) => {
-    for (let l = 1; l <= 10; l++) {
+  ['ball_size', 'ball_speed', 'ball_impact', 'ball_trajectory'].forEach((id) => {
+    for (let l = 1; l <= 8; l++) {
       getAssetThumbnail(id, l);
     }
   });

@@ -1,5 +1,6 @@
 import { soundManager, synthAudio } from '../audio';
 import { achievementManager } from '../services/achievements';
+import { safeVibrate } from '../utils/haptics';
 import { CollisionEventType } from './types';
 
 export class AudioBridge {
@@ -102,11 +103,7 @@ export class AudioBridge {
   }
 
   private vibrate(pattern: number | number[]) {
-    if (!this.vibrateEnabled || typeof navigator === 'undefined' || !navigator.vibrate) return;
-    try {
-      navigator.vibrate(pattern);
-    } catch {
-      // Ignore haptics errors on unsupported browsers
-    }
+    if (!this.vibrateEnabled) return;
+    safeVibrate(pattern);
   }
 }

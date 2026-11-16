@@ -13,6 +13,7 @@ import {
   playSyntheticLockTap,
 } from './soundPresets';
 import { synthAudio } from './synthAudio';
+import { safeVibrate } from '../utils/haptics';
 
 class SoundManager {
   private ctx: AudioContext | null = null;
@@ -110,6 +111,9 @@ class SoundManager {
   }
 
   // ── Armory & Economy Sounds ───────────────────────────────────────
+  private collectAudioTimer: number | null = null;
+  private collectStep = 1;
+
   public playCollectCore(step = 1) {
     if (this.soundEnabled && this.sfxEnabled && this.volume > 0) {
       const ctx = this.getContext();
@@ -118,6 +122,33 @@ class SoundManager {
       }
     }
     this.triggerVibrate(20);
+  }
+
+  public startCollectSequence(durationMs = 950) {
+    this.stopCollectSequence();
+    this.collectStep = 1;
+    this.playCollectCore(this.collectStep);
+
+    const interval = 110;
+    const maxSteps = Math.floor(durationMs / interval);
+    let count = 1;
+
+    this.collectAudioTimer = window.setInterval(() => {
+      count++;
+      this.collectStep = (this.collectStep % 8) + 1;
+      this.playCollectCore(this.collectStep);
+
+      if (count >= maxSteps) {
+        this.stopCollectSequence();
+      }
+    }, interval);
+  }
+
+  public stopCollectSequence() {
+    if (this.collectAudioTimer !== null) {
+      clearInterval(this.collectAudioTimer);
+      this.collectAudioTimer = null;
+    }
   }
 
   public playUpgradeSuccess() {
@@ -230,12 +261,8 @@ class SoundManager {
   }
 
   public triggerVibrate(pattern: number | number[]) {
-    if (!this.vibrateEnabled || typeof window === 'undefined') return;
-    if ('vibrate' in navigator && typeof navigator.vibrate === 'function') {
-      try {
-        navigator.vibrate(pattern);
-      } catch {}
-    }
+    if (!this.vibrateEnabled) return;
+    safeVibrate(pattern);
   }
 }
 

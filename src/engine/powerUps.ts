@@ -32,7 +32,7 @@ export class PowerUpManager {
     laser: 6.0,
     slowmo: 4.0,
     expand: 12.0,
-    shield: 8.0,
+    shield: 16.0,
   };
 
   private nextId = 1;
@@ -223,7 +223,7 @@ export class PowerUpManager {
         break;
       }
       case 'shield': {
-        const dur = 8.0 + (shieldLvl - 1) * 2.5;
+        const dur = 16.0 + (shieldLvl - 1) * (32.0 / 3);
         this.maxDurations.shield = dur;
         this.buffs.shield = dur;
         this.buffs.hasShield = true;
@@ -351,7 +351,7 @@ export class PowerUpManager {
         type: 'shield',
         name: this.buffs.shieldCharges > 1 ? `SHIELD (${this.buffs.shieldCharges}x)` : 'SHIELD',
         current: Math.round(this.buffs.shield * 10) / 10,
-        max: this.maxDurations.shield || 8.0,
+        max: this.maxDurations.shield || 16.0,
         color: POWER_UP_CONFIGS.shield.color,
         glow: POWER_UP_CONFIGS.shield.glow,
       });

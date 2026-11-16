@@ -249,3 +249,179 @@ export function renderBallImpactPreview(
     ctx.restore();
   }
 }
+
+/**
+ * 4. Ball Trajectory Matrix Preview (8-Ball Pool Style Predictive Guideline)
+ * Displays predictive incoming and outgoing deflection lines comparing current vs upgraded range.
+ */
+export function renderBallTrajectoryPreview(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  currentLevel: number,
+  isMax: boolean,
+  tick: number
+): void {
+  const leftCenterX = w * 0.25;
+  const rightCenterX = w * 0.75;
+  const padY = h * 0.82;
+  const padW = 44;
+  const padH = 8;
+  const ballR = 9;
+
+  const curDist = Math.round(600 + (currentLevel - 1) * (1200 / 7));
+  const nextLvl = isMax ? currentLevel : currentLevel + 1;
+  const nextDist = Math.round(600 + (nextLvl - 1) * (1200 / 7));
+
+  // 3.6s Looping animation: ball drops from top, hits paddle at angle, bounces off
+  const cycleTotal = 3.6;
+  const cycleT = tick % cycleTotal;
+  const dropDuration = 2.0;
+
+  // Draw Mini Paddles
+  ctx.save();
+  ctx.fillStyle = '#1e293b';
+  ctx.strokeStyle = '#00f7ff';
+  ctx.lineWidth = 1.5;
+  // Left Paddle
+  ctx.fillRect(leftCenterX - padW / 2, padY, padW, padH);
+  ctx.strokeRect(leftCenterX - padW / 2, padY, padW, padH);
+  // Right Paddle
+  ctx.fillStyle = '#064e3b';
+  ctx.strokeStyle = '#10b981';
+  ctx.fillRect(rightCenterX - padW / 2, padY, padW, padH);
+  ctx.strokeRect(rightCenterX - padW / 2, padY, padW, padH);
+  ctx.restore();
+
+  // Trajectory Math for Preview
+  // Ball descends from top-left offset to paddle center-right offset
+  const startY = h * 0.18;
+  const hitOffsetY = padY - ballR;
+  const hitXLeft = leftCenterX + 6;
+  const hitXRight = rightCenterX + 6;
+
+  let ballY: number;
+  let ballXLeft: number;
+  let ballXRight: number;
+  let isDescending = false;
+
+  if (cycleT < dropDuration) {
+    isDescending = true;
+    const p = cycleT / dropDuration;
+    ballY = startY + p * (hitOffsetY - startY);
+    ballXLeft = leftCenterX - 18 + p * 24;
+    ballXRight = rightCenterX - 18 + p * 24;
+  } else {
+    // Bouncing away
+    const p = (cycleT - dropDuration) / (cycleTotal - dropDuration);
+    ballY = hitOffsetY - p * (hitOffsetY - startY) * 0.9;
+    ballXLeft = hitXLeft + p * 28;
+    ballXRight = hitXRight + p * 28;
+  }
+
+  // Draw Guidelines during approach
+  const distLeft = padY - ballY;
+  // Left side: visible only when within short range (e.g. lower 45% of height)
+  const leftMaxRangeHeight = h * (0.35 + (currentLevel - 1) * 0.05);
+  const leftAlpha = isDescending && distLeft < leftMaxRangeHeight ? Math.min(1.0, (leftMaxRangeHeight - distLeft) / 25) : 0;
+
+  // Right side: visible from much higher altitude (e.g. up to 85% of height)
+  const rightMaxRangeHeight = h * (0.45 + (nextLvl - 1) * 0.07);
+  const rightAlpha = isDescending && distLeft < rightMaxRangeHeight ? Math.min(1.0, (rightMaxRangeHeight - distLeft) / 25) : 0;
+
+  // Draw Left Guideline (Short Range)
+  if (leftAlpha > 0.01) {
+    ctx.save();
+    ctx.strokeStyle = `rgba(0, 247, 255, ${leftAlpha * 0.8})`;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(ballXLeft, ballY);
+    ctx.lineTo(hitXLeft, hitOffsetY);
+    ctx.stroke();
+
+    // Outgoing ray
+    ctx.strokeStyle = `rgba(0, 247, 255, ${leftAlpha * 0.9})`;
+    ctx.beginPath();
+    ctx.moveTo(hitXLeft, hitOffsetY);
+    ctx.lineTo(hitXLeft + 22, hitOffsetY - 35);
+    ctx.stroke();
+
+    // Reticle
+    ctx.setLineDash([]);
+    ctx.fillStyle = `rgba(0, 247, 255, ${leftAlpha * 0.9})`;
+    ctx.beginPath();
+    ctx.arc(hitXLeft, hitOffsetY, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Draw Right Guideline (Upgraded Deep Matrix Range)
+  if (rightAlpha > 0.01) {
+    ctx.save();
+    ctx.strokeStyle = `rgba(16, 185, 129, ${rightAlpha * 0.9})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.shadowColor = '#10b981';
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.moveTo(ballXRight, ballY);
+    ctx.lineTo(hitXRight, hitOffsetY);
+    ctx.stroke();
+
+    // Outgoing Extended Ray with Arrow
+    ctx.strokeStyle = `rgba(52, 211, 153, ${rightAlpha})`;
+    ctx.beginPath();
+    ctx.moveTo(hitXRight, hitOffsetY);
+    const outTipX = hitXRight + 34;
+    const outTipY = hitOffsetY - 55;
+    ctx.lineTo(outTipX, outTipY);
+    ctx.stroke();
+
+    // Reticle on paddle
+    ctx.setLineDash([]);
+    ctx.fillStyle = `rgba(16, 185, 129, ${rightAlpha})`;
+    ctx.beginPath();
+    ctx.arc(hitXRight, hitOffsetY, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Arrowhead
+    ctx.save();
+    ctx.translate(outTipX, outTipY);
+    ctx.rotate(Math.atan2(34, -55));
+    ctx.fillStyle = `rgba(52, 211, 153, ${rightAlpha})`;
+    ctx.beginPath();
+    ctx.moveTo(0, -6);
+    ctx.lineTo(4, 4);
+    ctx.lineTo(0, 2);
+    ctx.lineTo(-4, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  // Draw Balls
+  drawBallWithPreset(ctx, { x: ballXLeft, y: ballY, radius: ballR }, 1, {
+    animTick: tick,
+    tier: 1,
+    palette: { glow: '#00f7ff', c1: '#ffffff', c2: '#38bdf8', c3: '#0369a1' },
+  });
+
+  drawBallWithPreset(ctx, { x: ballXRight, y: ballY, radius: ballR }, 1, {
+    animTick: tick,
+    tier: nextLvl >= 5 ? 3 : nextLvl >= 3 ? 2 : 1,
+    palette: { glow: '#10b981', c1: '#ffffff', c2: '#34d399', c3: '#065f46' },
+  });
+
+  // Range Badges at Bottom
+  ctx.save();
+  ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(`${curDist}px Range`, leftCenterX, h - 8);
+  ctx.fillStyle = '#34d399';
+  ctx.fillText(`${nextDist}px Range`, rightCenterX, h - 8);
+  ctx.restore();
+}

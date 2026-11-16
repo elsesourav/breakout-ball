@@ -117,9 +117,9 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
     baseCost: 70,
     accentColor: '#fbbf24',
     glowColor: 'rgba(251, 191, 36, 0.4)',
-    symbol: '',
-    statLabel: (lvl) => `+${(lvl - 1) * 12}% Speed`,
-    nextLabel: (lvl) => `+${lvl * 12}% Speed`,
+    symbol: '⚡',
+    statLabel: (lvl) => `${Math.round(800 + (lvl - 1) * (800 / 7))} px/s (${Math.round((lvl - 1) * 14.3)}% Boost)`,
+    nextLabel: (lvl) => `${Math.round(800 + lvl * (800 / 7))} px/s (+14.3%)`,
   },
 ];
 
@@ -160,6 +160,18 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     symbol: '',
     statLabel: (lvl) => `+${(lvl - 1) * 12}% Impact`,
     nextLabel: (lvl) => `+${lvl * 12}% Impact`,
+  },
+  {
+    id: 'ball_trajectory',
+    name: 'Trajectory Matrix',
+    category: 'ball',
+    maxLevel: 8,
+    baseCost: 75,
+    accentColor: '#10b981',
+    glowColor: 'rgba(16, 185, 129, 0.4)',
+    symbol: '☵',
+    statLabel: (lvl) => `${Math.round(600 + (lvl - 1) * (1200 / 7))}px Range`,
+    nextLabel: (lvl) => `${Math.round(600 + lvl * (1200 / 7))}px Range`,
   },
 ];
 
@@ -234,8 +246,8 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     accentColor: '#10b981',
     glowColor: 'rgba(16, 185, 129, 0.4)',
     symbol: '🛡',
-    statLabel: (lvl) => `${(8.0 + (lvl - 1) * 2.5).toFixed(1)}s Duration`,
-    nextLabel: (lvl) => `${(8.0 + lvl * 2.5).toFixed(1)}s Duration`,
+    statLabel: (lvl) => `${(16.0 + (lvl - 1) * (32.0 / 3)).toFixed(1)}s Duration`,
+    nextLabel: (lvl) => `${(16.0 + lvl * (32.0 / 3)).toFixed(1)}s Duration`,
   },
 ];
 

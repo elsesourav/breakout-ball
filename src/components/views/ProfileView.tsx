@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useGame } from '../../context/GameContext';
 import { AchievementsList } from '../profile/AchievementsList';
 import { ProfileHeroCard } from '../profile/ProfileHeroCard';
@@ -6,7 +6,9 @@ import { achievementManager } from '../../services/achievements';
 import { soundManager } from '../../audio';
 import { authService } from '../../services/auth';
 import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
+import { TopCoresBadge } from '../common/TopCoresBadge';
 import { FlyingCoresAnimation } from '../armory/FlyingCoresAnimation';
+import { currencyService } from '../../services/currency';
 
 export const ProfileView: React.FC = () => {
   const {
@@ -19,9 +21,42 @@ export const ProfileView: React.FC = () => {
     setActiveTab,
   } = useGame();
 
+  // Cores balance & bump-up count-up animation state
+  const [cores, setCores] = useState<number>(() => currencyService.getBalance());
+  const [displayCores, setDisplayCores] = useState<number>(cores);
+  const [isPulsing, setIsPulsing] = useState<boolean>(false);
+  const countUpRef = useRef<number | null>(null);
+
   // Flying cores particle state for achievement claiming
   const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
   const [flyOrigin, setFlyOrigin] = useState<{ x: number; y: number } | undefined>(undefined);
+
+  useEffect(() => {
+    currencyService.load(user.username).then(() => {
+      const b = currencyService.getBalance();
+      setCores(b);
+      setDisplayCores(b);
+    });
+  }, [user.username]);
+
+  // Synchronize currency balance when not pulsing/counting up
+  useEffect(() => {
+    const sync = () => {
+      if (!isPulsing && !isFlyingCores) {
+        const b = currencyService.getBalance();
+        setCores(b);
+        setDisplayCores(b);
+      }
+    };
+    window.addEventListener('currency-changed', sync);
+    window.addEventListener('currency_balance_changed', sync);
+    return () => {
+      window.removeEventListener('currency-changed', sync);
+      window.removeEventListener('currency_balance_changed', sync);
+      soundManager.stopCollectSequence();
+      if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
+    };
+  }, [isPulsing, isFlyingCores]);
 
   // Auto-refresh profile avatar when user returns to game tab from ElseSourav.com
   useEffect(() => {
@@ -52,6 +87,41 @@ export const ProfileView: React.FC = () => {
     return unsub;
   }, []);
 
+  const startCountUp = useCallback(
+    (target: number, fromVal?: number) => {
+      if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
+      const startVal = fromVal !== undefined ? fromVal : displayCores;
+      const diff = target - startVal;
+      if (diff <= 0) {
+        setDisplayCores(target);
+        soundManager.stopCollectSequence();
+        return;
+      }
+      const duration = 950;
+      const startTime = performance.now();
+
+      const tick = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const ease = 1 - Math.pow(1 - progress, 2);
+        const current = Math.round(startVal + diff * ease);
+
+        setDisplayCores(current);
+
+        if (progress < 1) {
+          countUpRef.current = requestAnimationFrame(tick);
+        } else {
+          setDisplayCores(target);
+          countUpRef.current = null;
+          soundManager.stopCollectSequence();
+        }
+      };
+
+      countUpRef.current = requestAnimationFrame(tick);
+    },
+    [displayCores]
+  );
+
   const handleSignIn = () => {
     soundManager.play('click');
     setAuthMode('signin');
@@ -80,13 +150,29 @@ export const ProfileView: React.FC = () => {
       ? 'ElseSourav SSO'
       : 'ElseSourav ID';
 
-  const handleClaimSuccess = (_reward: number, origin?: { x: number; y: number }) => {
+  const handleClaimSuccess = (reward: number, origin?: { x: number; y: number }) => {
+    const newBalance = currencyService.getBalance();
+    const prevBalance = Math.max(0, newBalance - reward);
+    setDisplayCores(prevBalance);
+    setCores(newBalance);
     if (origin) {
       setFlyOrigin(origin);
     } else {
       setFlyOrigin({ x: window.innerWidth / 2, y: window.innerHeight * 0.55 });
     }
     setIsFlyingCores(true);
+
+    // Landing time: trigger bump-up, slowly increase counter, and play collect sound
+    setTimeout(() => {
+      setIsPulsing(true);
+      soundManager.startCollectSequence(950);
+      startCountUp(newBalance, prevBalance);
+    }, 650);
+
+    setTimeout(() => {
+      setIsPulsing(false);
+      soundManager.stopCollectSequence();
+    }, 1650);
   };
 
   return (
@@ -100,7 +186,13 @@ export const ProfileView: React.FC = () => {
           title="PILOT PROFILE"
           subtitle="STATS & IDENTITY"
           onBack={() => setActiveTab('local')}
-          showCores={true}
+          rightSlot={
+            <TopCoresBadge
+              cores={displayCores}
+              isPulsing={isPulsing}
+              onOpenShop={() => setActiveTab('shop')}
+            />
+          }
         />
       </div>
 

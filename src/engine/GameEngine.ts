@@ -86,7 +86,7 @@ export class GameEngine {
     if (this.useWasm && this.wasmBridge.ready) this.wasmBridge.setPaddleTarget(targetX);
   }
   public getPaddleTarget(): number { return this.tsPhysics.paddle.targetX; }
-  public getPaddleMaxSpeed(): number { return this.tsPhysics.paddle.maxSpeed ?? 1600; }
+  public getPaddleMaxSpeed(): number { return this.tsPhysics.paddle.maxSpeed ?? 800; }
   public getPaddlePosition(): number { return this.tsPhysics.paddle.x; }
   public pause() { this.isPaused = true; }
   public resume() { this.isPaused = false; this.lastTime = performance.now(); this.accumulator = 0; }
@@ -97,7 +97,8 @@ export class GameEngine {
 
   public movePaddleRelative(deltaX: number) {
     const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
-    this.setPaddleTarget(this.tsPhysics.paddle.targetX + deltaX * (1 + (padSpeedLvl - 1) * 0.12));
+    const speedRatio = (800 + (padSpeedLvl - 1) * (800 / 7)) / 800;
+    this.setPaddleTarget(this.tsPhysics.paddle.targetX + deltaX * speedRatio);
   }
 
   public startLevel(level: LevelData) {
@@ -138,7 +139,7 @@ export class GameEngine {
 
   private applyUpgrades() {
     const padW = PADDLE_WIDTH * (1 + (currencyService.getUpgradeLevel('paddle_width') - 1) * 0.08);
-    const padSpd = 1600 * (1 + (currencyService.getUpgradeLevel('paddle_speed') - 1) * 0.12);
+    const padSpd = 800 + (currencyService.getUpgradeLevel('paddle_speed') - 1) * (800 / 7);
     const ballRad = BALL_RADIUS * (1 + (currencyService.getUpgradeLevel('ball_size') - 1) * 0.05);
     const ballSpd = BALL_SPEED * (1 + (currencyService.getUpgradeLevel('ball_speed') - 1) * 0.035);
     this.tsPhysics.paddle.width = padW;
@@ -225,7 +226,7 @@ export class GameEngine {
       const halfPadW = this.tsPhysics.paddle.width / 2;
       this.tsPhysics.paddle.prevX = this.tsPhysics.paddle.x;
 
-      const maxSpeed = this.tsPhysics.paddle.maxSpeed ?? 1600;
+      const maxSpeed = this.tsPhysics.paddle.maxSpeed ?? 800;
       const maxStep = maxSpeed * dt;
       const dx = this.tsPhysics.paddle.targetX - this.tsPhysics.paddle.x;
       const dist = Math.abs(dx);
@@ -269,7 +270,7 @@ export class GameEngine {
     const basePadW = PADDLE_WIDTH * (1 + (padWidthLvl - 1) * 0.08);
     const expandMultiplier = 1.30 + (currencyService.getUpgradeLevel('expand_power') - 1) * 0.04;
     this.tsPhysics.paddle.width = isExpand ? basePadW * expandMultiplier : basePadW;
-    this.tsPhysics.paddle.maxSpeed = 1600 * (1 + (currencyService.getUpgradeLevel('paddle_speed') - 1) * 0.12);
+    this.tsPhysics.paddle.maxSpeed = 800 + (currencyService.getUpgradeLevel('paddle_speed') - 1) * (800 / 7);
     this.tsPhysics.isMegaBall = this.powerUps.buffs.megaBall > 0;
     this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
     this.tsPhysics.ballImpactLevel = currencyService.getUpgradeLevel('ball_impact');

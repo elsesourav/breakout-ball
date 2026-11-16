@@ -197,6 +197,49 @@ export class TextureAtlas {
       c.stroke();
     });
 
+    // 7. Trajectory Matrix Guideline Sprites (8-Ball Pool Style)
+    // 7.1. Antialiased glowing guideline dot
+    placeItem('guideline_dot', 16, 16, (c, x, y) => {
+      const grad = c.createRadialGradient(x + 8, y + 8, 1, x + 8, y + 8, 7);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(x + 8, y + 8, 7, 0, Math.PI * 2);
+      c.fill();
+    });
+
+    // 7.2. Impact target reticle ring on paddle
+    placeItem('guideline_reticle', 32, 32, (c, x, y) => {
+      c.strokeStyle = '#ffffff';
+      c.lineWidth = 2.5;
+      c.beginPath();
+      c.arc(x + 16, y + 16, 11, 0, Math.PI * 2);
+      c.stroke();
+
+      // Inner dot
+      c.fillStyle = '#ffffff';
+      c.beginPath();
+      c.arc(x + 16, y + 16, 3, 0, Math.PI * 2);
+      c.fill();
+    });
+
+    // 7.3. Directional arrow pointer for outgoing deflection
+    placeItem('guideline_arrow', 24, 24, (c, x, y) => {
+      c.save();
+      c.translate(x + 12, y + 12);
+      c.fillStyle = '#ffffff';
+      c.beginPath();
+      c.moveTo(0, -9);
+      c.lineTo(7, 6);
+      c.lineTo(0, 3);
+      c.lineTo(-7, 6);
+      c.closePath();
+      c.fill();
+      c.restore();
+    });
+
     // 5. Upload atlas canvas to GPU WebGL Texture
     const tex = gl.createTexture();
     if (!tex) throw new Error('Failed to create WebGL atlas texture');

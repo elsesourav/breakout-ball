@@ -9,6 +9,7 @@ import { drawBlockWithPreset } from './draw/blockDrawers';
 import { drawPaddleWithPreset } from './draw/paddleDrawers';
 import { drawBallWithPreset } from './draw/ballDrawers';
 import { drawBlackHoleFloor } from './draw/blackHoleDrawers';
+import { calculateTrajectoryGuideline } from './trajectoryGuideline';
 
 const BALL_SKIN_PALETTES: Record<string, { c1: string; c2: string; c3: string; glow: string }> = {
   cyan: { c1: '#ffffff', c2: '#7df9ff', c3: '#00f7ff', glow: '#00f7ff' },
@@ -23,6 +24,7 @@ export class GameRenderer {
   private height: number;
   private animTick = 0;
   private shakeIntensity = 0;
+  private guidelineFadeAlpha = 0;
 
   constructor(width: number, height: number) {
     this.width = width;
@@ -141,6 +143,101 @@ export class GameRenderer {
       speedLevel,
       tier: designConfig.paddleTierOverride,
     });
+
+    // 6.1. Trajectory Matrix Guideline (8-Ball Pool Style Predictive Beam)
+    const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
+    const activeBalls = ballList.filter((b) => b.isActive);
+    let primaryBall: BallState | null = null;
+    let minDist = Infinity;
+    for (const b of activeBalls) {
+      if (b.vy > 0 && b.y < interpolatedPaddle.y) {
+        const d = interpolatedPaddle.y - b.y;
+        if (d < minDist) {
+          minDist = d;
+          primaryBall = b;
+        }
+      }
+    }
+    if (!primaryBall && activeBalls.length > 0) {
+      primaryBall = activeBalls[0];
+    }
+
+    if (primaryBall) {
+      const { guideline, nextFadeAlpha } = calculateTrajectoryGuideline(
+        primaryBall,
+        interpolatedPaddle,
+        w,
+        h,
+        trajLvl,
+        this.guidelineFadeAlpha
+      );
+      this.guidelineFadeAlpha = nextFadeAlpha;
+
+      if (guideline.visible && guideline.alpha > 0.01) {
+        ctx.save();
+        const gAlpha = guideline.alpha;
+        const isHit = guideline.isHit;
+
+        // Incoming Line
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([6, 8]);
+        ctx.strokeStyle = isHit ? `rgba(0, 247, 255, ${gAlpha * 0.85})` : `rgba(245, 158, 11, ${gAlpha * 0.5})`;
+        ctx.shadowColor = isHit ? '#00f7ff' : '#f59e0b';
+        ctx.shadowBlur = isHit ? 8 : 4;
+
+        for (const seg of guideline.incomingSegments) {
+          ctx.beginPath();
+          ctx.moveTo(seg.x1, seg.y1);
+          ctx.lineTo(seg.x2, seg.y2);
+          ctx.stroke();
+        }
+
+        // Impact Reticle
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(guideline.hitX, guideline.hitY, 8, 0, Math.PI * 2);
+        ctx.fillStyle = isHit ? `rgba(16, 185, 129, ${gAlpha * 0.9})` : `rgba(245, 158, 11, ${gAlpha * 0.7})`;
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Outgoing Reflected Ray
+        if (isHit && guideline.outgoingSegments.length > 0) {
+          ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.9})`;
+          ctx.shadowColor = '#10b981';
+          ctx.shadowBlur = 10;
+          ctx.lineWidth = 3;
+          ctx.setLineDash([8, 6]);
+
+          for (const seg of guideline.outgoingSegments) {
+            ctx.beginPath();
+            ctx.moveTo(seg.x1, seg.y1);
+            ctx.lineTo(seg.x2, seg.y2);
+            ctx.stroke();
+          }
+
+          // Outgoing Arrowhead
+          const lastSeg = guideline.outgoingSegments[guideline.outgoingSegments.length - 1];
+          const outAngle = Math.atan2(guideline.outVx, -guideline.outVy);
+          ctx.setLineDash([]);
+          ctx.save();
+          ctx.translate(lastSeg.x2, lastSeg.y2);
+          ctx.rotate(outAngle);
+          ctx.fillStyle = `rgba(52, 211, 153, ${gAlpha})`;
+          ctx.beginPath();
+          ctx.moveTo(0, -9);
+          ctx.lineTo(7, 6);
+          ctx.lineTo(0, 3);
+          ctx.lineTo(-7, 6);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+    }
 
     // 7. Render All Active Balls with Sub-Frame State Interpolation (Ultra-Smooth 120Hz/144Hz)
     const palette = BALL_SKIN_PALETTES[ballSkin] || BALL_SKIN_PALETTES.cyan;

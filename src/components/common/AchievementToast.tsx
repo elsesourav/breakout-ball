@@ -12,32 +12,55 @@ import {
 import { ACHIEVEMENT_CUSTOM_ICONS, IconFirstImpact } from '../profile/AchievementIcons';
 
 export const AchievementToast: React.FC = () => {
-  const { screen, setActiveTab } = useGame();
+  const { screen, activeTab, setActiveTab } = useGame();
   const [activeToast, setActiveToast] = useState<Achievement | null>(null);
 
   const isInGame = screen === 'playing';
 
+  // Dismiss immediately if user navigates to profile or shop
+  useEffect(() => {
+    if (activeTab === 'profile' || activeTab === 'shop') {
+      setActiveToast(null);
+    }
+  }, [activeTab]);
+
+  // Dismiss immediately when an achievement is claimed or shop collect succeeds
+  useEffect(() => {
+    const handleDismiss = () => {
+      setActiveToast(null);
+    };
+    window.addEventListener('achievement_claimed', handleDismiss);
+    window.addEventListener('shop_collect_success', handleDismiss);
+    return () => {
+      window.removeEventListener('achievement_claimed', handleDismiss);
+      window.removeEventListener('shop_collect_success', handleDismiss);
+    };
+  }, []);
+
   // Listen for real-time achievement unlocks
   useEffect(() => {
     const unsub = achievementManager.onUnlock((ach) => {
+      // Guard: Never show toast if already claimed, or if user is in profile or shop
+      if (ach.claimed) return;
+      if (activeTab === 'profile' || activeTab === 'shop') return;
       setActiveToast(ach);
       synthAudio.playAchievementChime();
     });
     return unsub;
-  }, []);
+  }, [activeTab]);
 
   // When returning home / exiting game to Level Map or Arena, show any pending unviewed achievement
   useEffect(() => {
-    if (screen === 'menu') {
+    if (screen === 'menu' && (activeTab as string) !== 'profile' && (activeTab as string) !== 'shop') {
       const pending = achievementManager.getPendingUnviewed();
-      if (pending) {
+      if (pending && !pending.claimed) {
         const timer = setTimeout(() => {
           setActiveToast(pending);
         }, 350);
         return () => clearTimeout(timer);
       }
     }
-  }, [screen]);
+  }, [screen, activeTab]);
 
   // Auto-dismiss: inside the game it is shown for less time (2000ms); on level map / menu it stays for 6000ms
   useEffect(() => {
@@ -54,7 +77,7 @@ export const AchievementToast: React.FC = () => {
     }
   }, [activeToast, isInGame]);
 
-  if (!activeToast) return null;
+  if (!activeToast || activeTab === 'profile' || activeTab === 'shop') return null;
 
   const IconComp = ACHIEVEMENT_CUSTOM_ICONS[activeToast.id] || IconFirstImpact;
 

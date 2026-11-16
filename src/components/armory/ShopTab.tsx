@@ -115,6 +115,9 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
     const res = currencyService.claimDailyCores(username);
     if (res.success) {
       setDailyStatus(currencyService.getDailyCollectStatus());
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('shop_collect_success'));
+      }
       // Trigger smooth flowing flight animation
       onClaimSuccess(res.amount, originPos);
     }
@@ -150,6 +153,10 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
       soundManager.playUpgradeSuccess();
       setStatus('success');
       setStatusMsg(res.message);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('shop_collect_success'));
+      }
 
       // Close modal quickly so it does not obstruct the flying cores flight!
       setTimeout(() => {

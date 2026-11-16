@@ -293,9 +293,8 @@ class AchievementManager {
     }
 
     this.claimedIds.add(id);
-    this.viewedIds.add(id);
+    this.markAsViewed(id);
     this.saveClaims(username);
-    this.saveViewed(username);
 
     // Credit cores to balance
     currencyService.addCores(ach.coreReward, username);

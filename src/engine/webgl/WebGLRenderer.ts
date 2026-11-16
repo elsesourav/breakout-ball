@@ -9,6 +9,7 @@ import { GLParticleSystem } from './GLParticleSystem';
 import { getBallTierFromUpgrades, getPaddleTierFromUpgrades } from '../../constants/visualPresets';
 import { currencyService } from '../../services/currency';
 import { ACCRETION_EMBERS, drawBlackHoleFloor } from '../draw/blackHoleDrawers';
+import { calculateTrajectoryGuideline } from '../trajectoryGuideline';
 
 export class WebGLRenderer {
   private gl: WebGLRenderingContext | WebGL2RenderingContext;
@@ -22,6 +23,7 @@ export class WebGLRenderer {
   private backdropBuffer: WebGLBuffer | null = null;
   private animTick = 0;
   private shakeIntensity = 0;
+  private guidelineFadeAlpha = 0;
 
   private bhCanvas: HTMLCanvasElement | null = null;
   private bhCtx: CanvasRenderingContext2D | null = null;
@@ -238,39 +240,13 @@ export class WebGLRenderer {
         alphaBlock = ticksLeft < 30 ? 0.22 + ((30 - ticksLeft) / 30) * 0.78 : 0.22;
       }
 
-      this.batcher.pushSprite(
-        b.x,
-        b.y,
-        b.w,
-        b.h,
-        uv.u0,
-        uv.v0,
-        uv.u1,
-        uv.v1,
-        tint,
-        tint,
-        tint,
-        alphaBlock
-      );
+      this.batcher.pushSprite(b.x, b.y, b.w, b.h, uv.u0, uv.v0, uv.u1, uv.v1, tint, tint, tint, alphaBlock);
 
       // Recharging portal: draw an inner pulsing cooldown energy line across the bottom of the portal
       if (b.health === 7 && (b.portalRechargeTimer ?? 0) > 0) {
         const progress = Math.max(0, 1.0 - (b.portalRechargeTimer! / 180));
         const barW = (b.w - 16) * progress;
-        this.batcher.pushSprite(
-          b.x + 8,
-          b.y + b.h - 8,
-          barW,
-          3,
-          whiteUV.u0,
-          whiteUV.v0,
-          whiteUV.u1,
-          whiteUV.v1,
-          0.0,
-          0.97,
-          1.0,
-          0.85
-        );
+        this.batcher.pushSprite(b.x + 8, b.y + b.h - 8, barW, 3, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 0.0, 0.97, 1.0, 0.85);
       }
     }
 
@@ -289,74 +265,116 @@ export class WebGLRenderer {
     const padSlotH = paddle.height + padMargin * 2;
 
     this.batcher.pushSprite(
-      renderPaddleX - paddle.width / 2 - padMargin,
-      paddle.y - padMargin,
-      padSlotW,
-      padSlotH,
-      paddleUV.u0,
-      paddleUV.v0,
-      paddleUV.u1,
-      paddleUV.v1,
-      1.0,
-      1.0,
-      1.0,
-      1.0
+      renderPaddleX - paddle.width / 2 - padMargin, paddle.y - padMargin,
+      padSlotW, padSlotH, paddleUV.u0, paddleUV.v0, paddleUV.u1, paddleUV.v1, 1.0, 1.0, 1.0, 1.0
     );
+
+    // 5.1. Trajectory Matrix Guideline (8-Ball Pool Style Predictive Beam)
+    const ballList = Array.isArray(balls) ? balls : [balls];
+    const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
+    const activeBalls = ballList.filter((b) => b.isActive);
+    let primaryBall: BallState | null = null;
+    let minDist = Infinity;
+    for (const b of activeBalls) {
+      if (b.vy > 0 && b.y < paddle.y) {
+        const d = paddle.y - b.y;
+        if (d < minDist) {
+          minDist = d;
+          primaryBall = b;
+        }
+      }
+    }
+    if (!primaryBall && activeBalls.length > 0) primaryBall = activeBalls[0];
+
+    if (primaryBall) {
+      const { guideline, nextFadeAlpha } = calculateTrajectoryGuideline(primaryBall, paddle, w, h, trajLvl, this.guidelineFadeAlpha);
+      this.guidelineFadeAlpha = nextFadeAlpha;
+
+      if (guideline.visible && guideline.alpha > 0.01) {
+        const dotUV = this.atlas.getUV('guideline_dot');
+        const reticleUV = this.atlas.getUV('guideline_reticle');
+        const arrowUV = this.atlas.getUV('guideline_arrow');
+
+        const gAlpha = guideline.alpha;
+        const isHit = guideline.isHit;
+        const inR = isHit ? 0.0 : 1.0;
+        const inG = isHit ? 0.97 : 0.45;
+        const inB = isHit ? 0.85 : 0.15;
+        const inAlpha = isHit ? gAlpha * 0.85 : gAlpha * 0.45;
+
+        // 1. Draw Incoming Predictive Dotted Segments
+        for (const seg of guideline.incomingSegments) {
+          const dx = seg.x2 - seg.x1;
+          const dy = seg.y2 - seg.y1;
+          const len = Math.hypot(dx, dy);
+          const stepSize = 18;
+          const count = Math.floor(len / stepSize);
+          const nx = dx / len;
+          const ny = dy / len;
+
+          for (let s = 1; s <= count; s++) {
+            const px = seg.x1 + nx * (s * stepSize);
+            const py = seg.y1 + ny * (s * stepSize);
+            const dotSize = 8;
+            this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, inR, inG, inB, inAlpha);
+          }
+        }
+
+        // 2. Draw Target Impact Reticle on Paddle Horizon
+        const reticleSize = 24;
+        this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, inR, inG, inB, gAlpha * 0.95);
+
+        // 3. Draw Outgoing Deflected Guideline (when collision is possible)
+        if (isHit && guideline.outgoingSegments.length > 0) {
+          const outR = 0.06;
+          const outG = 0.98;
+          const outB = 0.65;
+          const outAlpha = gAlpha * 0.9;
+
+          for (const seg of guideline.outgoingSegments) {
+            const dx = seg.x2 - seg.x1;
+            const dy = seg.y2 - seg.y1;
+            const len = Math.hypot(dx, dy);
+            const stepSize = 16;
+            const count = Math.floor(len / stepSize);
+            const nx = dx / len;
+            const ny = dy / len;
+
+            for (let s = 1; s <= count; s++) {
+              const px = seg.x1 + nx * (s * stepSize);
+              const py = seg.y1 + ny * (s * stepSize);
+              const dotSize = 9;
+              this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, outR, outG, outB, outAlpha * (1.0 - (s / (count + 1)) * 0.35));
+            }
+          }
+
+          // Directional arrowhead at tip of final outgoing segment
+          const lastSeg = guideline.outgoingSegments[guideline.outgoingSegments.length - 1];
+          const outAngle = Math.atan2(guideline.outVx, -guideline.outVy);
+          const arrowSize = 20;
+          this.batcher.pushSprite(lastSeg.x2 - arrowSize / 2, lastSeg.y2 - arrowSize / 2, arrowSize, arrowSize, arrowUV.u0, arrowUV.v0, arrowUV.u1, arrowUV.v1, outR, outG, outB, outAlpha, outAngle);
+        }
+      }
+    }
 
     // 6. Draw Falling Power-Up Shards
     if (powerUps && powerUps.drops.length > 0) {
       for (const drop of powerUps.drops) {
         const puUV = this.atlas.getUV(`pu_${drop.meta.type}`);
-        this.batcher.pushSprite(
-          drop.x - 14,
-          drop.y - 14,
-          28,
-          28,
-          puUV.u0,
-          puUV.v0,
-          puUV.u1,
-          puUV.v1,
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        );
+        this.batcher.pushSprite(drop.x - 14, drop.y - 14, 28, 28, puUV.u0, puUV.v0, puUV.u1, puUV.v1, 1.0, 1.0, 1.0, 1.0);
       }
     }
 
     // 7. Draw All Active Balls with Sub-frame Interpolation & Trails
-    const ballList = Array.isArray(balls) ? balls : [balls];
     for (const b of ballList) {
       if (!b.isActive) continue;
-
-      const renderBallX =
-        b.prevX !== undefined && alpha < 0.999
-          ? b.prevX + (b.x - b.prevX) * alpha
-          : b.x;
-      const renderBallY =
-        b.prevY !== undefined && alpha < 0.999
-          ? b.prevY + (b.y - b.prevY) * alpha
-          : b.y;
-
+      const renderBallX = b.prevX !== undefined && alpha < 0.999 ? b.prevX + (b.x - b.prevX) * alpha : b.x;
+      const renderBallY = b.prevY !== undefined && alpha < 0.999 ? b.prevY + (b.y - b.prevY) * alpha : b.y;
       const ballKey = b.isMega ? 'ball_mega' : `ball_${ballSkin}`;
       const ballUV = this.atlas.getUV(ballKey);
       const ballMargin = 12;
       const ballSlotSize = Math.ceil(b.radius * 2 + ballMargin * 2);
-
-      this.batcher.pushSprite(
-        renderBallX - ballSlotSize / 2,
-        renderBallY - ballSlotSize / 2,
-        ballSlotSize,
-        ballSlotSize,
-        ballUV.u0,
-        ballUV.v0,
-        ballUV.u1,
-        ballUV.v1,
-        1.0,
-        1.0,
-        1.0,
-        1.0
-      );
+      this.batcher.pushSprite(renderBallX - ballSlotSize / 2, renderBallY - ballSlotSize / 2, ballSlotSize, ballSlotSize, ballUV.u0, ballUV.v0, ballUV.u1, ballUV.v1, 1.0, 1.0, 1.0, 1.0);
     }
 
     // 8. Draw Explosions (Shockwave Rings & Near-Block Shatter Chunks)
@@ -365,38 +383,11 @@ export class WebGLRenderer {
       for (const wave of explosions.blastWaves) {
         const rad = wave.radius;
         const alphaWave = Math.max(0, wave.life / wave.maxLife);
-        this.batcher.pushSprite(
-          wave.x - rad,
-          wave.y - rad,
-          rad * 2,
-          rad * 2,
-          ringUV.u0,
-          ringUV.v0,
-          ringUV.u1,
-          ringUV.v1,
-          1.0,
-          0.6,
-          0.1,
-          alphaWave
-        );
+        this.batcher.pushSprite(wave.x - rad, wave.y - rad, rad * 2, rad * 2, ringUV.u0, ringUV.v0, ringUV.u1, ringUV.v1, 1.0, 0.6, 0.1, alphaWave);
       }
       for (const chunk of explosions.shatterChunks) {
         if (chunk.delay > 0) continue;
-        this.batcher.pushSprite(
-          chunk.x - chunk.w / 2,
-          chunk.y - chunk.h / 2,
-          chunk.w,
-          chunk.h,
-          whiteUV.u0,
-          whiteUV.v0,
-          whiteUV.u1,
-          whiteUV.v1,
-          1.0,
-          0.3,
-          0.2,
-          chunk.alpha,
-          chunk.angle
-        );
+        this.batcher.pushSprite(chunk.x - chunk.w / 2, chunk.y - chunk.h / 2, chunk.w, chunk.h, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 1.0, 0.3, 0.2, chunk.alpha, chunk.angle);
       }
     }
 
@@ -414,12 +405,7 @@ export class WebGLRenderer {
         b: 0.3,
         a: Math.max(0.05, Math.min(1.0, p.alpha)),
       }));
-      this.glParticles.renderPoints(
-        this.shaders.getProgram('particle'),
-        combatPoints,
-        w,
-        h
-      );
+      this.glParticles.renderPoints(this.shaders.getProgram('particle'), combatPoints, w, h);
     }
   }
 }

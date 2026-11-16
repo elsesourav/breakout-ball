@@ -329,11 +329,13 @@ export const GameCanvas: React.FC = () => {
       if (orient === 90) tilt = e.beta ?? e.gamma ?? 0;
       else if (orient === -90 || orient === 270) tilt = -(e.beta ?? e.gamma ?? 0);
       else if (orient === 180) tilt = -tilt;
-      const deadzone = 2.5;
+      const deadzone = 1.8;
       if (Math.abs(tilt) <= deadzone) return;
       const sign = Math.sign(tilt);
-      const mag = Math.min(1.0, (Math.abs(tilt) - deadzone) / 23.5);
-      const rate = sign * (mag * 0.45 + mag * mag * 0.55) * (settings.gyroSensitivity ?? 0.4) * 2.2;
+      // Reach full paddle tracking speed at comfortable ~15 deg tilt
+      const mag = Math.min(1.0, (Math.abs(tilt) - deadzone) / 14.0);
+      const sensitivity = (settings.gyroSensitivity ?? 0.5) * 2.0;
+      const rate = sign * mag * sensitivity;
       const deltaX = rate * engineRef.current.getPaddleMaxSpeed() * dt;
       const halfPadW = PADDLE_WIDTH / 2;
       engineRef.current.setPaddleTarget(Math.max(halfPadW, Math.min(CANVAS_WIDTH - halfPadW, engineRef.current.getPaddleTarget() + deltaX)));

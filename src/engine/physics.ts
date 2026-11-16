@@ -201,7 +201,7 @@ export class PhysicsWorld {
     // Physically accurate paddle speed control:
     // Paddle tracks targetX strictly capped by its maximum physical speed (px/sec)
     const dt = 1 / 60;
-    const maxSpeed = this.paddle.maxSpeed ?? 1600;
+    const maxSpeed = this.paddle.maxSpeed ?? 800;
     const maxStep = maxSpeed * dt;
     const dx = this.paddle.targetX - this.paddle.x;
     const dist = Math.abs(dx);
@@ -311,6 +311,10 @@ export class PhysicsWorld {
           // Strictly guarantee: each block can only take damage once per physics frame from a ball
           if (damagedBlocksThisTick.has(b)) continue;
           if (ball.lastHitBlockIndex === b && (ball.lastHitBlockCooldown ?? 0) > 0) continue;
+          // Quantum Portal in cooldown acts like nothing (intangible pass-through)
+          if (block.health === 7 && ((block.portalRechargeTimer ?? 0) > 0 || (ball.warpCooldown ?? 0) > 0)) {
+            continue;
+          }
 
           const closestX = Math.max(block.x, Math.min(ball.x, block.x + block.w));
           const closestY = Math.max(block.y, Math.min(ball.y, block.y + block.h));
@@ -327,6 +331,7 @@ export class PhysicsWorld {
               const res = handlePortalCollision(ball, block, this.blocks, b, this.config, this.events, this.combo);
               if (res === 'continue') continue;
               if (res === 'break') break;
+              continue; // Portal acts like nothing when not warping (pass-through)
             }
 
             // Normal reflection & physically accurate collision normal

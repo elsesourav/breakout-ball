@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useGame } from '../../context/GameContext';
 import { ActiveTab } from '../../types/game';
 import { soundManager } from '../../audio';
+import { safeVibrate } from '../../utils/haptics';
 import { currencyService } from '../../services/currency';
 import {
   NavArenaIcon,
@@ -58,8 +59,8 @@ export const SideNavDock: React.FC = () => {
   const handleNavClick = (tab: ActiveTab) => {
     if (tab === activeTab) return;
     soundManager.playClick();
-    if (settings.vibrate && typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate(15);
+    if (settings.vibrate) {
+      safeVibrate(15);
     }
     setActiveTab(tab);
   };

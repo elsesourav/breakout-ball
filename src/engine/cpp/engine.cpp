@@ -26,7 +26,7 @@ void BreakoutEngine::init(float width, float height, float padW, float padH, flo
     paddle.targetX = paddle.x;
     paddle.prevX = paddle.x;
     paddle.vx = 0.0f;
-    paddle.maxSpeed = 1600.0f;
+    paddle.maxSpeed = 800.0f;
 
     balls.clear();
     NativeBall mainBall;
@@ -297,7 +297,7 @@ bool BreakoutEngine::resolvePaddleBounce(NativeBall& ball, float halfPadW, float
 }
 
 int BreakoutEngine::handlePortalCollision(NativeBall& ball, NativeBlock& block, int blockIdx) {
-    if (ball.warpCooldown > 0) return 0;
+    if (ball.warpCooldown > 0 || block.portalRechargeTimer > 0) return 0;
 
     int targetIdx = block.portalPairIndex;
     if (targetIdx >= 0 && targetIdx < (int)blocks.size()) {
@@ -431,7 +431,7 @@ void BreakoutEngine::update(int substeps) {
 
     // 3. Move paddle with maxSpeed cap
     const float dt = 1.0f / 60.0f;
-    const float maxStep = (paddle.maxSpeed > 100.0f ? paddle.maxSpeed : 1600.0f) * dt;
+    const float maxStep = (paddle.maxSpeed > 100.0f ? paddle.maxSpeed : 800.0f) * dt;
     float dx = paddle.targetX - paddle.x;
     float dist = std::abs(dx);
     if (dist > 0.01f) {
@@ -526,6 +526,8 @@ void BreakoutEngine::update(int substeps) {
             for (size_t b = 0; b < blocks.size(); b++) {
                 auto& block = blocks[b];
                 if (block.isDead) continue;
+                // Quantum Portal in cooldown acts like nothing (intangible pass-through)
+                if (block.health == 7 && (block.portalRechargeTimer > 0 || ball.warpCooldown > 0)) continue;
 
                 if (std::find(damagedThisTick.begin(), damagedThisTick.end(), (int)b) != damagedThisTick.end()) continue;
                 if (ball.lastHitBlockIndex == (int)b && ball.lastHitBlockCooldown > 0) continue;
@@ -544,6 +546,7 @@ void BreakoutEngine::update(int substeps) {
                     if (block.health == 7) {
                         int pRes = handlePortalCollision(ball, block, (int)b);
                         if (pRes == 1) break; // Warped
+                        continue; // If in cooldown or portal did not warp, act like nothing (pass-through)
                     }
 
                     // Reflection normal

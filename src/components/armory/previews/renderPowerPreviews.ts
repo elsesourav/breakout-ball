@@ -14,7 +14,7 @@ export function getPowerDuration(upgradeId: string, level: number): number {
     case 'multi_power':
       return 6.0 + (level - 1) * 1.5;
     case 'shield_power':
-      return 8.0 + (level - 1) * 2.5;
+      return 16.0 + (level - 1) * (32.0 / 3);
     default:
       return 5.0 + (level - 1) * 1.0;
   }

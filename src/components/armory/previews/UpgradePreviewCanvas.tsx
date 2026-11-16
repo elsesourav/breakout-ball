@@ -4,6 +4,7 @@ import {
   renderBallSizePreview,
   renderBallSpeedPreview,
   renderBallImpactPreview,
+  renderBallTrajectoryPreview,
 } from './renderBallPreviews';
 import {
   renderPaddleWidthPreview,
@@ -83,6 +84,9 @@ export const UpgradePreviewCanvas: React.FC<UpgradePreviewCanvasProps> = ({
             break;
           case 'ball_impact':
             renderBallImpactPreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
+          case 'ball_trajectory':
+            renderBallTrajectoryPreview(ctx, w, h, currentLevel, isMax, tick);
             break;
           case 'paddle_width':
             renderPaddleWidthPreview(ctx, w, h, currentLevel, isMax, tick);

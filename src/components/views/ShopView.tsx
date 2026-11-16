@@ -5,6 +5,7 @@ import { ShopTab } from '../armory/ShopTab';
 import { PageHeaderWithBack } from '../navigation/PageHeaderWithBack';
 import { TopCoresBadge } from '../common/TopCoresBadge';
 import { FlyingCoresAnimation } from '../armory/FlyingCoresAnimation';
+import { soundManager } from '../../audio';
 
 export const ShopView: React.FC = () => {
   const { user, setActiveTab } = useGame();
@@ -39,22 +40,30 @@ export const ShopView: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const startCountUp = useCallback(
-    (target: number) => {
+  useEffect(() => {
+    return () => {
+      soundManager.stopCollectSequence();
       if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
-      const startVal = displayCores;
+    };
+  }, []);
+
+  const startCountUp = useCallback(
+    (target: number, fromVal?: number) => {
+      if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
+      const startVal = fromVal !== undefined ? fromVal : displayCores;
       const diff = target - startVal;
       if (diff <= 0) {
         setDisplayCores(target);
+        soundManager.stopCollectSequence();
         return;
       }
-      const duration = 900;
+      const duration = 950;
       const startTime = performance.now();
 
       const tick = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(1, elapsed / duration);
-        const ease = 1 - Math.pow(1 - progress, 3);
+        const ease = 1 - Math.pow(1 - progress, 2);
         const current = Math.round(startVal + diff * ease);
 
         setDisplayCores(current);
@@ -64,6 +73,7 @@ export const ShopView: React.FC = () => {
         } else {
           setDisplayCores(target);
           countUpRef.current = null;
+          soundManager.stopCollectSequence();
         }
       };
 
@@ -75,6 +85,8 @@ export const ShopView: React.FC = () => {
   const handleShopClaim = useCallback(
     (amount: number, origin?: { x: number; y: number }) => {
       const newBalance = currencyService.getBalance();
+      const prevBalance = Math.max(0, newBalance - amount);
+      setDisplayCores(prevBalance);
       setCores(newBalance);
       setClaimAmount(amount);
       if (origin) {
@@ -89,13 +101,16 @@ export const ShopView: React.FC = () => {
         scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
+      // Landing time: trigger bump-up, slowly increase counter, and play collect sound
       setTimeout(() => {
         setIsPulsing(true);
-        startCountUp(newBalance);
+        soundManager.startCollectSequence(950);
+        startCountUp(newBalance, prevBalance);
       }, 650);
 
       setTimeout(() => {
         setIsPulsing(false);
+        soundManager.stopCollectSequence();
       }, 1650);
     },
     [startCountUp]
