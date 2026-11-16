@@ -383,7 +383,7 @@ class AuthService {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: typeof window !== 'undefined' ? window.location.origin + '/arcade' : undefined,
+          redirectTo: typeof window !== 'undefined' ? window.location.origin + '/' : undefined,
         },
       });
 

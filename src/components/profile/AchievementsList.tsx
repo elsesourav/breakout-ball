@@ -5,20 +5,8 @@ import { achievementManager } from '../../services/achievements';
 import { useGame } from '../../context/GameContext';
 import { soundManager } from '../../audio';
 import { CoreIcon } from '../common/CoreIcon';
-import { Trophy, Award, Zap, Flame, Crown, Shield, Target, Compass, Timer, Palette, Globe, Lock, Check } from 'lucide-react';
-
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  zap: Zap,
-  flame: Flame,
-  sparkles: Zap,
-  compass: Compass,
-  target: Target,
-  timer: Timer,
-  shield: Shield,
-  crown: Crown,
-  palette: Palette,
-  globe: Globe,
-};
+import { Award, Lock, Check } from 'lucide-react';
+import { ACHIEVEMENT_CUSTOM_ICONS, IconFirstImpact } from './AchievementIcons';
 
 export const AchievementsList: React.FC = () => {
   const { user } = useGame();
@@ -87,7 +75,7 @@ export const AchievementsList: React.FC = () => {
       {/* 2. Full Natural Height Achievements Cards List (Outer Page Scrolls) */}
       <div className="p-3 flex flex-col gap-2.5">
         {achievements.map((ach) => {
-          const IconComp = ICON_MAP[ach.icon] || Trophy;
+          const IconComp = ACHIEVEMENT_CUSTOM_ICONS[ach.id] || IconFirstImpact;
           const rewardAmount = ach.coreReward || 25;
 
           return (

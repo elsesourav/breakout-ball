@@ -102,7 +102,7 @@ export const getRoutePath = (
       return '/leaderboard';
     case 'local':
     default:
-      return '/arcade';
+      return '/';
   }
 };
 

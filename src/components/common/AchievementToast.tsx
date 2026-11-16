@@ -6,31 +6,10 @@ import { achievementManager } from '../../services/achievements';
 import { synthAudio, soundManager } from '../../audio';
 import {
   Trophy,
-  Zap,
-  Flame,
-  Crown,
-  Shield,
-  Target,
-  Compass,
-  Timer,
-  Palette,
-  Globe,
   X,
   ChevronRight,
 } from 'lucide-react';
-
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  zap: Zap,
-  flame: Flame,
-  sparkles: Zap,
-  compass: Compass,
-  target: Target,
-  timer: Timer,
-  shield: Shield,
-  crown: Crown,
-  palette: Palette,
-  globe: Globe,
-};
+import { ACHIEVEMENT_CUSTOM_ICONS, IconFirstImpact } from '../profile/AchievementIcons';
 
 export const AchievementToast: React.FC = () => {
   const { screen, setActiveTab } = useGame();
@@ -77,7 +56,7 @@ export const AchievementToast: React.FC = () => {
 
   if (!activeToast) return null;
 
-  const IconComp = ICON_MAP[activeToast.icon] || Trophy;
+  const IconComp = ACHIEVEMENT_CUSTOM_ICONS[activeToast.id] || IconFirstImpact;
 
   // Handle clicking the notification body -> redirect to profile achievements section
   const handleCardClick = () => {
