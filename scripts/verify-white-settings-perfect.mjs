@@ -4,8 +4,8 @@ import fs from 'fs';
 async function run() {
   const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
     '--headless=new',
-    '--remote-debugging-port=9307',
-    '--user-data-dir=/tmp/chrome_test_verify_white_settings_perfect',
+    '--remote-debugging-port=9308',
+    '--user-data-dir=/tmp/chrome_test_verify_white_settings_poll',
     '--window-size=412,915',
     '--no-first-run',
     '--no-default-browser-check',
@@ -16,7 +16,7 @@ async function run() {
     let listRes = null;
     for (let i = 0; i < 20; i++) {
       try {
-        listRes = await fetch('http://127.0.0.1:9307/json/list');
+        listRes = await fetch('http://127.0.0.1:9308/json/list');
         if (listRes.ok) break;
       } catch (e) {
         await new Promise(r => setTimeout(r, 500));
@@ -46,7 +46,6 @@ async function run() {
 
     await send('Runtime.enable');
     await send('Page.enable');
-    // Set standard mobile device emulation: 412x915
     await send('Emulation.setDeviceMetricsOverride', {
       width: 412,
       height: 915,
@@ -55,23 +54,38 @@ async function run() {
     });
 
     await send('Page.navigate', { url: 'http://localhost:3000' });
-    await new Promise(r => setTimeout(r, 3000));
 
-    // Get exact rect of the settings button in 412px mobile viewport
-    const evalRes = await send('Runtime.evaluate', {
-      expression: `
-        (() => {
-          const btn = document.querySelector('button[title="System Settings"]');
-          if (!btn) return null;
-          const rect = btn.getBoundingClientRect();
-          return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-        })()
-      `,
-      returnByValue: true
-    });
+    // Poll until loading screen finishes and settings button is visible
+    let rect = null;
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 500));
+      const evalRes = await send('Runtime.evaluate', {
+        expression: `
+          (() => {
+            const btn = document.querySelector('button[title="System Settings"]');
+            if (!btn) return null;
+            const style = window.getComputedStyle(btn);
+            const parent = btn.closest('.z-40');
+            const parentStyle = parent ? window.getComputedStyle(parent) : null;
+            if (style.display === 'none' || style.visibility === 'hidden') return null;
+            const r = btn.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0) {
+              return { x: r.x, y: r.y, width: r.width, height: r.height };
+            }
+            return null;
+          })()
+        `,
+        returnByValue: true
+      });
+      if (evalRes?.result?.value) {
+        rect = evalRes.result.value;
+        // Wait an extra second for fade-in animations to complete
+        await new Promise(r => setTimeout(r, 1200));
+        break;
+      }
+    }
 
-    console.log('Button rect:', evalRes.result.value);
-    const rect = evalRes.result.value;
+    console.log('Button rect:', rect);
 
     // Full screen mobile screenshot
     const fullSnap = await send('Page.captureScreenshot', { format: 'png' });
@@ -82,8 +96,8 @@ async function run() {
       const btnSnap = await send('Page.captureScreenshot', {
         format: 'png',
         clip: {
-          x: Math.round(rect.x - 20),
-          y: Math.round(rect.y - 20),
+          x: Math.max(0, Math.round(rect.x - 20)),
+          y: Math.max(0, Math.round(rect.y - 20)),
           width: Math.round(rect.width + 40),
           height: Math.round(rect.height + 40),
           scale: 3
