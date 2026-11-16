@@ -57,17 +57,12 @@ export class GameEngine {
       this.ctx = context;
       this.useWebGL = false;
     }
-
     this.callbacks = callbacks;
     this.wasmBridge = new WasmPhysicsBridge();
     this.tsPhysics = new PhysicsWorld({
-      width: CANVAS_WIDTH, height: CANVAS_HEIGHT,
-      paddleWidth: PADDLE_WIDTH, paddleHeight: PADDLE_HEIGHT,
-      ballRadius: BALL_RADIUS, ballSpeed: BALL_SPEED,
-      blockWidth: BLOCK_WIDTH, blockHeight: BLOCK_HEIGHT,
-      substeps: 6,
+      width: CANVAS_WIDTH, height: CANVAS_HEIGHT, paddleWidth: PADDLE_WIDTH, paddleHeight: PADDLE_HEIGHT,
+      ballRadius: BALL_RADIUS, ballSpeed: BALL_SPEED, blockWidth: BLOCK_WIDTH, blockHeight: BLOCK_HEIGHT, substeps: 6,
     });
-
     this.particles = new ParticleSystem(CANVAS_WIDTH, CANVAS_HEIGHT, 240);
     this.renderer = new GameRenderer(CANVAS_WIDTH, CANVAS_HEIGHT);
     this.audio = new AudioBridge(true);
@@ -225,7 +220,6 @@ export class GameEngine {
     if (this.state.status !== 'playing') {
       const halfPadW = this.tsPhysics.paddle.width / 2;
       this.tsPhysics.paddle.prevX = this.tsPhysics.paddle.x;
-
       const maxSpeed = this.tsPhysics.paddle.maxSpeed ?? 800;
       const maxStep = maxSpeed * dt;
       const dx = this.tsPhysics.paddle.targetX - this.tsPhysics.paddle.x;
@@ -238,9 +232,7 @@ export class GameEngine {
         this.tsPhysics.paddle.x = this.tsPhysics.paddle.targetX;
         this.tsPhysics.paddle.vx = 0;
       }
-
       this.tsPhysics.paddle.x = Math.max(halfPadW, Math.min(this.tsPhysics.config.width - halfPadW, this.tsPhysics.paddle.x));
-
       for (const b of this.tsPhysics.balls) {
         b.prevX = b.x; b.prevY = b.y;
         b.x = this.tsPhysics.paddle.x; b.y = this.tsPhysics.paddle.y - b.radius - 4;
@@ -369,10 +361,7 @@ export class GameEngine {
         this.triggerCameraShake(20.0 * impactShakeMult);
         this.state.blocksDestroyed++;
         this.recordScore(ev.combo, 500);
-        if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
-          this.handleWin();
-          return;
-        }
+        if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') { this.handleWin(); return; }
       } else if (ev.type === 'shield_bounce') {
         this.powerUps.consumeShield();
         this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
@@ -389,13 +378,9 @@ export class GameEngine {
 
         if (isDestroy && block) {
           const cfg = BLOCK_COLORS[block.initialHealth] || BLOCK_COLORS[1];
-          // 1. Inward collapsing block sprite shrinking and pulled into black hole suction
           this.particles.spawnDestroyingBlock(block.x, block.y, block.w, block.h, block.initialHealth, cfg.bg[0] || color, cfg.border || color);
-          // 2. Full 48 neon debris particles with gravitational suction
           this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, true);
-
           if (isEmpSource && ev.epicenterX !== undefined && ev.epicenterY !== undefined) {
-            // 3. Directional explosive blast shrapnel propelled outward away from epicenter
             this.explosions.spawnNearBlockShatter(block.x, block.y, block.w, block.h, color, ev.epicenterX, ev.epicenterY);
           }
         } else if (!isDestroy) {
@@ -408,7 +393,6 @@ export class GameEngine {
 
         const baseShake = isEmpSource ? 5.5 : isDestroy ? 4.0 : isCrit ? 3.5 : 1.5;
         this.triggerCameraShake(baseShake * impactShakeMult);
-
         let pts = 50 * (1 + Math.floor(ev.combo / 3));
         let text = `+${pts}`;
         if (isCrit) {
@@ -422,10 +406,7 @@ export class GameEngine {
         }
         this.particles.addFloatingText(text, ev.hitX, ev.hitY, isCrit ? '#fbbf24' : color);
         this.recordScore(ev.combo, pts);
-        if (isDestroy && this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') {
-          this.handleWin();
-          return;
-        }
+        if (isDestroy && this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') { this.handleWin(); return; }
       } else if (ev.type === 'ball_lost') {
         this.triggerCameraShake(10.0);
         this.handleLifeLost();
@@ -462,19 +443,16 @@ export class GameEngine {
 
   private handleLifeLost() {
     if (this.state.status !== 'playing') return;
-
     this.state.lives--;
     this.callbacks.onLivesChange?.(this.state.lives);
     this.state.combo = 0;
     this.callbacks.onComboChange?.(0);
-
     if (this.state.lives <= 0) {
       this.state.status = 'gameover';
       this.audio.playGameOver();
       this.callbacks.onGameOver?.(this.state);
       return;
     }
-
     this.state.status = 'paused';
     const { ballRad } = this.applyUpgrades();
     const paddleX = this.tsPhysics.paddle.x;

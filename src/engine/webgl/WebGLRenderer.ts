@@ -180,21 +180,12 @@ export class WebGLRenderer {
       );
     }
 
-    // 3. Cosmic Black Hole Singularity Floor (Dedicated WebGL Texture with exact same draw)
+    // 3. Cosmic Black Hole Singularity Floor (Dedicated WebGL Texture)
     if (this.bhCtx && this.bhTexture && this.bhCanvas) {
       this.bhCtx.clearRect(0, 0, w, this.bhHeight);
       drawBlackHoleFloor(this.bhCtx, w, this.bhHeight, this.animTick);
       gl.bindTexture(gl.TEXTURE_2D, this.bhTexture);
-      gl.texSubImage2D(
-        gl.TEXTURE_2D,
-        0,
-        0,
-        0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        this.bhCanvas
-      );
-
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.bhCanvas);
       const spriteProg = this.shaders.getProgram('sprite');
       this.batcher.begin(spriteProg, this.bhTexture, w, h);
       this.batcher.pushSprite(0, h - this.bhHeight, w, this.bhHeight, 0, 0, 1, 1, 1, 1, 1, 1);
@@ -431,42 +422,14 @@ export class WebGLRenderer {
       for (const shard of explosions.shards) {
         const sSize = shard.size * 1.5;
         const [sr, sg, sb] = parseColorRgb(shard.color);
-        this.batcher.pushSprite(
-          shard.x - sSize / 2,
-          shard.y - sSize / 2,
-          sSize,
-          sSize,
-          whiteUV.u0,
-          whiteUV.v0,
-          whiteUV.u1,
-          whiteUV.v1,
-          sr,
-          sg,
-          sb,
-          shard.alpha,
-          shard.angle
-        );
+        this.batcher.pushSprite(shard.x - sSize / 2, shard.y - sSize / 2, sSize, sSize, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, sr, sg, sb, shard.alpha, shard.angle);
       }
 
       // Directional Shatter Chunks of Destroyed Near Blocks with Authentic Block Colors
       for (const chunk of explosions.shatterChunks) {
         if (chunk.delay > 0) continue;
         const [cr, cg, cb] = parseColorRgb(chunk.color);
-        this.batcher.pushSprite(
-          chunk.x - chunk.w / 2,
-          chunk.y - chunk.h / 2,
-          chunk.w,
-          chunk.h,
-          whiteUV.u0,
-          whiteUV.v0,
-          whiteUV.u1,
-          whiteUV.v1,
-          cr,
-          cg,
-          cb,
-          chunk.alpha,
-          chunk.angle
-        );
+        this.batcher.pushSprite(chunk.x - chunk.w / 2, chunk.y - chunk.h / 2, chunk.w, chunk.h, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, cr, cg, cb, chunk.alpha, chunk.angle);
       }
     }
 
@@ -476,12 +439,8 @@ export class WebGLRenderer {
     // 9. Draw Combat Particles via GPU Point Sprites
     if (particles.particles.length > 0) {
       const combatPoints = particles.particles.map((p) => ({
-        x: p.x,
-        y: p.y,
-        size: Math.max(3.0, p.size * 2.2),
-        r: p.r ?? 1.0,
-        g: p.g ?? 0.9,
-        b: p.b ?? 0.3,
+        x: p.x, y: p.y, size: Math.max(3.0, p.size * 2.2),
+        r: p.r ?? 1.0, g: p.g ?? 0.9, b: p.b ?? 0.3,
         a: Math.max(0.12, Math.min(1.0, p.alpha)),
       }));
       this.glParticles.renderPoints(this.shaders.getProgram('particle'), combatPoints, w, h);
@@ -494,9 +453,7 @@ function parseColorRgb(color: string): [number, number, number] {
     let hex = color.slice(1);
     if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
     const num = parseInt(hex, 16);
-    if (!isNaN(num)) {
-      return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
-    }
+    if (!isNaN(num)) return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
   }
   return [1.0, 0.6, 0.2];
 }
