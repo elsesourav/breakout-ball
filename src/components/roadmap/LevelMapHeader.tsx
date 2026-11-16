@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { Star, Settings } from 'lucide-react';
 import { CoreIcon } from '../common/CoreIcon';
 import { TopCoresBadge } from '../common/TopCoresBadge';
 import { DailyCollectStatus } from '../../services/currency';
 import { TOTAL_LEVELS } from './types';
+import { useGame } from '../../context/GameContext';
+import { soundManager } from '../../audio';
 
 interface LevelMapHeaderProps {
   displayCores: number;
@@ -23,6 +25,7 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
   onOpenShop,
   hazeRef,
 }) => {
+  const { setIsSettingsOpen } = useGame();
   const canShowFree =
     dailyStatus.canCollect ||
     (typeof window !== 'undefined' &&
@@ -31,12 +34,29 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
 
   return (
     <>
-      {/* ── Top Bar: Free Gift / Brand (Left) ── Star Count ── Cores Pill (Right) ── */}
-      <div className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-gradient-to-b from-[#050716]/95 via-[#06081c]/80 to-transparent pt-2.5 pb-4 px-3 sm:px-4 pointer-events-none">
-        <div className="w-full max-w-sm flex items-center justify-between gap-2">
-          {/* Left: Free Gift or Clean Brand Badge */}
-          <div className="flex items-center gap-2 pointer-events-auto">
-            {canShowFree ? (
+      {/* ── Top Bar: Stars & Optional Free (Left Stack) ── Cores Pill (Right) ── */}
+      <div className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-gradient-to-b from-[#050716]/95 via-[#06081c]/70 to-transparent pt-2.5 pb-4 px-3 sm:px-4 pointer-events-none">
+        <div className="w-full max-w-sm flex items-start justify-between gap-2">
+          {/* Top Left Stack: Stars Badge, then below it Free Collect button if available */}
+          <div className="flex flex-col items-start gap-1.5 pointer-events-auto">
+            {/* 1. Total Stars Badge */}
+            <div
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(24, 18, 5, 0.94) 100%)',
+                border: '1.2px solid rgba(251, 191, 36, 0.45)',
+                boxShadow: '0 0 12px rgba(251, 191, 36, 0.25)',
+              }}
+              className="h-9 flex items-center gap-1.5 px-3 rounded-full text-amber-300 font-tech font-bold text-xs select-none shadow-md"
+              title={`${totalStars} Stars Collected in Arcade`}
+            >
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+              <span className="text-xs font-black text-amber-300 tracking-wide">{totalStars}</span>
+              <span className="text-[9px] text-amber-400/70 font-normal">/{TOTAL_LEVELS * 3}</span>
+            </div>
+
+            {/* 2. Below Stars: Show Free Button only if free is available */}
+            {canShowFree && (
               <motion.button
                 type="button"
                 id="daily-free-collect-button"
@@ -50,66 +70,45 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                   boxShadow:
                     '0 0 14px rgba(0, 247, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
                 }}
-                className="h-9 px-2.5 sm:px-3 flex items-center gap-1.5 rounded-xl cursor-pointer select-none relative group overflow-hidden btn-shine-sweep"
+                className="h-8 px-2.5 flex items-center gap-1.5 rounded-xl cursor-pointer select-none relative group overflow-hidden btn-shine-sweep"
                 title="Claim Free Cores in Core Shop!"
               >
-                <span className="text-sm leading-none filter drop-shadow select-none">🎁</span>
-                <span className="font-tech font-black text-xs text-cyan-100 tracking-wider leading-none">
+                <span className="text-xs leading-none filter drop-shadow select-none">🎁</span>
+                <span className="font-tech font-black text-[11px] text-cyan-100 tracking-wider leading-none">
                   FREE
                 </span>
-                <CoreIcon size={12} variant="cyan" glow />
+                <CoreIcon size={11} variant="cyan" glow />
               </motion.button>
-            ) : (
-              <div
-                style={{
-                  background: 'linear-gradient(135deg, rgba(14, 25, 54, 0.85) 0%, rgba(8, 14, 38, 0.9) 100%)',
-                  border: '1px solid rgba(0, 247, 255, 0.3)',
-                }}
-                className="h-9 px-2.5 rounded-xl flex items-center gap-1.5 select-none shadow-sm"
-              >
-                <img
-                  src="/logo.png"
-                  alt="Breakout"
-                  className="w-4 h-4 rounded-full object-cover shadow-[0_0_6px_#00f7ff]"
-                />
-                <span
-                  style={{
-                    background: 'linear-gradient(90deg, #00f7ff 0%, #a855f7 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                  className="font-display font-black text-xs tracking-wider"
-                >
-                  BREAKOUT
-                </span>
-              </div>
             )}
           </div>
 
-          {/* Right Group: Star Counter + Top Cores Badge */}
-          <div className="flex items-center gap-2 pointer-events-auto">
-            {/* Star Counter */}
-            <div
-              style={{
-                background:
-                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(24, 18, 5, 0.94) 100%)',
-                border: '1.2px solid rgba(251, 191, 36, 0.45)',
-                boxShadow: '0 0 12px rgba(251, 191, 36, 0.25)',
-              }}
-              className="h-9 flex items-center gap-1.5 px-2.5 rounded-full text-amber-300 font-tech font-bold text-xs select-none"
-              title={`${totalStars} Stars Collected in Arcade`}
-            >
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
-              <span className="text-xs font-black text-amber-300 tracking-wide">{totalStars}</span>
-              <span className="text-[9px] text-amber-400/70 font-normal">/{TOTAL_LEVELS * 3}</span>
-            </div>
-
-            {/* Top Cores Badge */}
+          {/* Top Right: Cores Pill & Settings Icon Button */}
+          <div className="flex items-center gap-1.5 pointer-events-auto">
             <TopCoresBadge
               cores={displayCores}
               isPulsing={isPulsing}
               onOpenShop={onOpenShop}
             />
+            <motion.button
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setIsSettingsOpen(true);
+              }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(26, 18, 54, 0.95) 100%)',
+                border: '1.2px solid rgba(168, 85, 247, 0.45)',
+                boxShadow:
+                  '0 0 12px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+              }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-purple-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0"
+              title="System Settings"
+            >
+              <Settings className="w-4 h-4 text-purple-300" />
+            </motion.button>
           </div>
         </div>
       </div>

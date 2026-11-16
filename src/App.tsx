@@ -5,7 +5,7 @@ import { SideNavDock } from './components/navigation/SideNavDock';
 import { ArcadeView, ArenaView, ArmoryView, ProfileView, StudioView } from './components/views';
 import { LevelDesigner } from './components/designer';
 import { GameCanvas } from './components/gameplay';
-import { AlertModal, AuthModal, LevelModifierModal, LevelPreviewModal } from './components/modals';
+import { AlertModal, AuthModal, LevelModifierModal, LevelPreviewModal, SettingsModal } from './components/modals';
 import { AchievementToast, CyberToastContainer, GameLoadingScreen } from './components/common';
 import { usePageMeta } from './hooks/usePageMeta';
 
@@ -91,6 +91,7 @@ export const AppContent: React.FC = () => {
         {editingLevel && <LevelModifierModal />}
         <AlertModal />
         <AuthModal />
+        <SettingsModal />
         <AchievementToast />
         <CyberToastContainer />
       </main>

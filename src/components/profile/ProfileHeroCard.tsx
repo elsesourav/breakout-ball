@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User as UserIcon, Settings, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck, Pencil } from 'lucide-react';
+import { User as UserIcon, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck, Pencil } from 'lucide-react';
 import { soundManager } from '../../audio';
 
 interface ProfileHeroCardProps {
@@ -16,7 +16,7 @@ interface ProfileHeroCardProps {
   unlockedBadgesCount: number;
   totalBadgesCount: number;
   userCreatedLevelsCount: number;
-  onOpenSettings: () => void;
+  onOpenSettings?: () => void;
   onSectionSwitch: (section: 'badges' | 'leaderboard') => void;
   onSignIn: () => void;
   onCreateAccount: () => void;
@@ -31,7 +31,6 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
   unlockedBadgesCount,
   totalBadgesCount,
   userCreatedLevelsCount,
-  onOpenSettings,
   onSectionSwitch,
   onSignIn,
   onCreateAccount,
@@ -105,21 +104,6 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
           ) : (
             <p className="text-[11px] text-slate-400 font-ui truncate mt-0.5">Guest Player • Local Saves</p>
           )}
-        </div>
-
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => {
-              soundManager.play('click');
-              onOpenSettings();
-            }}
-            className="cyber-btn-settings"
-            title="System Settings"
-          >
-            <Settings className="w-3.5 h-3.5 text-cyan-400" />
-            <span>SETTINGS</span>
-          </button>
         </div>
       </div>
 

@@ -1,23 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '../../context/GameContext';
-import {
-  LogIn,
-  LogOut,
-  Trophy,
-  UserPlus,
-  ShieldCheck,
-  Mail,
-  Cloud,
-  Layers,
-  User as UserIcon,
-  Settings,
-  ArrowLeft,
-  Award,
-} from 'lucide-react';
+import { Trophy, Award } from 'lucide-react';
 import { OverallScoreLeaderboard } from '../leaderboard/OverallScoreLeaderboard';
 import { AchievementsList } from '../profile/AchievementsList';
-import { ProfileSettingsView } from '../profile/ProfileSettingsView';
 import { ProfileHeroCard } from '../profile/ProfileHeroCard';
 import { achievementManager } from '../../services/achievements';
 import { soundManager } from '../../audio';
@@ -32,15 +18,8 @@ export const ProfileView: React.FC = () => {
     setAuthMode,
     localProgress,
     userCreatedLevels,
-    logoutUser,
   } = useGame();
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return new URLSearchParams(window.location.search).has('settings');
-    }
-    return false;
-  });
   const [activeSection, setActiveSection] = useState<'badges' | 'leaderboard'>(() => {
     if (typeof window !== 'undefined') {
       const sp = new URLSearchParams(window.location.search);
@@ -90,7 +69,6 @@ export const ProfileView: React.FC = () => {
     const handleSwitch = (e: Event) => {
       const custom = e as CustomEvent<{ section: 'badges' | 'leaderboard' }>;
       if (custom.detail?.section) {
-        setIsSettingsOpen(false);
         setActiveSection(custom.detail.section);
       }
     };
@@ -126,12 +104,10 @@ export const ProfileView: React.FC = () => {
       cancelAnimationFrame(raf1);
       window.removeEventListener('resize', updateLayout);
     };
-  }, [isSettingsOpen, activeSection]);
+  }, [activeSection]);
 
   // Universal Wheel & Touch Coordinator: Body scrolls first, then table scrolls starting at docking point
   useEffect(() => {
-    if (isSettingsOpen) return;
-
     const outer = outerContainerRef.current;
     if (!outer) return;
 
@@ -261,7 +237,7 @@ export const ProfileView: React.FC = () => {
       outer.removeEventListener('touchmove', handleTouchMove);
       outer.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isSettingsOpen]);
+  }, []);
 
   const handleOuterScroll = () => {
     // Outer scroll handler; hard snapping removed to prevent glitching at boundaries
@@ -277,12 +253,6 @@ export const ProfileView: React.FC = () => {
     soundManager.play('click');
     setAuthMode('signup');
     setIsAuthModalOpen(true);
-  };
-
-  const handleSignOut = async () => {
-    await logoutUser();
-    setIsSettingsOpen(false);
-    setUnlockedBadgesCount(0);
   };
 
   const handleSectionSwitch = (section: 'badges' | 'leaderboard') => {
@@ -318,50 +288,31 @@ export const ProfileView: React.FC = () => {
         color: '#ffffff',
       }}
     >
-      {/* =========================================================================
-          VIEW 1: DEDICATED SETTINGS PAGE (Opened only when Settings button clicked)
-          ========================================================================= */}
-      {isSettingsOpen ? (
-        <ProfileSettingsView
-          onBack={() => setIsSettingsOpen(false)}
-          user={user}
-          displayName={displayName}
-          displayHandle={displayHandle}
-          providerLabel={providerLabel}
-          onSignOut={handleSignOut}
-          onSignIn={handleSignIn}
-          onCreateAccount={handleCreateAccount}
-        />
-      ) : (
-        /* =========================================================================
-            VIEW 2: MAIN PROFILE PAGE (Profile card, Stats, Sign-In/Up & Leaderboard/Badges)
-            ========================================================================= */
-        <div className="w-full max-w-sm flex flex-col pb-8">
-          {/* Top Page Header with Back to Arcade */}
-          <div className="w-full -mx-0 mb-1">
-            <PageHeaderWithBack
-              title="PILOT PROFILE"
-              subtitle="STATS & IDENTITY"
-            />
-          </div>
+      <div className="w-full max-w-sm flex flex-col pb-8">
+        {/* Top Page Header with Back to Arcade */}
+        <div className="w-full -mx-0 mb-1">
+          <PageHeaderWithBack
+            title="PILOT PROFILE"
+            subtitle="STATS & IDENTITY"
+          />
+        </div>
 
-          {/* 1. Hero Player Profile Card */}
-          <div ref={heroCardRef} className="w-full mt-2 mb-2.5">
-            <ProfileHeroCard
-              user={user}
-              displayName={displayName}
-              displayHandle={displayHandle}
-              providerLabel={providerLabel}
-              completedCount={completedCount}
-              unlockedBadgesCount={unlockedBadgesCount}
-              totalBadgesCount={totalBadgesCount}
-              userCreatedLevelsCount={userCreatedLevels.length}
-              onOpenSettings={() => setIsSettingsOpen(true)}
-              onSectionSwitch={handleSectionSwitch}
-              onSignIn={handleSignIn}
-              onCreateAccount={handleCreateAccount}
-            />
-          </div>
+        {/* 1. Hero Player Profile Card */}
+        <div ref={heroCardRef} className="w-full mt-2 mb-2.5">
+          <ProfileHeroCard
+            user={user}
+            displayName={displayName}
+            displayHandle={displayHandle}
+            providerLabel={providerLabel}
+            completedCount={completedCount}
+            unlockedBadgesCount={unlockedBadgesCount}
+            totalBadgesCount={totalBadgesCount}
+            userCreatedLevelsCount={userCreatedLevels.length}
+            onSectionSwitch={handleSectionSwitch}
+            onSignIn={handleSignIn}
+            onCreateAccount={handleCreateAccount}
+          />
+        </div>
 
           {/* 2. STICKY CATEGORY SWITCHER BAR (Locks smoothly at top: 0px without clipping) */}
           <div
@@ -475,7 +426,6 @@ export const ProfileView: React.FC = () => {
             </AnimatePresence>
           </div>
         </div>
-      )}
     </div>
   );
 };

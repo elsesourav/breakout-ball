@@ -49,6 +49,8 @@ interface GameContextType {
   hideAlert: () => void;
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
+  isSettingsOpen: boolean;
+  setIsSettingsOpen: (open: boolean) => void;
   authMode: 'signin' | 'signup';
   setAuthMode: (mode: 'signin' | 'signup') => void;
   startPlayLevel: (level: LevelData) => void;
@@ -131,6 +133,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [alertConfig, setAlertConfig] = useState<AlertConfig | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [isOpeningLevel, setIsOpeningLevel] = useState<boolean>(false);
@@ -470,7 +473,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localLevels, localProgress, onlineLevels, userCreatedLevels,
         settings, updateSettings, user, updateUser, leaderboards,
         alertConfig, showAlert, hideAlert,
-        isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode,
+        isAuthModalOpen, setIsAuthModalOpen, isSettingsOpen, setIsSettingsOpen, authMode, setAuthMode,
         startPlayLevel, openPreview, openDesigner, openModifier, closeModifier,
         saveUserLevel, deleteUserLevel, updateLevelPrivacy,
         isInitialLoading, isOpeningLevel, loadingLeaderboardLevelId,
