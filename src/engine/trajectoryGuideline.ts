@@ -65,13 +65,13 @@ export function calculateTrajectoryGuideline(
   const targetY = padTop - ballR;
 
   // 1. Guard against non-descending balls or balls already past the paddle horizon
-  // Must be strictly descending downwards (vy > 15) and located above paddle top
+  // "1 Always show the incoming path": strictly active whenever ball is descending downwards (vy > 15) and located above paddle top
   const distToPaddle = targetY - ball.y;
   const isDescending = ball.isActive && ball.vy > 15 && distToPaddle > 0;
 
-  if (!isDescending || distToPaddle > maxDistance) {
-    // When ball is moving upwards or out of range, smoothly dissolve alpha to 0
-    const lerpSpeed = 2.2;
+  if (!isDescending) {
+    // When ball is moving upwards or past the paddle horizon, smoothly dissolve alpha to 0
+    const lerpSpeed = 2.8;
     const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * lerpSpeed);
     return {
       guideline: {
@@ -138,13 +138,11 @@ export function calculateTrajectoryGuideline(
   const isHit = hitX >= padLeft - ballR && hitX <= padRight + ballR;
 
   // 4. Target Alpha Calculation
-  // ALWAYS show the incoming predictive trajectory when descending in range!
-  const fadeRange = Math.min(240, maxDistance * 0.35);
-  const distFactor = Math.min(1.0, Math.max(0.0, (maxDistance - distToPaddle) / fadeRange));
-  const targetAlpha = Math.max(0.5, distFactor);
+  // ALWAYS show the incoming predictive trajectory when descending!
+  const targetAlpha = 0.92;
 
-  // Smooth gradual fade-in (lerpSpeed 8.0 for responsive onset) and slow graceful fade-out dissolution (lerpSpeed 3.0)
-  const lerpSpeed = targetAlpha < currentFadeAlpha ? 3.0 : 8.0;
+  // Smooth gradual fade-in (lerpSpeed 8.0 for responsive onset) and slow graceful fade-out dissolution (lerpSpeed 2.8)
+  const lerpSpeed = targetAlpha < currentFadeAlpha ? 2.8 : 8.0;
   const nextFadeAlpha = Math.max(
     0.0,
     Math.min(1.0, currentFadeAlpha + (targetAlpha - currentFadeAlpha) * Math.min(1.0, dt * lerpSpeed))

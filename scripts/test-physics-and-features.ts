@@ -199,12 +199,12 @@ if (res3.guideline.incomingSegments.length > 0 || res3.guideline.outgoingSegment
 }
 console.log('✅ Ascending balls produce 0 segments (strictly NO horizontal lines).');
 
-// Ball 4 (Missing paddle): must NOT produce segments or visible red lines
+// Ball 4 (Descending, paddle not yet aligned): ALWAYS shows incoming predictive path down to paddle horizon, but isHit is false and outgoing is empty (NO red lines)
 const res4 = calculateTrajectoryGuideline(ball4Missing, testPaddle, 1152, 2048, 1, 0.5, 1/60);
-if (res4.guideline.visible || res4.guideline.isHit || res4.guideline.incomingSegments.length > 0) {
-  throw new Error('Missing ball produced guideline segments (red miss line bug)!');
+if (!res4.guideline.visible || res4.guideline.isHit || res4.guideline.incomingSegments.length === 0 || res4.guideline.outgoingSegments.length > 0) {
+  throw new Error('Ball 4 should always show incoming trajectory down to paddle plane without outgoing deflection');
 }
-console.log('✅ Misaligned balls produce 0 segments (strictly NO red miss lines).\n');
+console.log('✅ Descending balls always show incoming path; outgoing deflection appears only when paddle intercepts (NO red miss lines).\n');
 
 // 7. VERIFY BALL UPGRADE DEFINITIONS IN UI
 console.log('--- 7. Ball Upgrade Modules in UI ---');
