@@ -8,6 +8,7 @@ import { SpriteBatcher } from './SpriteBatcher';
 import { GLParticleSystem } from './GLParticleSystem';
 import { getBallTierFromUpgrades, getPaddleTierFromUpgrades } from '../../constants/visualPresets';
 import { currencyService } from '../../services/currency';
+import { ACCRETION_EMBERS, drawBlackHoleFloor } from '../draw/blackHoleDrawers';
 
 export class WebGLRenderer {
   private gl: WebGLRenderingContext | WebGL2RenderingContext;
@@ -21,6 +22,11 @@ export class WebGLRenderer {
   private backdropBuffer: WebGLBuffer | null = null;
   private animTick = 0;
   private shakeIntensity = 0;
+
+  private bhCanvas: HTMLCanvasElement | null = null;
+  private bhCtx: CanvasRenderingContext2D | null = null;
+  private bhTexture: WebGLTexture | null = null;
+  private readonly bhHeight = 220;
 
   constructor(
     gl: WebGLRenderingContext | WebGL2RenderingContext,
@@ -37,6 +43,35 @@ export class WebGLRenderer {
     this.glParticles = new GLParticleSystem(gl);
 
     this.initBackdropQuad();
+    this.initBlackHoleTexture(gl, width);
+  }
+
+  private initBlackHoleTexture(gl: WebGLRenderingContext | WebGL2RenderingContext, width: number) {
+    this.bhCanvas = document.createElement('canvas');
+    this.bhCanvas.width = width;
+    this.bhCanvas.height = this.bhHeight;
+    this.bhCtx = this.bhCanvas.getContext('2d', { alpha: true });
+
+    this.bhTexture = gl.createTexture();
+    if (this.bhTexture) {
+      gl.bindTexture(gl.TEXTURE_2D, this.bhTexture);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        width,
+        this.bhHeight,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        null
+      );
+    }
   }
 
   private initBackdropQuad() {
@@ -90,45 +125,96 @@ export class WebGLRenderer {
     }
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-    // 2. Draw Stars via GPU Point Sprites (1 draw call for 240 stars!)
+    // 2. Draw Stars & Black Hole Embers via GPU Point Sprites
+    const particleList: { x: number; y: number; size: number; r: number; g: number; b: number; a: number }[] = [];
+
     if (particles.stars.length > 0) {
-      const starPoints = particles.stars.map((s) => ({
-        x: s.x,
-        y: s.y,
-        size: s.size * 1.5,
-        r: 1.0,
-        g: 1.0,
-        b: 1.0,
-        a: Math.max(0.1, Math.min(1.0, s.alpha)),
-      }));
+      for (const s of particles.stars) {
+        particleList.push({
+          x: s.x,
+          y: s.y,
+          size: s.size * 1.5,
+          r: 1.0,
+          g: 1.0,
+          b: 1.0,
+          a: Math.max(0.1, Math.min(1.0, s.alpha)),
+        });
+      }
+    }
+
+    // 40 Relativistic Keplerian Black Hole Embers
+    const cx = w * 0.5;
+    const cy = h + 24;
+    const baseRx = Math.min(w * 0.44, 500);
+    const baseRy = 62;
+    for (let i = 0; i < ACCRETION_EMBERS.length; i++) {
+      const ember = ACCRETION_EMBERS[i];
+      const curAngle = ember.angle + this.animTick * ember.speed * 0.85;
+      const rX = baseRx * ember.radiusFactor;
+      const rY = baseRy * ember.radiusFactor * 0.82;
+      const px = cx + Math.cos(curAngle) * rX;
+      const py = cy + Math.sin(curAngle) * rY;
+      const isCyan = px < cx;
+      const depthFactor = (Math.sin(curAngle) + 1.2) / 2.2;
+      const doppler = isCyan ? 1.25 : 0.75;
+      const finalAlpha = Math.min(1.0, ember.baseAlpha * depthFactor * doppler);
+      particleList.push({
+        x: px,
+        y: py,
+        size: ember.size * (0.85 + depthFactor * 0.35) * 2.2,
+        r: isCyan ? (i % 2 === 0 ? 0.0 : 1.0) : 0.75,
+        g: isCyan ? (i % 2 === 0 ? 0.97 : 1.0) : 0.52,
+        b: isCyan ? 1.0 : 0.98,
+        a: finalAlpha,
+      });
+    }
+
+    if (particleList.length > 0) {
       this.glParticles.renderPoints(
         this.shaders.getProgram('particle'),
-        starPoints,
+        particleList,
         w,
         h
       );
     }
 
+    // 3. Cosmic Black Hole Singularity Floor (Dedicated WebGL Texture with exact same draw)
+    if (this.bhCtx && this.bhTexture && this.bhCanvas) {
+      this.bhCtx.clearRect(0, 0, w, this.bhHeight);
+      drawBlackHoleFloor(this.bhCtx, w, this.bhHeight, this.animTick);
+      gl.bindTexture(gl.TEXTURE_2D, this.bhTexture);
+      gl.texSubImage2D(
+        gl.TEXTURE_2D,
+        0,
+        0,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        this.bhCanvas
+      );
+
+      const spriteProg = this.shaders.getProgram('sprite');
+      this.batcher.begin(spriteProg, this.bhTexture, w, h);
+      this.batcher.pushSprite(0, h - this.bhHeight, w, this.bhHeight, 0, 0, 1, 1, 1, 1, 1, 1);
+      this.batcher.flush();
+    }
+
     if (!this.atlas.texture) return;
 
-    // 3. Begin Batched GPU Quad Rendering
+    // 4. Begin Batched GPU Quad Rendering (Atlas)
     const spriteProg = this.shaders.getProgram('sprite');
     this.batcher.begin(spriteProg, this.atlas.texture, w, h);
 
     const whiteUV = this.atlas.getUV('white_rect');
 
-    // 3.1. Cosmic Black Hole Singularity Floor
-    const bhUV = this.atlas.getUV('blackhole_floor');
-    this.batcher.pushSprite(0, h - 44, w, 44, bhUV.u0, bhUV.v0, bhUV.u1, bhUV.v1, 1.0, 1.0, 1.0, 0.9);
-
-    // 3.2. Bottom Forcefield Laser Barrier (Active Shield)
+    // 4.1. Bottom Forcefield Laser Barrier (Active Shield)
     if (powerUps && powerUps.hasActiveShield()) {
       const shieldY = h - 35;
       this.batcher.pushSprite(0, shieldY - 2, w, 4, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 0.2, 0.9, 0.6, 0.95);
       this.batcher.pushSprite(0, shieldY - 5, w, 10, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 0.1, 0.8, 0.5, 0.25);
     }
 
-    // 3.3. Active Laser Cannon Bolts
+    // 4.2. Active Laser Cannon Bolts
     if (powerUps && powerUps.lasers.length > 0) {
       for (const bolt of powerUps.lasers) {
         this.batcher.pushSprite(bolt.x - bolt.w / 2, bolt.y - bolt.h / 2, bolt.w, bolt.h, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 1.0, 0.0, 0.35, 0.9);
@@ -136,13 +222,22 @@ export class WebGLRenderer {
       }
     }
 
-    // 4. Draw All Alive Blocks in 1 Batched Pass
+    // 4.3. Draw All Alive Blocks in 1 Batched Pass
     for (let i = 0; i < blocks.length; i++) {
       const b = blocks[i];
       if (b.isDead || b.health <= 0) continue;
 
       const uv = this.atlas.getUV(`block_${b.health}`);
       const tint = b.hitAnim > 0 ? 1.0 + b.hitAnim * 0.6 : 1.0;
+
+      // Portal (health 7) recharge cooldown transparency
+      let alphaBlock = 1.0;
+      if (b.health === 7 && (b.portalRechargeTimer ?? 0) > 0) {
+        const ticksLeft = b.portalRechargeTimer!;
+        // Distinct dormant transparency during 3s recharge break (acts like an ethereal portal in cooldown)
+        alphaBlock = ticksLeft < 30 ? 0.22 + ((30 - ticksLeft) / 30) * 0.78 : 0.22;
+      }
+
       this.batcher.pushSprite(
         b.x,
         b.y,
@@ -155,8 +250,28 @@ export class WebGLRenderer {
         tint,
         tint,
         tint,
-        1.0
+        alphaBlock
       );
+
+      // Recharging portal: draw an inner pulsing cooldown energy line across the bottom of the portal
+      if (b.health === 7 && (b.portalRechargeTimer ?? 0) > 0) {
+        const progress = Math.max(0, 1.0 - (b.portalRechargeTimer! / 180));
+        const barW = (b.w - 16) * progress;
+        this.batcher.pushSprite(
+          b.x + 8,
+          b.y + b.h - 8,
+          barW,
+          3,
+          whiteUV.u0,
+          whiteUV.v0,
+          whiteUV.u1,
+          whiteUV.v1,
+          0.0,
+          0.97,
+          1.0,
+          0.85
+        );
+      }
     }
 
     // 5. Draw Paddle with Sub-frame State Interpolation
@@ -169,12 +284,15 @@ export class WebGLRenderer {
     const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
     const padTier = getPaddleTierFromUpgrades(padWidthLvl, padSpeedLvl);
     const paddleUV = this.atlas.getUV(`paddle_t${padTier}`);
+    const padMargin = 16;
+    const padSlotW = paddle.width + padMargin * 2;
+    const padSlotH = paddle.height + padMargin * 2;
 
     this.batcher.pushSprite(
-      renderPaddleX - paddle.width / 2,
-      paddle.y,
-      paddle.width,
-      paddle.height,
+      renderPaddleX - paddle.width / 2 - padMargin,
+      paddle.y - padMargin,
+      padSlotW,
+      padSlotH,
       paddleUV.u0,
       paddleUV.v0,
       paddleUV.u1,
@@ -222,13 +340,14 @@ export class WebGLRenderer {
 
       const ballKey = b.isMega ? 'ball_mega' : `ball_${ballSkin}`;
       const ballUV = this.atlas.getUV(ballKey);
-      const diam = b.radius * 2.4;
+      const ballMargin = 12;
+      const ballSlotSize = Math.ceil(b.radius * 2 + ballMargin * 2);
 
       this.batcher.pushSprite(
-        renderBallX - diam / 2,
-        renderBallY - diam / 2,
-        diam,
-        diam,
+        renderBallX - ballSlotSize / 2,
+        renderBallY - ballSlotSize / 2,
+        ballSlotSize,
+        ballSlotSize,
         ballUV.u0,
         ballUV.v0,
         ballUV.u1,

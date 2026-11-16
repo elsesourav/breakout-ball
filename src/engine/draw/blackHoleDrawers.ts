@@ -11,7 +11,7 @@
  * - Seamless bottom gradient to prevent any blank or abrupt cutoffs
  */
 
-interface AccretionEmber {
+export interface AccretionEmber {
   angle: number;
   radiusFactor: number;
   speed: number;
@@ -20,7 +20,7 @@ interface AccretionEmber {
 }
 
 // 40 deterministic embers for 60fps GC-free rendering
-const ACCRETION_EMBERS: AccretionEmber[] = Array.from({ length: 40 }, (_, i) => ({
+export const ACCRETION_EMBERS: AccretionEmber[] = Array.from({ length: 40 }, (_, i) => ({
   angle: (i * Math.PI * 2) / 40 + ((i * 13) % 7) * 0.08,
   radiusFactor: 0.55 + ((i * 17) % 35) / 80, // Stays strictly bounded within disk
   speed: 1.3 + ((i * 11) % 15) / 10,

@@ -234,33 +234,19 @@ export function detonateEmpExplosion(
         continue;
       }
       if (other.health >= 1 && other.health <= 5) {
-        other.health = Math.max(0, other.health - 2);
-        other.hitAnim = 1.0;
-        if (other.health <= 0) {
-          other.isDead = true;
-          state.remainingBreakable = Math.max(0, state.remainingBreakable - 1);
-          events.push({
-            type: 'block_destroy',
-            blockIndex: ob,
-            hitX: ox,
-            hitY: oy,
-            combo: ++state.combo,
-            source: 'emp',
-            epicenterX: hitCenterX,
-            epicenterY: hitCenterY,
-          });
-        } else {
-          events.push({
-            type: 'block_damage',
-            blockIndex: ob,
-            hitX: ox,
-            hitY: oy,
-            combo: state.combo,
-            source: 'emp',
-            epicenterX: hitCenterX,
-            epicenterY: hitCenterY,
-          });
-        }
+        other.health = 0;
+        other.isDead = true;
+        state.remainingBreakable = Math.max(0, state.remainingBreakable - 1);
+        events.push({
+          type: 'block_destroy',
+          blockIndex: ob,
+          hitX: ox,
+          hitY: oy,
+          combo: ++state.combo,
+          source: 'emp',
+          epicenterX: hitCenterX,
+          epicenterY: hitCenterY,
+        });
       }
     }
   }

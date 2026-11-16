@@ -3,7 +3,6 @@ import { drawBlockWithPreset } from '../draw/blockDrawers';
 import { drawPaddleWithPreset } from '../draw/paddleDrawers';
 import { drawBallWithPreset } from '../draw/ballDrawers';
 import { renderCustomPowerUpIcon } from '../draw/powerUpIconDrawers';
-import { drawBlackHoleFloor } from '../draw/blackHoleDrawers';
 import { PowerUpType } from '../powerUpTypes';
 
 export interface UVRect {
@@ -84,14 +83,16 @@ export class TextureAtlas {
     const blockTypes = [1, 2, 3, 4, 5, 6, 7, 8];
     for (const hp of blockTypes) {
       placeItem(`block_${hp}`, BLOCK_WIDTH, BLOCK_HEIGHT, (c, x, y) => {
+        c.save();
+        c.translate(x, y);
         drawBlockWithPreset(
           c,
           {
             index: 0,
             col: 0,
             row: 0,
-            x,
-            y,
+            x: 0,
+            y: 0,
             w: BLOCK_WIDTH,
             h: BLOCK_HEIGHT,
             health: hp,
@@ -101,67 +102,83 @@ export class TextureAtlas {
           },
           1
         );
+        c.restore();
       });
     }
 
     // 2. Bake Paddle Tiers (1, 2, 3)
     const paddleTiers = [1, 2, 3] as const;
+    const padMargin = 16;
+    const padSlotW = PADDLE_WIDTH + padMargin * 2;
+    const padSlotH = PADDLE_HEIGHT + padMargin * 2;
     for (const tier of paddleTiers) {
-      placeItem(`paddle_t${tier}`, PADDLE_WIDTH, PADDLE_HEIGHT, (c, x, y) => {
+      placeItem(`paddle_t${tier}`, padSlotW, padSlotH, (c, x, y) => {
+        c.save();
+        c.translate(x + padMargin, y + padMargin);
         drawPaddleWithPreset(
           c,
           {
-            x: x + PADDLE_WIDTH / 2,
-            y,
+            x: PADDLE_WIDTH / 2,
+            y: 0,
             width: PADDLE_WIDTH,
             height: PADDLE_HEIGHT,
             vx: 0,
-            targetX: x + PADDLE_WIDTH / 2,
+            targetX: PADDLE_WIDTH / 2,
           },
           1,
           { tier }
         );
+        c.restore();
       });
     }
 
     // 3. Bake Balls (cyan, fire, void, matrix, gold, mega)
     const ballSkins = ['cyan', 'fire', 'void', 'matrix', 'gold'];
-    const ballDiam = Math.ceil(BALL_RADIUS * 2.4);
+    const ballMargin = 12;
+    const ballSlotSize = Math.ceil(BALL_RADIUS * 2 + ballMargin * 2);
     for (const skin of ballSkins) {
-      placeItem(`ball_${skin}`, ballDiam, ballDiam, (c, x, y) => {
+      placeItem(`ball_${skin}`, ballSlotSize, ballSlotSize, (c, x, y) => {
+        c.save();
+        c.translate(x + ballSlotSize / 2, y + ballSlotSize / 2);
         drawBallWithPreset(
           c,
           {
-            x: x + ballDiam / 2,
-            y: y + ballDiam / 2,
+            x: 0,
+            y: 0,
             radius: BALL_RADIUS,
             isMega: false,
           },
           1
         );
+        c.restore();
       });
     }
     // Mega Ball
-    placeItem('ball_mega', ballDiam, ballDiam, (c, x, y) => {
+    placeItem('ball_mega', ballSlotSize, ballSlotSize, (c, x, y) => {
+      c.save();
+      c.translate(x + ballSlotSize / 2, y + ballSlotSize / 2);
       drawBallWithPreset(
         c,
         {
-          x: x + ballDiam / 2,
-          y: y + ballDiam / 2,
+          x: 0,
+          y: 0,
           radius: BALL_RADIUS * 1.3,
           isMega: true,
         },
         1,
         { isMega: true }
       );
+      c.restore();
     });
 
     // 4. Bake Power-Up Drop Icons
     const puTypes: PowerUpType[] = ['multiball', 'megaball', 'laser', 'slowmo', 'shield', 'expand'];
     for (const pt of puTypes) {
       placeItem(`pu_${pt}`, 32, 32, (c, x, y) => {
+        c.save();
         c.translate(x + 16, y + 16);
         renderCustomPowerUpIcon(c, pt, 14, '#ffffff');
+        c.restore();
       });
     }
 
@@ -178,11 +195,6 @@ export class TextureAtlas {
       c.beginPath();
       c.arc(x + 32, y + 32, 28, 0, Math.PI * 2);
       c.stroke();
-    });
-
-    // 7. Cosmic Black Hole Singularity Floor
-    placeItem('blackhole_floor', 256, 48, (c, x, y) => {
-      drawBlackHoleFloor(c, 256, 48, 0);
     });
 
     // 5. Upload atlas canvas to GPU WebGL Texture

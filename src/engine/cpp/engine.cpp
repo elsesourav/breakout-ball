@@ -390,34 +390,20 @@ void BreakoutEngine::detonateEmpReactor(int bIdx) {
             }
 
             if (other.health >= 1 && other.health <= 5) {
-                other.health--;
-                other.hitAnim = 1.0f;
-                if (other.health <= 0) {
-                    other.isDead = true;
-                    remainingBreakable = std::max(0, remainingBreakable - 1);
-                    combo++;
-                    NativeEvent dev;
-                    dev.type = 4; // block_destroy
-                    dev.blockIndex = (int)ob;
-                    dev.hitX = ox;
-                    dev.hitY = oy;
-                    dev.combo = combo;
-                    dev.source = 1;
-                    dev.epicenterX = hitCenterX;
-                    dev.epicenterY = hitCenterY;
-                    events.push_back(dev);
-                } else {
-                    NativeEvent hev;
-                    hev.type = 3; // block_damage
-                    hev.blockIndex = (int)ob;
-                    hev.hitX = ox;
-                    hev.hitY = oy;
-                    hev.combo = combo;
-                    hev.source = 1;
-                    hev.epicenterX = hitCenterX;
-                    hev.epicenterY = hitCenterY;
-                    events.push_back(hev);
-                }
+                other.health = 0;
+                other.isDead = true;
+                remainingBreakable = std::max(0, remainingBreakable - 1);
+                combo++;
+                NativeEvent dev;
+                dev.type = 4; // block_destroy
+                dev.blockIndex = (int)ob;
+                dev.hitX = ox;
+                dev.hitY = oy;
+                dev.combo = combo;
+                dev.source = 1;
+                dev.epicenterX = hitCenterX;
+                dev.epicenterY = hitCenterY;
+                events.push_back(dev);
             }
         }
     }

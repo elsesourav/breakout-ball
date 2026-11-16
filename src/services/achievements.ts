@@ -293,14 +293,12 @@ class AchievementManager {
     }
 
     this.claimedIds.add(id);
+    this.viewedIds.add(id);
     this.saveClaims(username);
+    this.saveViewed(username);
 
     // Credit cores to balance
     currencyService.addCores(ach.coreReward, username);
-
-    // Notify listeners so UI updates immediately
-    const updatedAch = { ...ach, unlocked: true, claimed: true };
-    this.listeners.forEach((fn) => fn(updatedAch));
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
@@ -315,7 +313,7 @@ class AchievementManager {
 
   public getPendingUnviewed(): Achievement | null {
     const all = this.getAll();
-    const unviewed = all.filter((a) => a.unlocked && !this.viewedIds.has(a.id));
+    const unviewed = all.filter((a) => a.unlocked && !a.claimed && !this.viewedIds.has(a.id));
     return unviewed.length > 0 ? unviewed[unviewed.length - 1] : null;
   }
 
