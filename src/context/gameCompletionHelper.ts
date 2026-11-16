@@ -46,6 +46,13 @@ export async function processLevelCompletion(
     if (time < 30) {
       achievementManager.unlock('speed_demon');
     }
+    if (starsEarned === 3 || newBestStars === 3) {
+      achievementManager.unlock('celestial_ace');
+    }
+    const num = parseInt(levelId, 10);
+    if (!isNaN(num) && num % 10 === 0) {
+      achievementManager.unlock('boss_slayer');
+    }
 
     const levelNum = parseInt(levelId, 10);
     if (!isNaN(levelNum)) {

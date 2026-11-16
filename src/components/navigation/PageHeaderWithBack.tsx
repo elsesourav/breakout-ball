@@ -11,6 +11,7 @@ interface PageHeaderWithBackProps {
   subtitle?: string;
   onBack?: () => void;
   rightSlot?: React.ReactNode;
+  hideSettings?: boolean;
 }
 
 export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
@@ -18,6 +19,7 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
   subtitle,
   onBack,
   rightSlot,
+  hideSettings = false,
 }) => {
   const { setActiveTab, setIsSettingsOpen } = useGame();
   const [cores, setCores] = React.useState<number>(() => currencyService.getBalance());
@@ -88,29 +90,31 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
           )}
         </div>
 
-        {/* Right: TopCoresBadge and Settings Button */}
+        {/* Right: TopCoresBadge and Optional Settings Button */}
         <div className="flex-shrink-0 flex items-center gap-1.5">
           {rightSlot || (
             <TopCoresBadge cores={cores} onOpenShop={handleOpenShop} />
           )}
-          <motion.button
-            type="button"
-            onClick={() => {
-              soundManager.playClick();
-              setIsSettingsOpen(true);
-            }}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
-            style={{
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(26, 18, 54, 0.95) 100%)',
-              border: '1.2px solid rgba(168, 85, 247, 0.45)',
-              boxShadow: '0 0 12px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-            }}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-purple-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0"
-            title="System Settings"
-          >
-            <Settings className="w-4 h-4 text-purple-300" />
-          </motion.button>
+          {!hideSettings && (
+            <motion.button
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setIsSettingsOpen(true);
+              }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(26, 18, 54, 0.95) 100%)',
+                border: '1.2px solid rgba(168, 85, 247, 0.45)',
+                boxShadow: '0 0 12px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+              }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-purple-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0"
+              title="System Settings"
+            >
+              <Settings className="w-4 h-4 text-purple-300" />
+            </motion.button>
+          )}
         </div>
       </div>
     </header>

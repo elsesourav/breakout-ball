@@ -13,12 +13,12 @@ interface ProfileHeroCardProps {
   displayHandle: string | null;
   providerLabel: string;
   completedCount: number;
-  unlockedBadgesCount: number;
-  totalBadgesCount: number;
+  unlockedAchievementsCount: number;
+  totalAchievementsCount: number;
   userCreatedLevelsCount: number;
   onOpenSettings?: () => void;
   onOpenLeaderboard?: () => void;
-  onSectionSwitch?: (section: 'badges' | 'leaderboard') => void;
+  onSectionSwitch?: (section: 'achievements' | 'leaderboard') => void;
   onSignIn: () => void;
   onCreateAccount: () => void;
 }
@@ -29,8 +29,8 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
   displayHandle,
   providerLabel,
   completedCount,
-  unlockedBadgesCount,
-  totalBadgesCount,
+  unlockedAchievementsCount,
+  totalAchievementsCount,
   userCreatedLevelsCount,
   onOpenLeaderboard,
   onSectionSwitch,
@@ -135,16 +135,16 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
         <div
           onClick={() => {
             soundManager.play('click');
-            onSectionSwitch?.('badges');
+            onSectionSwitch?.('achievements');
           }}
           className="bg-black/40 rounded-xl p-2 border border-cyan-500/20 cursor-pointer hover:border-amber-400/50 hover:bg-amber-950/20 transition-all active:scale-95"
         >
           <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
             <Award className="w-3.5 h-3.5 text-amber-400" />
-            <span>Badges</span>
+            <span>Achievements</span>
           </div>
           <p className="text-sm font-bold text-amber-300 mt-0.5 font-tech">
-            {unlockedBadgesCount} <span className="text-slate-400 text-[10px]">/ {totalBadgesCount}</span>
+            {unlockedAchievementsCount} <span className="text-slate-400 text-[10px]">/ {totalAchievementsCount}</span>
           </p>
         </div>
 

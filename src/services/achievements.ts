@@ -1,8 +1,10 @@
 import { Achievement } from '../types/game';
 import { backendApi } from './backendApi';
+import { currencyService } from './currency';
 
 const STORAGE_KEY = 'breakout_achievements_v1';
 const VIEWED_STORAGE_KEY = 'breakout_viewed_achievements_v1';
+const CLAIM_STORAGE_KEY = 'breakout_achievement_claims_v1';
 
 export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   {
@@ -12,6 +14,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'zap',
     category: 'combat',
     unlocked: false,
+    coreReward: 15,
   },
   {
     id: 'combo_5',
@@ -20,6 +23,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'flame',
     category: 'combat',
     unlocked: false,
+    coreReward: 20,
   },
   {
     id: 'combo_10',
@@ -28,6 +32,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'zap',
     category: 'combat',
     unlocked: false,
+    coreReward: 50,
   },
   {
     id: 'portal_hopper',
@@ -36,6 +41,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'compass',
     category: 'mastery',
     unlocked: false,
+    coreReward: 25,
   },
   {
     id: 'emp_detonator',
@@ -44,6 +50,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'target',
     category: 'combat',
     unlocked: false,
+    coreReward: 25,
   },
   {
     id: 'speed_demon',
@@ -52,6 +59,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'timer',
     category: 'speed',
     unlocked: false,
+    coreReward: 40,
   },
   {
     id: 'campaign_10',
@@ -60,6 +68,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'shield',
     category: 'mastery',
     unlocked: false,
+    coreReward: 60,
   },
   {
     id: 'apex_champion',
@@ -68,6 +77,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'crown',
     category: 'mastery',
     unlocked: false,
+    coreReward: 200,
   },
   {
     id: 'level_architect',
@@ -76,6 +86,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'palette',
     category: 'creative',
     unlocked: false,
+    coreReward: 35,
   },
   {
     id: 'arena_challenger',
@@ -84,12 +95,59 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     icon: 'globe',
     category: 'mastery',
     unlocked: false,
+    coreReward: 30,
+  },
+  {
+    id: 'laser_barrage',
+    title: 'Photon Striker',
+    description: 'Strike energy blocks with tactical laser cannons',
+    icon: 'zap',
+    category: 'combat',
+    unlocked: false,
+    coreReward: 30,
+  },
+  {
+    id: 'multiball_chaos',
+    title: 'Overclocked Swarm',
+    description: 'Unleash multi-ball frenzy with multiple simultaneous balls',
+    icon: 'flame',
+    category: 'mastery',
+    unlocked: false,
+    coreReward: 35,
+  },
+  {
+    id: 'shield_saviour',
+    title: 'Aegis Sentinel',
+    description: 'Deflect a draining ball with the bottom safety barrier',
+    icon: 'shield',
+    category: 'mastery',
+    unlocked: false,
+    coreReward: 30,
+  },
+  {
+    id: 'boss_slayer',
+    title: 'Titan Breaker',
+    description: 'Annihilate any Sector Boss stage',
+    icon: 'crown',
+    category: 'mastery',
+    unlocked: false,
+    coreReward: 75,
+  },
+  {
+    id: 'celestial_ace',
+    title: 'Celestial Ace',
+    description: 'Attain a flawless 3-star rating on any stage',
+    icon: 'target',
+    category: 'mastery',
+    unlocked: false,
+    coreReward: 50,
   },
 ];
 
 class AchievementManager {
   private unlockedIds: Set<string> = new Set();
   private viewedIds: Set<string> = new Set();
+  private claimedIds: Set<string> = new Set();
   private listeners: ((achievement: Achievement) => void)[] = [];
   private isRestrictedContext: boolean = false;
 
@@ -100,6 +158,7 @@ class AchievementManager {
   public loadForUser(username?: string) {
     const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
     const key = userKey ? `breakout_achievements_${userKey}` : STORAGE_KEY;
+    const claimKey = userKey ? `breakout_achievement_claims_${userKey}` : CLAIM_STORAGE_KEY;
     try {
       const raw = localStorage.getItem(key);
       if (raw) {
@@ -112,6 +171,17 @@ class AchievementManager {
       }
     } catch {
       this.load();
+    }
+
+    try {
+      const cRaw = localStorage.getItem(claimKey);
+      if (cRaw) {
+        this.claimedIds = new Set(JSON.parse(cRaw));
+      } else {
+        this.claimedIds = new Set();
+      }
+    } catch {
+      this.claimedIds = new Set();
     }
 
     // Recover unlocked trophies directly from SQLite database for authenticated player
@@ -135,9 +205,11 @@ class AchievementManager {
   public reset(): void {
     this.unlockedIds = new Set();
     this.viewedIds = new Set();
+    this.claimedIds = new Set();
     try {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(VIEWED_STORAGE_KEY);
+      localStorage.removeItem(CLAIM_STORAGE_KEY);
     } catch {}
   }
 
@@ -177,12 +249,68 @@ class AchievementManager {
     } catch {
       this.viewedIds = new Set(this.unlockedIds);
     }
+
+    try {
+      const cRaw = localStorage.getItem(CLAIM_STORAGE_KEY);
+      if (cRaw) {
+        this.claimedIds = new Set(JSON.parse(cRaw));
+      } else {
+        this.claimedIds = new Set();
+      }
+    } catch {
+      this.claimedIds = new Set();
+    }
   }
 
   private save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(this.unlockedIds)));
     } catch {}
+  }
+
+  private saveClaims(username?: string) {
+    const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
+    const claimKey = userKey ? `breakout_achievement_claims_${userKey}` : CLAIM_STORAGE_KEY;
+    try {
+      localStorage.setItem(claimKey, JSON.stringify(Array.from(this.claimedIds)));
+    } catch {}
+  }
+
+  public isClaimed(id: string): boolean {
+    return this.claimedIds.has(id);
+  }
+
+  public claimReward(id: string, username?: string): { success: boolean; reward: number } {
+    if (!this.unlockedIds.has(id)) {
+      return { success: false, reward: 0 };
+    }
+    if (this.claimedIds.has(id)) {
+      return { success: false, reward: 0 };
+    }
+    const ach = INITIAL_ACHIEVEMENTS.find((a) => a.id === id);
+    if (!ach || !ach.coreReward) {
+      return { success: false, reward: 0 };
+    }
+
+    this.claimedIds.add(id);
+    this.saveClaims(username);
+
+    // Credit cores to balance
+    currencyService.addCores(ach.coreReward, username);
+
+    // Notify listeners so UI updates immediately
+    const updatedAch = { ...ach, unlocked: true, claimed: true };
+    this.listeners.forEach((fn) => fn(updatedAch));
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('achievement_claimed', { detail: { id, reward: ach.coreReward } })
+      );
+      window.dispatchEvent(new Event('currency-changed'));
+      window.dispatchEvent(new Event('currency_balance_changed'));
+    }
+
+    return { success: true, reward: ach.coreReward };
   }
 
   public getPendingUnviewed(): Achievement | null {
@@ -202,6 +330,7 @@ class AchievementManager {
     return INITIAL_ACHIEVEMENTS.map((a) => ({
       ...a,
       unlocked: this.unlockedIds.has(a.id),
+      claimed: this.claimedIds.has(a.id),
     }));
   }
 

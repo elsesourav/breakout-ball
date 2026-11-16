@@ -292,6 +292,7 @@ export class GameEngine {
         const extraBalls = 1 + multiLvl; // Lvl 1: 2 extra, Lvl 2: 3 extra, ... Lvl 5: 6 extra
         this.tsPhysics.spawnExtraBalls(extraBalls);
         this.particles.spawnVictoryConfetti(CANVAS_WIDTH, CANVAS_HEIGHT);
+        this.audio.unlockAchievement('multiball_chaos');
       } else if (powerType === 'shield') {
         this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
       }

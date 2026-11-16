@@ -41,11 +41,44 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
 
   return (
     <>
-      {/* ── Top Bar: Free (Left) ── Stars (Center) ── Profile + Cores & Settings (Right) ── */}
+      {/* ── Top Bar: Profile & Free (Left) ── Stars (Center) ── Cores & Settings (Right) ── */}
       <div className="absolute top-0 inset-x-0 z-40 w-full flex justify-center bg-gradient-to-b from-[#050716]/95 via-[#06081c]/70 to-transparent pt-2.5 pb-4 px-3 sm:px-4 pointer-events-none">
         <div className="w-full max-w-sm flex items-start justify-between gap-1.5">
-          {/* Top Left: Free Collect button if available */}
-          <div className="flex items-center min-w-[36px] pointer-events-auto">
+          {/* Top Left: Profile Button (with Free Collect button underneath if available) */}
+          <div className="flex flex-col items-start gap-1.5 pointer-events-auto">
+            {/* 1. Profile / Pilot Avatar Button (Square / Squircle type) */}
+            <motion.button
+              type="button"
+              onClick={handleOpenProfile}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(12, 30, 60, 0.95) 100%)',
+                border: '1.2px solid rgba(0, 247, 255, 0.45)',
+                boxShadow: '0 0 10px rgba(0, 247, 255, 0.22)',
+              }}
+              className="w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all flex-shrink-0 overflow-hidden"
+              title="Pilot Profile"
+            >
+              {user.isLoggedIn && user.avatarUrl && !avatarErr ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.fullName || 'Pilot'}
+                  referrerPolicy="no-referrer"
+                  onError={() => setAvatarErr(true)}
+                  className="w-full h-full object-cover rounded-[8px]"
+                />
+              ) : user.isLoggedIn ? (
+                <span className="text-xs font-tech font-bold text-cyan-300">
+                  {(user.fullName || user.username || 'P').slice(0, 2).toUpperCase()}
+                </span>
+              ) : (
+                <UserIcon className="w-5 h-5 text-cyan-400 stroke-[2.2]" />
+              )}
+            </motion.button>
+
+            {/* 2. Free Collect button if available */}
             {canShowFree && (
               <motion.button
                 type="button"
@@ -67,15 +100,15 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                     'linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(14, 25, 54, 0.98) 100%)',
                   border: '1.4px solid rgba(0, 247, 255, 0.85)',
                 }}
-                className="h-8 px-2.5 flex items-center gap-1.5 rounded-xl cursor-pointer select-none relative group overflow-hidden btn-shine-sweep"
+                className="h-7.5 px-2.5 flex items-center gap-1.5 rounded-xl cursor-pointer select-none relative group overflow-hidden btn-shine-sweep"
                 title="Claim Free Cores in Core Shop!"
               >
                 <span className="text-xs leading-none filter drop-shadow select-none">🎁</span>
-                <span className="font-tech font-black text-[11px] text-cyan-100 tracking-wider leading-none">
+                <span className="font-tech font-black text-[10.5px] text-cyan-100 tracking-wider leading-none">
                   FREE
                 </span>
-                <span className="text-[9px] font-tech font-bold text-cyan-300 leading-none">CORES</span>
-                <CoreIcon size={11} variant="cyan" glow />
+                <span className="text-[8.5px] font-tech font-bold text-cyan-300 leading-none">CORES</span>
+                <CoreIcon size={10} variant="cyan" glow />
               </motion.button>
             )}
           </div>
@@ -98,68 +131,33 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
             </div>
           </div>
 
-          {/* Top Right: Profile Button + Cores Section (with Settings Button at Bottom) */}
-          <div className="flex items-start gap-1.5 pointer-events-auto">
-            {/* 1. Profile / Pilot Button */}
+          {/* Top Right: Cores Section with Settings Button at Bottom */}
+          <div className="flex flex-col items-end gap-3.5 sm:gap-4 pointer-events-auto">
+            <TopCoresBadge
+              cores={displayCores}
+              isPulsing={isPulsing}
+              onOpenShop={onOpenShop}
+            />
             <motion.button
               type="button"
-              onClick={handleOpenProfile}
+              onClick={() => {
+                soundManager.playClick();
+                setIsSettingsOpen(true);
+              }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               style={{
                 background:
-                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(12, 30, 60, 0.95) 100%)',
-                border: '1.2px solid rgba(0, 247, 255, 0.45)',
-                boxShadow: '0 0 10px rgba(0, 247, 255, 0.22)',
+                  'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(26, 18, 54, 0.95) 100%)',
+                border: '1.2px solid rgba(168, 85, 247, 0.45)',
+                boxShadow:
+                  '0 0 12px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
               }}
-              className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all flex-shrink-0 overflow-hidden"
-              title="Pilot Profile"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-purple-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0 mt-1"
+              title="System Settings"
             >
-              {user.isLoggedIn && user.avatarUrl && !avatarErr ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.fullName || 'Pilot'}
-                  referrerPolicy="no-referrer"
-                  onError={() => setAvatarErr(true)}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              ) : user.isLoggedIn ? (
-                <span className="text-xs font-tech font-bold text-cyan-300">
-                  {(user.fullName || user.username || 'P').slice(0, 2).toUpperCase()}
-                </span>
-              ) : (
-                <UserIcon className="w-4 h-4 text-cyan-400 stroke-[2.2]" />
-              )}
+              <Settings className="w-5.5 h-5.5 text-purple-300 stroke-[2.2]" />
             </motion.button>
-
-            {/* 2. Cores Section with Settings Button at Bottom */}
-            <div className="flex flex-col items-end gap-1.5">
-              <TopCoresBadge
-                cores={displayCores}
-                isPulsing={isPulsing}
-                onOpenShop={onOpenShop}
-              />
-              <motion.button
-                type="button"
-                onClick={() => {
-                  soundManager.playClick();
-                  setIsSettingsOpen(true);
-                }}
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
-                style={{
-                  background:
-                    'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(26, 18, 54, 0.95) 100%)',
-                  border: '1.2px solid rgba(168, 85, 247, 0.45)',
-                  boxShadow:
-                    '0 0 12px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-                }}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-purple-300 hover:text-white cursor-pointer active:scale-95 transition-all flex-shrink-0"
-                title="System Settings"
-              >
-                <Settings className="w-4 h-4 text-purple-300" />
-              </motion.button>
-            </div>
           </div>
         </div>
       </div>

@@ -242,7 +242,7 @@ export const buildTabMetadata = (tab: ActiveTab): PageMetadata => {
 
     case 'profile':
       return {
-        title: 'Pilot Profile // Stats, Badges & Achievements | Breakout Ball',
+        title: 'Pilot Profile // Stats & Achievements | Breakout Ball',
         description: 'View your pilot clearance rank, stars collected, campaign cores, and unlocked cyberpunk achievements in Breakout Ball.',
         keywords: ['pilot profile', 'player stats', 'achievements', 'breakout ranking', 'breakout ball'],
         canonicalUrl: '/profile',

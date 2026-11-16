@@ -77,6 +77,9 @@ export class AudioBridge {
       case 'shield_bounce':
         soundManager.playSideHit();
         synthAudio.playPaddleBounce();
+        if (!achievementManager.isRestricted()) {
+          achievementManager.unlock('shield_saviour');
+        }
         this.vibrate(70);
         break;
     }
@@ -85,6 +88,12 @@ export class AudioBridge {
   public playWin() {
     soundManager.playWin();
     this.vibrate([100, 50, 150]);
+  }
+
+  public unlockAchievement(id: string) {
+    if (!achievementManager.isRestricted()) {
+      achievementManager.unlock(id);
+    }
   }
 
   public playGameOver() {

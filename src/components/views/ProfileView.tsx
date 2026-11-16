@@ -30,19 +30,19 @@ export const ProfileView: React.FC = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, [user.avatarUrl, updateUser]);
 
-  const [unlockedBadgesCount, setUnlockedBadgesCount] = useState(() => {
+  const [unlockedAchievementsCount, setUnlockedAchievementsCount] = useState(() => {
     return achievementManager.getAll().filter((a) => a.unlocked).length;
   });
-  const totalBadgesCount = achievementManager.getAll().length || 8;
+  const totalAchievementsCount = achievementManager.getAll().length || 15;
 
   useEffect(() => {
     achievementManager.loadForUser(user.username);
-    setUnlockedBadgesCount(achievementManager.getAll().filter((a) => a.unlocked).length);
+    setUnlockedAchievementsCount(achievementManager.getAll().filter((a) => a.unlocked).length);
   }, [user.username]);
 
   useEffect(() => {
     const unsub = achievementManager.onUnlock(() => {
-      setUnlockedBadgesCount(achievementManager.getAll().filter((a) => a.unlocked).length);
+      setUnlockedAchievementsCount(achievementManager.getAll().filter((a) => a.unlocked).length);
     });
     return unsub;
   }, []);
@@ -92,6 +92,7 @@ export const ProfileView: React.FC = () => {
             title="PILOT PROFILE"
             subtitle="STATS & IDENTITY"
             onBack={() => setActiveTab('local')}
+            hideSettings={true}
           />
         </div>
 
@@ -103,8 +104,8 @@ export const ProfileView: React.FC = () => {
             displayHandle={displayHandle}
             providerLabel={providerLabel}
             completedCount={completedCount}
-            unlockedBadgesCount={unlockedBadgesCount}
-            totalBadgesCount={totalBadgesCount}
+            unlockedAchievementsCount={unlockedAchievementsCount}
+            totalAchievementsCount={totalAchievementsCount}
             userCreatedLevelsCount={userCreatedLevels.length}
             onOpenLeaderboard={() => setActiveTab('leaderboard')}
             onSignIn={handleSignIn}
@@ -112,7 +113,7 @@ export const ProfileView: React.FC = () => {
           />
         </div>
 
-        {/* 2. Achievements / Badges Showcase */}
+        {/* 2. Achievements Showcase */}
         <div className="w-full flex flex-col min-h-0">
           <AchievementsList />
         </div>

@@ -87,7 +87,7 @@ export const AchievementToast: React.FC = () => {
     setActiveTab('profile');
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
-        new CustomEvent('profile-switch-section', { detail: { section: 'badges' } })
+        new CustomEvent('profile-switch-section', { detail: { section: 'achievements' } })
       );
     }
   };

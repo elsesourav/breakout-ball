@@ -55,6 +55,8 @@ export interface Achievement {
   category: 'combat' | 'speed' | 'mastery' | 'creative';
   unlocked: boolean;
   unlockedAt?: number;
+  coreReward?: number;
+  claimed?: boolean;
 }
 
 export interface GameSettings {

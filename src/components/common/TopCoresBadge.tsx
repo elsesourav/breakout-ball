@@ -15,10 +15,12 @@ export const TopCoresBadge: React.FC<TopCoresBadgeProps> = ({
   onOpenShop,
   className = '',
 }) => {
-  // Format cores compactly (e.g. 1.25k if >= 10000, else toLocaleString)
+  // Format cores compactly if extremely large (e.g. 100k+), otherwise comma-formatted
   const formattedCores =
-    cores >= 10000
-      ? `${(cores / 1000).toFixed(1)}k`
+    cores >= 1000000
+      ? `${(cores / 1000000).toFixed(1)}M`
+      : cores >= 100000
+      ? `${(cores / 1000).toFixed(0)}k`
       : cores.toLocaleString();
 
   return (
@@ -44,19 +46,19 @@ export const TopCoresBadge: React.FC<TopCoresBadgeProps> = ({
           ? '0 0 16px rgba(0, 247, 255, 0.6), inset 0 0 8px rgba(0, 247, 255, 0.25)'
           : '0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 247, 255, 0.2)',
       }}
-      className={`h-9 pl-1 pr-1.5 py-0.5 rounded-full flex items-center gap-1.5 cursor-pointer select-none transition-all duration-200 hover:scale-105 active:scale-95 group pointer-events-auto ${className}`}
+      className={`h-8 w-[112px] sm:w-[118px] px-2.5 rounded-full flex items-center justify-between cursor-pointer select-none transition-all duration-200 hover:scale-105 active:scale-95 group pointer-events-auto flex-shrink-0 ${className}`}
     >
-      {/* Plus button before the number */}
+      {/* Plus icon on the left without border */}
       <span
-        className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center font-bold text-xs shadow-[0_0_8px_rgba(0,247,255,0.4)] group-hover:bg-cyan-400 group-hover:text-black transition-all flex-shrink-0"
+        className="text-cyan-300 group-hover:text-white transition-colors flex items-center justify-center flex-shrink-0"
         title="Add Cores / Open Shop"
       >
-        <Plus className="w-3.5 h-3.5 stroke-[3]" />
+        <Plus className="w-4 h-4 stroke-[3] group-hover:scale-110 transition-transform" />
       </span>
 
-      {/* Cores Value */}
+      {/* Cores Value (centered in fixed space) */}
       <span
-        className={`font-tech font-black text-sm tracking-wide transition-colors ${
+        className={`flex-1 text-center font-tech font-black text-sm tracking-wide transition-colors truncate px-1 ${
           isPulsing ? 'text-white' : 'text-cyan-100'
         }`}
         style={{
@@ -67,9 +69,9 @@ export const TopCoresBadge: React.FC<TopCoresBadgeProps> = ({
       </span>
 
       {/* Cores Icon on the right */}
-      <div className="flex items-center justify-center pl-0.5 flex-shrink-0">
+      <div className="flex items-center justify-center flex-shrink-0">
         <CoreIcon
-          size={18}
+          size={17}
           glow
           variant="cyan"
           className="transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110"
