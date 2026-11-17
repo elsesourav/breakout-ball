@@ -50,7 +50,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
     hasPlayedSoundRef.current = false;
 
     // 1. Calculate accurate start & target positions (icon after the number)
-    const currentOrigin = originRef.current;
+    const currentOrigin = origin;
     const sX = currentOrigin?.x ?? (typeof window !== 'undefined' ? window.innerWidth / 2 : 200);
     const sY = currentOrigin?.y ?? (typeof window !== 'undefined' ? window.innerHeight * 0.55 : 350);
     setStartPos({ x: sX, y: sY });
@@ -106,12 +106,13 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
     return () => {
       clearTimeout(completeTimer);
     };
-  }, [active, triggerKey, amount]);
+  }, [active, triggerKey, amount, origin]);
 
   if (!active || particles.length === 0) return null;
 
   return (
     <div
+      key={triggerKey ?? 'burst'}
       style={{ zIndex: 999999 }}
       className="fixed inset-0 pointer-events-none select-none overflow-hidden"
     >
@@ -124,7 +125,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
 
           return (
             <motion.div
-              key={p.id}
+              key={`${triggerKey ?? 'p'}-${p.id}`}
               initial={{
                 x: sX,
                 y: sY,

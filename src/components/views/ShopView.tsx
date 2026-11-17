@@ -130,6 +130,13 @@ export const ShopView: React.FC = () => {
 
   const handleShopClaim = useCallback(
     (amount: number, origin?: { x: number; y: number }) => {
+      // Immediately stop any currently running count-up animation, audio, or timers
+      if (countUpRef.current) {
+        cancelAnimationFrame(countUpRef.current);
+        countUpRef.current = null;
+      }
+      soundManager.stopCollectSequence();
+      setIsPulsing(false);
       if (landingTimerRef.current) clearTimeout(landingTimerRef.current);
       if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
 

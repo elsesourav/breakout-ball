@@ -195,7 +195,13 @@ export const ProfileView: React.FC = () => {
       : 'ElseSourav ID';
 
   const handleClaimSuccess = (reward: number, origin?: { x: number; y: number }) => {
-    // Clear any previous scheduled landing or pulse stop timers
+    // Immediately stop any currently running count-up animation, audio, or timers
+    if (countUpRef.current) {
+      cancelAnimationFrame(countUpRef.current);
+      countUpRef.current = null;
+    }
+    soundManager.stopCollectSequence();
+    setIsPulsing(false);
     if (landingTimerRef.current) clearTimeout(landingTimerRef.current);
     if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
 
@@ -211,6 +217,7 @@ export const ProfileView: React.FC = () => {
     } else {
       setFlyOrigin({ x: window.innerWidth / 2, y: window.innerHeight * 0.55 });
     }
+    // Launch fresh animation with new trigger key, overriding any previous burst
     setIsFlyingCores(true);
     setFlyTriggerKey(Date.now());
 
