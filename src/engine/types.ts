@@ -16,6 +16,7 @@ export interface BallState {
   lastHitBlockIndex?: number;
   lastHitBlockCooldown?: number;
   isMega?: boolean;
+  isLaunchAiming?: boolean;
   trail: { x: number; y: number; alpha: number; size: number }[];
 }
 

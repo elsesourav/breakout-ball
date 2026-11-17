@@ -169,8 +169,8 @@ export class ExplosionSystem {
     const dist = Math.hypot(dx, dy) || 1;
     const outwardAngle = Math.atan2(dy, dx);
 
-    // Stagger delay based on shockwave travel time
-    const delay = Math.max(0, Math.min(8, Math.floor(dist / 38)));
+    // Immediate simultaneous blast shatter along with inward collapse animation
+    const delay = 0;
 
     // Shatter into 12-16 authentic geometric block fragments
     const cols = 4;

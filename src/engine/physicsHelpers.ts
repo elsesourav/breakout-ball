@@ -1,4 +1,6 @@
 import { BallState, PaddleState, BlockEngineState, CollisionEvent, PhysicsWorldConfig } from './types';
+import { PowerUpManager } from './powerUps';
+import { ParticleSystem } from './particles';
 
 export function pairPortals(blocks: BlockEngineState[], portalIndices: number[]): void {
   const pairMap = new Map<number, number[]>();
@@ -35,6 +37,32 @@ export function pairPortals(blocks: BlockEngineState[], portalIndices: number[])
     const loneIdx = orphanIndices[orphanIndices.length - 1];
     blocks[loneIdx].portalPairIndex = undefined;
   }
+}
+
+export function computeLaunchTrajectory(
+  paddleX: number,
+  paddleY: number,
+  paddleVx: number = 0,
+  ballRad: number,
+  ballSpd: number,
+  arenaW: number
+): { ballX: number; ballY: number; vx: number; vy: number } {
+  const ballX = paddleX;
+  const ballY = paddleY - ballRad - 4;
+  const halfW = arenaW / 2;
+  const paddlePosRatio = (paddleX - halfW) / halfW;
+  const baseAngle = -Math.PI / 2 + (-paddlePosRatio * 0.42);
+  const velRatio = Math.max(-1, Math.min(1, paddleVx / 800));
+  const launchAngle = Math.max(
+    (-145 * Math.PI) / 180,
+    Math.min((-35 * Math.PI) / 180, baseAngle + velRatio * 0.12)
+  );
+  return {
+    ballX,
+    ballY,
+    vx: Math.cos(launchAngle) * ballSpd,
+    vy: Math.sin(launchAngle) * ballSpd,
+  };
 }
 
 export function resolvePaddleBounce(
@@ -253,5 +281,36 @@ export function detonateEmpExplosion(
         });
       }
     }
+  }
+}
+
+export function updateNonPlayingEntities(
+  powerUps: PowerUpManager,
+  particles: ParticleSystem,
+  dt: number,
+  isWin: boolean,
+  onBuffsChange?: (buffs: any[]) => void
+): void {
+  for (let l = powerUps.lasers.length - 1; l >= 0; l--) {
+    const bolt = powerUps.lasers[l];
+    bolt.y += bolt.vy * dt;
+    particles.spawnLaserTrail(bolt.x, bolt.y);
+    if (bolt.y < -50) powerUps.lasers.splice(l, 1);
+  }
+  for (let d = powerUps.drops.length - 1; d >= 0; d--) {
+    const drop = powerUps.drops[d];
+    drop.y += drop.vy * dt;
+    drop.angle += 0.05;
+    if (drop.y > 900) powerUps.drops.splice(d, 1);
+  }
+  if (isWin) {
+    const d = dt * 3.5, b = powerUps.buffs;
+    b.laser = Math.max(0, b.laser - d);
+    b.megaBall = Math.max(0, b.megaBall - d);
+    b.slowMo = Math.max(0, b.slowMo - d);
+    b.expand = Math.max(0, b.expand - d);
+    b.shield = Math.max(0, b.shield - d);
+    b.hasShield = b.shield > 0;
+    onBuffsChange?.(powerUps.getActiveBuffs());
   }
 }

@@ -210,7 +210,7 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
 
       {/* Subtle Ecosystem Credit */}
       <div className="mt-3 pt-2.5 border-t border-cyan-500/15 flex items-center justify-center gap-1.5 text-[11px] text-slate-400 font-mono">
-        <img src="/logo.png" alt="Breakout Ball" className="w-3.5 h-3.5 rounded-full object-cover shadow-[0_0_6px_#ff4500]" />
+        <img src="/favicon.svg" alt="Breakout Ball" className="w-3.5 h-3.5 object-contain" />
         <span>Breakout Ball V2 • Ecosystem by </span>
         <a href="https://elsesourav.com" target="_blank" rel="noreferrer" className="text-cyan-400 font-bold hover:underline">
           ElseSourav

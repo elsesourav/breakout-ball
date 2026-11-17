@@ -72,6 +72,7 @@ export interface GameSettings {
   gyroSensitivity: number; // 0.05 to 0.7
   wasmParticles?: boolean;
   ballSkin?: BallSkin;
+  showLaunchGuideline?: boolean;
 }
 
 export type ActiveTab = 'local' | 'online' | 'armory' | 'create' | 'profile' | 'shop' | 'leaderboard';

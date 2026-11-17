@@ -226,7 +226,7 @@ export class WebGLRenderer {
     // 4.4. Draw Destroying Blocks (Shrinking Inward & Black Hole Suction Animation)
     if (particles.destroyingBlocks.length > 0) {
       for (const db of particles.destroyingBlocks) {
-        const uv = this.atlas.getUV(db.initialHealth === 7 ? 'block_7_p1' : `block_${db.initialHealth}`);
+        const uv = this.atlas.getUV(db.initialHealth === 7 ? 'block_7_p1' : `block_${db.initialHealth || 1}`);
         const cx = db.x + db.w / 2, cy = db.y + db.h / 2, curW = db.w * db.scale, curH = db.h * db.scale;
         this.batcher.pushSprite(cx - curW / 2, cy - curH / 2, curW, curH, uv.u0, uv.v0, uv.u1, uv.v1, 1.25, 1.25, 1.25, db.alpha);
       }

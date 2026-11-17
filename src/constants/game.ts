@@ -45,6 +45,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
   gyroscope: false,
   gyroSensitivity: 0.4,
   wasmParticles: true,
+  showLaunchGuideline: true,
 };
 
 export const DEFAULT_USER: UserProfile = {

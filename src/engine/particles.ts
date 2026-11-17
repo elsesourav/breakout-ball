@@ -420,45 +420,7 @@ export class ParticleSystem {
     }
     ctx.restore();
 
-    // 3. Render Destroying Blocks (Canvas 2D)
-    if (this.destroyingBlocks.length > 0) {
-      ctx.save();
-      for (const db of this.destroyingBlocks) {
-        const cx = db.x + db.w / 2;
-        const cy = db.y + db.h / 2;
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.scale(db.scale, db.scale);
-        ctx.globalAlpha = db.alpha;
-
-        const rw = db.w;
-        const rh = db.h;
-        ctx.fillStyle = db.color;
-        ctx.beginPath();
-        if (typeof (ctx as any).roundRect === 'function') {
-          (ctx as any).roundRect(-rw / 2, -rh / 2, rw, rh, 4);
-        } else {
-          ctx.rect(-rw / 2, -rh / 2, rw, rh);
-        }
-        ctx.fill();
-
-        ctx.strokeStyle = db.borderColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        ctx.moveTo(-rw * 0.3, 0);
-        ctx.lineTo(rw * 0.3, 0);
-        ctx.stroke();
-
-        ctx.restore();
-      }
-      ctx.restore();
-    }
-
-    // 4. Render Floating Texts
+    // 3. Render Floating Texts
     if (this.floatingTexts.length > 0) {
       ctx.save();
       ctx.textAlign = 'center';

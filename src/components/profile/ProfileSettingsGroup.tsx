@@ -213,6 +213,32 @@ export const ProfileSettingsGroup: React.FC = () => {
           <span>Controls & Simulation</span>
         </div>
 
+        {/* Launch Aim Guideline Toggle */}
+        <div className="flex justify-between items-center py-0.5">
+          <div className="flex items-center gap-2.5">
+            <MousePointer className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+            <div className="flex flex-col">
+              <span className="font-settings-title text-xs font-bold text-white tracking-wider">
+                LAUNCH GUIDELINE
+              </span>
+              <span className="font-settings-desc text-[11px] text-slate-400 mt-0.5">
+                Laser aiming preview on initial launch
+              </span>
+            </div>
+          </div>
+          <CustomCyberSwitch
+            checked={settings.showLaunchGuideline !== false}
+            onChange={(checked) => updateSettings({ showLaunchGuideline: checked })}
+            variant="neon-cyan"
+            size="md"
+            showText={true}
+            onLabel="ON"
+            offLabel="OFF"
+            className="font-tech"
+            ariaLabel="Launch Guideline Toggle"
+          />
+        </div>
+
         {/* Gyroscope Tilt */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2.5">

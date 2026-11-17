@@ -5,7 +5,7 @@ import { PowerUpManager } from './powerUps';
 import { ExplosionSystem } from './explosionSystem';
 import { currencyService } from '../services/currency';
 import { getActiveDesignConfig, getBallTierFromUpgrades } from '../constants/visualPresets';
-import { drawBlockWithPreset } from './draw/blockDrawers';
+import { drawBlockWithPreset, drawArmored3DSlabBlock } from './draw/blockDrawers';
 import { drawPaddleWithPreset } from './draw/paddleDrawers';
 import { drawBallWithPreset } from './draw/ballDrawers';
 import { drawBlackHoleFloor } from './draw/blackHoleDrawers';
@@ -133,17 +133,19 @@ export class GameRenderer {
         ctx.translate(db.x + db.w / 2, db.y + db.h / 2);
         ctx.scale(db.scale, db.scale);
         ctx.globalAlpha = db.alpha;
-        ctx.fillStyle = db.color;
-        ctx.beginPath();
-        if (typeof (ctx as any).roundRect === 'function') {
-          (ctx as any).roundRect(-db.w / 2, -db.h / 2, db.w, db.h, 4);
-        } else {
-          ctx.rect(-db.w / 2, -db.h / 2, db.w, db.h);
-        }
-        ctx.fill();
-        ctx.strokeStyle = db.borderColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        drawArmored3DSlabBlock(ctx, {
+          index: 0,
+          col: 0,
+          row: 0,
+          x: -db.w / 2,
+          y: -db.h / 2,
+          w: db.w,
+          h: db.h,
+          health: db.initialHealth || 1,
+          initialHealth: db.initialHealth || 1,
+          isDead: false,
+          hitAnim: 0,
+        }, { animTick });
         ctx.restore();
       }
       ctx.restore();
@@ -186,7 +188,12 @@ export class GameRenderer {
 
     for (let i = 0; i < ballList.length; i++) {
       const b = ballList[i];
-      if (!b || !b.isActive || b.vy <= 0.1) continue;
+      if (!b || !b.isActive) continue;
+      if (b.isLaunchAiming) {
+        targetIdx = i;
+        break;
+      }
+      if (b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = interpolatedPaddle.y - bRad;
       const speed = Math.hypot(b.vx, b.vy);

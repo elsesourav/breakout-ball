@@ -14,6 +14,7 @@ import {
   PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BALL_SPEED, BLOCK_COLORS,
 } from '../constants/game';
 import { ScoreState, EngineCallbacks, CollisionEvent } from './types';
+import { computeLaunchTrajectory, updateNonPlayingEntities } from './physicsHelpers';
 
 export class GameEngine {
   private canvas: HTMLCanvasElement;
@@ -44,6 +45,10 @@ export class GameEngine {
 
   private currentLevel: LevelData | null = null;
   private callbacks: EngineCallbacks = {};
+  private isFirstLaunch = true;
+  private isBallLaunched = false;
+  private showLaunchGuideline = true;
+  public setShowLaunchGuideline(show: boolean) { this.showLaunchGuideline = show; }
 
   constructor(canvas: HTMLCanvasElement, callbacks: EngineCallbacks = {}) {
     this.canvas = canvas;
@@ -102,6 +107,8 @@ export class GameEngine {
     this.explosions.clear();
     this.powerUps.reset();
     this.accumulator = 0;
+    this.isFirstLaunch = true;
+    this.isBallLaunched = false;
 
     const breakables = level.blocks.filter((b) => (b.h >= 1 && b.h <= 5) || b.h === 8).length;
     this.state = {
@@ -115,7 +122,12 @@ export class GameEngine {
 
     this.tsPhysics.loadBlocks(level.blocks);
     this.tsPhysics.resetBall(initialBallX, initialBallY, 0, 0);
-    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, baseSpeed: ballSpd, speed: ballSpd });
+    if (this.tsPhysics.balls[0]) {
+      Object.assign(this.tsPhysics.balls[0], {
+        radius: ballRad, baseSpeed: ballSpd, speed: ballSpd,
+        isLaunchAiming: this.showLaunchGuideline,
+      });
+    }
 
     if (this.useWasm && this.wasmBridge.ready) {
       this.wasmBridge.initEngine(CANVAS_WIDTH, CANVAS_HEIGHT, padW, PADDLE_HEIGHT, ballRad, ballSpd, BLOCK_WIDTH, BLOCK_HEIGHT);
@@ -139,24 +151,25 @@ export class GameEngine {
   }
 
   public launchBall() {
+    if (this.isBallLaunched) return;
     if (this.state.status !== 'countdown' && this.state.status !== 'playing' && this.state.status !== 'paused') return;
+    this.isBallLaunched = true;
+    this.isFirstLaunch = false;
     this.state.status = 'playing';
+    if (this.tsPhysics.balls[0]) this.tsPhysics.balls[0].isLaunchAiming = false;
+
     const { ballRad, ballSpd } = this.applyUpgrades();
-    const paddle = this.tsPhysics.paddle;
-    const ballX = paddle.x, ballY = paddle.y - ballRad - 4;
-    const maxSpeed = paddle.maxSpeed || 1600;
-    const paddleVelRatio = Math.max(-1, Math.min(1, paddle.vx / maxSpeed));
-    const paddlePosRatio = (paddle.x - CANVAS_WIDTH / 2) / (CANVAS_WIDTH / 2);
-
-    let throwAngle = Math.abs(paddle.vx) > 30
-      ? -Math.PI / 2 + paddleVelRatio * 0.55
-      : -Math.PI / 2 + (-paddlePosRatio * 0.25) + (Math.random() - 0.5) * 0.1;
-
-    throwAngle = Math.max((-150 * Math.PI) / 180, Math.min((-30 * Math.PI) / 180, throwAngle));
-    const vx = Math.cos(throwAngle) * ballSpd, vy = Math.sin(throwAngle) * ballSpd;
+    const { ballX, ballY, vx, vy } = computeLaunchTrajectory(
+      this.tsPhysics.paddle.x, this.tsPhysics.paddle.y, this.tsPhysics.paddle.vx,
+      ballRad, ballSpd, CANVAS_WIDTH
+    );
 
     this.tsPhysics.resetBall(ballX, ballY, vx, vy);
-    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, baseSpeed: ballSpd, speed: ballSpd, prevX: ballX, prevY: ballY });
+    if (this.tsPhysics.balls[0]) {
+      Object.assign(this.tsPhysics.balls[0], {
+        radius: ballRad, baseSpeed: ballSpd, speed: ballSpd, prevX: ballX, prevY: ballY, isActive: true,
+      });
+    }
     if (this.useWasm && this.wasmBridge.ready) this.wasmBridge.resetBall(ballX, ballY, vx, vy);
   }
 
@@ -202,50 +215,34 @@ export class GameEngine {
     if (this.state.status !== 'playing') {
       const halfPadW = this.tsPhysics.paddle.width / 2;
       this.tsPhysics.paddle.prevX = this.tsPhysics.paddle.x;
-      const maxSpeed = this.tsPhysics.paddle.maxSpeed ?? 800;
-      const maxStep = maxSpeed * dt;
-      const dx = this.tsPhysics.paddle.targetX - this.tsPhysics.paddle.x;
-      const dist = Math.abs(dx);
-      if (dist > 0.01) {
-        const step = dist >= maxStep ? Math.sign(dx) * maxStep : dx;
-        this.tsPhysics.paddle.vx = step / dt;
-        this.tsPhysics.paddle.x += step;
+
+      if (this.state.status === 'countdown') {
+        const prev = this.tsPhysics.paddle.x;
+        this.tsPhysics.paddle.x = Math.max(halfPadW, Math.min(this.tsPhysics.config.width - halfPadW, this.tsPhysics.paddle.targetX));
+        this.tsPhysics.paddle.vx = (this.tsPhysics.paddle.x - prev) / Math.max(dt, 0.001);
       } else {
-        this.tsPhysics.paddle.x = this.tsPhysics.paddle.targetX;
-        this.tsPhysics.paddle.vx = 0;
+        const maxSpeed = this.tsPhysics.paddle.maxSpeed ?? 800;
+        const maxStep = maxSpeed * dt;
+        const dx = this.tsPhysics.paddle.targetX - this.tsPhysics.paddle.x;
+        const dist = Math.abs(dx);
+        if (dist > 0.01) {
+          const step = dist >= maxStep ? Math.sign(dx) * maxStep : dx;
+          this.tsPhysics.paddle.vx = step / dt;
+          this.tsPhysics.paddle.x += step;
+        } else {
+          this.tsPhysics.paddle.x = this.tsPhysics.paddle.targetX;
+          this.tsPhysics.paddle.vx = 0;
+        }
+        this.tsPhysics.paddle.x = Math.max(halfPadW, Math.min(this.tsPhysics.config.width - halfPadW, this.tsPhysics.paddle.x));
       }
-      this.tsPhysics.paddle.x = Math.max(halfPadW, Math.min(this.tsPhysics.config.width - halfPadW, this.tsPhysics.paddle.x));
+
       for (const b of this.tsPhysics.balls) {
         b.prevX = b.x; b.prevY = b.y;
         b.x = this.tsPhysics.paddle.x; b.y = this.tsPhysics.paddle.y - b.radius - 4;
         b.vx = 0; b.vy = 0; b.isActive = false;
+        b.isLaunchAiming = this.isFirstLaunch && this.showLaunchGuideline && this.state.status === 'countdown';
       }
-      // Fly remaining bullets off screen on complete/pause (never stuck/frozen)
-      for (let l = this.powerUps.lasers.length - 1; l >= 0; l--) {
-        const bolt = this.powerUps.lasers[l];
-        bolt.y += bolt.vy * dt;
-        this.particles.spawnLaserTrail(bolt.x, bolt.y);
-        if (bolt.y < -50) this.powerUps.lasers.splice(l, 1);
-      }
-      // Continue falling power-up drops off screen
-      for (let d = this.powerUps.drops.length - 1; d >= 0; d--) {
-        const drop = this.powerUps.drops[d];
-        drop.y += drop.vy * dt; drop.angle += 0.05;
-        if (drop.y > CANVAS_HEIGHT + 60) this.powerUps.drops.splice(d, 1);
-      }
-      // Smoothly deactivate active powers on win
-      if (this.state.status === 'win') {
-        const d = dt * 3.5, b = this.powerUps.buffs;
-        b.laser = Math.max(0, b.laser - d); b.megaBall = Math.max(0, b.megaBall - d);
-        b.slowMo = Math.max(0, b.slowMo - d); b.expand = Math.max(0, b.expand - d);
-        b.shield = Math.max(0, b.shield - d); b.hasShield = b.shield > 0;
-        this.tsPhysics.isMegaBall = false; this.tsPhysics.hasShield = false;
-        const baseW = PADDLE_WIDTH * (1 + (currencyService.getUpgradeLevel('paddle_width') - 1) * 0.08);
-        if (this.tsPhysics.paddle.width > baseW) {
-          this.tsPhysics.paddle.width = Math.max(baseW, this.tsPhysics.paddle.width - (this.tsPhysics.paddle.width - baseW) * dt * 4.0);
-        }
-        this.callbacks.onBuffsChange?.(this.powerUps.getActiveBuffs());
-      }
+      updateNonPlayingEntities(this.powerUps, this.particles, dt, this.state.status === 'win', this.callbacks.onBuffsChange);
       this.particles.update(CANVAS_WIDTH, CANVAS_HEIGHT);
       this.explosions.update(CANVAS_WIDTH, CANVAS_HEIGHT);
       return;
@@ -355,15 +352,20 @@ export class GameEngine {
         this.particles.addFloatingText('🌀 PORTAL WARP', ev.hitX, ev.hitY, '#00f7ff');
         this.triggerCameraShake(2.0);
       } else if (ev.type === 'emp_explode') {
-        const bw = this.tsPhysics.config.blockWidth, bh = this.tsPhysics.config.blockHeight;
+        const block = this.tsPhysics.blocks[ev.blockIndex];
+        const bw = block ? block.w : this.tsPhysics.config.blockWidth;
+        const bh = block ? block.h : this.tsPhysics.config.blockHeight;
+        const bx = block ? block.x : ev.hitX - bw / 2;
+        const by = block ? block.y : ev.hitY - bh / 2;
+        const cfg = BLOCK_COLORS[8] || { bg: ['#ff3b00', '#ff8800'], border: '#ffaa00' };
+
         this.explosions.spawnExplosion(ev.hitX, ev.hitY, bw * 2.5);
-        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, '#ff7700', true);
-        this.particles.spawnDestroyingBlock(ev.hitX - bw / 2, ev.hitY - bh / 2, bw, bh, 8, '#ff3b00', '#ffaa00');
+        this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, cfg.border, true);
+        this.particles.spawnDestroyingBlock(bx, by, bw, bh, 8, cfg.bg[0], cfg.border);
         this.particles.addFloatingText('💥 EMP DETONATION!', ev.hitX, ev.hitY, '#ff3b00');
         this.triggerCameraShake(20.0 * impactShakeMult);
         this.state.blocksDestroyed++;
         this.recordScore(ev.combo, 500);
-        if (this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') { this.handleWin(); return; }
       } else if (ev.type === 'shield_bounce') {
         this.powerUps.consumeShield();
         this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
@@ -398,7 +400,6 @@ export class GameEngine {
         }
         this.particles.addFloatingText(text, ev.hitX, ev.hitY, isCrit ? '#fbbf24' : color);
         this.recordScore(ev.combo, pts);
-        if (isDestroy && this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') { this.handleWin(); return; }
       } else if (ev.type === 'ball_lost') {
         this.triggerCameraShake(10.0);
         this.handleLifeLost();
@@ -414,7 +415,9 @@ export class GameEngine {
     }
     this.state.blocksDestroyed = Math.max(this.state.blocksDestroyed, deadCount);
     this.tsPhysics.remainingBreakable = remCount;
-    if (remCount <= 0 && this.state.status === 'playing') { this.handleWin(); return; }
+    if (remCount <= 0 && this.state.status === 'playing') {
+      this.handleWin();
+    }
 
     // 5. Update Ball Motion Trails
     for (const b of this.tsPhysics.balls) {
@@ -453,18 +456,19 @@ export class GameEngine {
       return;
     }
     this.state.status = 'paused';
+    this.isBallLaunched = false;
     const { ballRad } = this.applyUpgrades();
     const paddleX = this.tsPhysics.paddle.x, resetY = this.tsPhysics.paddle.y - ballRad - 4;
     this.tsPhysics.paddle.prevX = paddleX;
     this.tsPhysics.resetBall(paddleX, resetY, 0, 0);
-    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, prevX: paddleX, prevY: resetY, isMega: false });
+    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, prevX: paddleX, prevY: resetY, isMega: false, isLaunchAiming: false });
     if (this.useWasm && this.wasmBridge.ready) {
       this.wasmBridge.resetBall(paddleX, resetY, 0, 0);
       this.wasmBridge.setModifiers(false, false, this.tsPhysics.ballImpactLevel, this.tsPhysics.paddle.maxSpeed || 800);
     }
 
     setTimeout(() => {
-      if (this.state.lives > 0 && (this.state.status === 'paused' || this.state.status === 'countdown')) this.launchBall();
+      if (this.state.lives > 0 && this.state.status === 'paused') this.launchBall();
     }, 700);
   }
 

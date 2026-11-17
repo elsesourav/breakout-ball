@@ -169,8 +169,9 @@ export const GameCanvas: React.FC = () => {
     if (engineRef.current) {
       engineRef.current.setVibrate(settings.vibrate);
       engineRef.current.setBallSkin(settings.ballSkin);
+      engineRef.current.setShowLaunchGuideline(settings.showLaunchGuideline !== false);
     }
-  }, [settings.vibrate, settings.ballSkin]);
+  }, [settings.vibrate, settings.ballSkin, settings.showLaunchGuideline]);
 
   // Initialize Engine & Level (strictly bound to selectedLevel.id and attemptId)
   useEffect(() => {
@@ -212,7 +213,9 @@ export const GameCanvas: React.FC = () => {
 
     engine.setVibrate(settings.vibrate);
     engine.setBallSkin(settings.ballSkin);
+    engine.setShowLaunchGuideline(settings.showLaunchGuideline !== false);
     engineRef.current = engine;
+    if (typeof window !== 'undefined') (window as any).__gameEngine = engine;
 
     let t1: ReturnType<typeof setTimeout> | undefined;
     let t2: ReturnType<typeof setTimeout> | undefined;
@@ -372,10 +375,10 @@ export const GameCanvas: React.FC = () => {
     }
     processPointerPosition(e.clientX);
 
-    // Tap to launch immediately if ball is resting on paddle
+    // Tap to launch immediately if ball is resting on paddle after death, NOT during initial countdown
     if (
       engineRef.current &&
-      (engineRef.current.state.status === 'paused' || engineRef.current.state.status === 'countdown')
+      engineRef.current.state.status === 'paused'
     ) {
       engineRef.current.launchBall();
     }

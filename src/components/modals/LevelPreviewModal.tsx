@@ -159,19 +159,25 @@ export const LevelPreviewModal: React.FC = () => {
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="relative flex items-center justify-center flex-shrink-0">
               <img
-                src="/logo.png"
-                alt="Breakout Comet"
-                className="w-6 h-6 rounded-full object-cover shadow-[0_0_10px_#ff4500]"
+                src="/favicon.svg"
+                alt="Breakout Ball"
+                className="w-6 h-6 object-contain"
               />
-              <div className="absolute inset-0 rounded-full border border-orange-400/40 pointer-events-none" />
             </div>
             <div className="flex flex-col min-w-0">
-              <span
-                className="font-display font-black text-sm tracking-wider uppercase truncate"
-                style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.45)' }}
-              >
-                {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
-              </span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span
+                  className="font-display font-black text-sm tracking-wider uppercase truncate"
+                  style={{ color: '#00f7ff', textShadow: '0 0 10px rgba(0, 247, 255, 0.45)' }}
+                >
+                  {isCampaign ? `LEVEL ${selectedLevel.id}` : selectedLevel.name}
+                </span>
+                {isCampaign && selectedLevel.name && selectedLevel.name.replace(/^Level \d+:\s*/i, '').trim() !== `Level ${selectedLevel.id}` && (
+                  <span className="font-tech text-xs text-slate-300 font-bold truncate">
+                    • {selectedLevel.name.replace(/^Level \d+:\s*/i, '').trim()}
+                  </span>
+                )}
+              </div>
               {!isCampaign && (
                 <div className="flex items-center gap-2 mt-0.5">
                   {selectedLevel.creator && (
@@ -210,7 +216,7 @@ export const LevelPreviewModal: React.FC = () => {
 
         {/* Game Canvas Preview Container */}
         <div
-          className="relative w-full rounded-xl overflow-hidden border border-cyan-500/30 bg-[#050716] shadow-[0_0_20px_rgba(0,0,0,0.8)] flex-shrink-0"
+          className="relative w-full rounded-xl overflow-hidden border border-cyan-500/25 bg-[#030514] shadow-[0_0_15px_rgba(0,0,0,0.6)] flex-shrink-0"
           style={{ width: '100%', height: '160px', minHeight: '160px' }}
         >
           <canvas
@@ -220,8 +226,8 @@ export const LevelPreviewModal: React.FC = () => {
             style={{ width: '100%', height: '160px', display: 'block' }}
           />
 
-          {/* Bottom HUD Overlay on Canvas */}
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent px-3 py-1.5 flex items-center justify-between border-t border-white/10">
+          {/* Minimalist Bottom HUD Overlay on Canvas */}
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#030514]/90 via-[#030514]/60 to-transparent px-3 py-1 flex items-center justify-between border-t border-cyan-500/15">
             {/* Status */}
             <div className="flex items-center gap-1">
               <span

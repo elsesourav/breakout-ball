@@ -1,45 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#0c1735" />
-      <stop offset="100%" stop-color="#030408" />
-    </radialGradient>
-    <linearGradient id="comet" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#ff3366" />
-      <stop offset="50%" stop-color="#ff9900" />
-      <stop offset="100%" stop-color="#00f7ff" />
-    </linearGradient>
-    <radialGradient id="ballGlow" cx="40%" cy="40%" r="60%">
+    <!-- Radiant spherical 3D ball gradient -->
+    <radialGradient id="breakoutSphere" cx="35%" cy="32%" r="65%">
       <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="45%" stop-color="#ff9900" />
-      <stop offset="90%" stop-color="#ff2200" />
-      <stop offset="100%" stop-color="#990000" />
+      <stop offset="25%" stop-color="#00f7ff" />
+      <stop offset="60%" stop-color="#0284c7" />
+      <stop offset="85%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
     </radialGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
+
+    <!-- Warm energy core variant -->
+    <radialGradient id="energyCore" cx="36%" cy="34%" r="62%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="30%" stop-color="#ffb703" />
+      <stop offset="65%" stop-color="#fb8500" />
+      <stop offset="88%" stop-color="#d90429" />
+      <stop offset="100%" stop-color="#590d22" />
+    </radialGradient>
+
+    <!-- Cyber aura soft glow filter -->
+    <filter id="softGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- Base chassis -->
-  <rect width="64" height="64" rx="16" fill="url(#bg)" stroke="#00f7ff" stroke-opacity="0.5" stroke-width="2"/>
+  <!-- Outer ambient atmospheric pulse aura (Centered) -->
+  <circle cx="32" cy="32" r="26" fill="#00f7ff" opacity="0.18" filter="url(#softGlow)" />
 
-  <!-- Orbital grid lines -->
-  <circle cx="32" cy="32" r="26" fill="none" stroke="#00f7ff" stroke-opacity="0.15" stroke-dasharray="3,3" />
+  <!-- High-tech cyan orbital reticle ring -->
+  <circle cx="32" cy="32" r="27.5" fill="none" stroke="#00f7ff" stroke-width="1.2" stroke-dasharray="6,4" opacity="0.65" />
 
-  <!-- Comet Tail Streamers -->
-  <path d="M12 50 Q 24 40 34 28" stroke="url(#comet)" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.6"/>
-  <path d="M16 54 Q 28 44 38 32" stroke="#ff0055" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.5"/>
-  <path d="M8 46 Q 20 36 30 24" stroke="#ffaa00" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.4"/>
+  <!-- Main 3D Spherical Breakout Ball (Centered, No Background, No Fire Streamers) -->
+  <circle cx="32" cy="32" r="22" fill="url(#energyCore)" filter="url(#softGlow)" />
 
-  <!-- Fiery Breakout Ball -->
-  <circle cx="38" cy="24" r="13" fill="#ff4400" filter="url(#glow)" opacity="0.8"/>
-  <circle cx="38" cy="24" r="11" fill="url(#ballGlow)"/>
-  <!-- Specular highlight -->
-  <ellipse cx="35" cy="20" rx="3.5" ry="2" fill="#ffffff" opacity="0.85"/>
+  <!-- Inner Cyber Energy Flux Ring -->
+  <ellipse cx="32" cy="32" rx="21.5" ry="7.5" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.45" transform="rotate(-20 32 32)" />
 
-  <!-- Neon cyber sparkles -->
-  <circle cx="50" cy="14" r="1.5" fill="#00f7ff"/>
-  <circle cx="55" cy="28" r="1.2" fill="#ffaa00"/>
-  <circle cx="26" cy="40" r="1.4" fill="#ff0077"/>
+  <!-- Specular 3D Glass Light Reflections -->
+  <ellipse cx="25" cy="23" rx="6.5" ry="3.8" transform="rotate(-30 25 23)" fill="#ffffff" opacity="0.9" />
+  <circle cx="21" cy="27" r="1.4" fill="#ffffff" opacity="0.75" />
+
+  <!-- Core Neon Plasma Sparkles -->
+  <circle cx="48" cy="18" r="1.6" fill="#00f7ff" />
+  <circle cx="50" cy="42" r="1.3" fill="#ffb703" />
+  <circle cx="15" cy="44" r="1.4" fill="#00f7ff" />
 </svg>

@@ -61,6 +61,98 @@ export function getTrajectoryOutgoingLength(level: number): number {
 export const getTrajectoryMaxDistance = getTrajectoryDetectionRadius;
 
 /**
+ * Calculates predictive launch aiming guideline projecting upwards from paddle into arena
+ */
+export function calculateLaunchAimGuideline(
+  paddle: PaddleState,
+  ball: BallState,
+  arenaW: number,
+  _arenaH: number,
+  detectionRadius: number,
+  outgoingLength: number
+): { guideline: TrajectoryGuideline; nextFadeAlpha: number } {
+  const ballR = ball.radius || 10;
+  const startX = paddle.x;
+  const startY = paddle.y - ballR - 4;
+  const minX = ballR;
+  const maxX = arenaW - ballR;
+
+  // Dynamic launch angle based on paddle position and movement
+  const halfW = arenaW / 2;
+  const paddlePosRatio = (paddle.x - halfW) / halfW;
+  const baseAngle = -Math.PI / 2 + (-paddlePosRatio * 0.42);
+  const velRatio = Math.max(-1, Math.min(1, (paddle.vx || 0) / 800));
+  const launchAngle = Math.max(
+    (-145 * Math.PI) / 180,
+    Math.min((-35 * Math.PI) / 180, baseAngle + velRatio * 0.12)
+  );
+
+  let curVx = Math.cos(launchAngle);
+  let curVy = Math.sin(launchAngle); // Negative (upwards)
+  let curX = startX;
+  let curY = startY;
+
+  const incomingSegments: TrajectorySegment[] = [];
+  let remainingDist = 580;
+  let safety = 6;
+
+  while (safety-- > 0 && remainingDist > 10 && curY > 15) {
+    let timeToWall = Infinity;
+    let wallX = curX;
+
+    if (curVx > 0.001) {
+      timeToWall = (maxX - curX) / curVx;
+      wallX = maxX;
+    } else if (curVx < -0.001) {
+      timeToWall = (minX - curX) / curVx;
+      wallX = minX;
+    }
+
+    const timeToCeiling = (15 - curY) / curVy;
+    const earliestTime = Math.min(timeToWall, timeToCeiling);
+
+    if (earliestTime < remainingDist && earliestTime > 0) {
+      const nextX = curX + curVx * earliestTime;
+      const nextY = curY + curVy * earliestTime;
+      incomingSegments.push({ x1: curX, y1: curY, x2: nextX, y2: nextY });
+      remainingDist -= earliestTime;
+      curX = nextX;
+      curY = nextY;
+
+      if (earliestTime === timeToWall) {
+        curVx = -curVx; // Wall reflection
+      } else {
+        break; // Reached ceiling
+      }
+    } else {
+      const nextX = curX + curVx * remainingDist;
+      const nextY = curY + curVy * remainingDist;
+      incomingSegments.push({ x1: curX, y1: curY, x2: nextX, y2: nextY });
+      curX = nextX;
+      curY = nextY;
+      break;
+    }
+  }
+
+  return {
+    guideline: {
+      visible: true,
+      alpha: 1.0,
+      isHit: true,
+      hitX: curX,
+      hitY: curY,
+      incomingSegments,
+      outgoingSegments: [],
+      outVx: curVx,
+      outVy: curVy,
+      detectionRadius,
+      outgoingLength,
+    },
+    nextFadeAlpha: 1.0,
+  };
+}
+
+/**
  * Computes complete V-type predictive trajectory (incoming + outgoing).
  * Strictly requires active in-flight gameplay, descent towards paddle,
  * position under detection radius, and velocity direction aligned to collide with paddle.
@@ -92,6 +184,9 @@ export function calculateTrajectoryGuideline(
     (ball.y >= targetY - 4 && ball.vy < 0.1);
 
   if (isRestingOnPaddle) {
+    if (ball.isLaunchAiming) {
+      return calculateLaunchAimGuideline(paddle, ball, arenaW, arenaH, detectionRadius, outgoingLength);
+    }
     return {
       guideline: {
         visible: false,
