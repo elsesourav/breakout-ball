@@ -88,6 +88,7 @@ public:
     void pairPortals();
     void resetBall(float x, float y, float vx, float vy);
     void setPaddleTarget(float targetX);
+    void setPaddleWidth(float w);
     void setModifiers(int shieldActive, int megaActive, int impactLvl, float maxPadSpeed);
     void spawnExtraBalls(int count);
     void update(int substeps);

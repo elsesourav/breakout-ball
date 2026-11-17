@@ -188,7 +188,7 @@ export class GameRenderer {
 
     for (let i = 0; i < ballList.length; i++) {
       const b = ballList[i];
-      if (!b || !b.isActive) continue;
+      if (!b || (!b.isActive && !b.isLaunchAiming)) continue;
       if (b.isLaunchAiming) {
         targetIdx = i;
         break;
@@ -226,7 +226,7 @@ export class GameRenderer {
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
       // Display V-type guideline ONLY when under radius AND paddle intercepts target velocity location
-      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
+      if (guideline.visible && guideline.alpha > 0.01 && (guideline.isHit || b.isLaunchAiming)) {
         ctx.save();
         const gAlpha = guideline.alpha;
 

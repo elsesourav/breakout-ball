@@ -303,7 +303,12 @@ export class WebGLRenderer {
 
     for (let i = 0; i < ballList.length; i++) {
       const b = ballList[i];
-      if (!b || !b.isActive || b.vy <= 0.1) continue;
+      if (!b || (!b.isActive && !b.isLaunchAiming)) continue;
+      if (b.isLaunchAiming) {
+        targetIdx = i;
+        break;
+      }
+      if (b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = paddle.y - bRad;
       const speed = Math.hypot(b.vx, b.vy);
@@ -329,7 +334,7 @@ export class WebGLRenderer {
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
       // Display V-type guideline ONLY when under radius AND paddle intercepts target velocity location
-      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
+      if (guideline.visible && guideline.alpha > 0.01 && (guideline.isHit || b.isLaunchAiming)) {
         const gAlpha = guideline.alpha;
         const inR = 0.0, inG = 0.97, inB = 1.0;
         const inAlpha = gAlpha * 1.0;
