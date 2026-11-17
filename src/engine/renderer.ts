@@ -218,8 +218,8 @@ export class GameRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // Display V-type guideline when under radius and velocity intercepts paddle
-      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
+      // Display V-type guideline when under radius and descending towards paddle
+      if (guideline.visible && guideline.alpha > 0.01) {
         ctx.save();
         const gAlpha = guideline.alpha;
 

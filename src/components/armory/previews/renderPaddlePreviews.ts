@@ -136,6 +136,8 @@ export function renderPaddleSpeedPreview(
     }
   );
 
+  const nextLvl = isMax ? currentLevel : currentLevel + 1;
+
   // Start Line / Rest Guide during gap
   if (!isSprinting) {
     ctx.save();
@@ -143,15 +145,24 @@ export function renderPaddleSpeedPreview(
     ctx.textAlign = 'center';
     ctx.fillStyle = '#64748b';
     ctx.fillText('STANDBY', leftCenterX, centerY + 22);
-    ctx.fillStyle = '#10b981';
-    ctx.fillText('AFTERBURNER READY', rightCenterX, centerY + 22);
+    ctx.fillStyle = nextLvl >= 8 ? '#f59e0b' : '#10b981';
+    ctx.fillText(nextLvl >= 8 ? 'PRESET BOOSTER [MAX]' : 'AFTERBURNER READY', rightCenterX, centerY + 22);
+    ctx.restore();
+  } else if (nextLvl >= 8) {
+    // When sprinting at max level, show glowing Preset Booster badge
+    ctx.save();
+    ctx.font = 'bold 8px monospace, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffd700';
+    ctx.fillText('PRESET BOOSTER [MAX]', rightCenterX, centerY + 24);
     ctx.restore();
   }
 }
 
 /**
- * 3. Paddle Fancy Plasma Thrusters Preview (Current vs Upgraded)
- * Displays plasma flank thruster spark streams (Off -> Sky Plasma -> Indigo -> Violet -> Hyperion Dual).
+ * 3. Paddle Chassis Thruster Aura Preview (Current vs Upgraded)
+ * Displays the ethereal hull contour halo and orbital celestial stardust motes.
+ * Completely distinct from physical bottom fire boosters (stationary, zero downward fire).
  */
 export function renderPaddleFancyPreview(
   ctx: CanvasRenderingContext2D,
@@ -170,7 +181,7 @@ export function renderPaddleFancyPreview(
   const curFancy = currentLevel;
   const nextFancy = isMax ? currentLevel : currentLevel + 1;
 
-  // Left: CURRENT Paddle
+  // Left: CURRENT Paddle (Stationary floating, chassis aura only, speedLevel: 1 -> zero bottom flame)
   drawPaddleWithPreset(
     ctx,
     { x: leftCenterX, y: centerY, width: pw, height: ph, vx: 0, targetX: leftCenterX },
@@ -183,7 +194,7 @@ export function renderPaddleFancyPreview(
     }
   );
 
-  // Right: UPGRADED Paddle with Plasma Exhaust Sparks
+  // Right: UPGRADED Paddle with Contour Energy Halo & Orbital Stardust Motes
   drawPaddleWithPreset(
     ctx,
     { x: rightCenterX, y: centerY, width: pw, height: ph, vx: 0, targetX: rightCenterX },
@@ -196,7 +207,7 @@ export function renderPaddleFancyPreview(
     }
   );
 
-  // Flank brackets indicating active thruster emitter pods
+  // Flank brackets indicating active celestial chassis aura containment
   ctx.save();
   ctx.strokeStyle = nextFancy === 5 ? '#ffd700' : nextFancy === 4 ? '#c084fc' : nextFancy === 3 ? '#818cf8' : '#38bdf8';
   ctx.lineWidth = 1.5;
@@ -214,7 +225,15 @@ export function renderPaddleFancyPreview(
 
   // Tier Labels at Bottom
   const tierName = (lvl: number) =>
-    lvl === 1 ? 'Standard (Off)' : lvl === 2 ? '6 Sky Plasma' : lvl === 3 ? '10 Indigo Core' : lvl === 4 ? '14 Violet Warp' : '20 Hyperion Dual';
+    lvl === 1
+      ? 'Clean Chassis'
+      : lvl === 2
+      ? 'Cyan Halo (6 Motes)'
+      : lvl === 3
+      ? 'Indigo Field (10)'
+      : lvl === 4
+      ? 'Warp Pulse (14)'
+      : 'Solar Corona (20)';
 
   ctx.save();
   ctx.font = '10px ui-monospace, SFMono-Regular, monospace';

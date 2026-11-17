@@ -165,13 +165,16 @@ export function calculateTrajectoryGuideline(
   // 4. Radius check by VELOCITY DISTANCE: distance traveled along velocity path to paddle plane
   const isUnderRadius = totalIncomingPath <= detectionRadius;
 
-  // 5. Paddle Collision Feasibility Check: whether velocity trajectory or ball position intercepts paddle
+  // 5. Feasibility check: whether ball landing point intercepts playable paddle plane
+  const isWithinArena = hitX >= -ballR && hitX <= arenaW + ballR;
+
+  // 6. Paddle Collision / Lock-On Feasibility Check: whether paddle is aligned to intercept ball
   const isHit =
     (hitX >= padLeft - ballR * 1.5 && hitX <= padRight + ballR * 1.5) ||
     (ball.x >= padLeft - ballR * 0.5 && ball.x <= padRight + ballR * 0.5 && totalIncomingPath <= 350);
 
-  // Strictly do NOT render guideline when velocity distance is out of range or misses the paddle
-  if (!isUnderRadius || !isHit) {
+  // Strictly do NOT render guideline when velocity distance is out of range or off-screen
+  if (!isUnderRadius || !isWithinArena) {
     const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * 4.0);
     return {
       guideline: { visible: false, alpha: 0, isHit: false, hitX, hitY, incomingSegments: [], outgoingSegments: [], outVx: 0, outVy: 0, detectionRadius, outgoingLength },

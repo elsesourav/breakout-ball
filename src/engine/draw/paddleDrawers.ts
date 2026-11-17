@@ -60,25 +60,44 @@ export function drawMechTitanPaddle(
 
   ctx.save();
 
-  // Speed-based Thruster Fire Effect (Independent of Width)
+  // Speed-based Under-Chassis Booster Nozzles & Flames (Driven strictly by paddle_speed)
   const speedLevel = options.speedLevel !== undefined ? options.speedLevel : 1;
+  const isQuad = speedLevel >= 7;
+  const isMaxBooster = speedLevel >= 8;
+  const thrusterPositions = isQuad
+    ? [paddle.x - pw * 0.38, paddle.x - pw * 0.18, paddle.x + pw * 0.18, paddle.x + pw * 0.38]
+    : [paddle.x - pw * 0.28, paddle.x + pw * 0.28];
+  const nozW = isQuad ? 10 : 12;
+  const nozH = 6;
 
-  // 1. Under-Chassis Ion Thruster Exhaust Plumes (Driven Strictly by Speed Level)
+  // 1. Under-Chassis Mechanical Booster Nozzles
+  thrusterPositions.forEach((tx) => {
+    // Nozzle mount casing
+    ctx.fillStyle = '#1e293b';
+    ctx.strokeStyle = isMaxBooster ? '#fbbf24' : '#475569';
+    ctx.lineWidth = 1.2;
+    ctx.fillRect(tx - nozW / 2, py + ph - 2, nozW, nozH);
+    ctx.strokeRect(tx - nozW / 2, py + ph - 2, nozW, nozH);
+
+    // Inner glowing ceramic throat
+    ctx.fillStyle = isMaxBooster ? '#ffd700' : speedLevel >= 4 ? '#00f7ff' : '#38bdf8';
+    ctx.fillRect(tx - nozW * 0.3, py + ph + nozH - 3, nozW * 0.6, 2);
+  });
+
+  // 1.1. Active Fire Booster Plumes (Culminating in the Preset Booster at Max Level)
   if (speedLevel >= 2) {
-    const isQuad = speedLevel >= 7;
-    const thrusterPositions = isQuad
-      ? [paddle.x - pw * 0.38, paddle.x - pw * 0.20, paddle.x + pw * 0.20, paddle.x + pw * 0.38]
-      : [paddle.x - pw * 0.30, paddle.x + pw * 0.30];
-
-    const thrusterW = isQuad ? 10 : 12;
-    const flameH = (isQuad ? 14 : 8) + (speedLevel - 1) * 2.0 + Math.sin(animTick * 14) * 3;
+    const flameH = (isMaxBooster ? 26 : isQuad ? 18 : 10) + (speedLevel - 1) * 2.0 + Math.sin(animTick * 16) * 3;
 
     thrusterPositions.forEach((tx) => {
-      const flameGrad = ctx.createLinearGradient(tx, py + ph - 2, tx, py + ph + flameH);
+      const flameGrad = ctx.createLinearGradient(tx, py + ph + nozH - 2, tx, py + ph + nozH + flameH);
       flameGrad.addColorStop(0, '#ffffff');
 
-      if (speedLevel >= 7) {
-        // Quad Hyper Overdrive: Blazing Orange-Gold Core to Crimson Flame
+      if (isMaxBooster) {
+        // Preset Booster [MAX OVERDRIVE]: Roaring White-Hot to Gold to Crimson Afterburner
+        flameGrad.addColorStop(0.2, '#ffffff');
+        flameGrad.addColorStop(0.4, '#ffd700');
+        flameGrad.addColorStop(0.75, '#ff4500');
+      } else if (speedLevel >= 7) {
         flameGrad.addColorStop(0.25, '#ffd700');
         flameGrad.addColorStop(0.65, '#ff4500');
       } else if (speedLevel >= 4) {
@@ -94,17 +113,35 @@ export function drawMechTitanPaddle(
 
       ctx.fillStyle = flameGrad;
       ctx.beginPath();
-      ctx.moveTo(tx - thrusterW / 2, py + ph);
-      ctx.lineTo(tx + thrusterW / 2, py + ph);
-      ctx.lineTo(tx, py + ph + flameH);
+      ctx.moveTo(tx - nozW / 2, py + ph + nozH - 1);
+      ctx.lineTo(tx + nozW / 2, py + ph + nozH - 1);
+      ctx.lineTo(tx, py + ph + nozH + flameH);
       ctx.closePath();
       ctx.fill();
 
-      // Exhaust spark particles
+      // Preset Booster: Supersonic Mach Diamond Shock Rings in the core plume
+      if (isMaxBooster) {
+        const shockFractions = [0.28, 0.52, 0.74];
+        for (const frac of shockFractions) {
+          const dy = py + ph + nozH + flameH * frac;
+          const dw = (nozW * 0.38) * (1 - frac * 0.3);
+          const dh = 4.5 * (1 - frac * 0.3);
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.moveTo(tx, dy - dh);
+          ctx.lineTo(tx + dw, dy);
+          ctx.lineTo(tx, dy + dh);
+          ctx.lineTo(tx - dw, dy);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+
+      // Exhaust spark embers
       if (Math.sin(animTick * 18 + tx) > 0.35) {
-        ctx.fillStyle = speedLevel >= 7 ? '#ffd700' : '#ffffff';
+        ctx.fillStyle = isMaxBooster ? '#ffd700' : '#ffffff';
         ctx.beginPath();
-        ctx.arc(tx + Math.sin(animTick * 10) * 3, py + ph + flameH + 3, 1.4, 0, Math.PI * 2);
+        ctx.arc(tx + Math.sin(animTick * 10) * 3, py + ph + nozH + flameH + 3, 1.4, 0, Math.PI * 2);
         ctx.fill();
       }
     });
@@ -262,30 +299,52 @@ export function drawMechTitanPaddle(
     });
   }
 
-  // 6. Fancy Plasma Thruster Emitter Particles (Cosmetic Prestige Sparks)
+  // 7. Chassis Thruster Aura & Orbital Stardust Motes (paddle_fancy Cosmetic Upgrade)
+  // Distinct from bottom fire propulsion: wraps the armored hull with an ethereal halo and orbital motes
   const fancyLevel = options.fancyLevel || 1;
   if (fancyLevel >= 2) {
+    const auraColor =
+      fancyLevel === 2
+        ? 'rgba(56, 189, 248, 0.45)'
+        : fancyLevel === 3
+        ? 'rgba(129, 140, 248, 0.55)'
+        : fancyLevel === 4
+        ? 'rgba(192, 132, 252, 0.65)'
+        : 'rgba(251, 191, 36, 0.75)';
+
+    // 7.1. Pulsating Hull Contour Aura Halo
+    ctx.save();
+    const haloPulse = 0.5 + Math.sin(animTick * 6) * 0.25;
+    ctx.strokeStyle = auraColor;
+    ctx.lineWidth = fancyLevel === 5 ? 3.5 : 2.2;
+    ctx.shadowColor = fancyLevel === 5 ? '#ffd700' : fancyLevel === 4 ? '#c084fc' : '#38bdf8';
+    ctx.shadowBlur = 12 * haloPulse;
+    drawChamfer(ctx, px - 3, py - 3, pw + 6, ph + 6, chamfer + 2);
+    ctx.stroke();
+    ctx.restore();
+
+    // 7.2. Orbital Celestial Stardust Motes (Smooth 3D orbit around hull & wingtips)
     const fancyParticleCount = fancyLevel === 2 ? 6 : fancyLevel === 3 ? 10 : fancyLevel === 4 ? 14 : 20;
     const baseColor =
-      fancyLevel === 2 ? '#38bdf8' : fancyLevel === 3 ? '#818cf8' : fancyLevel === 4 ? '#c084fc' : '';
+      fancyLevel === 2 ? '#38bdf8' : fancyLevel === 3 ? '#818cf8' : fancyLevel === 4 ? '#c084fc' : '#ffd700';
 
     for (let i = 0; i < fancyParticleCount; i++) {
-      const isLeft = i % 2 === 0;
-      const xSpread = pw * (0.28 + (i % 4) * 0.05);
-      const px = paddle.x + (isLeft ? -xSpread : xSpread) + Math.sin(animTick * 4 + i) * 6;
-      const py = paddle.y + ph + 2 + ((animTick * 25 + i * 14) % 36);
-      const pAlpha = Math.max(0, 1 - ((animTick * 25 + i * 14) % 36) / 36);
+      const angle = animTick * 2.2 + (i * Math.PI * 2) / fancyParticleCount;
+      const rx = pw * 0.54 + Math.sin(animTick * 3 + i) * 6;
+      const ry = ph * 0.75 + Math.cos(animTick * 2.5 + i) * 4;
+      const mx = paddle.x + Math.cos(angle) * rx;
+      const my = py + ph * 0.5 + Math.sin(angle) * ry;
       const pColor = fancyLevel === 5 ? (i % 2 === 0 ? '#ffd700' : '#ff0055') : baseColor;
 
       ctx.fillStyle = pColor;
-      ctx.globalAlpha = pAlpha * 0.45;
+      ctx.globalAlpha = 0.4;
       ctx.beginPath();
-      ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+      ctx.arc(mx, my, 4.0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.globalAlpha = pAlpha * 0.9;
+      ctx.globalAlpha = 0.95;
       ctx.beginPath();
-      ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+      ctx.arc(mx, my, 2.0, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.globalAlpha = 1.0;

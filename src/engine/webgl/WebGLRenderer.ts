@@ -30,20 +30,14 @@ export class WebGLRenderer {
   private bhTexture: WebGLTexture | null = null;
   private readonly bhHeight = 220;
 
-  constructor(
-    gl: WebGLRenderingContext | WebGL2RenderingContext,
-    width: number,
-    height: number
-  ) {
+  constructor(gl: WebGLRenderingContext | WebGL2RenderingContext, width: number, height: number) {
     this.gl = gl;
     this.width = width;
     this.height = height;
-
     this.shaders = new ShaderManager(gl);
     this.atlas = new TextureAtlas(gl);
     this.batcher = new SpriteBatcher(gl, 2048);
     this.glParticles = new GLParticleSystem(gl);
-
     this.initBackdropQuad();
     this.initBlackHoleTexture(gl, width);
   }
@@ -62,17 +56,7 @@ export class WebGLRenderer {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texImage2D(
-        gl.TEXTURE_2D,
-        0,
-        gl.RGBA,
-        width,
-        this.bhHeight,
-        0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        null
-      );
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, this.bhHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     }
   }
 
@@ -172,12 +156,7 @@ export class WebGLRenderer {
     }
 
     if (particleList.length > 0) {
-      this.glParticles.renderPoints(
-        this.shaders.getProgram('particle'),
-        particleList,
-        w,
-        h
-      );
+      this.glParticles.renderPoints(this.shaders.getProgram('particle'), particleList, w, h);
     }
 
     // 3. Cosmic Black Hole Singularity Floor (Dedicated WebGL Texture)
@@ -253,7 +232,7 @@ export class WebGLRenderer {
       }
     }
 
-    // 5. Draw Paddle with Sub-frame State Interpolation
+    // 5. Draw Paddle with Under-Chassis Boosters & Chassis Aura
     const renderPaddleX = paddle.prevX !== undefined && alpha < 0.999 ? paddle.prevX + (paddle.x - paddle.prevX) * alpha : paddle.x;
     const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
     const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
@@ -264,24 +243,43 @@ export class WebGLRenderer {
     const padSlotW = paddle.width + padMargin * 2;
     const padSlotH = paddle.height + padMargin * 2;
 
-    this.batcher.pushSprite(renderPaddleX - paddle.width / 2 - padMargin, paddle.y - padMargin, padSlotW, padSlotH, paddleUV.u0, paddleUV.v0, paddleUV.u1, paddleUV.v1, 1.0, 1.0, 1.0, 1.0);
+    // 5.0. Under-Chassis Mechanical Booster Nozzles & Flames (Speed Upgrade & Preset Booster)
+    const isQuad = padSpeedLvl >= 7;
+    const thrusterPos = isQuad
+      ? [-paddle.width * 0.38, -paddle.width * 0.18, paddle.width * 0.18, paddle.width * 0.38]
+      : [-paddle.width * 0.28, paddle.width * 0.28];
+    const nozUV = this.atlas.getUV('booster_nozzle');
+    const flameUV = this.atlas.getUV(padSpeedLvl >= 8 ? 'booster_flame_max' : 'booster_flame_blue');
+    const flameW = isQuad ? 16 : 20;
+    const flameH = (padSpeedLvl >= 8 ? 32 : isQuad ? 24 : 14) + (padSpeedLvl - 1) * 2 + Math.sin(this.animTick * 16) * 3;
+    const tilt = Math.max(-0.25, Math.min(0.25, -(paddle.vx || 0) * 0.0003));
 
-    // 5.0. Fancy Plasma Thruster Exhaust Sparks (Cosmetic Upgrade)
-    const padFancyLvl = currencyService.getUpgradeLevel('paddle_fancy');
-    if (padFancyLvl >= 2) {
-      const pCount = padFancyLvl === 2 ? 6 : padFancyLvl === 3 ? 10 : padFancyLvl === 4 ? 14 : 20;
-      const [bR, bG, bB] = padFancyLvl === 2 ? [0.22, 0.74, 0.97] : padFancyLvl === 3 ? [0.51, 0.55, 0.97] : padFancyLvl === 4 ? [0.75, 0.52, 0.99] : [1.0, 0.84, 0.0];
-      for (let i = 0; i < pCount; i++) {
-        const xSpread = paddle.width * (0.28 + (i % 4) * 0.05);
-        const px = renderPaddleX + (i % 2 === 0 ? -xSpread : xSpread) + Math.sin(this.animTick * 4 + i) * 6;
-        const py = paddle.y + paddle.height + 2 + ((this.animTick * 25 + i * 14) % 36);
-        const pAlpha = Math.max(0, 1 - ((this.animTick * 25 + i * 14) % 36) / 36);
-        const [pr, pg, pb] = padFancyLvl === 5 ? (i % 2 === 0 ? [1.0, 0.84, 0.0] : [1.0, 0.03, 0.33]) : [bR, bG, bB];
-        this.batcher.pushSprite(px - 4, py - 4, 8, 8, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, pr, pg, pb, pAlpha * 0.9);
+    for (const ox of thrusterPos) {
+      const tx = renderPaddleX + ox;
+      this.batcher.pushSprite(tx - 10, paddle.y + paddle.height - 4, 20, 12, nozUV.u0, nozUV.v0, nozUV.u1, nozUV.v1, 1, 1, 1, 1);
+      if (padSpeedLvl >= 2) {
+        this.batcher.pushSprite(tx - flameW / 2, paddle.y + paddle.height + 6, flameW, flameH, flameUV.u0, flameUV.v0, flameUV.u1, flameUV.v1, 1, 1, 1, 0.95, tilt);
       }
     }
 
-    // 5.1. V-Type Trajectory Matrix Guideline (Incoming + Outgoing Deflection Ray)
+    // 5.1. Armored Paddle Hull
+    this.batcher.pushSprite(renderPaddleX - paddle.width / 2 - padMargin, paddle.y - padMargin, padSlotW, padSlotH, paddleUV.u0, paddleUV.v0, paddleUV.u1, paddleUV.v1, 1.0, 1.0, 1.0, 1.0);
+
+    // 5.2. Chassis Thruster Aura & Orbital Motes (paddle_fancy Cosmetic Upgrade)
+    const padFancyLvl = currencyService.getUpgradeLevel('paddle_fancy');
+    if (padFancyLvl >= 2) {
+      const [ar, ag, ab] = padFancyLvl === 2 ? [0.22, 0.74, 0.97] : padFancyLvl === 3 ? [0.51, 0.55, 0.97] : padFancyLvl === 4 ? [0.75, 0.52, 0.99] : [1.0, 0.84, 0.0];
+      const pCount = padFancyLvl === 2 ? 6 : padFancyLvl === 3 ? 10 : padFancyLvl === 4 ? 14 : 20;
+      for (let i = 0; i < pCount; i++) {
+        const ang = this.animTick * 2.2 + (i * Math.PI * 2) / pCount;
+        const mx = renderPaddleX + Math.cos(ang) * (paddle.width * 0.54 + Math.sin(this.animTick * 3 + i) * 6);
+        const my = paddle.y + paddle.height * 0.5 + Math.sin(ang) * (paddle.height * 0.75 + 4);
+        const [pr, pg, pb] = padFancyLvl === 5 ? (i % 2 === 0 ? [1.0, 0.84, 0.0] : [1.0, 0.03, 0.33]) : [ar, ag, ab];
+        this.batcher.pushSprite(mx - 4, my - 4, 8, 8, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, pr, pg, pb, 0.9);
+      }
+    }
+
+    // 5.3. V-Type Trajectory Matrix Guideline (Incoming + Outgoing Deflection Ray)
     const ballList = Array.isArray(balls) ? balls : [balls];
     const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
     const reticleUV = this.atlas.getUV('guideline_reticle');
@@ -330,8 +328,8 @@ export class WebGLRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // Display V-type guideline when under radius and velocity intercepts paddle
-      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
+      // Display V-type guideline when under radius and descending towards paddle
+      if (guideline.visible && guideline.alpha > 0.01) {
         const gAlpha = guideline.alpha;
         const inR = 0.0, inG = 0.97, inB = 1.0;
         const inAlpha = gAlpha * 1.0;
@@ -487,8 +485,8 @@ function parseColorRgb(color: string): [number, number, number] {
   if (color && color.startsWith('#')) {
     let hex = color.slice(1);
     if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
-    const num = parseInt(hex, 16);
-    if (!isNaN(num)) return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
+    const n = parseInt(hex, 16);
+    if (!isNaN(n)) return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
   }
   return [1.0, 0.6, 0.2];
 }

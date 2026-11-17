@@ -339,6 +339,70 @@ export class TextureAtlas {
       c.restore();
     });
 
+    // 8. Under-Chassis Mechanical Booster Sprites (Speed Upgrade & Preset Booster)
+    // 8.1. Titanium Booster Nozzle Socket (24x16)
+    placeItem('booster_nozzle', 24, 16, (c, x, y) => {
+      c.fillStyle = '#1e293b';
+      c.fillRect(x + 2, y + 2, 20, 12);
+      c.strokeStyle = '#64748b';
+      c.lineWidth = 1.5;
+      c.strokeRect(x + 2, y + 2, 20, 12);
+      // Throat recess
+      c.fillStyle = '#090d16';
+      c.fillRect(x + 5, y + 6, 14, 6);
+      c.fillStyle = '#00f7ff';
+      c.fillRect(x + 7, y + 9, 10, 3);
+    });
+
+    // 8.2. Standard Ion Flame Plume (24x48)
+    placeItem('booster_flame_blue', 24, 48, (c, x, y) => {
+      const grad = c.createLinearGradient(x + 12, y, x + 12, y + 48);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.25, '#00f7ff');
+      grad.addColorStop(0.65, '#2563eb');
+      grad.addColorStop(1, 'rgba(37, 99, 235, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.moveTo(x + 2, y);
+      c.lineTo(x + 22, y);
+      c.lineTo(x + 12, y + 48);
+      c.closePath();
+      c.fill();
+    });
+
+    // 8.3. Preset Booster [MAX OVERDRIVE] Supersonic Flame with Mach Diamonds (32x64)
+    placeItem('booster_flame_max', 32, 64, (c, x, y) => {
+      const grad = c.createLinearGradient(x + 16, y, x + 16, y + 64);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.2, '#ffffff');
+      grad.addColorStop(0.45, '#ffd700');
+      grad.addColorStop(0.75, '#ff4500');
+      grad.addColorStop(1, 'rgba(255, 69, 0, 0)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.moveTo(x + 3, y);
+      c.lineTo(x + 29, y);
+      c.lineTo(x + 16, y + 64);
+      c.closePath();
+      c.fill();
+
+      // Mach Diamond Shock Rings inside supersonic exhaust column
+      const shockYs = [16, 32, 46];
+      for (let i = 0; i < shockYs.length; i++) {
+        const sy = y + shockYs[i];
+        const dw = 5 * (1 - i * 0.25);
+        const dh = 6 * (1 - i * 0.25);
+        c.fillStyle = '#ffffff';
+        c.beginPath();
+        c.moveTo(x + 16, sy - dh);
+        c.lineTo(x + 16 + dw, sy);
+        c.lineTo(x + 16, sy + dh);
+        c.lineTo(x + 16 - dw, sy);
+        c.closePath();
+        c.fill();
+      }
+    });
+
     // 5. Upload atlas canvas to GPU WebGL Texture
     const tex = gl.createTexture();
     if (!tex) throw new Error('Failed to create WebGL atlas texture');
