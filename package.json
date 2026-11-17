@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server/src/index.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test:levels": "node scripts/levelTester.mjs"

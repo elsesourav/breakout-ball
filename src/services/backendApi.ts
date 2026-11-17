@@ -69,13 +69,17 @@ export interface BackendHealthResponse {
   timestamp?: string;
 }
 
+const PROD_BACKEND_URL = 'https://api-breakout.elsesourav.com';
+
 class BackendApiService {
   private baseUrl: string;
 
   constructor() {
-    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-    const defaultHost = isLocal ? 'http://localhost:4000' : 'https://api-breakout.elsesourav.com';
-    this.baseUrl = ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_BACKEND_URL) || defaultHost;
+    // Connect to live production backend by default so local dev (e.g. localhost:3000)
+    // works seamlessly out-of-the-box without requiring a local port 4000 server.
+    // Set VITE_BACKEND_URL=http://localhost:4000 to target local server.
+    const envUrl = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_BACKEND_URL;
+    this.baseUrl = envUrl ? envUrl.replace(/\/+$/, '') : PROD_BACKEND_URL;
   }
 
   public getBaseUrl(): string {
