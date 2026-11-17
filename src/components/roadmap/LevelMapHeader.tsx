@@ -40,10 +40,12 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
     const unsub = achievementManager.onUnlock(checkAch);
     window.addEventListener('achievement_claimed', checkAch);
     window.addEventListener('achievement_unlocked', checkAch);
+    window.addEventListener('achievement_updated', checkAch);
     return () => {
       unsub();
       window.removeEventListener('achievement_claimed', checkAch);
       window.removeEventListener('achievement_unlocked', checkAch);
+      window.removeEventListener('achievement_updated', checkAch);
     };
   }, []);
 
@@ -80,18 +82,36 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
               <motion.button
                 type="button"
                 onClick={handleOpenProfile}
-                whileHover={{ y: -0.5 }}
-                whileTap={{ y: 3 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                whileHover={{ y: -0.5, scale: 1.04 }}
+                whileTap={{ y: 3, scale: 0.96 }}
+                animate={
+                  hasUnclaimedAch
+                    ? {
+                        boxShadow: [
+                          '0 0 10px rgba(255, 215, 0, 0.6), 0 0 20px rgba(0, 247, 255, 0.4), inset 0 0 8px rgba(255, 215, 0, 0.3)',
+                          '0 0 22px rgba(255, 215, 0, 0.95), 0 0 38px rgba(0, 247, 255, 0.75), inset 0 0 14px rgba(255, 215, 0, 0.5)',
+                          '0 0 10px rgba(255, 215, 0, 0.6), 0 0 20px rgba(0, 247, 255, 0.4), inset 0 0 8px rgba(255, 215, 0, 0.3)',
+                        ],
+                        borderColor: [
+                          'rgba(255, 215, 0, 0.9)',
+                          'rgba(0, 247, 255, 0.9)',
+                          'rgba(255, 215, 0, 0.9)',
+                        ],
+                      }
+                    : undefined
+                }
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
-                  background:
-                    'linear-gradient(180deg, rgba(20, 35, 70, 0.96) 0%, rgba(10, 18, 42, 0.98) 100%)',
-                  border: '1.8px solid rgba(0, 247, 255, 0.8)',
-                  boxShadow:
-                    'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 247, 255, 0.25)',
+                  background: hasUnclaimedAch
+                    ? 'linear-gradient(180deg, rgba(32, 28, 10, 0.96) 0%, rgba(14, 18, 36, 0.98) 100%)'
+                    : 'linear-gradient(180deg, rgba(20, 35, 70, 0.96) 0%, rgba(10, 18, 42, 0.98) 100%)',
+                  border: hasUnclaimedAch ? '2px solid #ffd700' : '1.8px solid rgba(0, 247, 255, 0.8)',
+                  boxShadow: hasUnclaimedAch
+                    ? '0 0 16px rgba(255, 215, 0, 0.8), 0 0 28px rgba(0, 247, 255, 0.5), inset 0 0 10px rgba(255, 215, 0, 0.4)'
+                    : 'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 247, 255, 0.25)',
                 }}
                 className="relative w-full h-full rounded-lg flex items-center justify-center cursor-pointer overflow-hidden pointer-events-auto"
-                title="Pilot Profile"
+                title={hasUnclaimedAch ? `Pilot Profile • ${unclaimedCount} Achievements to Claim!` : 'Pilot Profile'}
               >
                 {user.isLoggedIn && user.avatarUrl && !avatarErr ? (
                   <img

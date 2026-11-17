@@ -81,21 +81,28 @@ export const ProfileView: React.FC = () => {
   }, [user.avatarUrl, updateUser]);
 
   const [unlockedAchievementsCount, setUnlockedAchievementsCount] = useState(() => {
+    achievementManager.loadForUser(user.username);
     return achievementManager.getAll().filter((a) => a.unlocked).length;
   });
   const totalAchievementsCount = achievementManager.getAll().length || 15;
 
   useEffect(() => {
-    achievementManager.loadForUser(user.username);
-    setUnlockedAchievementsCount(achievementManager.getAll().filter((a) => a.unlocked).length);
-  }, [user.username]);
-
-  useEffect(() => {
-    const unsub = achievementManager.onUnlock(() => {
+    const refresh = () => {
       setUnlockedAchievementsCount(achievementManager.getAll().filter((a) => a.unlocked).length);
-    });
-    return unsub;
-  }, []);
+    };
+    achievementManager.loadForUser(user.username);
+    refresh();
+    const unsub = achievementManager.onUnlock(refresh);
+    window.addEventListener('achievement_unlocked', refresh);
+    window.addEventListener('achievement_updated', refresh);
+    window.addEventListener('achievement_claimed', refresh);
+    return () => {
+      unsub();
+      window.removeEventListener('achievement_unlocked', refresh);
+      window.removeEventListener('achievement_updated', refresh);
+      window.removeEventListener('achievement_claimed', refresh);
+    };
+  }, [user.username]);
 
   const startCountUp = useCallback(
     (target: number, fromVal?: number) => {

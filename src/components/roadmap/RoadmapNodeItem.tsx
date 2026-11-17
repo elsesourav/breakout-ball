@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { motion } from 'framer-motion';
 import { Play, Check, Star } from 'lucide-react';
 import { RoadmapNode, SVG_WIDTH } from './types';
 import { LocalLevelProgress } from '../../types/game';
@@ -79,17 +80,57 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
           willChange: 'transform, opacity',
         }}
       >
-        {/* 3D Ground Elevation Contact Shadow */}
+        {/* 3D Ground Elevation Contact Shadow with intense beacon glow when active */}
         <div
-          className="absolute -bottom-2.5 w-16 h-3 rounded-full pointer-events-none select-none"
+          className="absolute -bottom-2.5 w-20 h-4 rounded-full pointer-events-none select-none"
           style={{
             background: isCurrent
-              ? 'radial-gradient(ellipse at center, rgba(0,247,255,0.4) 0%, rgba(0,0,0,0.85) 50%, transparent 75%)'
+              ? 'radial-gradient(ellipse at center, rgba(0,247,255,0.75) 0%, rgba(0,180,216,0.45) 45%, rgba(0,0,0,0.85) 75%, transparent 90%)'
               : 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 75%)',
-            filter: 'blur(2.5px)',
+            filter: isCurrent ? 'blur(3.5px)' : 'blur(2.5px)',
             transform: 'scaleY(0.45)',
           }}
         />
+
+        {/* Extra Type of Glow Effect: High-Energy Beacon Aura & Rotating Target Reticle for Active Level */}
+        {isCurrent && (
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+            {/* 1. Pulsing radiant shockwave beacon aura */}
+            <motion.div
+              className="absolute -inset-4 rounded-full pointer-events-none"
+              animate={{
+                scale: [1, 1.32, 1],
+                opacity: [0.85, 0.2, 0.85],
+              }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                background:
+                  'radial-gradient(circle, rgba(0,247,255,0.45) 0%, rgba(0,247,255,0.12) 60%, transparent 80%)',
+                filter: 'blur(5px)',
+              }}
+            />
+            {/* 2. Rotating high-tech dashed orbital reticle ring */}
+            <motion.div
+              className="absolute -inset-2.5 rounded-full pointer-events-none"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
+              style={{
+                border: '1.5px dashed rgba(0, 247, 255, 0.85)',
+                boxShadow: '0 0 16px rgba(0, 247, 255, 0.55)',
+              }}
+            />
+            {/* 3. Outer target pulse ring */}
+            <motion.div
+              className="absolute -inset-1 rounded-full pointer-events-none"
+              animate={{ scale: [1, 1.08, 1], opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                border: '1.2px solid rgba(0, 247, 255, 0.65)',
+                boxShadow: '0 0 20px rgba(0, 247, 255, 0.75), inset 0 0 10px rgba(0, 247, 255, 0.4)',
+              }}
+            />
+          </div>
+        )}
 
         {/* 3D Celestial Cyber Globe (High-tech Arcade Stage Node) */}
         <button
@@ -122,7 +163,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
             className="absolute inset-0 w-full h-full pointer-events-none overflow-visible"
             style={{
               filter: isCurrent
-                ? 'drop-shadow(0 0 14px rgba(0, 247, 255, 0.8))'
+                ? 'drop-shadow(0 0 20px rgba(0, 247, 255, 0.95)) drop-shadow(0 0 35px rgba(0, 247, 255, 0.5))'
                 : isComplete
                 ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.6))'
                 : 'drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8))',
@@ -296,7 +337,9 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
 
           {/* High-Tech Arcade PLAY Button Anchored Below Current Active Level Index */}
           {isCurrent && (
-            <div
+            <motion.div
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
               style={{
                 position: 'absolute',
                 bottom: '-16px',
@@ -304,7 +347,8 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
                 transform: 'translateX(-50%)',
                 background: 'linear-gradient(180deg, #00f7ff 0%, #00b4d8 60%, #0077b6 100%)',
                 border: '1.5px solid #ffffff',
-                boxShadow: '0 2.5px 0 #023e8a, 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 18px rgba(0, 247, 255, 0.85), inset 0 1px 2px #ffffff',
+                boxShadow:
+                  '0 2.5px 0 #023e8a, 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 22px rgba(0, 247, 255, 0.95), 0 0 40px rgba(0, 180, 216, 0.55), inset 0 1px 2px #ffffff',
                 borderRadius: '9999px',
                 pointerEvents: 'none',
                 whiteSpace: 'nowrap',
@@ -325,7 +369,7 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               >
                 PLAY
               </span>
-            </div>
+            </motion.div>
           )}
         </button>
       </div>

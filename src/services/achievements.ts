@@ -159,27 +159,51 @@ class AchievementManager {
   private claimedIds: Set<string> = new Set();
   private listeners: ((achievement: Achievement) => void)[] = [];
   private isRestrictedContext: boolean = false;
+  private currentUsername: string | null = null;
 
   constructor() {
     this.load();
   }
 
+  public notifyListeners(): void {
+    const list = this.getAll();
+    if (list.length > 0) {
+      this.listeners.forEach((fn) => fn(list[0]));
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('achievement_unlocked'));
+      window.dispatchEvent(new Event('achievement_updated'));
+    }
+  }
+
   public loadForUser(username?: string) {
     const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
+    this.currentUsername = userKey;
     const key = userKey ? `breakout_achievements_${userKey}` : STORAGE_KEY;
     const claimKey = userKey ? `breakout_achievement_claims_${userKey}` : CLAIM_STORAGE_KEY;
+
     try {
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        const arr: string[] = JSON.parse(raw);
-        this.unlockedIds = new Set(arr);
-        this.viewedIds = new Set(arr);
-      } else {
-        this.unlockedIds = new Set();
-        this.viewedIds = new Set();
+      const globalRaw = localStorage.getItem(STORAGE_KEY);
+      if (globalRaw) {
+        const globalArr: string[] = JSON.parse(globalRaw);
+        globalArr.forEach((id) => {
+          this.unlockedIds.add(id);
+          this.viewedIds.add(id);
+        });
       }
-    } catch {
-      this.load();
+    } catch {}
+
+    if (userKey) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const arr: string[] = JSON.parse(raw);
+          arr.forEach((id) => {
+            this.unlockedIds.add(id);
+            this.viewedIds.add(id);
+          });
+        }
+      } catch {}
     }
 
     try {
@@ -187,25 +211,31 @@ class AchievementManager {
       if (cRaw) {
         this.claimedIds = new Set(JSON.parse(cRaw));
       } else {
-        this.claimedIds = new Set();
+        const gClaimRaw = localStorage.getItem(CLAIM_STORAGE_KEY);
+        if (gClaimRaw) {
+          this.claimedIds = new Set(JSON.parse(gClaimRaw));
+        }
       }
-    } catch {
-      this.claimedIds = new Set();
-    }
+    } catch {}
+
+    this.save(userKey);
 
     // Recover unlocked trophies directly from SQLite database for authenticated player
     if (userKey) {
       backendApi.getUserTrophies(userKey).then((trophies) => {
+        let hasNew = false;
         if (trophies && trophies.length > 0) {
           trophies.forEach((t) => {
-            if (t.trophy_id) {
+            if (t.trophy_id && !this.unlockedIds.has(t.trophy_id)) {
               this.unlockedIds.add(t.trophy_id);
               this.viewedIds.add(t.trophy_id);
+              hasNew = true;
             }
           });
-          try {
-            localStorage.setItem(key, JSON.stringify(Array.from(this.unlockedIds)));
-          } catch {}
+          if (hasNew) {
+            this.save(userKey);
+            this.notifyListeners();
+          }
         }
       }).catch(() => {});
     }
@@ -219,6 +249,10 @@ class AchievementManager {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(VIEWED_STORAGE_KEY);
       localStorage.removeItem(CLAIM_STORAGE_KEY);
+      if (this.currentUsername) {
+        localStorage.removeItem(`breakout_achievements_${this.currentUsername}`);
+        localStorage.removeItem(`breakout_achievement_claims_${this.currentUsername}`);
+      }
     } catch {}
   }
 
@@ -271,17 +305,24 @@ class AchievementManager {
     }
   }
 
-  private save() {
+  private save(username?: string | null) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(this.unlockedIds)));
+      const arr = Array.from(this.unlockedIds);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      const uKey = username || this.currentUsername;
+      if (uKey && uKey.toLowerCase() !== 'anonymous') {
+        localStorage.setItem(`breakout_achievements_${uKey.toLowerCase()}`, JSON.stringify(arr));
+      }
     } catch {}
   }
 
   private saveClaims(username?: string) {
-    const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : null;
+    const userKey = username && username.toLowerCase() !== 'anonymous' ? username.toLowerCase() : this.currentUsername;
     const claimKey = userKey ? `breakout_achievement_claims_${userKey}` : CLAIM_STORAGE_KEY;
     try {
-      localStorage.setItem(claimKey, JSON.stringify(Array.from(this.claimedIds)));
+      const arr = Array.from(this.claimedIds);
+      localStorage.setItem(claimKey, JSON.stringify(arr));
+      localStorage.setItem(CLAIM_STORAGE_KEY, JSON.stringify(arr));
     } catch {}
   }
 

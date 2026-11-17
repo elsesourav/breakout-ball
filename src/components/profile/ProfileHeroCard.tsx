@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User as UserIcon, Trophy, Award, Layers, Cloud, LogIn, UserPlus, Mail, ShieldCheck, Pencil } from 'lucide-react';
 import { soundManager } from '../../audio';
+import { achievementManager } from '../../services/achievements';
 
 interface ProfileHeroCardProps {
   user: {
@@ -137,11 +138,20 @@ export const ProfileHeroCard: React.FC<ProfileHeroCardProps> = ({
             soundManager.play('click');
             onSectionSwitch?.('achievements');
           }}
-          className="bg-black/40 rounded-xl p-2 border border-cyan-500/20 cursor-pointer hover:border-amber-400/50 hover:bg-amber-950/20 transition-all active:scale-95"
+          className={`rounded-xl p-2 cursor-pointer transition-all active:scale-95 ${
+            achievementManager.hasUncollected()
+              ? 'bg-amber-950/40 border-2 border-amber-400 shadow-[0_0_15px_rgba(255,215,0,0.5)] animate-pulse'
+              : 'bg-black/40 border border-cyan-500/20 hover:border-amber-400/50 hover:bg-amber-950/20'
+          }`}
         >
           <div className="flex items-center justify-center gap-1 text-[11px] text-slate-300 font-ui font-medium">
-            <Award className="w-3.5 h-3.5 text-amber-400" />
-            <span>Achievements</span>
+            <Award className={`w-3.5 h-3.5 ${achievementManager.hasUncollected() ? 'text-yellow-300' : 'text-amber-400'}`} />
+            <span className={achievementManager.hasUncollected() ? 'text-amber-200 font-bold' : ''}>Achievements</span>
+            {achievementManager.hasUncollected() && (
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[8px] font-tech font-black bg-amber-400 text-slate-950">
+                CLAIM
+              </span>
+            )}
           </div>
           <p className="text-sm font-bold text-amber-300 mt-0.5 font-tech">
             {unlockedAchievementsCount} <span className="text-slate-400 text-[10px]">/ {totalAchievementsCount}</span>

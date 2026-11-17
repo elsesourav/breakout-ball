@@ -107,22 +107,29 @@ export const ArcadeView: React.FC = () => {
     return highest;
   }, [localProgress]);
 
-  // ── Target Level for Centering (Current Play Level) ──────────────────────────
-  const currentPlayLevelId = useMemo(() => {
-    if (selectedLevel) {
-      const num = parseInt(selectedLevel.id, 10);
-      if (!isNaN(num) && num >= 1 && num <= TOTAL_LEVELS) return num;
-    }
-    const savedLast = arcadeScrollService.getLastPlayedLevel();
-    if (savedLast >= 1 && savedLast <= TOTAL_LEVELS) {
-      return savedLast;
-    }
+  // ── Next playable level to conquer (The active frontier that needs to be played) ──
+  const nextPlayableLevelId = useMemo(() => {
     for (let i = 1; i <= TOTAL_LEVELS; i++) {
       const p = localProgress[String(i)];
       if (p !== undefined && !p.completed) return i;
     }
     return currentUnlockedId || 1;
-  }, [selectedLevel, localProgress, currentUnlockedId]);
+  }, [localProgress, currentUnlockedId]);
+
+  // ── Target Level for Centering ───────────────────────────────────────────────
+  const currentPlayLevelId = useMemo(() => {
+    if (selectedLevel) {
+      const num = parseInt(selectedLevel.id, 10);
+      const isComplete = localProgress[String(num)]?.completed;
+      if (!isNaN(num) && num >= 1 && num <= TOTAL_LEVELS && !isComplete) return num;
+    }
+    const savedLast = arcadeScrollService.getLastPlayedLevel();
+    const isSavedComplete = localProgress[String(savedLast)]?.completed;
+    if (savedLast >= 1 && savedLast <= TOTAL_LEVELS && !isSavedComplete) {
+      return savedLast;
+    }
+    return nextPlayableLevelId;
+  }, [selectedLevel, localProgress, nextPlayableLevelId]);
 
   // ── Total Campaign Stars Earned ──────────────────────────────────────────────
   const totalStars = useMemo(() => {
@@ -453,7 +460,7 @@ export const ArcadeView: React.FC = () => {
           {/* Level Energy Cells */}
           {nodes.map((node) => {
             const progress   = localProgress[String(node.id)];
-            const isCurrent  = node.id === currentPlayLevelId;
+            const isCurrent  = node.id === nextPlayableLevelId;
 
             return (
               <RoadmapNodeItem

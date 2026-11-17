@@ -14,15 +14,27 @@ interface AchievementsListProps {
 
 export const AchievementsList: React.FC<AchievementsListProps> = ({ onClaimSuccess }) => {
   const { user } = useGame();
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>(() => {
+    achievementManager.loadForUser(user.username);
+    return achievementManager.getAll();
+  });
 
   useEffect(() => {
-    achievementManager.loadForUser(user.username);
-    setAchievements(achievementManager.getAll());
-    const unsub = achievementManager.onUnlock(() => {
+    const refresh = () => {
       setAchievements(achievementManager.getAll());
-    });
-    return unsub;
+    };
+    achievementManager.loadForUser(user.username);
+    refresh();
+    const unsub = achievementManager.onUnlock(refresh);
+    window.addEventListener('achievement_unlocked', refresh);
+    window.addEventListener('achievement_updated', refresh);
+    window.addEventListener('achievement_claimed', refresh);
+    return () => {
+      unsub();
+      window.removeEventListener('achievement_unlocked', refresh);
+      window.removeEventListener('achievement_updated', refresh);
+      window.removeEventListener('achievement_claimed', refresh);
+    };
   }, [user.username]);
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;

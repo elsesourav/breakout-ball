@@ -421,10 +421,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           dbService.saveProgress(updatedProgress, user.username);
           return updatedProgress;
         });
+        const nextLvl = localLevels[nextLevelNum - 1];
+        if (nextLvl) setSelectedLevel(nextLvl);
       }
       return outcome;
     },
-    [user.username, selectedLevel, isLevelSelfMadeOrTest, onlineLevels]
+    [user.username, selectedLevel, isLevelSelfMadeOrTest, onlineLevels, localLevels]
   );
 
   return (
