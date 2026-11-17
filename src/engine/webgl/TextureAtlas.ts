@@ -403,6 +403,27 @@ export class TextureAtlas {
       }
     });
 
+    // 8.4. Radiant Twinkling Sparkle Starburst (32x32)
+    placeItem('sparkle_star', 32, 32, (c, x, y) => {
+      c.save();
+      c.translate(x + 16, y + 16);
+      c.fillStyle = '#ffffff';
+      // 4-point diamond cross flare
+      c.beginPath();
+      c.moveTo(0, -14);
+      c.quadraticCurveTo(0, 0, 14, 0);
+      c.quadraticCurveTo(0, 0, 0, 14);
+      c.quadraticCurveTo(0, 0, -14, 0);
+      c.quadraticCurveTo(0, 0, 0, -14);
+      c.closePath();
+      c.fill();
+      // Center brilliant core
+      c.beginPath();
+      c.arc(0, 0, 4, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    });
+
     // 5. Upload atlas canvas to GPU WebGL Texture
     const tex = gl.createTexture();
     if (!tex) throw new Error('Failed to create WebGL atlas texture');

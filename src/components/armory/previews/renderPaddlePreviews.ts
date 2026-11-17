@@ -161,8 +161,9 @@ export function renderPaddleSpeedPreview(
 
 /**
  * 3. Paddle Chassis Thruster Aura Preview (Current vs Upgraded)
- * Displays the ethereal hull contour halo and orbital celestial stardust motes.
- * Completely distinct from physical bottom fire boosters (stationary, zero downward fire).
+ * Displays the continuous sparkle particle release everywhere across the paddle.
+ * Sparkles continuously emit, drift outward, and twinkle with radiant starburst cross-flares.
+ * Completely distinct from physical bottom fire boosters (stationary, zero downward flame).
  */
 export function renderPaddleFancyPreview(
   ctx: CanvasRenderingContext2D,
@@ -181,7 +182,21 @@ export function renderPaddleFancyPreview(
   const curFancy = currentLevel;
   const nextFancy = isMax ? currentLevel : currentLevel + 1;
 
-  // Left: CURRENT Paddle (Stationary floating, chassis aura only, speedLevel: 1 -> zero bottom flame)
+  // Subtle floating pedestal guide lines
+  ctx.save();
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(leftCenterX - pw * 0.7, centerY + ph + 10);
+  ctx.lineTo(leftCenterX + pw * 0.7, centerY + ph + 10);
+  ctx.moveTo(rightCenterX - pw * 0.7, centerY + ph + 10);
+  ctx.lineTo(rightCenterX + pw * 0.7, centerY + ph + 10);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Left: CURRENT Paddle (Stationary floating, gentle sparkle release, zero bottom flame)
   drawPaddleWithPreset(
     ctx,
     { x: leftCenterX, y: centerY, width: pw, height: ph, vx: 0, targetX: leftCenterX },
@@ -194,7 +209,7 @@ export function renderPaddleFancyPreview(
     }
   );
 
-  // Right: UPGRADED Paddle with Contour Energy Halo & Orbital Stardust Motes
+  // Right: UPGRADED Paddle with Richer Sparkle Particle Emission
   drawPaddleWithPreset(
     ctx,
     { x: rightCenterX, y: centerY, width: pw, height: ph, vx: 0, targetX: rightCenterX },
@@ -207,33 +222,17 @@ export function renderPaddleFancyPreview(
     }
   );
 
-  // Flank brackets indicating active celestial chassis aura containment
-  ctx.save();
-  ctx.strokeStyle = nextFancy === 5 ? '#ffd700' : nextFancy === 4 ? '#c084fc' : nextFancy === 3 ? '#818cf8' : '#38bdf8';
-  ctx.lineWidth = 1.5;
-  const lw = rightCenterX - pw / 2 - 3;
-  const rw = rightCenterX + pw / 2 + 3;
-  ctx.beginPath();
-  ctx.moveTo(lw, centerY - 6);
-  ctx.lineTo(lw - 4, centerY + ph / 2);
-  ctx.lineTo(lw, centerY + ph + 6);
-  ctx.moveTo(rw, centerY - 6);
-  ctx.lineTo(rw + 4, centerY + ph / 2);
-  ctx.lineTo(rw, centerY + ph + 6);
-  ctx.stroke();
-  ctx.restore();
-
   // Tier Labels at Bottom
   const tierName = (lvl: number) =>
     lvl === 1
       ? 'Clean Chassis'
       : lvl === 2
-      ? 'Cyan Halo (6 Motes)'
+      ? '12 Cyan Sparkles'
       : lvl === 3
-      ? 'Indigo Field (10)'
+      ? '20 Indigo Sparkles'
       : lvl === 4
-      ? 'Warp Pulse (14)'
-      : 'Solar Corona (20)';
+      ? '32 Warp Sparkles'
+      : '48 Solar Corona';
 
   ctx.save();
   ctx.font = '10px ui-monospace, SFMono-Regular, monospace';

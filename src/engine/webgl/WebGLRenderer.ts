@@ -265,17 +265,24 @@ export class WebGLRenderer {
     // 5.1. Armored Paddle Hull
     this.batcher.pushSprite(renderPaddleX - paddle.width / 2 - padMargin, paddle.y - padMargin, padSlotW, padSlotH, paddleUV.u0, paddleUV.v0, paddleUV.u1, paddleUV.v1, 1.0, 1.0, 1.0, 1.0);
 
-    // 5.2. Chassis Thruster Aura & Orbital Motes (paddle_fancy Cosmetic Upgrade)
+    // 5.2. Continuous Chassis Sparkle Particle Release (paddle_fancy Upgrade)
     const padFancyLvl = currencyService.getUpgradeLevel('paddle_fancy');
     if (padFancyLvl >= 2) {
+      const pCount = padFancyLvl === 2 ? 12 : padFancyLvl === 3 ? 20 : padFancyLvl === 4 ? 32 : 48;
       const [ar, ag, ab] = padFancyLvl === 2 ? [0.22, 0.74, 0.97] : padFancyLvl === 3 ? [0.51, 0.55, 0.97] : padFancyLvl === 4 ? [0.75, 0.52, 0.99] : [1.0, 0.84, 0.0];
-      const pCount = padFancyLvl === 2 ? 6 : padFancyLvl === 3 ? 10 : padFancyLvl === 4 ? 14 : 20;
+      const starUV = this.atlas.getUV('sparkle_star');
+      const cycle = 1.6;
       for (let i = 0; i < pCount; i++) {
-        const ang = this.animTick * 2.2 + (i * Math.PI * 2) / pCount;
-        const mx = renderPaddleX + Math.cos(ang) * (paddle.width * 0.54 + Math.sin(this.animTick * 3 + i) * 6);
-        const my = paddle.y + paddle.height * 0.5 + Math.sin(ang) * (paddle.height * 0.75 + 4);
-        const [pr, pg, pb] = padFancyLvl === 5 ? (i % 2 === 0 ? [1.0, 0.84, 0.0] : [1.0, 0.03, 0.33]) : [ar, ag, ab];
-        this.batcher.pushSprite(mx - 4, my - 4, 8, 8, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, pr, pg, pb, 0.9);
+        const pAge = (this.animTick * 0.8 + (i * cycle) / pCount) % cycle, prog = pAge / cycle, pAlpha = Math.sin(prog * Math.PI);
+        if (pAlpha <= 0.01) continue;
+        const relX = ((Math.sin(i * 997.1) * 0.5 + 0.5) - 0.5) * paddle.width * 0.88;
+        const relY = ((Math.cos(i * 773.3) * 0.5 + 0.5) - 0.5) * paddle.height * 0.75;
+        const dAngle = Math.atan2(relY, relX) + Math.sin(i + this.animTick * 2) * 0.4, dDist = 6 + prog * (14 + (padFancyLvl - 1) * 4);
+        const px = renderPaddleX + relX + Math.cos(dAngle) * dDist, py = paddle.y + paddle.height * 0.5 + relY + Math.sin(dAngle) * dDist - prog * 6;
+        const [pr, pg, pb] = padFancyLvl === 5 ? (i % 2 === 0 ? [1.0, 0.84, 0.0] : [1.0, 0.05, 0.5]) : [ar, ag, ab];
+        const isStar = (i % 3 === 0 && padFancyLvl >= 3) || padFancyLvl === 5;
+        const sSize = (isStar ? 14 : 9) * (0.8 + 0.2 * Math.sin(this.animTick * 10 + i));
+        this.batcher.pushSprite(px - sSize / 2, py - sSize / 2, sSize, sSize, (isStar ? starUV : dotUV).u0, (isStar ? starUV : dotUV).v0, (isStar ? starUV : dotUV).u1, (isStar ? starUV : dotUV).v1, pr, pg, pb, pAlpha * 0.95);
       }
     }
 
@@ -482,11 +489,9 @@ export class WebGLRenderer {
 }
 
 function parseColorRgb(color: string): [number, number, number] {
-  if (color && color.startsWith('#')) {
-    let hex = color.slice(1);
-    if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
-    const n = parseInt(hex, 16);
-    if (!isNaN(n)) return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
-  }
-  return [1.0, 0.6, 0.2];
+  if (!color || !color.startsWith('#')) return [1.0, 0.6, 0.2];
+  let hex = color.slice(1);
+  if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
+  const n = parseInt(hex, 16);
+  return isNaN(n) ? [1.0, 0.6, 0.2] : [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }

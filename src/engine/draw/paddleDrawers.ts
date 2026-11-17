@@ -299,8 +299,8 @@ export function drawMechTitanPaddle(
     });
   }
 
-  // 7. Chassis Thruster Aura & Orbital Stardust Motes (paddle_fancy Cosmetic Upgrade)
-  // Distinct from bottom fire propulsion: wraps the armored hull with an ethereal halo and orbital motes
+  // 7. Continuous Chassis Sparkle Particle Release (paddle_fancy Upgrade)
+  // Sparkles continuously release and drift outward everywhere from the paddle hull
   const fancyLevel = options.fancyLevel || 1;
   if (fancyLevel >= 2) {
     const auraColor =
@@ -312,42 +312,73 @@ export function drawMechTitanPaddle(
         ? 'rgba(192, 132, 252, 0.65)'
         : 'rgba(251, 191, 36, 0.75)';
 
-    // 7.1. Pulsating Hull Contour Aura Halo
+    // 7.1. Soft Breathing Hull Contour Halo
     ctx.save();
     const haloPulse = 0.5 + Math.sin(animTick * 6) * 0.25;
     ctx.strokeStyle = auraColor;
-    ctx.lineWidth = fancyLevel === 5 ? 3.5 : 2.2;
+    ctx.lineWidth = fancyLevel === 5 ? 2.5 : 1.8;
     ctx.shadowColor = fancyLevel === 5 ? '#ffd700' : fancyLevel === 4 ? '#c084fc' : '#38bdf8';
-    ctx.shadowBlur = 12 * haloPulse;
-    drawChamfer(ctx, px - 3, py - 3, pw + 6, ph + 6, chamfer + 2);
+    ctx.shadowBlur = 10 * haloPulse;
+    drawChamfer(ctx, px - 2, py - 2, pw + 4, ph + 4, chamfer + 2);
     ctx.stroke();
     ctx.restore();
 
-    // 7.2. Orbital Celestial Stardust Motes (Smooth 3D orbit around hull & wingtips)
-    const fancyParticleCount = fancyLevel === 2 ? 6 : fancyLevel === 3 ? 10 : fancyLevel === 4 ? 14 : 20;
+    // 7.2. Radiant Sparkle Particle Emission (Always releasing slowly everywhere across the paddle)
+    const pCount = fancyLevel === 2 ? 12 : fancyLevel === 3 ? 20 : fancyLevel === 4 ? 32 : 48;
     const baseColor =
       fancyLevel === 2 ? '#38bdf8' : fancyLevel === 3 ? '#818cf8' : fancyLevel === 4 ? '#c084fc' : '#ffd700';
+    const cycle = 1.6;
 
-    for (let i = 0; i < fancyParticleCount; i++) {
-      const angle = animTick * 2.2 + (i * Math.PI * 2) / fancyParticleCount;
-      const rx = pw * 0.54 + Math.sin(animTick * 3 + i) * 6;
-      const ry = ph * 0.75 + Math.cos(animTick * 2.5 + i) * 4;
-      const mx = paddle.x + Math.cos(angle) * rx;
-      const my = py + ph * 0.5 + Math.sin(angle) * ry;
-      const pColor = fancyLevel === 5 ? (i % 2 === 0 ? '#ffd700' : '#ff0055') : baseColor;
+    for (let i = 0; i < pCount; i++) {
+      const pAge = (animTick * 0.8 + (i * cycle) / pCount) % cycle;
+      const prog = pAge / cycle; // 0 to 1 lifetime
+      const pAlpha = Math.sin(prog * Math.PI); // Fades in smoothly, peaks at mid-flight, fades out
+      if (pAlpha <= 0.01) continue;
 
+      // Origin dispersed everywhere across paddle body & edges
+      const relX = ((Math.sin(i * 997.1) * 0.5 + 0.5) - 0.5) * pw * 0.88;
+      const relY = ((Math.cos(i * 773.3) * 0.5 + 0.5) - 0.5) * ph * 0.75;
+
+      // Gentle omni-directional outward drift + slight upward float
+      const driftAngle = Math.atan2(relY, relX) + Math.sin(i + animTick * 2) * 0.4;
+      const driftDist = 6 + prog * (14 + (fancyLevel - 1) * 4);
+      const sx = paddle.x + relX + Math.cos(driftAngle) * driftDist;
+      const sy = py + ph * 0.5 + relY + Math.sin(driftAngle) * driftDist - prog * 6;
+
+      const pColor = fancyLevel === 5 ? (i % 2 === 0 ? '#ffd700' : '#ff007f') : baseColor;
+      const twinkle = 0.7 + 0.3 * Math.sin(animTick * 14 + i * 5);
+      const isStar = (i % 3 === 0 && fancyLevel >= 3) || fancyLevel === 5;
+
+      ctx.save();
+      ctx.globalAlpha = pAlpha * twinkle;
+
+      // Outer soft glow
       ctx.fillStyle = pColor;
-      ctx.globalAlpha = 0.4;
       ctx.beginPath();
-      ctx.arc(mx, my, 4.0, 0, Math.PI * 2);
+      ctx.arc(sx, sy, isStar ? 3.5 : 2.5, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.globalAlpha = 0.95;
+      // Brilliant white core
+      ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(mx, my, 2.0, 0, Math.PI * 2);
+      ctx.arc(sx, sy, isStar ? 1.6 : 1.1, 0, Math.PI * 2);
       ctx.fill();
+
+      // 4-point diamond cross flare for radiant starburst sparkles
+      if (isStar) {
+        const flareR = 3.5 + 1.5 * Math.sin(animTick * 12 + i);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.0;
+        ctx.beginPath();
+        ctx.moveTo(sx - flareR, sy);
+        ctx.lineTo(sx + flareR, sy);
+        ctx.moveTo(sx, sy - flareR);
+        ctx.lineTo(sx, sy + flareR);
+        ctx.stroke();
+      }
+
+      ctx.restore();
     }
-    ctx.globalAlpha = 1.0;
   }
 
   ctx.restore();

@@ -23,6 +23,7 @@ import { RoadmapObstacles } from '../roadmap/RoadmapObstacles';
 import { RoadmapSectorBanner } from '../roadmap/RoadmapSectorBanner';
 import { RoadmapNodeItem } from '../roadmap/RoadmapNodeItem';
 import { LevelMapHeader } from '../roadmap/LevelMapHeader';
+import { arcadeScrollService } from '../../services/arcadeScroll';
 
 // ─── Scroll-linked perspective scale ─────────────────────────────────────────
 const SCALE_HORIZON = 0.85;      // Subtle arcade depth (85% size at top of screen)
@@ -32,11 +33,8 @@ const SCALE_MAX = 1.0;
 const FOREGROUND_LIMIT_Y = 0.48;
 const FADE_ZONE = 0.0;          // Full screen visibility without artificial blackout zones
 
-// Retain user's current scroll position across tab navigation (no jarring auto-scroll)
-let savedArcadeScrollTop: number | null = null;
-
 export const ArcadeView: React.FC = () => {
-  const { localLevels, localProgress, openPreview, user, setActiveTab, isOpeningLevel } = useGame();
+  const { localLevels, localProgress, openPreview, user, setActiveTab, isOpeningLevel, selectedLevel } = useGame();
   const [displayCores, setDisplayCores] = useState<number>(() => currencyService.getBalance());
   const [dailyStatus, setDailyStatus] = useState<DailyCollectStatus>(() => currencyService.getDailyCollectStatus());
   const [isPulsing] = useState<boolean>(false);
@@ -109,6 +107,23 @@ export const ArcadeView: React.FC = () => {
     return highest;
   }, [localProgress]);
 
+  // ── Target Level for Centering (Current Play Level) ──────────────────────────
+  const currentPlayLevelId = useMemo(() => {
+    if (selectedLevel) {
+      const num = parseInt(selectedLevel.id, 10);
+      if (!isNaN(num) && num >= 1 && num <= TOTAL_LEVELS) return num;
+    }
+    const savedLast = arcadeScrollService.getLastPlayedLevel();
+    if (savedLast >= 1 && savedLast <= TOTAL_LEVELS) {
+      return savedLast;
+    }
+    for (let i = 1; i <= TOTAL_LEVELS; i++) {
+      const p = localProgress[String(i)];
+      if (p !== undefined && !p.completed) return i;
+    }
+    return currentUnlockedId || 1;
+  }, [selectedLevel, localProgress, currentUnlockedId]);
+
   // ── Total Campaign Stars Earned ──────────────────────────────────────────────
   const totalStars = useMemo(() => {
     return Object.values(localProgress).reduce((acc, p) => {
@@ -179,20 +194,32 @@ export const ArcadeView: React.FC = () => {
     refreshScaleElements();
   }, [currentUnlockedId, nodes, refreshScaleElements]);
 
-  // ── Restore current scroll position without jarring auto-scroll jump ────────
+  const userInteractedRef = useRef<boolean>(false);
+  const initialCenteredLevelRef = useRef<number | null>(null);
+
+  const getScrollTopForLevel = useCallback((levelId: number, container: HTMLElement) => {
+    const clampedLevel = Math.max(1, Math.min(TOTAL_LEVELS, levelId));
+    const targetY = TOTAL_HEIGHT - BOTTOM_OFFSET - (clampedLevel - 1) * SPACING;
+    const viewH = container.clientHeight || window.innerHeight;
+    const maxScroll = Math.max(0, container.scrollHeight - viewH);
+    return Math.max(0, Math.min(maxScroll, Math.round(targetY - viewH * 0.5)));
+  }, []);
+
+  // ── Immediately position scroll to current play level without jarring jumps ──
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
-    if (savedArcadeScrollTop !== null) {
-      container.scrollTop = savedArcadeScrollTop;
-    } else {
-      const el = activeRef.current;
-      const h = container.clientHeight;
-      const initialTop = el ? Math.max(0, el.offsetTop - h * 0.55) : container.scrollHeight;
-      container.scrollTop = initialTop;
-      savedArcadeScrollTop = initialTop;
+
+    const savedTop = arcadeScrollService.getSavedScroll();
+    if (!userInteractedRef.current && (savedTop === null || initialCenteredLevelRef.current !== currentPlayLevelId)) {
+      const targetTop = getScrollTopForLevel(currentPlayLevelId, container);
+      container.scrollTop = targetTop;
+      arcadeScrollService.setSavedScroll(targetTop);
+      initialCenteredLevelRef.current = currentPlayLevelId;
+    } else if (savedTop !== null) {
+      container.scrollTop = savedTop;
     }
-  }, [currentUnlockedId]);
+  }, [currentPlayLevelId, getScrollTopForLevel]);
 
   // ── rAF scroll-linked perspective scale ───────────────────────────────────────
   // Projects both objects and conduit path segments with authentic 3D perspective:
@@ -206,7 +233,6 @@ export const ArcadeView: React.FC = () => {
       }
 
       const scrollTop = container.scrollTop;
-      savedArcadeScrollTop = scrollTop;
       const viewH = container.clientHeight;
 
       // Perspective projection function:
@@ -324,7 +350,11 @@ export const ArcadeView: React.FC = () => {
       return;
     }
     const level = localLevels[levelId - 1];
-    if (level) openPreview(level);
+    if (level) {
+      arcadeScrollService.setLastPlayedLevel(levelId);
+      arcadeScrollService.reset();
+      openPreview(level);
+    }
   };
 
   const handleBlockerClick = (blocker: RouteBlocker) => {
@@ -358,6 +388,14 @@ export const ArcadeView: React.FC = () => {
       {/* ── Scroll container ────────────────────────────────────────────────── */}
       <div
         ref={scrollRef}
+        onPointerDown={() => { userInteractedRef.current = true; }}
+        onTouchStart={() => { userInteractedRef.current = true; }}
+        onWheel={() => { userInteractedRef.current = true; }}
+        onScroll={() => {
+          if (scrollRef.current && userInteractedRef.current) {
+            arcadeScrollService.setSavedScroll(scrollRef.current.scrollTop);
+          }
+        }}
         className="relative w-full h-full overflow-y-auto overflow-x-hidden select-none"
         style={{
           scrollbarWidth: 'none',
@@ -415,8 +453,7 @@ export const ArcadeView: React.FC = () => {
           {/* Level Energy Cells */}
           {nodes.map((node) => {
             const progress   = localProgress[String(node.id)];
-            const isComplete = progress?.completed;
-            const isCurrent  = node.id === currentUnlockedId && !isComplete;
+            const isCurrent  = node.id === currentPlayLevelId;
 
             return (
               <RoadmapNodeItem

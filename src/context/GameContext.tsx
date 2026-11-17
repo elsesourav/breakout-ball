@@ -9,6 +9,7 @@ import { dbService } from '../services/db';
 import { authService } from '../services/auth';
 import { currencyService } from '../services/currency';
 import { accountMigrationService } from '../services/accountMigration';
+import { arcadeScrollService } from '../services/arcadeScroll';
 import { parseCurrentRoute, getRoutePath, pushAppRoute, replaceAppRoute, scrubUrlParams } from '../services/router';
 import { processLevelCompletion } from './gameCompletionHelper';
 import { INITIAL_LOCAL_LEVELS } from '../constants/levels';
@@ -57,7 +58,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const match = [...INITIAL_LOCAL_LEVELS, ...INITIAL_ONLINE_LEVELS].find((l) => l.id === initialRoute.levelId);
       if (match) return match;
     }
-    return INITIAL_LOCAL_LEVELS[0] || null;
+    const lastLevel = arcadeScrollService.getLastPlayedLevel();
+    return INITIAL_LOCAL_LEVELS[lastLevel - 1] || INITIAL_LOCAL_LEVELS[0] || null;
   });
   const [editingLevel, setEditingLevel] = useState<LevelData | null>(null);
   const [localLevels, setLocalLevels] = useState<LevelData[]>(() => INITIAL_LOCAL_LEVELS);
@@ -115,6 +117,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (route.type === 'level' && route.levelId) {
           const found = allLevels.find((lvl) => lvl.id === route.levelId);
           if (found) {
+            arcadeScrollService.setLastPlayedLevel(found.id);
+            arcadeScrollService.reset();
             setSelectedLevel(found);
             const board = await dbService.getLeaderboard(found.id);
             setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
@@ -126,6 +130,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else if (route.type === 'play' && route.levelId) {
           const found = allLevels.find((lvl) => lvl.id === route.levelId);
           if (found) {
+            arcadeScrollService.setLastPlayedLevel(found.id);
+            arcadeScrollService.reset();
             setSelectedLevel(found); setScreenState('playing'); soundManager.startBgMusic();
             const isRestricted = isLevelSelfMadeOrTest(found);
             achievementManager.setRestrictedContext(isRestricted);
@@ -135,7 +141,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
         replaceAppRoute(getRoutePath(route.tab, 'menu'));
-        setSelectedLevel(locals[0] || null);
+        const lastLvl = arcadeScrollService.getLastPlayedLevel();
+        let targetLevel = locals[lastLvl - 1] || locals[0] || null;
+        if (!locals[lastLvl - 1]) {
+          for (let i = 1; i <= locals.length; i++) {
+            const p = userProgress[String(i)];
+            if (p !== undefined && !p.completed) {
+              targetLevel = locals[i - 1] || targetLevel;
+              break;
+            }
+          }
+        }
+        if (targetLevel) {
+          arcadeScrollService.setLastPlayedLevel(targetLevel.id);
+        }
+        setSelectedLevel(targetLevel);
       } catch (err) {
         console.error('Error during initial data load:', err);
       } finally {
@@ -156,10 +176,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const route = parseCurrentRoute();
       const allLevels = [...localLevels, ...onlineLevels, ...userCreatedLevels];
       if (route.type === 'tab') {
+        arcadeScrollService.reset();
         setActiveTabState(route.tab); setScreenState('menu');
       } else if (route.levelId) {
         const found = allLevels.find((lvl) => lvl.id === route.levelId);
         if (found) {
+          arcadeScrollService.setLastPlayedLevel(found.id);
+          arcadeScrollService.reset();
           setSelectedLevel(found);
           if (route.type === 'level') {
             const board = await dbService.getLeaderboard(found.id);
@@ -228,11 +251,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setScreen = useCallback((newScreen: GameScreen) => {
     if (newScreen !== 'playing') achievementManager.setRestrictedContext(false);
-    setScreenState(newScreen);
     if (newScreen === 'menu') {
+      arcadeScrollService.reset();
       isOpeningLevelRef.current = false; setIsOpeningLevel(false); setLoadingLeaderboardLevelId(null);
       pushAppRoute(getRoutePath(activeTab, 'menu'));
     }
+    setScreenState(newScreen);
   }, [activeTab]);
 
   const updateSettings = (newSettings: Partial<GameSettings>) => setSettings((prev) => ({ ...prev, ...newSettings }));
@@ -281,6 +305,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logoutUser = useCallback(async () => {
     soundManager.playClick();
+    arcadeScrollService.setLastPlayedLevel(1);
+    arcadeScrollService.reset();
     const prevUser = user.username;
     await authService.logout();
     currencyService.reset();
@@ -303,7 +329,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user?.id, user?.username]);
 
   const startPlayLevel = useCallback((level: LevelData) => {
-    soundManager.playClick(); setSelectedLevel(level); setScreenState('playing'); soundManager.startBgMusic();
+    soundManager.playClick();
+    arcadeScrollService.setLastPlayedLevel(level.id);
+    arcadeScrollService.reset();
+    setSelectedLevel(level); setScreenState('playing'); soundManager.startBgMusic();
     const isRestricted = isLevelSelfMadeOrTest(level);
     achievementManager.setRestrictedContext(isRestricted);
     if (!isRestricted) {
@@ -318,6 +347,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const openPreview = useCallback(async (level: LevelData) => {
     if (isOpeningLevelRef.current) return;
     isOpeningLevelRef.current = true; setIsOpeningLevel(true); soundManager.playClick();
+    arcadeScrollService.setLastPlayedLevel(level.id);
+    arcadeScrollService.reset();
     setSelectedLevel(level); setScreenState('preview');
     pushAppRoute(getRoutePath(activeTab, 'preview', level.id));
     setLoadingLeaderboardLevelId(level.id);
@@ -365,6 +396,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       const levelNum = parseInt(levelId, 10);
       if (!isNaN(levelNum) && !isRestricted) {
+        const nextLevelNum = Math.min(100, levelNum + 1);
+        arcadeScrollService.setLastPlayedLevel(nextLevelNum);
+        arcadeScrollService.reset();
         setLocalProgress((prev) => {
           const current = prev[levelId];
           const isBetter = !current?.bestTime || time < current.bestTime;

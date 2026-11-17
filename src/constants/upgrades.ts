@@ -140,20 +140,20 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
       lvl === 1
         ? 'Standard (Clean Chassis)'
         : lvl === 2
-        ? 'Tier 1: Cyan Ion Halo (6 Aura Motes)'
+        ? 'Tier 1: Cyan Sparkles (12 P)'
         : lvl === 3
-        ? 'Tier 2: Electric Indigo Field (10 Aura Motes)'
+        ? 'Tier 2: Electric Indigo (20 P)'
         : lvl === 4
-        ? 'Tier 3: Violet Warp Pulse (14 Aura Motes)'
-        : 'Tier 4: Prismatic Solar Corona (20 Celestial Motes)',
+        ? 'Tier 3: Violet Warp (32 P)'
+        : 'Tier 4: Prismatic Solar Corona (48 P)',
     nextLabel: (lvl) =>
       lvl <= 1
-        ? 'Tier 1: Cyan Ion Halo (6 Aura Motes)'
+        ? 'Tier 1: Cyan Sparkles (12 P)'
         : lvl === 2
-        ? 'Tier 2: Electric Indigo Field (10 Aura Motes)'
+        ? 'Tier 2: Electric Indigo (20 P)'
         : lvl === 3
-        ? 'Tier 3: Violet Warp Pulse (14 Aura Motes)'
-        : 'Tier 4: Prismatic Solar Corona (20 Celestial Motes)',
+        ? 'Tier 3: Violet Warp (32 P)'
+        : 'Tier 4: Prismatic Solar Corona (48 P)',
   },
 ];
 

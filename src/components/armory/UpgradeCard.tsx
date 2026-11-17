@@ -119,27 +119,27 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
       };
     case 'paddle_fancy':
       return {
-        statName: 'CHASSIS AURA',
+        statName: 'SPARKLE AURA',
         current:
           level === 1
             ? 'OFF'
             : level === 2
-            ? 'CYAN HALO'
+            ? '12 CYAN'
             : level === 3
-            ? 'INDIGO FIELD'
+            ? '20 INDIGO'
             : level === 4
-            ? 'WARP PULSE'
-            : 'SOLAR CORONA',
+            ? '32 WARP'
+            : '48 CORONA',
         delta:
           level >= 5
             ? null
             : level === 1
-            ? 'CYAN HALO'
+            ? '12 CYAN'
             : level === 2
-            ? 'INDIGO FIELD'
+            ? '20 INDIGO'
             : level === 3
-            ? 'WARP PULSE'
-            : 'SOLAR CORONA',
+            ? '32 WARP'
+            : '48 CORONA',
       };
     default:
       return {

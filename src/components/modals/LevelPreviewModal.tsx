@@ -28,6 +28,7 @@ import {
 } from '../../services/dailyApex';
 import { cyberToast } from '../common/CyberToast';
 import { soundManager } from '../../audio';
+import { arcadeScrollService } from '../../services/arcadeScroll';
 import { currencyService } from '../../services/currency';
 import { CoreIcon } from '../common/CoreIcon';
 
@@ -146,6 +147,7 @@ export const LevelPreviewModal: React.FC = () => {
       className="active"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
+          arcadeScrollService.reset();
           setSelectedLevel(null);
           setScreen('menu');
         }
@@ -414,6 +416,7 @@ export const LevelPreviewModal: React.FC = () => {
           <button
             type="button"
             onClick={() => {
+              arcadeScrollService.reset();
               setSelectedLevel(null);
               setScreen('menu');
             }}
