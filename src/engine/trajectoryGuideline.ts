@@ -112,11 +112,10 @@ export function calculateTrajectoryGuideline(
 
   // 2. Velocity direction check: ball must be actively descending towards paddle plane
   const isDescending = ball.vy > 0.1;
-  const closestPadX = Math.max(padLeft, Math.min(padRight, ball.x));
-  const distToPaddle = Math.hypot(ball.x - closestPadX, targetY - ball.y);
+  const distToPaddlePlane = targetY - ball.y;
 
-  // 3. Radius check: ball must be under the upgrade level's detection radius
-  const isUnderRadius = ball.y < targetY && distToPaddle <= detectionRadius;
+  // 3. Radius check: ball must be within the upgrade level's detection radius of paddle plane
+  const isUnderRadius = ball.y < targetY && distToPaddlePlane <= detectionRadius;
 
   if (!isDescending || !isUnderRadius) {
     const lerpSpeed = 4.0;
@@ -179,10 +178,12 @@ export function calculateTrajectoryGuideline(
   const hitX = curX;
   const hitY = targetY;
 
-  // 5. Paddle Collision Feasibility Check: velocity direction must collide with paddle
-  const isHit = hitX >= padLeft - ballR * 0.4 && hitX <= padRight + ballR * 0.4;
+  // 5. Paddle Collision Feasibility Check: whether velocity trajectory or ball position intercepts paddle
+  const isHit =
+    (hitX >= padLeft - ballR * 1.5 && hitX <= padRight + ballR * 1.5) ||
+    (ball.x >= padLeft - ballR * 0.5 && ball.x <= padRight + ballR * 0.5 && distToPaddlePlane <= 350);
 
-  // Only draw the V-type line when velocity direction correctly intercepts the paddle
+  // Strictly do NOT render guideline when trajectory misses the paddle
   if (!isHit) {
     const lerpSpeed = 4.0;
     const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * lerpSpeed);
@@ -204,7 +205,7 @@ export function calculateTrajectoryGuideline(
     };
   }
 
-  // 6. Alpha Calculation: instant high-visibility onset (0.80) when collision aligns, smoothly reaching 1.0
+  // 6. Alpha Calculation: high-visibility onset (0.80) when descending into range, reaching 1.0
   const targetAlpha = 1.0;
   const baselineAlpha = currentFadeAlpha < 0.80 ? 0.80 : currentFadeAlpha;
   const lerpSpeed = 12.0;
@@ -291,7 +292,7 @@ export function calculateTrajectoryGuideline(
     guideline: {
       visible: true,
       alpha: nextFadeAlpha,
-      isHit: true,
+      isHit,
       hitX,
       hitY,
       incomingSegments,

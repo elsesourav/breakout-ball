@@ -82,9 +82,11 @@ export class PowerUpManager {
   ): {
     collected: PowerUpType[];
     laserHits: { blockIndex: number; x: number; y: number }[];
+    muzzleFlashes: { x: number; y: number }[];
   } {
     const collectedTypes: PowerUpType[] = [];
     const laserHits: { blockIndex: number; x: number; y: number }[] = [];
+    const muzzleFlashes: { x: number; y: number }[] = [];
 
     // 1. Update active power-up shard drops
     const halfPadW = paddle.width / 2;
@@ -145,13 +147,17 @@ export class PowerUpManager {
             w: boltW,
             h: boltH,
           });
+          muzzleFlashes.push({ x: paddle.x, y: paddle.y - 6 });
         } else {
           // Twin plasma cannons
           const cannonOffset = halfPadW * 0.75;
+          const leftX = paddle.x - cannonOffset;
+          const rightX = paddle.x + cannonOffset;
           this.lasers.push(
-            { id: this.nextId++, x: paddle.x - cannonOffset, y: paddle.y - 6, vy: -950, w: boltW, h: boltH },
-            { id: this.nextId++, x: paddle.x + cannonOffset, y: paddle.y - 6, vy: -950, w: boltW, h: boltH }
+            { id: this.nextId++, x: leftX, y: paddle.y - 6, vy: -950, w: boltW, h: boltH },
+            { id: this.nextId++, x: rightX, y: paddle.y - 6, vy: -950, w: boltW, h: boltH }
           );
+          muzzleFlashes.push({ x: leftX, y: paddle.y - 6 }, { x: rightX, y: paddle.y - 6 });
         }
       }
     }
@@ -187,7 +193,7 @@ export class PowerUpManager {
       }
     }
 
-    return { collected: collectedTypes, laserHits };
+    return { collected: collectedTypes, laserHits, muzzleFlashes };
   }
 
   public activateBuff(type: PowerUpType) {

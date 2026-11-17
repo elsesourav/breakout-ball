@@ -115,16 +115,11 @@ export class GameEngine {
 
     this.tsPhysics.loadBlocks(level.blocks);
     this.tsPhysics.resetBall(initialBallX, initialBallY, 0, 0);
-    if (this.tsPhysics.balls[0]) {
-      this.tsPhysics.balls[0].radius = ballRad;
-      this.tsPhysics.balls[0].baseSpeed = ballSpd;
-      this.tsPhysics.balls[0].speed = ballSpd;
-    }
+    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, baseSpeed: ballSpd, speed: ballSpd });
 
     if (this.useWasm && this.wasmBridge.ready) {
       this.wasmBridge.initEngine(CANVAS_WIDTH, CANVAS_HEIGHT, padW, PADDLE_HEIGHT, ballRad, ballSpd, BLOCK_WIDTH, BLOCK_HEIGHT);
-      const synced = this.tsPhysics.blocks.map((b) => ({ x: b.col, y: b.row, h: b.health, portalPairId: b.portalPairId }));
-      this.wasmBridge.loadBlocks(synced, BLOCK_WIDTH, BLOCK_HEIGHT);
+      this.wasmBridge.loadBlocks(this.tsPhysics.blocks.map((b) => ({ x: b.col, y: b.row, h: b.health, portalPairId: b.portalPairId })), BLOCK_WIDTH, BLOCK_HEIGHT);
       this.wasmBridge.resetBall(initialBallX, initialBallY, 0, 0);
     }
 
@@ -138,44 +133,31 @@ export class GameEngine {
     const padSpd = 800 + (currencyService.getUpgradeLevel('paddle_speed') - 1) * (800 / 7);
     const ballRad = BALL_RADIUS * (1 + (currencyService.getUpgradeLevel('ball_size') - 1) * 0.05);
     const ballSpd = BALL_SPEED * (1 + (currencyService.getUpgradeLevel('ball_speed') - 1) * 0.035);
-    this.tsPhysics.paddle.width = padW;
-    this.tsPhysics.paddle.maxSpeed = padSpd;
-    this.tsPhysics.config.ballRadius = ballRad;
-    this.tsPhysics.config.ballSpeed = ballSpd;
+    Object.assign(this.tsPhysics.paddle, { width: padW, maxSpeed: padSpd });
+    Object.assign(this.tsPhysics.config, { ballRadius: ballRad, ballSpeed: ballSpd });
     return { padW, padSpd, ballRad, ballSpd };
   }
 
   public launchBall() {
     if (this.state.status !== 'countdown' && this.state.status !== 'playing' && this.state.status !== 'paused') return;
     this.state.status = 'playing';
-
-    const { padW, padSpd, ballRad, ballSpd } = this.applyUpgrades();
+    const { ballRad, ballSpd } = this.applyUpgrades();
     const paddle = this.tsPhysics.paddle;
-    const ballX = paddle.x;
-    const ballY = paddle.y - ballRad - 4;
+    const ballX = paddle.x, ballY = paddle.y - ballRad - 4;
     const maxSpeed = paddle.maxSpeed || 1600;
     const paddleVelRatio = Math.max(-1, Math.min(1, paddle.vx / maxSpeed));
-    const boardCenter = CANVAS_WIDTH / 2;
-    const paddlePosRatio = (paddle.x - boardCenter) / boardCenter;
+    const paddlePosRatio = (paddle.x - CANVAS_WIDTH / 2) / (CANVAS_WIDTH / 2);
 
     let throwAngle = Math.abs(paddle.vx) > 30
       ? -Math.PI / 2 + paddleVelRatio * 0.55
       : -Math.PI / 2 + (-paddlePosRatio * 0.25) + (Math.random() - 0.5) * 0.1;
 
     throwAngle = Math.max((-150 * Math.PI) / 180, Math.min((-30 * Math.PI) / 180, throwAngle));
-    const vx = Math.cos(throwAngle) * ballSpd;
-    const vy = Math.sin(throwAngle) * ballSpd;
+    const vx = Math.cos(throwAngle) * ballSpd, vy = Math.sin(throwAngle) * ballSpd;
 
     this.tsPhysics.resetBall(ballX, ballY, vx, vy);
-    if (this.tsPhysics.balls[0]) {
-      Object.assign(this.tsPhysics.balls[0], {
-        radius: ballRad, baseSpeed: ballSpd, speed: ballSpd, prevX: ballX, prevY: ballY,
-      });
-    }
-
-    if (this.useWasm && this.wasmBridge.ready) {
-      this.wasmBridge.resetBall(ballX, ballY, vx, vy);
-    }
+    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, baseSpeed: ballSpd, speed: ballSpd, prevX: ballX, prevY: ballY });
+    if (this.useWasm && this.wasmBridge.ready) this.wasmBridge.resetBall(ballX, ballY, vx, vy);
   }
 
   public startLoop() {
@@ -187,7 +169,7 @@ export class GameEngine {
     const loop = () => {
       const now = performance.now();
       if (isFirstFrame) { this.lastTime = now; this.accumulator = 0; isFirstFrame = false; }
-      let dt = (now - this.lastTime) / 1000;
+      let dt = Math.min((now - this.lastTime) / 1000, this.MAX_FRAME_DELTA);
       this.lastTime = now;
 
       if (this.isPaused) {
@@ -197,7 +179,6 @@ export class GameEngine {
         return;
       }
 
-      if (dt > this.MAX_FRAME_DELTA) dt = this.MAX_FRAME_DELTA;
       this.accumulator += dt;
       while (this.accumulator >= this.FIXED_STEP) {
         this.fixedTick(this.FIXED_STEP);
@@ -238,6 +219,32 @@ export class GameEngine {
         b.prevX = b.x; b.prevY = b.y;
         b.x = this.tsPhysics.paddle.x; b.y = this.tsPhysics.paddle.y - b.radius - 4;
         b.vx = 0; b.vy = 0; b.isActive = false;
+      }
+      // Fly remaining bullets off screen on complete/pause (never stuck/frozen)
+      for (let l = this.powerUps.lasers.length - 1; l >= 0; l--) {
+        const bolt = this.powerUps.lasers[l];
+        bolt.y += bolt.vy * dt;
+        this.particles.spawnLaserTrail(bolt.x, bolt.y);
+        if (bolt.y < -50) this.powerUps.lasers.splice(l, 1);
+      }
+      // Continue falling power-up drops off screen
+      for (let d = this.powerUps.drops.length - 1; d >= 0; d--) {
+        const drop = this.powerUps.drops[d];
+        drop.y += drop.vy * dt; drop.angle += 0.05;
+        if (drop.y > CANVAS_HEIGHT + 60) this.powerUps.drops.splice(d, 1);
+      }
+      // Smoothly deactivate active powers on win
+      if (this.state.status === 'win') {
+        const d = dt * 3.5, b = this.powerUps.buffs;
+        b.laser = Math.max(0, b.laser - d); b.megaBall = Math.max(0, b.megaBall - d);
+        b.slowMo = Math.max(0, b.slowMo - d); b.expand = Math.max(0, b.expand - d);
+        b.shield = Math.max(0, b.shield - d); b.hasShield = b.shield > 0;
+        this.tsPhysics.isMegaBall = false; this.tsPhysics.hasShield = false;
+        const baseW = PADDLE_WIDTH * (1 + (currencyService.getUpgradeLevel('paddle_width') - 1) * 0.08);
+        if (this.tsPhysics.paddle.width > baseW) {
+          this.tsPhysics.paddle.width = Math.max(baseW, this.tsPhysics.paddle.width - (this.tsPhysics.paddle.width - baseW) * dt * 4.0);
+        }
+        this.callbacks.onBuffsChange?.(this.powerUps.getActiveBuffs());
       }
       this.particles.update(CANVAS_WIDTH, CANVAS_HEIGHT);
       this.explosions.update(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -281,7 +288,9 @@ export class GameEngine {
     } else {
       events = this.tsPhysics.step(6);
     }
-    const { collected, laserHits } = this.powerUps.update(this.tsPhysics.paddle, dt, this.tsPhysics.blocks);
+    const { collected, laserHits, muzzleFlashes } = this.powerUps.update(this.tsPhysics.paddle, dt, this.tsPhysics.blocks);
+    if (muzzleFlashes?.length) for (const f of muzzleFlashes) this.particles.spawnLaserMuzzleFlash(f.x, f.y);
+    if (this.powerUps.lasers.length) for (const bolt of this.powerUps.lasers) this.particles.spawnLaserTrail(bolt.x, bolt.y);
 
     if (this.callbacks.onBuffsChange) {
       this.buffsEmitTimer = (this.buffsEmitTimer || 0) + 1;
@@ -315,6 +324,7 @@ export class GameEngine {
     }
 
     for (const hit of laserHits) {
+      this.particles.spawnLaserImpact(hit.x, hit.y);
       const block = this.tsPhysics.blocks[hit.blockIndex];
       if (block && !block.isDead) {
         block.hitAnim = 1.0;
@@ -333,22 +343,13 @@ export class GameEngine {
 
     let empDestroyStagger = 0;
     for (const ev of events) {
-      if (ev.source === 'emp' && ev.type === 'block_destroy') {
-        empDestroyStagger++;
-        const delayMs = empDestroyStagger * 28;
-        setTimeout(() => {
-          this.audio.triggerEvent(ev.type, ev.combo, ev.source);
-          this.callbacks.onEventAudio?.(ev.type, ev.combo);
-        }, delayMs);
-      } else {
-        this.audio.triggerEvent(ev.type, ev.combo, ev.source);
-        this.callbacks.onEventAudio?.(ev.type, ev.combo);
-      }
+      const playAudio = () => { this.audio.triggerEvent(ev.type, ev.combo, ev.source); this.callbacks.onEventAudio?.(ev.type, ev.combo); };
+      if (ev.source === 'emp' && ev.type === 'block_destroy') setTimeout(playAudio, ++empDestroyStagger * 28);
+      else playAudio();
 
       if (ev.type === 'paddle') {
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
-        this.state.combo = 0;
-        this.callbacks.onComboChange?.(0);
+        this.state.combo = 0; this.callbacks.onComboChange?.(0);
       } else if (ev.type === 'portal_warp') {
         this.particles.spawnPaddleBounce(ev.hitX, ev.hitY);
         this.particles.addFloatingText('🌀 PORTAL WARP', ev.hitX, ev.hitY, '#00f7ff');
@@ -371,9 +372,7 @@ export class GameEngine {
         this.triggerCameraShake(3.0);
       } else if (ev.type === 'block_damage' || ev.type === 'crit_damage' || ev.type === 'block_destroy') {
         const block = this.tsPhysics.blocks[ev.blockIndex];
-        const isCrit = ev.type === 'crit_damage';
-        const isDestroy = ev.type === 'block_destroy';
-        const isEmpSource = ev.source === 'emp';
+        const isCrit = ev.type === 'crit_damage', isDestroy = ev.type === 'block_destroy', isEmpSource = ev.source === 'emp';
         const fallback = isCrit ? '#fbbf24' : isDestroy ? '#ff0844' : '#00f7ff';
         const color = block ? BLOCK_COLORS[block.initialHealth]?.border || fallback : fallback;
 
@@ -385,26 +384,14 @@ export class GameEngine {
             this.explosions.spawnNearBlockShatter(block.x, block.y, block.w, block.h, color, ev.epicenterX, ev.epicenterY);
           }
         } else if (!isDestroy) {
-          if (isEmpSource) {
-            if (block) this.explosions.spawnNearBlockDamage(block.x, block.y, block.w, block.h, color);
-          } else {
-            this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, isCrit);
-          }
+          if (isEmpSource && block) this.explosions.spawnNearBlockDamage(block.x, block.y, block.w, block.h, color);
+          else this.particles.spawnBlockExplosion(ev.hitX, ev.hitY, color, isCrit);
         }
 
-        const baseShake = isEmpSource ? 5.5 : isDestroy ? 4.0 : isCrit ? 3.5 : 1.5;
-        this.triggerCameraShake(baseShake * impactShakeMult);
-        let pts = 50 * (1 + Math.floor(ev.combo / 3));
-        let text = `+${pts}`;
-        if (isCrit) {
-          pts = 100 * (1 + Math.floor(ev.combo / 2));
-          text = `💥 CRIT +${pts}`;
-        } else if (isDestroy) {
-          this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.32);
-          this.state.blocksDestroyed++;
-          pts = 100 * (1 + ev.combo);
-          text = ev.combo > 1 ? `+${pts} (${ev.combo}x)` : `+${pts}`;
-        }
+        this.triggerCameraShake((isEmpSource ? 5.5 : isDestroy ? 4.0 : isCrit ? 3.5 : 1.5) * impactShakeMult);
+        let pts = isCrit ? 100 * (1 + Math.floor(ev.combo / 2)) : isDestroy ? 100 * (1 + ev.combo) : 50 * (1 + Math.floor(ev.combo / 3));
+        let text = isCrit ? `💥 CRIT +${pts}` : isDestroy ? (ev.combo > 1 ? `+${pts} (${ev.combo}x)` : `+${pts}`) : `+${pts}`;
+        if (isDestroy) { this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.32); this.state.blocksDestroyed++; }
         this.particles.addFloatingText(text, ev.hitX, ev.hitY, isCrit ? '#fbbf24' : color);
         this.recordScore(ev.combo, pts);
         if (isDestroy && this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') { this.handleWin(); return; }
@@ -444,10 +431,17 @@ export class GameEngine {
 
   private handleLifeLost() {
     if (this.state.status !== 'playing') return;
-    this.state.lives--;
-    this.callbacks.onLivesChange?.(this.state.lives);
-    this.state.combo = 0;
-    this.callbacks.onComboChange?.(0);
+    this.state.lives--; this.callbacks.onLivesChange?.(this.state.lives);
+    this.state.combo = 0; this.callbacks.onComboChange?.(0);
+
+    // Clear all powers, extra multiballs, lasers, drops & active buffs immediately on death
+    this.powerUps.reset();
+    this.callbacks.onBuffsChange?.([]);
+    this.tsPhysics.isMegaBall = false;
+    this.tsPhysics.hasShield = false;
+    const baseW = PADDLE_WIDTH * (1 + (currencyService.getUpgradeLevel('paddle_width') - 1) * 0.08);
+    this.tsPhysics.paddle.width = baseW;
+
     if (this.state.lives <= 0) {
       this.state.status = 'gameover';
       this.audio.playGameOver();
@@ -456,12 +450,14 @@ export class GameEngine {
     }
     this.state.status = 'paused';
     const { ballRad } = this.applyUpgrades();
-    const paddleX = this.tsPhysics.paddle.x;
-    const resetY = this.tsPhysics.paddle.y - ballRad - 4;
+    const paddleX = this.tsPhysics.paddle.x, resetY = this.tsPhysics.paddle.y - ballRad - 4;
     this.tsPhysics.paddle.prevX = paddleX;
     this.tsPhysics.resetBall(paddleX, resetY, 0, 0);
-    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, prevX: paddleX, prevY: resetY });
-    if (this.useWasm && this.wasmBridge.ready) this.wasmBridge.resetBall(paddleX, resetY, 0, 0);
+    if (this.tsPhysics.balls[0]) Object.assign(this.tsPhysics.balls[0], { radius: ballRad, prevX: paddleX, prevY: resetY, isMega: false });
+    if (this.useWasm && this.wasmBridge.ready) {
+      this.wasmBridge.resetBall(paddleX, resetY, 0, 0);
+      this.wasmBridge.setModifiers(false, false, this.tsPhysics.ballImpactLevel, this.tsPhysics.paddle.maxSpeed || 800);
+    }
 
     setTimeout(() => {
       if (this.state.lives > 0 && (this.state.status === 'paused' || this.state.status === 'countdown')) this.launchBall();

@@ -112,24 +112,20 @@ export function seedDatabase() {
   PRE_PLAYERS.forEach((player, pIdx) => {
     const avatarUrl = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(player.username)}&size=64`;
     
-    // Stages completed gracefully scales: top 3 have completed all 50 campaign levels
-    let levelsToComplete = 50;
+    // Stages completed gracefully scales: top 3 have completed all 100 campaign levels
+    let levelsToComplete = 100;
     if (pIdx < 3) {
-      levelsToComplete = 50;
-    } else if (pIdx < 5) {
-      levelsToComplete = 49;
-    } else if (pIdx < 7) {
-      levelsToComplete = 48;
-    } else if (pIdx < 9) {
-      levelsToComplete = 47;
-    } else if (pIdx < 12) {
-      levelsToComplete = 46 - (pIdx - 9);
+      levelsToComplete = 100;
+    } else if (pIdx < 6) {
+      levelsToComplete = 99;
+    } else if (pIdx < 10) {
+      levelsToComplete = 98 - Math.floor((pIdx - 6) * 0.5);
     } else if (pIdx < 20) {
-      levelsToComplete = 44 - Math.floor((pIdx - 12) * 0.6);
+      levelsToComplete = 95 - Math.floor((pIdx - 10) * 0.7);
     } else if (pIdx < 35) {
-      levelsToComplete = 39 - Math.floor((pIdx - 20) * 0.85);
+      levelsToComplete = 87 - Math.floor((pIdx - 20) * 0.9);
     } else {
-      levelsToComplete = Math.max(14, 26 - Math.floor((pIdx - 35) * 0.85));
+      levelsToComplete = Math.max(55, 73 - Math.floor((pIdx - 35) * 1.2));
     }
 
     const joinOffsetDays = 35 + (50 - pIdx) * 0.4;
@@ -167,9 +163,9 @@ export function seedDatabase() {
       
       const lives = player.baseSkill > 0.75 || (lvl + pIdx) % 3 !== 0 ? 3 : ((lvl + pIdx) % 2 === 0 ? 2 : 1);
       const stars = lives === 3 ? 3 : (lives === 2 ? 2 : 1);
-      const basePts = 5800 + (lvl % 5) * 120;
-      const timeBonus = Math.max(250, Math.floor(1000 - timeUsed * 14));
-      const score = Math.floor((basePts + timeBonus + lives * 220) * (0.90 + player.baseSkill * 0.18));
+      const basePts = 1600 + (lvl % 5) * 40;
+      const timeBonus = Math.max(150, Math.floor(450 - timeUsed * 6));
+      const score = Math.floor((basePts + timeBonus + lives * 150) * (0.92 + player.baseSkill * 0.12));
 
       cumulativeScore += score;
 

@@ -148,3 +148,80 @@ export function renderPaddleSpeedPreview(
     ctx.restore();
   }
 }
+
+/**
+ * 3. Paddle Fancy Plasma Thrusters Preview (Current vs Upgraded)
+ * Displays plasma flank thruster spark streams (Off -> Sky Plasma -> Indigo -> Violet -> Hyperion Dual).
+ */
+export function renderPaddleFancyPreview(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  currentLevel: number,
+  isMax: boolean,
+  tick: number
+): void {
+  const leftCenterX = w * 0.25;
+  const rightCenterX = w * 0.75;
+  const centerY = h * 0.44;
+  const pw = 52;
+  const ph = 13;
+
+  const curFancy = currentLevel;
+  const nextFancy = isMax ? currentLevel : currentLevel + 1;
+
+  // Left: CURRENT Paddle
+  drawPaddleWithPreset(
+    ctx,
+    { x: leftCenterX, y: centerY, width: pw, height: ph, vx: 0, targetX: leftCenterX },
+    1,
+    {
+      animTick: tick,
+      widthLevel: 1,
+      speedLevel: 1,
+      fancyLevel: curFancy,
+    }
+  );
+
+  // Right: UPGRADED Paddle with Plasma Exhaust Sparks
+  drawPaddleWithPreset(
+    ctx,
+    { x: rightCenterX, y: centerY, width: pw, height: ph, vx: 0, targetX: rightCenterX },
+    1,
+    {
+      animTick: tick,
+      widthLevel: 1,
+      speedLevel: 1,
+      fancyLevel: nextFancy,
+    }
+  );
+
+  // Flank brackets indicating active thruster emitter pods
+  ctx.save();
+  ctx.strokeStyle = nextFancy === 5 ? '#ffd700' : nextFancy === 4 ? '#c084fc' : nextFancy === 3 ? '#818cf8' : '#38bdf8';
+  ctx.lineWidth = 1.5;
+  const lw = rightCenterX - pw / 2 - 3;
+  const rw = rightCenterX + pw / 2 + 3;
+  ctx.beginPath();
+  ctx.moveTo(lw, centerY - 6);
+  ctx.lineTo(lw - 4, centerY + ph / 2);
+  ctx.lineTo(lw, centerY + ph + 6);
+  ctx.moveTo(rw, centerY - 6);
+  ctx.lineTo(rw + 4, centerY + ph / 2);
+  ctx.lineTo(rw, centerY + ph + 6);
+  ctx.stroke();
+  ctx.restore();
+
+  // Tier Labels at Bottom
+  const tierName = (lvl: number) =>
+    lvl === 1 ? 'Standard (Off)' : lvl === 2 ? '6 Sky Plasma' : lvl === 3 ? '10 Indigo Core' : lvl === 4 ? '14 Violet Warp' : '20 Hyperion Dual';
+
+  ctx.save();
+  ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(tierName(curFancy), leftCenterX, h - 10);
+  ctx.fillStyle = nextFancy === 5 ? '#ffd700' : nextFancy === 4 ? '#c084fc' : nextFancy === 3 ? '#818cf8' : '#38bdf8';
+  ctx.fillText(tierName(nextFancy), rightCenterX, h - 10);
+  ctx.restore();
+}

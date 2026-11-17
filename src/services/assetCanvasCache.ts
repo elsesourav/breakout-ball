@@ -85,6 +85,13 @@ function drawBallAsset(
       c2: '#34d399',
       c3: '#065f46',
     };
+  } else if (upgradeId === 'ball_fancy') {
+    palette = {
+      glow: level >= 5 ? '#ff0055' : level >= 4 ? '#ec4899' : level >= 3 ? '#ffd700' : '#00f7ff',
+      c1: '#ffffff',
+      c2: level >= 5 ? '#f43f5e' : level >= 4 ? '#f472b6' : level >= 3 ? '#fde047' : '#38bdf8',
+      c3: level >= 5 ? '#9f1239' : level >= 4 ? '#831843' : level >= 3 ? '#854d0e' : '#0369a1',
+    };
   }
 
   // Draw decorative predictive guideline ring on thumbnail for trajectory matrix
@@ -111,7 +118,8 @@ function drawBallAsset(
     {
       tier: level >= 6 ? 3 : level >= 3 ? 2 : 1,
       palette,
-      animTick: 0,
+      animTick: 0.5,
+      fancyLevel: upgradeId === 'ball_fancy' ? level : undefined,
     }
   );
 }
@@ -148,7 +156,8 @@ function drawPaddleAsset(
       tier,
       widthLevel: upgradeId === 'paddle_width' ? level : 1,
       speedLevel: upgradeId === 'paddle_speed' ? level : 1,
-      animTick: 0,
+      animTick: 0.5,
+      fancyLevel: upgradeId === 'paddle_fancy' ? level : undefined,
     }
   );
 }
@@ -223,15 +232,17 @@ export function prewarmAssetThumbnails(): void {
   getAssetThumbnail('power', 1);
 
   // Ball Modules
-  ['ball_size', 'ball_speed', 'ball_impact', 'ball_trajectory'].forEach((id) => {
-    for (let l = 1; l <= 8; l++) {
+  ['ball_size', 'ball_speed', 'ball_impact', 'ball_trajectory', 'ball_fancy'].forEach((id) => {
+    const maxLvl = id === 'ball_fancy' ? 5 : 8;
+    for (let l = 1; l <= maxLvl; l++) {
       getAssetThumbnail(id, l);
     }
   });
 
   // Paddle Modules
-  ['paddle_width', 'paddle_speed'].forEach((id) => {
-    for (let l = 1; l <= 8; l++) {
+  ['paddle_width', 'paddle_speed', 'paddle_fancy'].forEach((id) => {
+    const maxLvl = id === 'paddle_fancy' ? 5 : 8;
+    for (let l = 1; l <= maxLvl; l++) {
       getAssetThumbnail(id, l);
     }
   });

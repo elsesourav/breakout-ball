@@ -37,8 +37,8 @@ export const OverallScoreLeaderboard: React.FC = () => {
           if (isMounted && res && res.length > 0) {
             const mapped: ScoreLeaderboardEntry[] = res.map((e, idx) => {
               const derivedStage = e.levelsCompleted !== undefined
-                ? Math.min(50, Math.max(1, e.levelsCompleted))
-                : Math.max(14, 50 - Math.floor(idx * 0.75));
+                ? Math.min(100, Math.max(1, e.levelsCompleted))
+                : Math.max(25, 100 - Math.floor(idx * 1.5));
 
               return {
                 rank: e.rank || idx + 1,
@@ -48,7 +48,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                 score: e.totalScore || e.score || 0,
                 stagesCleared: derivedStage,
                 badgeTitle:
-                  derivedStage >= 50 ? 'Apex Legend' : derivedStage >= 40 ? 'Void Master' : derivedStage >= 25 ? 'Core Crusher' : 'Sector Player',
+                  derivedStage >= 100 ? 'Omega Sovereign' : derivedStage >= 80 ? 'Singularity Legend' : derivedStage >= 50 ? 'Apex Legend' : derivedStage >= 25 ? 'Core Crusher' : 'Sector Pilot',
                 avatarUrl: getPilotAvatarUrl(e.username, e.avatarUrl, idx),
               };
             });
@@ -60,7 +60,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
           const firestoreData = await getOverallLeaderboard();
           if (isMounted && firestoreData && firestoreData.length > 0) {
             const mapped: ScoreLeaderboardEntry[] = firestoreData.map((e: any, idx: number) => {
-              const derivedStage = e.levelsCompleted || e.stagesCleared || Math.max(14, 50 - Math.floor(idx * 0.75));
+              const derivedStage = e.levelsCompleted || e.stagesCleared || Math.max(25, 100 - Math.floor(idx * 1.5));
 
               return {
                 rank: e.rank || idx + 1,
@@ -70,7 +70,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
                 score: e.totalScore || e.score || 0,
                 stagesCleared: derivedStage,
                 badgeTitle:
-                  e.badgeTitle || (derivedStage >= 50 ? 'Apex Legend' : derivedStage >= 40 ? 'Void Master' : 'Sector Player'),
+                  e.badgeTitle || (derivedStage >= 100 ? 'Omega Sovereign' : derivedStage >= 80 ? 'Singularity Legend' : derivedStage >= 50 ? 'Apex Legend' : 'Sector Pilot'),
                 avatarUrl: getPilotAvatarUrl(e.username, e.avatarUrl, idx),
               };
             });
@@ -104,7 +104,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
         const fallback = activeTab === 'alltime' ? FALLBACK_GLOBAL_PILOTS : FALLBACK_WEEKLY_PILOTS;
         setLivePilots(
           fallback.map((p, idx) => {
-            const derivedStage = p.stagesCleared || (activeTab === 'alltime' ? Math.max(14, 50 - Math.floor(idx * 0.75)) : Math.max(5, p.coresCleared || 10));
+            const derivedStage = p.stagesCleared || (activeTab === 'alltime' ? Math.max(25, 100 - Math.floor(idx * 1.5)) : Math.max(5, p.coresCleared || 10));
             return {
               ...p,
               rank: idx + 1,
@@ -164,12 +164,14 @@ export const OverallScoreLeaderboard: React.FC = () => {
       score: userStats.score,
       stagesCleared: userStats.completedStages,
       badgeTitle:
-        userStats.completedStages >= 50
+        userStats.completedStages >= 100
+          ? 'Omega Sovereign'
+          : userStats.completedStages >= 80
+          ? 'Singularity Legend'
+          : userStats.completedStages >= 50
           ? 'Apex Legend'
-          : userStats.completedStages >= 30
-          ? 'Void Master'
-          : userStats.completedStages >= 15
-          ? 'Veteran Player'
+          : userStats.completedStages >= 25
+          ? 'Core Crusher'
           : 'Cadet Player',
       avatarUrl: userStats.avatarUrl,
       isCurrentUser: true,
@@ -401,7 +403,7 @@ export const OverallScoreLeaderboard: React.FC = () => {
 
                 <div className="text-center font-tech text-xs text-slate-300">
                   <span className="font-bold text-white">{entry.stagesCleared}</span>
-                  <span className="text-[9px] text-slate-500">/50</span>
+                  <span className="text-[9px] text-slate-500">/{activeTab === 'alltime' ? '100' : '20'}</span>
                 </div>
 
                 <div className="text-right pr-1">

@@ -136,6 +136,47 @@ export class ParticleSystem {
     }
   }
 
+  public spawnLaserMuzzleFlash(x: number, y: number) {
+    const muzzleColors = ['#ff0055', '#ff4d79', '#ffffff', '#fbbf24'];
+    for (let i = 0; i < 9; i++) {
+      const angle = -Math.PI / 2 + (Math.random() * 1.2 - 0.6);
+      const speed = Math.random() * 9 + 4;
+      const color = muzzleColors[Math.floor(Math.random() * muzzleColors.length)];
+      const [r, g, b] = parseHexColor(color);
+      this.particles.push({
+        x: x + (Math.random() * 6 - 3), y: y - 2,
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        size: Math.random() * 3.5 + 2.0, color, r, g, b, alpha: 1.0, life: 0.22, maxLife: 0.22, shape: 'spark',
+      });
+    }
+  }
+
+  public spawnLaserTrail(x: number, y: number) {
+    if (this.particles.length > 220 || Math.random() > 0.45) return;
+    const color = Math.random() > 0.5 ? '#ff0055' : '#00f7ff';
+    const [r, g, b] = parseHexColor(color);
+    this.particles.push({
+      x: x + (Math.random() * 4 - 2), y: y + 10,
+      vx: (Math.random() - 0.5) * 1.5, vy: Math.random() * 2 + 1,
+      size: Math.random() * 2.2 + 1.2, color, r, g, b, alpha: 0.85, life: 0.14, maxLife: 0.14, shape: 'spark',
+    });
+  }
+
+  public spawnLaserImpact(x: number, y: number) {
+    const impactColors = ['#ff0055', '#ff4d79', '#fbbf24', '#ffffff'];
+    for (let i = 0; i < 14; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 8 + 3;
+      const color = impactColors[Math.floor(Math.random() * impactColors.length)];
+      const [r, g, b] = parseHexColor(color);
+      this.particles.push({
+        x: x + (Math.random() * 8 - 4), y: y + (Math.random() * 8 - 4),
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        size: Math.random() * 4.0 + 2.0, color, r, g, b, alpha: 1.0, life: 0.25, maxLife: 0.25, shape: 'spark',
+      });
+    }
+  }
+
   public spawnVictoryConfetti(width: number, height: number) {
     const isMobile =
       typeof window !== 'undefined' &&

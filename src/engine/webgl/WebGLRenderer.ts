@@ -261,29 +261,36 @@ export class WebGLRenderer {
     }
 
     // 5. Draw Paddle with Sub-frame State Interpolation
-    const renderPaddleX =
-      paddle.prevX !== undefined && alpha < 0.999
-        ? paddle.prevX + (paddle.x - paddle.prevX) * alpha
-        : paddle.x;
-
+    const renderPaddleX = paddle.prevX !== undefined && alpha < 0.999 ? paddle.prevX + (paddle.x - paddle.prevX) * alpha : paddle.x;
     const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
     const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
     const padTier = getPaddleTierFromUpgrades(padWidthLvl, padSpeedLvl);
     const paddleUV = this.atlas.getUV(`paddle_t${padTier}`);
+    const dotUV = this.atlas.getUV('guideline_dot');
     const padMargin = 16;
     const padSlotW = paddle.width + padMargin * 2;
     const padSlotH = paddle.height + padMargin * 2;
 
-    this.batcher.pushSprite(
-      renderPaddleX - paddle.width / 2 - padMargin, paddle.y - padMargin,
-      padSlotW, padSlotH, paddleUV.u0, paddleUV.v0, paddleUV.u1, paddleUV.v1, 1.0, 1.0, 1.0, 1.0
-    );
+    this.batcher.pushSprite(renderPaddleX - paddle.width / 2 - padMargin, paddle.y - padMargin, padSlotW, padSlotH, paddleUV.u0, paddleUV.v0, paddleUV.u1, paddleUV.v1, 1.0, 1.0, 1.0, 1.0);
+
+    // 5.0. Fancy Plasma Thruster Exhaust Sparks (Cosmetic Upgrade)
+    const padFancyLvl = currencyService.getUpgradeLevel('paddle_fancy');
+    if (padFancyLvl >= 2) {
+      const pCount = padFancyLvl === 2 ? 6 : padFancyLvl === 3 ? 10 : padFancyLvl === 4 ? 14 : 20;
+      const [bR, bG, bB] = padFancyLvl === 2 ? [0.22, 0.74, 0.97] : padFancyLvl === 3 ? [0.51, 0.55, 0.97] : padFancyLvl === 4 ? [0.75, 0.52, 0.99] : [1.0, 0.84, 0.0];
+      for (let i = 0; i < pCount; i++) {
+        const xSpread = paddle.width * (0.28 + (i % 4) * 0.05);
+        const px = renderPaddleX + (i % 2 === 0 ? -xSpread : xSpread) + Math.sin(this.animTick * 4 + i) * 6;
+        const py = paddle.y + paddle.height + 2 + ((this.animTick * 25 + i * 14) % 36);
+        const pAlpha = Math.max(0, 1 - ((this.animTick * 25 + i * 14) % 36) / 36);
+        const [pr, pg, pb] = padFancyLvl === 5 ? (i % 2 === 0 ? [1.0, 0.84, 0.0] : [1.0, 0.03, 0.33]) : [bR, bG, bB];
+        this.batcher.pushSprite(px - 4, py - 4, 8, 8, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, pr, pg, pb, pAlpha * 0.9);
+      }
+    }
 
     // 5.1. V-Type Trajectory Matrix Guideline (Incoming + Outgoing Deflection Ray)
-    // Selects the single priority descending ball nearest to the paddle under detection radius
     const ballList = Array.isArray(balls) ? balls : [balls];
     const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
-    const dotUV = this.atlas.getUV('guideline_dot');
     const reticleUV = this.atlas.getUV('guideline_reticle');
     const arrowUV = this.atlas.getUV('guideline_arrow');
 
@@ -301,8 +308,7 @@ export class WebGLRenderer {
       if (!b || !b.isActive || b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = paddle.y - bRad;
-      const closestPadX = Math.max(paddle.x - halfPadW, Math.min(paddle.x + halfPadW, b.x));
-      const dist = Math.hypot(b.x - closestPadX, targetY - b.y);
+      const dist = targetY - b.y;
       if (b.y < targetY && dist <= detectionRadius && dist < minDescDist) {
         minDescDist = dist;
         targetIdx = i;
@@ -330,7 +336,7 @@ export class WebGLRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // ONLY display when under radius AND velocity trajectory collides with paddle (V-type)
+      // Display V-type guideline when under radius and velocity intercepts paddle
       if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
         const gAlpha = guideline.alpha;
         const inR = 0.0, inG = 0.97, inB = 1.0;
@@ -355,11 +361,16 @@ export class WebGLRenderer {
 
         // 2. Draw Apex of the V: Concentric Landing Target Reticle on Paddle Face
         const reticleSize = 40;
-        this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, 0.06, 0.98, 0.65, gAlpha * 1.0);
+        const retR = guideline.isHit ? 0.06 : 0.0;
+        const retG = guideline.isHit ? 0.98 : 0.97;
+        const retB = guideline.isHit ? 0.65 : 1.0;
+        this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, retR, retG, retB, gAlpha * 1.0);
 
-        // 3. Draw Paddle Lock-on Beam along paddle face
-        const halfPadW = paddle.width / 2;
-        this.batcher.pushSprite(paddle.x - halfPadW, paddle.y, paddle.width, 5, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 0.06, 0.98, 0.65, gAlpha * 0.9);
+        // 3. Draw Paddle Lock-on Beam along paddle face (when paddle intercepts landing point)
+        if (guideline.isHit) {
+          const halfPadW = paddle.width / 2;
+          this.batcher.pushSprite(paddle.x - halfPadW, paddle.y, paddle.width, 5, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 0.06, 0.98, 0.65, gAlpha * 0.9);
+        }
 
         // 4. Draw Outgoing Arm of the V (Emerald Green deflection ray with Arrowhead)
         if (guideline.outgoingSegments.length > 0) {
@@ -387,10 +398,6 @@ export class WebGLRenderer {
           const arrowSize = 30;
           this.batcher.pushSprite(lastSeg.x2 - arrowSize / 2, lastSeg.y2 - arrowSize / 2, arrowSize, arrowSize, arrowUV.u0, arrowUV.v0, arrowUV.u1, arrowUV.v1, outR, outG, outB, outAlpha, outAngle);
         }
-
-        if (this.animTick % 3 < 0.06) {
-          console.log(`[Trajectory V-Beam] dist=${Math.round(minDescDist)}px vy=${b.vy.toFixed(1)} isHit=${guideline.isHit} alpha=${guideline.alpha.toFixed(2)}`);
-        }
       }
     }
 
@@ -412,6 +419,19 @@ export class WebGLRenderer {
       const ballMargin = 12;
       const ballSlotSize = Math.ceil(b.radius * 2 + ballMargin * 2);
       this.batcher.pushSprite(renderBallX - ballSlotSize / 2, renderBallY - ballSlotSize / 2, ballSlotSize, ballSlotSize, ballUV.u0, ballUV.v0, ballUV.u1, ballUV.v1, 1.0, 1.0, 1.0, 1.0);
+
+      // Fancy Ball Stardust Aura Particles (Cosmetic Upgrade)
+      const ballFancyLvl = currencyService.getUpgradeLevel('ball_fancy');
+      if (ballFancyLvl >= 2) {
+        const pCount = ballFancyLvl === 2 ? 4 : ballFancyLvl === 3 ? 7 : ballFancyLvl === 4 ? 10 : 14;
+        for (let i = 0; i < pCount; i++) {
+          const angle = this.animTick * (1.2 + (i % 3) * 0.25) + (i * (Math.PI * 2 / pCount));
+          const dist = b.radius * (1.22 + 0.12 * Math.sin(this.animTick * 3 + i * 2));
+          const px = renderBallX + Math.cos(angle) * dist, py = renderBallY + Math.sin(angle) * (dist * 0.88);
+          const [pr, pg, pb] = ballFancyLvl === 2 ? [0.0, 0.97, 1.0] : ballFancyLvl === 3 ? [1.0, 0.84, 0.0] : ballFancyLvl === 4 ? [0.93, 0.28, 0.6] : [0.5 + 0.5 * Math.sin(this.animTick * 5 + i), 0.5 + 0.5 * Math.sin(this.animTick * 5 + i + 2), 0.5 + 0.5 * Math.sin(this.animTick * 5 + i + 4)];
+          this.batcher.pushSprite(px - 4, py - 4, 8, 8, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, pr, pg, pb, 0.85);
+        }
+      }
     }
 
     // 8. Draw Explosions (Shockwave Rings, Fireball Flare, Shards & Shatter Chunks)

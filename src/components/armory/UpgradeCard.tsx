@@ -93,6 +93,54 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
         current: `${(16.0 + (level - 1) * (32.0 / 3)).toFixed(1)}s`,
         delta: '10.7s',
       };
+    case 'ball_fancy':
+      return {
+        statName: 'AURA PARTICLES',
+        current:
+          level === 1
+            ? 'DORMANT'
+            : level === 2
+            ? '4 CYAN'
+            : level === 3
+            ? '7 GOLD'
+            : level === 4
+            ? '10 MAGENTA'
+            : '14 PRISMATIC',
+        delta:
+          level >= 5
+            ? null
+            : level === 1
+            ? '4 CYAN'
+            : level === 2
+            ? '7 GOLD'
+            : level === 3
+            ? '10 MAGENTA'
+            : '14 PRISMATIC',
+      };
+    case 'paddle_fancy':
+      return {
+        statName: 'THRUSTER SPARKS',
+        current:
+          level === 1
+            ? 'OFF'
+            : level === 2
+            ? '6 PLASMA'
+            : level === 3
+            ? '10 INDIGO'
+            : level === 4
+            ? '14 VIOLET'
+            : '20 HYPERION',
+        delta:
+          level >= 5
+            ? null
+            : level === 1
+            ? '6 PLASMA'
+            : level === 2
+            ? '10 INDIGO'
+            : level === 3
+            ? '14 VIOLET'
+            : '20 HYPERION',
+      };
     default:
       return {
         statName: 'LEVEL',

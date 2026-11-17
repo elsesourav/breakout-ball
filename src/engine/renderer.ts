@@ -189,8 +189,7 @@ export class GameRenderer {
       if (!b || !b.isActive || b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = interpolatedPaddle.y - bRad;
-      const closestPadX = Math.max(interpolatedPaddle.x - halfPadW, Math.min(interpolatedPaddle.x + halfPadW, b.x));
-      const dist = Math.hypot(b.x - closestPadX, targetY - b.y);
+      const dist = targetY - b.y;
       if (b.y < targetY && dist <= detectionRadius && dist < minDescDist) {
         minDescDist = dist;
         targetIdx = i;
@@ -218,7 +217,7 @@ export class GameRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // ONLY display when under radius AND velocity trajectory collides with paddle (V-type)
+      // Display V-type guideline when under radius and velocity intercepts paddle
       if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
         ctx.save();
         const gAlpha = guideline.alpha;
@@ -238,13 +237,14 @@ export class GameRenderer {
         }
 
         // 2. Apex of the V: Concentric Landing Target Reticle on Paddle Face
+        const retR = guideline.isHit ? '16, 185, 129' : '0, 247, 255';
         ctx.setLineDash([]);
-        ctx.shadowColor = '#10b981';
+        ctx.shadowColor = guideline.isHit ? '#10b981' : '#00f7ff';
         ctx.shadowBlur = 10;
 
         ctx.beginPath();
         ctx.arc(guideline.hitX, guideline.hitY, 18, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.95})`;
+        ctx.strokeStyle = `rgba(${retR}, ${gAlpha * 0.95})`;
         ctx.lineWidth = 3.5;
         ctx.stroke();
 
@@ -259,16 +259,18 @@ export class GameRenderer {
         ctx.fillStyle = '#ffffff';
         ctx.fill();
 
-        // 3. Paddle Lock-on Beam along paddle face
-        const halfPadW = interpolatedPaddle.width / 2;
-        ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.95})`;
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = 14;
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(interpolatedPaddle.x - halfPadW, interpolatedPaddle.y);
-        ctx.lineTo(interpolatedPaddle.x + halfPadW, interpolatedPaddle.y);
-        ctx.stroke();
+        // 3. Paddle Lock-on Beam along paddle face (when paddle intercepts landing point)
+        if (guideline.isHit) {
+          const halfPadW = interpolatedPaddle.width / 2;
+          ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.95})`;
+          ctx.shadowColor = '#10b981';
+          ctx.shadowBlur = 14;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(interpolatedPaddle.x - halfPadW, interpolatedPaddle.y);
+          ctx.lineTo(interpolatedPaddle.x + halfPadW, interpolatedPaddle.y);
+          ctx.stroke();
+        }
 
         // 4. Outgoing Arm of the V (Emerald Green deflection ray with Arrowhead)
         if (guideline.outgoingSegments.length > 0) {

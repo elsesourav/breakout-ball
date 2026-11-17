@@ -425,3 +425,60 @@ export function renderBallTrajectoryPreview(
   ctx.fillText(`${nextDist}px Range`, rightCenterX, h - 8);
   ctx.restore();
 }
+
+/**
+ * 5. Ball Fancy Stardust Aura Preview (Current vs Upgraded)
+ * Displays orbiting cosmetic aura particle progression (Dormant -> Cyan -> Gold -> Magenta -> Prismatic).
+ */
+export function renderBallFancyPreview(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  currentLevel: number,
+  isMax: boolean,
+  tick: number
+): void {
+  const leftCenterX = w * 0.25;
+  const rightCenterX = w * 0.75;
+  const centerY = h * 0.48;
+  const ballR = 18;
+
+  const curFancy = currentLevel;
+  const nextFancy = isMax ? currentLevel : currentLevel + 1;
+
+  // Left: CURRENT Ball
+  drawBallWithPreset(ctx, { x: leftCenterX, y: centerY, radius: ballR }, 1, {
+    animTick: tick,
+    tier: 2,
+    fancyLevel: curFancy,
+  });
+
+  // Right: UPGRADED Ball with subtle target orbit guideline
+  ctx.save();
+  ctx.strokeStyle = 'rgba(236, 72, 153, 0.4)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.arc(rightCenterX, centerY, ballR * 1.35, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  drawBallWithPreset(ctx, { x: rightCenterX, y: centerY, radius: ballR }, 1, {
+    animTick: tick,
+    tier: 2,
+    fancyLevel: nextFancy,
+  });
+
+  // Descriptive Aura Tier Labels at Bottom
+  const tierName = (lvl: number) =>
+    lvl === 1 ? 'Dormant (0)' : lvl === 2 ? '4 Cyan Sparks' : lvl === 3 ? '7 Gold Stardust' : lvl === 4 ? '10 Magenta Warp' : '14 Prismatic Rainbow';
+
+  ctx.save();
+  ctx.font = '10px ui-monospace, SFMono-Regular, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#94a3b8';
+  ctx.fillText(tierName(curFancy), leftCenterX, h - 10);
+  ctx.fillStyle = nextFancy === 5 ? '#f43f5e' : nextFancy === 4 ? '#ec4899' : nextFancy === 3 ? '#ffd700' : '#00f7ff';
+  ctx.fillText(tierName(nextFancy), rightCenterX, h - 10);
+  ctx.restore();
+}

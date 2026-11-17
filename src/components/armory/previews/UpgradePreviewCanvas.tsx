@@ -5,10 +5,12 @@ import {
   renderBallSpeedPreview,
   renderBallImpactPreview,
   renderBallTrajectoryPreview,
+  renderBallFancyPreview,
 } from './renderBallPreviews';
 import {
   renderPaddleWidthPreview,
   renderPaddleSpeedPreview,
+  renderPaddleFancyPreview,
 } from './renderPaddlePreviews';
 import { renderPowerDurationPreview } from './renderPowerPreviews';
 
@@ -88,11 +90,17 @@ export const UpgradePreviewCanvas: React.FC<UpgradePreviewCanvasProps> = ({
           case 'ball_trajectory':
             renderBallTrajectoryPreview(ctx, w, h, currentLevel, isMax, tick);
             break;
+          case 'ball_fancy':
+            renderBallFancyPreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
           case 'paddle_width':
             renderPaddleWidthPreview(ctx, w, h, currentLevel, isMax, tick);
             break;
           case 'paddle_speed':
             renderPaddleSpeedPreview(ctx, w, h, currentLevel, isMax, tick);
+            break;
+          case 'paddle_fancy':
+            renderPaddleFancyPreview(ctx, w, h, currentLevel, isMax, tick);
             break;
           default:
             break;
