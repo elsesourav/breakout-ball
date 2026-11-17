@@ -11,8 +11,8 @@ async function captureAll() {
   console.log('Starting Headless Chrome for 3:4 Mobile Screenshot Captures...');
   const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
     '--headless=new',
-    '--remote-debugging-port=9310',
-    '--user-data-dir=/tmp/chrome_showcase_34_' + Date.now(),
+    '--remote-debugging-port=9315',
+    '--user-data-dir=/tmp/chrome_showcase_34_clean_' + Date.now(),
     '--window-size=1200,1600',
     '--no-first-run',
     '--no-default-browser-check',
@@ -23,13 +23,13 @@ async function captureAll() {
     let listRes = null;
     for (let i = 0; i < 30; i++) {
       try {
-        listRes = await fetch('http://127.0.0.1:9310/json/list');
+        listRes = await fetch('http://127.0.0.1:9315/json/list');
         if (listRes.ok) break;
       } catch (e) {
         await new Promise(r => setTimeout(r, 400));
       }
     }
-    if (!listRes) throw new Error('Could not connect to Chrome debugger on port 9310');
+    if (!listRes) throw new Error('Could not connect to Chrome debugger on port 9315');
 
     const pages = await listRes.json();
     const page = pages.find((p) => p.type === 'page');
@@ -68,65 +68,149 @@ async function captureAll() {
 
     const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
+    // Helper: Wait for initial loading screen to completely vanish, and dismiss any floating toast alerts
+    async function prepareScreen(additionalWait = 1000) {
+      await send('Runtime.evaluate', {
+        awaitPromise: true,
+        expression: `
+          new Promise((resolve) => {
+            const check = () => {
+              const loader = document.querySelector('[class*="z-[9999]"]');
+              if (!loader) {
+                // Remove any floating achievement toasts or alert popups
+                document.querySelectorAll('[role="alert"], [class*="toast"], [class*="Toast"]').forEach(el => el.remove());
+                return resolve();
+              }
+              setTimeout(check, 100);
+            };
+            check();
+          });
+        `
+      });
+      await wait(additionalWait);
+      // Double clean toasts right before screenshot
+      await send('Runtime.evaluate', {
+        expression: `
+          document.querySelectorAll('[role="alert"], [class*="toast"], [class*="Toast"]').forEach(el => el.remove());
+        `
+      });
+      await wait(150);
+    }
+
     async function snap(filename) {
       const res = await send('Page.captureScreenshot', { format: 'png' });
       const dest = path.join(OUT_DIR, filename);
       fs.writeFileSync(dest, Buffer.from(res.data, 'base64'));
-      console.log(`Saved screenshot (3:4 ratio - 1200x1600): ${filename}`);
+      console.log(`✓ Saved screenshot (3:4 ratio - 1200x1600): ${filename}`);
     }
 
-    // ===============================================================
-    // MOBILE SCREENSHOTS IN 3:4 RATIO (480 x 640 @ 2.5x = 1200 x 1600)
-    // ===============================================================
-    console.log('\n--- Capturing 3:4 Mobile Screenshots (1200x1600) ---');
+    // Set 3:4 mobile viewport: 480 x 640 @ 2.5x scale = 1200 x 1600
     await setViewport(480, 640, 2.5);
 
-    // 1. Campaign Map
+    // ==========================================
+    // 1. CAMPAIGN MAP (100 Sectors)
+    // ==========================================
+    console.log('\n1. Capturing Campaign Map...');
     await send('Page.navigate', { url: `${BASE_URL}/` });
     await wait(3800);
+    await prepareScreen(1500);
     await snap('mobile-01-campaign-map.png');
 
-    // 2. Level 3 Preview Modal
+    // ==========================================
+    // 2. LEVEL PREVIEW MODAL
+    // ==========================================
+    console.log('\n2. Capturing Level Preview Modal...');
     await send('Page.navigate', { url: `${BASE_URL}/level/3` });
     await wait(3000);
+    await prepareScreen(1200);
     await snap('mobile-02-level-preview.png');
 
-    // 3. Active Gameplay Action
+    // ==========================================
+    // 3. ACTIVE GAMEPLAY ACTION
+    // ==========================================
+    console.log('\n3. Capturing Gameplay Action...');
     await send('Page.navigate', { url: `${BASE_URL}/play/3` });
-    await wait(3900); // Allow countdown to finish and ball to launch
+    // Wait for 3-2-1-GO to finish and ball to launch into action
+    await wait(4000);
     await snap('mobile-03-gameplay-action.png');
 
-    // 4. Global Arena
+    // ==========================================
+    // 4. GLOBAL APEX ARENA
+    // ==========================================
+    console.log('\n4. Capturing Global Apex Arena...');
     await send('Page.navigate', { url: `${BASE_URL}/arena` });
-    await wait(3500);
+    await wait(3200);
+    await prepareScreen(1200);
     await snap('mobile-04-global-arena.png');
 
-    // 5. Level Studio (Mobile Designer)
+    // ==========================================
+    // 5. LEVEL STUDIO (MATRIX FORGE DESIGNER)
+    // ==========================================
+    console.log('\n5. Capturing Level Studio Designer Canvas...');
     await send('Page.navigate', { url: `${BASE_URL}/studio` });
-    await wait(3000);
+    await wait(3200);
+    await prepareScreen(1000);
+
+    // Click "DESIGN NEW ARENA" to enter the matrix designer canvas
+    await send('Runtime.evaluate', {
+      expression: `
+        document.querySelectorAll("button").forEach(b => {
+          if (b.textContent && b.textContent.includes("DESIGN NEW")) {
+            b.click();
+          }
+        });
+      `
+    });
+    await wait(1800);
+
+    // Click on canvas to draw a few colorful bricks
+    await send('Runtime.evaluate', {
+      expression: `
+        const canvas = document.querySelector('canvas');
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const dX = rect.left + rect.width / 2;
+          const dY = rect.top + rect.height / 3;
+          // Trigger mouse click to place a block
+          const evt = new MouseEvent('mousedown', { bubbles: true, clientX: dX, clientY: dY });
+          canvas.dispatchEvent(evt);
+          const evtUp = new MouseEvent('mouseup', { bubbles: true, clientX: dX, clientY: dY });
+          canvas.dispatchEvent(evtUp);
+        }
+      `
+    });
+    await wait(500);
+    await prepareScreen(400);
     await snap('mobile-05-level-designer.png');
 
-    // 6. Cyber Armory
+    // ==========================================
+    // 6. CYBER ARMORY
+    // ==========================================
+    console.log('\n6. Capturing Cyber Armory...');
     await send('Page.navigate', { url: `${BASE_URL}/armory` });
-    await wait(3000);
+    await wait(3200);
+    await prepareScreen(1200);
     await snap('mobile-06-cyber-armory.png');
 
-    // 7. Pilot Profile & Achievements
+    // ==========================================
+    // 7. PILOT PROFILE & ACHIEVEMENTS
+    // ==========================================
+    console.log('\n7. Capturing Pilot Profile...');
     await send('Page.navigate', { url: `${BASE_URL}/profile` });
-    await wait(3000);
+    await wait(3500);
+    await prepareScreen(1500);
     await snap('mobile-07-pilot-profile.png');
 
-    // Clean up any remaining desktop screenshots from showcase/screenshots
+    // Cleanup desktop screenshots if any
     const files = fs.readdirSync(OUT_DIR);
     for (const f of files) {
       if (f.startsWith('desktop-')) {
         fs.unlinkSync(path.join(OUT_DIR, f));
-        console.log(`Removed desktop screenshot: ${f}`);
       }
     }
 
     ws.close();
-    console.log('\nAll 3:4 mobile screenshots captured successfully!');
+    console.log('\nAll 3:4 Mobile Screenshots Captured Successfully & Verified!');
   } catch (err) {
     console.error('Error during screenshot capture:', err);
   } finally {

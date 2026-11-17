@@ -18,6 +18,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
 SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
+RAW_DIR = os.path.join(SHOWCASE_DIR, '.raw_916')
 APP_ICONS_DIR = os.path.join(SHOWCASE_DIR, 'app-icons')
 BANNERS_DIR = os.path.join(SHOWCASE_DIR, 'banners')
 SCREENSHOTS_DIR = os.path.join(SHOWCASE_DIR, 'screenshots')
@@ -98,13 +99,18 @@ def create_cyber_background(w, h):
     blurred_overlay = overlay.filter(ImageFilter.GaussianBlur(radius=int(min(w, h) * 0.05)))
     return Image.alpha_composite(bg, blurred_overlay)
 
-def create_mobile_phone_mockup(screenshot_img, phone_w, phone_h, corner_radius=38, border_color=(0, 240, 255, 230)):
+def create_mobile_phone_mockup(raw_filename, phone_w, phone_h, corner_radius=36, border_color=(0, 240, 255, 230)):
     """
-    Renders a sleek futuristic mobile smartphone mockup:
-    - Titanium / dark glass chassis with glowing neon chamfer
+    Renders a realistic smartphone mockup around native 9:16 mobile screenshots:
+    - Titanium chassis
     - Full-bleed mobile screen with rounded corners
-    - Dynamic Island camera capsule at the top
+    - Sleek punch-hole camera (zero obstruction of top game HUD)
     """
+    raw_path = os.path.join(RAW_DIR, raw_filename)
+    if not os.path.exists(raw_path):
+        raw_path = os.path.join(SCREENSHOTS_DIR, raw_filename)
+    screenshot_img = Image.open(raw_path).convert('RGBA')
+
     # 1. Base phone chassis
     phone = Image.new('RGBA', (phone_w, phone_h), (0, 0, 0, 0))
     pdraw = ImageDraw.Draw(phone)
@@ -141,17 +147,12 @@ def create_mobile_phone_mockup(screenshot_img, phone_w, phone_h, corner_radius=3
     screen_layer.paste(cropped_sc, (bezel, bezel), s_mask)
     phone = Image.alpha_composite(phone, screen_layer)
     
-    # 3. Dynamic Island / Speaker Pill
+    # 3. Modern Sleek Camera Punch-Hole (subtle top dot, keeping HUD fully visible)
     pdraw = ImageDraw.Draw(phone)
-    pill_w = int(screen_w * 0.28)
-    pill_h = max(10, int(screen_h * 0.026))
-    pill_x = (phone_w - pill_w) // 2
-    pill_y = bezel + 6
-    pdraw.rounded_rectangle([pill_x, pill_y, pill_x + pill_w, pill_y + pill_h], radius=pill_h // 2, fill=(0, 0, 0, 230))
-    # Camera dot
-    cam_sz = max(4, pill_h // 3)
-    pdraw.ellipse([pill_x + pill_w - cam_sz * 3, pill_y + (pill_h - cam_sz) // 2,
-                   pill_x + pill_w - cam_sz * 2, pill_y + (pill_h + cam_sz) // 2], fill=(20, 30, 50, 255))
+    cam_r = max(3, int(phone_w * 0.008))
+    cx = phone_w // 2
+    cy = bezel + cam_r + 2
+    pdraw.ellipse([cx - cam_r, cy - cam_r, cx + cam_r, cy + cam_r], fill=(0, 0, 0, 240), outline=(20, 30, 45, 180), width=1)
     
     # 4. Outer Glowing Titanium / Neon Border
     border_layer = Image.new('RGBA', (phone_w, phone_h), (0, 0, 0, 0))
@@ -161,6 +162,39 @@ def create_mobile_phone_mockup(screenshot_img, phone_w, phone_h, corner_radius=3
                             radius=screen_r + 1, outline=(255, 255, 255, 40), width=1)
     
     return Image.alpha_composite(phone, border_layer)
+
+def paste_phone_with_smooth_shadow(canvas, phone_img, x, y, pad=100, blur_radius=25, opacity=220):
+    """
+    Pastes phone onto canvas with a generous shadow margin to guarantee zero box clipping.
+    """
+    pw, ph = phone_img.size
+    shadow_box = Image.new('RGBA', (pw + pad * 2, ph + pad * 2), (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shadow_box)
+    sdraw.rounded_rectangle([pad + 4, pad + 10, pad + pw - 4, pad + ph + 2], radius=38, fill=(0, 0, 0, opacity))
+    blurred = shadow_box.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+    
+    canvas.paste(blurred, (x - pad, y - pad), blurred)
+    canvas.paste(phone_img, (x, y), phone_img)
+
+def draw_cta_button(draw, x, y, w, h, text, fill=(0, 229, 255), text_color=(5, 12, 30), font=None):
+    """
+    Draws a high-contrast pill button with a crisp vector play triangle.
+    """
+    draw.rounded_rectangle([x, y, x + w, y + h], radius=h // 2,
+                           fill=fill, outline=(255, 255, 255, 140), width=2)
+    bbox = font.getbbox(text)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    arrow_sz = 14
+    gap = 14
+    total_w = tw + gap + arrow_sz
+    start_x = x + (w - total_w) // 2
+    ty = y + (h - th) // 2 - 2
+    draw.text((start_x, ty), text, font=font, fill=text_color)
+    
+    ax = start_x + tw + gap
+    ay = y + (h - arrow_sz) // 2
+    draw.polygon([(ax, ay), (ax + arrow_sz, ay + arrow_sz // 2), (ax, ay + arrow_sz)], fill=text_color)
 
 def generate_icons(clean_icon):
     print("Generating ElseSourav App Icons (512x512)...")
@@ -213,104 +247,83 @@ def generate_desktop_carousel_banner(clean_icon):
     banner = create_cyber_background(w, h)
     draw = ImageDraw.Draw(banner)
     
-    font_badge = get_font(FONT_BOLD, 28)
-    font_title = get_font(FONT_TITLE, 102)
-    font_subtitle = get_font(FONT_TREBUCHET, 46)
-    font_body = get_font(FONT_REGULAR, 32)
-    font_pill = get_font(FONT_BOLD, 26)
-    font_btn = get_font(FONT_BOLD, 30)
+    font_badge = get_font(FONT_BOLD, 24)
+    font_title = get_font(FONT_TITLE, 94)
+    font_subtitle = get_font(FONT_TREBUCHET, 42)
+    font_body = get_font(FONT_REGULAR, 30)
+    font_pill = get_font(FONT_BOLD, 22)
+    font_btn = get_font(FONT_BOLD, 28)
     
     # LEFT CONTENT
     left_x = 130
     
-    # Badge Pill
-    badge_text = "★ MOBILE ARCADE REVOLUTION • 100 SECTORS"
+    # Badge Pill (Dynamic width)
+    badge_text = "// MOBILE ARCADE REVOLUTION • 100 SECTORS"
     bbox_b = font_badge.getbbox(badge_text)
     bw = bbox_b[2] - bbox_b[0] + 44
-    bh = 54
-    by = 150
-    draw.rounded_rectangle([left_x, by, left_x + bw, by + bh], radius=27,
+    bh = 50
+    by = 135
+    draw.rounded_rectangle([left_x, by, left_x + bw, by + bh], radius=25,
                            fill=(13, 22, 48, 230), outline=(0, 240, 255, 210), width=2)
-    draw.text((left_x + 22, by + 12), badge_text, font=font_badge, fill=(0, 240, 255))
+    draw.text((left_x + 22, by + 11), badge_text, font=font_badge, fill=(0, 240, 255))
     
     # Fireball icon miniature next to title
-    icon_sm = clean_icon.resize((120, 120), Image.Resampling.LANCZOS)
-    banner.paste(icon_sm, (left_x, 230), icon_sm)
+    icon_sm = clean_icon.resize((115, 115), Image.Resampling.LANCZOS)
+    banner.paste(icon_sm, (left_x, 215), icon_sm)
     
     # Title
-    draw.text((left_x + 135, 235), "BREAKOUT BALL", font=font_title, fill=(255, 255, 255))
-    draw.text((left_x, 375), "MOBILE CYBER ARCADE", font=font_subtitle, fill=(0, 229, 255))
+    draw.text((left_x + 130, 220), "BREAKOUT BALL", font=font_title, fill=(255, 255, 255))
+    draw.text((left_x, 355), "MOBILE CYBER ARCADE", font=font_subtitle, fill=(0, 229, 255))
     
     # Body Description
-    draw.text((left_x, 460), "Engineered for pure mobile immersion: high-octane physics,", font=font_body, fill=(203, 213, 225))
-    draw.text((left_x, 510), "fluid touch steering, 100 tactical sectors, and live rankings.", font=font_body, fill=(148, 163, 184))
+    draw.text((left_x, 435), "Engineered for pure mobile immersion: high-octane physics,", font=font_body, fill=(203, 213, 225))
+    draw.text((left_x, 482), "fluid touch steering, 100 tactical sectors, and live rankings.", font=font_body, fill=(148, 163, 184))
     
-    # Feature Pills
-    pills = [
-        ("⚡ C++ WASM Physics", (0, 229, 255)),
-        ("📱 Touch & Gyro Tilt", (168, 85, 247)),
-        ("🌐 Global Apex Arena", (244, 63, 94)),
-        ("🛠️ Level Studio", (234, 179, 8)),
-        ("🛡️ Cyber Armory", (34, 197, 94))
+    # Feature Pills in 2 clean, perfectly balanced rows
+    row1_pills = [
+        ("C++ WASM Physics", (0, 229, 255)),
+        ("Touch & Tilt Steering", (168, 85, 247)),
+        ("Global Apex Arena", (244, 63, 94))
     ]
-    px = left_x
-    py = 610
-    for label, col in pills:
-        l_bbox = font_pill.getbbox(label)
-        pw = l_bbox[2] - l_bbox[0] + 36
-        draw.rounded_rectangle([px, py, px + pw, py + 52], radius=14,
-                               fill=(15, 23, 42, 200), outline=(col[0], col[1], col[2], 180), width=2)
-        draw.text((px + 18, py + 11), label, font=font_pill, fill=col)
-        px += pw + 18
+    row2_pills = [
+        ("Level Studio", (234, 179, 8)),
+        ("Cyber Armory", (34, 197, 94)),
+        ("Multi-Device Cloud Sync", (0, 240, 255))
+    ]
+    
+    for r_idx, r_pills in enumerate([row1_pills, row2_pills]):
+        px = left_x
+        py = 560 + r_idx * 64
+        for label, col in r_pills:
+            l_bbox = font_pill.getbbox(label)
+            pw = l_bbox[2] - l_bbox[0] + 44
+            draw.rounded_rectangle([px, py, px + pw, py + 48], radius=14,
+                                   fill=(15, 23, 42, 200), outline=(col[0], col[1], col[2], 180), width=2)
+            draw.ellipse([px + 14, py + 20, px + 22, py + 28], fill=col)
+            draw.text((px + 28, py + 10), label, font=font_pill, fill=col)
+            px += pw + 18
         
     # CTA Buttons
     btn_x = left_x
     btn_y = 720
-    draw.rounded_rectangle([btn_x, btn_y, btn_x + 290, btn_y + 72], radius=36,
-                           fill=(0, 229, 255), outline=(255, 255, 255, 120), width=2)
-    draw.text((btn_x + 60, btn_y + 18), "PLAY NOW ▶", font=font_btn, fill=(5, 12, 30))
+    draw_cta_button(draw, btn_x, btn_y, 280, 68, "PLAY NOW", fill=(0, 229, 255), text_color=(5, 12, 30), font=font_btn)
     
-    draw.rounded_rectangle([btn_x + 320, btn_y, btn_x + 630, btn_y + 72], radius=36,
+    draw.rounded_rectangle([btn_x + 310, btn_y, btn_x + 600, btn_y + 68], radius=34,
                            fill=(15, 23, 42, 220), outline=(255, 255, 255, 120), width=2)
-    draw.text((btn_x + 365, btn_y + 18), "LEVEL STUDIO", font=font_btn, fill=(241, 245, 249))
+    draw.text((btn_x + 350, btn_y + 16), "LEVEL STUDIO", font=font_btn, fill=(241, 245, 249))
 
-    # RIGHT SIDE: Dual Mobile Smartphone Presentation Showcase
-    # Phone 1 (Primary - Gameplay Action): 460 x 780
-    sc_action_path = os.path.join(SCREENSHOTS_DIR, 'mobile-03-gameplay-action.png')
-    if os.path.exists(sc_action_path):
-        sc_action = Image.open(sc_action_path)
-        phone_1 = create_mobile_phone_mockup(sc_action, 470, 800, corner_radius=42, border_color=(0, 240, 255, 240))
-        # Shadow
-        p1_shadow = Image.new('RGBA', (510, 840), (0, 0, 0, 0))
-        p1_sdraw = ImageDraw.Draw(p1_shadow)
-        p1_sdraw.rounded_rectangle([20, 20, 490, 820], radius=42, fill=(0, 0, 0, 230))
-        p1_shadow = p1_shadow.filter(ImageFilter.GaussianBlur(radius=25))
-        banner.paste(p1_shadow, (1380, 120), p1_shadow)
-        banner.paste(phone_1, (1400, 140), phone_1)
+    # RIGHT SIDE: Triple Mobile Smartphone Presentation Showcase (Pure 9:16 Screens)
+    # Phone 3 (Tertiary background peek - Level Preview): 380 x 640
+    phone_3 = create_mobile_phone_mockup('raw_02_preview.png', 380, 640, corner_radius=34, border_color=(244, 63, 94, 200))
+    paste_phone_with_smooth_shadow(banner, phone_3, 1180, 260, pad=100, blur_radius=22, opacity=190)
 
-    # Phone 2 (Secondary - Campaign Map): 420 x 720
-    sc_map_path = os.path.join(SCREENSHOTS_DIR, 'mobile-01-campaign-map.png')
-    if os.path.exists(sc_map_path):
-        sc_map = Image.open(sc_map_path)
-        phone_2 = create_mobile_phone_mockup(sc_map, 430, 730, corner_radius=38, border_color=(168, 85, 247, 230))
-        p2_shadow = Image.new('RGBA', (470, 770), (0, 0, 0, 0))
-        p2_sdraw = ImageDraw.Draw(p2_shadow)
-        p2_sdraw.rounded_rectangle([20, 20, 450, 750], radius=38, fill=(0, 0, 0, 220))
-        p2_shadow = p2_shadow.filter(ImageFilter.GaussianBlur(radius=22))
-        banner.paste(p2_shadow, (1930, 180), p2_shadow)
-        banner.paste(phone_2, (1950, 200), phone_2)
+    # Phone 2 (Secondary - Campaign Map): 430 x 730
+    phone_2 = create_mobile_phone_mockup('raw_01_map.png', 430, 730, corner_radius=38, border_color=(168, 85, 247, 230))
+    paste_phone_with_smooth_shadow(banner, phone_2, 1950, 200, pad=100, blur_radius=25, opacity=210)
 
-    # Phone 3 (Tertiary background peek - Level Preview): 370 x 630
-    sc_prev_path = os.path.join(SCREENSHOTS_DIR, 'mobile-02-level-preview.png')
-    if os.path.exists(sc_prev_path):
-        sc_prev = Image.open(sc_prev_path)
-        phone_3 = create_mobile_phone_mockup(sc_prev, 380, 640, corner_radius=34, border_color=(244, 63, 94, 200))
-        p3_shadow = Image.new('RGBA', (420, 680), (0, 0, 0, 0))
-        p3_sdraw = ImageDraw.Draw(p3_shadow)
-        p3_sdraw.rounded_rectangle([20, 20, 400, 660], radius=34, fill=(0, 0, 0, 210))
-        p3_shadow = p3_shadow.filter(ImageFilter.GaussianBlur(radius=20))
-        banner.paste(p3_shadow, (1160, 240), p3_shadow)
-        banner.paste(phone_3, (1180, 260), phone_3)
+    # Phone 1 (Primary - Gameplay Action): 470 x 800
+    phone_1 = create_mobile_phone_mockup('raw_03_gameplay.png', 470, 800, corner_radius=42, border_color=(0, 240, 255, 240))
+    paste_phone_with_smooth_shadow(banner, phone_1, 1400, 140, pad=120, blur_radius=28, opacity=230)
 
     out_path = os.path.join(BANNERS_DIR, 'carousel-slider-desktop-21x9.png')
     banner.save(out_path, 'PNG', optimize=True)
@@ -325,54 +338,50 @@ def generate_mobile_carousel_banner(clean_icon):
     banner = create_cyber_background(w, h)
     draw = ImageDraw.Draw(banner)
     
-    font_badge = get_font(FONT_BOLD, 26)
-    font_title = get_font(FONT_TITLE, 76)
-    font_subtitle = get_font(FONT_TREBUCHET, 38)
-    font_body = get_font(FONT_REGULAR, 28)
+    font_badge = get_font(FONT_BOLD, 22)
+    font_title = get_font(FONT_TITLE, 74)
+    font_subtitle = get_font(FONT_TREBUCHET, 36)
+    font_body = get_font(FONT_REGULAR, 26)
     font_pill = get_font(FONT_BOLD, 22)
     font_btn = get_font(FONT_BOLD, 30)
 
-    # Top: Badge
-    badge_text = "★ MOBILE ARCADE 2.0 • 100 SECTORS"
+    # Top: Badge (dynamic width)
+    badge_text = "// MOBILE ARCADE 2.0 • 100 SECTORS"
     bbox = font_badge.getbbox(badge_text)
-    bw = bbox[2] - bbox[0] + 40
-    draw.rounded_rectangle([(w - bw) // 2, 70, (w + bw) // 2, 124], radius=27,
+    bw = bbox[2] - bbox[0] + 44
+    draw.rounded_rectangle([(w - bw) // 2, 65, (w + bw) // 2, 115], radius=25,
                            fill=(13, 22, 48, 230), outline=(0, 240, 255, 220), width=2)
-    draw.text(((w - bw) // 2 + 20, 83), badge_text, font=font_badge, fill=(0, 240, 255))
+    draw.text(((w - bw) // 2 + 22, 77), badge_text, font=font_badge, fill=(0, 240, 255))
     
-    icon_sz = 140
+    icon_sz = 125
     icon_sm = clean_icon.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
-    banner.paste(icon_sm, ((w - icon_sz) // 2, 145), icon_sm)
+    banner.paste(icon_sm, ((w - icon_sz) // 2, 135), icon_sm)
     
-    draw.text(((w - 620) // 2, 300), "BREAKOUT BALL", font=font_title, fill=(255, 255, 255))
-    draw.text(((w - 490) // 2, 390), "CYBER ARCADE 2.0", font=font_subtitle, fill=(0, 229, 255))
-    draw.text(((w - 680) // 2, 445), "C++ WebAssembly Physics • Real-Time Arena", font=font_body, fill=(203, 213, 225))
+    draw.text(((w - 600) // 2, 280), "BREAKOUT BALL", font=font_title, fill=(255, 255, 255))
+    draw.text(((w - 470) // 2, 368), "CYBER ARCADE 2.0", font=font_subtitle, fill=(0, 229, 255))
+    draw.text(((w - 640) // 2, 420), "C++ WebAssembly Physics • Real-Time Arena", font=font_body, fill=(203, 213, 225))
 
-    # Center: Mobile Phone Mockup
-    mb_img_path = os.path.join(SCREENSHOTS_DIR, 'mobile-03-gameplay-action.png')
-    if os.path.exists(mb_img_path):
-        mb_sc = Image.open(mb_img_path)
-        phone = create_mobile_phone_mockup(mb_sc, 490, 800, corner_radius=42, border_color=(0, 240, 255, 230))
-        mshadow = Image.new('RGBA', (530, 840), (0, 0, 0, 0))
-        msdraw = ImageDraw.Draw(mshadow)
-        msdraw.rounded_rectangle([20, 20, 510, 820], radius=42, fill=(0, 0, 0, 230))
-        mshadow = mshadow.filter(ImageFilter.GaussianBlur(radius=25))
-        banner.paste(mshadow, ((w - 530) // 2, 500), mshadow)
-        banner.paste(phone, ((w - 490) // 2, 520), phone)
+    # Center: Mobile Phone Mockup (Gameplay Action)
+    phone = create_mobile_phone_mockup('raw_03_gameplay.png', 490, 800, corner_radius=42, border_color=(0, 240, 255, 230))
+    paste_phone_with_smooth_shadow(banner, phone, (w - 490) // 2, 500, pad=100, blur_radius=25, opacity=230)
 
-    pills = [("⚡ C++ WASM", (0, 229, 255)), ("📱 Touch / Gyro", (168, 85, 247)), ("🛠️ Studio", (244, 63, 94))]
-    total_pw = 175 * 3 + 30
+    # Dynamic centered pills
+    pills = [("C++ WASM", (0, 229, 255)), ("Touch / Gyro", (168, 85, 247)), ("Studio", (244, 63, 94))]
+    pill_widths = []
+    for label, _ in pills:
+        l_box = font_pill.getbbox(label)
+        pill_widths.append(l_box[2] - l_box[0] + 46)
+    
+    total_pw = sum(pill_widths) + (len(pills) - 1) * 20
     px = (w - total_pw) // 2
-    for label, col in pills:
-        draw.rounded_rectangle([px, 1350, px + 175, 1400], radius=14,
+    for (label, col), pw in zip(pills, pill_widths):
+        draw.rounded_rectangle([px, 1345, px + pw, 1395], radius=14,
                                fill=(15, 23, 42, 220), outline=col, width=2)
-        draw.text((px + 16, 1362), label, font=font_pill, fill=col)
-        px += 190
+        draw.ellipse([px + 14, 1366, px + 22, 1374], fill=col)
+        draw.text((px + 28, 1358), label, font=font_pill, fill=col)
+        px += pw + 20
 
-    btn_w = 420
-    draw.rounded_rectangle([(w - btn_w) // 2, 1440, (w + btn_w) // 2, 1515], radius=38,
-                           fill=(0, 229, 255), outline=(255, 255, 255, 140), width=2)
-    draw.text(((w - 180) // 2, 1460), "PLAY NOW ▶", font=font_btn, fill=(5, 12, 30))
+    draw_cta_button(draw, (w - 420) // 2, 1435, 420, 76, "PLAY NOW", fill=(0, 229, 255), text_color=(5, 12, 30), font=font_btn)
 
     out_path = os.path.join(BANNERS_DIR, 'carousel-slider-mobile-3x4.png')
     banner.save(out_path, 'PNG', optimize=True)
@@ -388,19 +397,22 @@ def generate_landscape_app_cover(clean_icon):
     banner = create_cyber_background(w, h)
     draw = ImageDraw.Draw(banner)
     
-    font_badge = get_font(FONT_BOLD, 22)
-    font_title = get_font(FONT_TITLE, 74)
-    font_subtitle = get_font(FONT_TREBUCHET, 34)
-    font_body = get_font(FONT_REGULAR, 24)
+    font_badge = get_font(FONT_BOLD, 20)
+    font_title = get_font(FONT_TITLE, 70)
+    font_subtitle = get_font(FONT_TREBUCHET, 32)
+    font_body = get_font(FONT_REGULAR, 23)
     font_pill = get_font(FONT_BOLD, 20)
     font_btn = get_font(FONT_BOLD, 24)
 
     left_x = 90
     
-    # Badge
-    draw.rounded_rectangle([left_x, 110, left_x + 360, 156], radius=23,
+    # Badge (dynamic width)
+    badge_text = "// NEXT-GEN MOBILE BRICK BREAKER"
+    bbox_b = font_badge.getbbox(badge_text)
+    bw = bbox_b[2] - bbox_b[0] + 40
+    draw.rounded_rectangle([left_x, 110, left_x + bw, 154], radius=22,
                            fill=(13, 22, 48, 230), outline=(0, 240, 255, 200), width=2)
-    draw.text((left_x + 18, 122), "★ NEXT-GEN MOBILE BRICK BREAKER", font=font_badge, fill=(0, 240, 255))
+    draw.text((left_x + 20, 122), badge_text, font=font_badge, fill=(0, 240, 255))
     
     # Title & Icon
     icon_sz = 95
@@ -408,54 +420,39 @@ def generate_landscape_app_cover(clean_icon):
     banner.paste(icon_sm, (left_x, 180), icon_sm)
     
     draw.text((left_x + 110, 185), "BREAKOUT BALL", font=font_title, fill=(255, 255, 255))
-    draw.text((left_x, 290), "CYBER ARCADE REIMAGINED", font=font_subtitle, fill=(0, 229, 255))
+    draw.text((left_x, 285), "CYBER ARCADE REIMAGINED", font=font_subtitle, fill=(0, 229, 255))
     
-    draw.text((left_x, 355), "100 Tactical Sectors with C++ WASM Physics,", font=font_body, fill=(203, 213, 225))
-    draw.text((left_x, 395), "Touch / Gyro Tilt Steering, and Real-Time Arena.", font=font_body, fill=(148, 163, 184))
+    draw.text((left_x, 345), "100 Tactical Sectors with C++ WASM Physics,", font=font_body, fill=(203, 213, 225))
+    draw.text((left_x, 385), "Touch / Gyro Tilt Steering, and Real-Time Arena.", font=font_body, fill=(148, 163, 184))
 
-    # Feature Pills
+    # Feature Pills (dynamic width)
     pills = [
-        ("⚡ WASM Physics", (0, 229, 255)),
-        ("📱 Touch & Tilt", (168, 85, 247)),
-        ("🌐 Global Apex", (244, 63, 94)),
-        ("🛠️ Level Studio", (234, 179, 8))
+        ("WASM Physics", (0, 229, 255)),
+        ("Touch & Tilt", (168, 85, 247)),
+        ("Global Apex", (244, 63, 94)),
+        ("Level Studio", (234, 179, 8))
     ]
     px = left_x
     for label, col in pills:
-        draw.rounded_rectangle([px, 470, px + 175, 515], radius=12,
+        l_box = font_pill.getbbox(label)
+        pw = l_box[2] - l_box[0] + 40
+        draw.rounded_rectangle([px, 460, px + pw, 506], radius=12,
                                fill=(15, 23, 42, 220), outline=col, width=2)
-        draw.text((px + 14, 482), label, font=font_pill, fill=col)
-        px += 190
+        draw.ellipse([px + 12, 480, px + 18, 486], fill=col)
+        draw.text((px + 24, 471), label, font=font_pill, fill=col)
+        px += pw + 16
 
     # CTA Button
-    draw.rounded_rectangle([left_x, 560, left_x + 220, 620], radius=30,
-                           fill=(0, 229, 255), outline=(255, 255, 255, 120), width=2)
-    draw.text((left_x + 45, 577), "PLAY FREE ▶", font=font_btn, fill=(5, 12, 30))
+    draw_cta_button(draw, left_x, 555, 230, 60, "PLAY FREE", fill=(0, 229, 255), text_color=(5, 12, 30), font=font_btn)
 
     # RIGHT: Dual Mobile Smartphone Mockups (Gameplay + Campaign Map)
-    # Primary Phone (Gameplay): 390 x 660
-    sc_action_path = os.path.join(SCREENSHOTS_DIR, 'mobile-03-gameplay-action.png')
-    if os.path.exists(sc_action_path):
-        sc_action = Image.open(sc_action_path)
-        phone_1 = create_mobile_phone_mockup(sc_action, 400, 680, corner_radius=38, border_color=(0, 240, 255, 230))
-        p1_shadow = Image.new('RGBA', (440, 720), (0, 0, 0, 0))
-        p1_sdraw = ImageDraw.Draw(p1_shadow)
-        p1_sdraw.rounded_rectangle([20, 20, 420, 700], radius=38, fill=(0, 0, 0, 230))
-        p1_shadow = p1_shadow.filter(ImageFilter.GaussianBlur(radius=22))
-        banner.paste(p1_shadow, (1080, 90), p1_shadow)
-        banner.paste(phone_1, (1100, 110), phone_1)
-
     # Secondary Phone (Campaign Map): 350 x 590
-    sc_map_path = os.path.join(SCREENSHOTS_DIR, 'mobile-01-campaign-map.png')
-    if os.path.exists(sc_map_path):
-        sc_map = Image.open(sc_map_path)
-        phone_2 = create_mobile_phone_mockup(sc_map, 350, 590, corner_radius=34, border_color=(168, 85, 247, 210))
-        p2_shadow = Image.new('RGBA', (390, 630), (0, 0, 0, 0))
-        p2_sdraw = ImageDraw.Draw(p2_shadow)
-        p2_sdraw.rounded_rectangle([20, 20, 370, 610], radius=34, fill=(0, 0, 0, 210))
-        p2_shadow = p2_shadow.filter(ImageFilter.GaussianBlur(radius=20))
-        banner.paste(p2_shadow, (880, 170), p2_shadow)
-        banner.paste(phone_2, (900, 190), phone_2)
+    phone_2 = create_mobile_phone_mockup('raw_01_map.png', 350, 590, corner_radius=34, border_color=(168, 85, 247, 210))
+    paste_phone_with_smooth_shadow(banner, phone_2, 900, 190, pad=90, blur_radius=22, opacity=200)
+
+    # Primary Phone (Gameplay): 400 x 680
+    phone_1 = create_mobile_phone_mockup('raw_03_gameplay.png', 400, 680, corner_radius=38, border_color=(0, 240, 255, 230))
+    paste_phone_with_smooth_shadow(banner, phone_1, 1100, 110, pad=100, blur_radius=25, opacity=230)
 
     out_path = os.path.join(BANNERS_DIR, 'app-cover-landscape-16x9.png')
     banner.save(out_path, 'PNG', optimize=True)
@@ -470,37 +467,25 @@ def generate_portrait_app_cover(clean_icon):
     banner = create_cyber_background(w, h)
     draw = ImageDraw.Draw(banner)
     
-    font_badge = get_font(FONT_BOLD, 26)
     font_title = get_font(FONT_TITLE, 78)
     font_subtitle = get_font(FONT_TREBUCHET, 38)
     font_body = get_font(FONT_REGULAR, 28)
     font_btn = get_font(FONT_BOLD, 32)
 
     # Top: Logo & Title
-    icon_sz = 160
+    icon_sz = 145
     icon_sm = clean_icon.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
-    banner.paste(icon_sm, ((w - icon_sz) // 2, 90), icon_sm)
+    banner.paste(icon_sm, ((w - icon_sz) // 2, 85), icon_sm)
 
-    draw.text(((w - 640) // 2, 270), "BREAKOUT BALL", font=font_title, fill=(255, 255, 255))
-    draw.text(((w - 530) // 2, 360), "CYBER ARCADE REIMAGINED", font=font_subtitle, fill=(0, 229, 255))
-    draw.text(((w - 620) // 2, 420), "100 Tactical Sectors • C++ WASM Physics", font=font_body, fill=(203, 213, 225))
+    draw.text(((w - 640) // 2, 260), "BREAKOUT BALL", font=font_title, fill=(255, 255, 255))
+    draw.text(((w - 530) // 2, 350), "CYBER ARCADE REIMAGINED", font=font_subtitle, fill=(0, 229, 255))
+    draw.text(((w - 620) // 2, 410), "100 Tactical Sectors • C++ WASM Physics", font=font_body, fill=(203, 213, 225))
 
     # Center: Mobile Phone Mockup (Campaign Map)
-    mb_img_path = os.path.join(SCREENSHOTS_DIR, 'mobile-01-campaign-map.png')
-    if os.path.exists(mb_img_path):
-        mb_sc = Image.open(mb_img_path)
-        phone = create_mobile_phone_mockup(mb_sc, 500, 850, corner_radius=44, border_color=(0, 240, 255, 230))
-        mshadow = Image.new('RGBA', (540, 890), (0, 0, 0, 0))
-        msdraw = ImageDraw.Draw(mshadow)
-        msdraw.rounded_rectangle([20, 20, 520, 870], radius=44, fill=(0, 0, 0, 230))
-        mshadow = mshadow.filter(ImageFilter.GaussianBlur(radius=25))
-        banner.paste(mshadow, ((w - 540) // 2, 480), mshadow)
-        banner.paste(phone, ((w - 500) // 2, 500), phone)
+    phone = create_mobile_phone_mockup('raw_01_map.png', 500, 850, corner_radius=44, border_color=(0, 240, 255, 230))
+    paste_phone_with_smooth_shadow(banner, phone, (w - 500) // 2, 485, pad=100, blur_radius=25, opacity=230)
 
-    btn_w = 440
-    draw.rounded_rectangle([(w - btn_w) // 2, 1420, (w + btn_w) // 2, 1500], radius=40,
-                           fill=(0, 229, 255), outline=(255, 255, 255, 140), width=2)
-    draw.text(((w - 200) // 2, 1442), "PLAY NOW ▶", font=font_btn, fill=(5, 12, 30))
+    draw_cta_button(draw, (w - 440) // 2, 1420, 440, 80, "PLAY NOW", fill=(0, 229, 255), text_color=(5, 12, 30), font=font_btn)
 
     out_path = os.path.join(BANNERS_DIR, 'app-cover-portrait-3x4.png')
     banner.save(out_path, 'PNG', optimize=True)
@@ -516,66 +501,61 @@ def generate_update_post_banner(clean_icon):
     banner = create_cyber_background(w, h)
     draw = ImageDraw.Draw(banner)
     
-    font_badge = get_font(FONT_BOLD, 22)
-    font_title = get_font(FONT_TITLE, 74)
-    font_subtitle = get_font(FONT_TREBUCHET, 34)
-    font_body = get_font(FONT_REGULAR, 24)
-    font_pill = get_font(FONT_BOLD, 20)
+    font_badge = get_font(FONT_BOLD, 20)
+    font_title = get_font(FONT_TITLE, 64)
+    font_subtitle = get_font(FONT_TREBUCHET, 32)
+    font_body = get_font(FONT_REGULAR, 23)
+    font_pill = get_font(FONT_BOLD, 19)
 
-    left_x = 90
+    left_x = 85
 
-    # Badge
-    draw.rounded_rectangle([left_x, 110, left_x + 360, 156], radius=23,
+    # Badge (dynamic width)
+    badge_text = "// DEVLOG UPDATE • VERSION 2.0"
+    bbox_b = font_badge.getbbox(badge_text)
+    bw = bbox_b[2] - bbox_b[0] + 40
+    draw.rounded_rectangle([left_x, 90, left_x + bw, 134], radius=22,
                            fill=(13, 22, 48, 230), outline=(244, 63, 94, 220), width=2)
-    draw.text((left_x + 22, 122), "⚡ DEVLOG UPDATE  •  VERSION 2.0", font=font_badge, fill=(244, 63, 94))
+    draw.text((left_x + 20, 102), badge_text, font=font_badge, fill=(244, 63, 94))
 
-    icon_sz = 95
+    icon_sz = 88
     icon_sm = clean_icon.resize((icon_sz, icon_sz), Image.Resampling.LANCZOS)
-    banner.paste(icon_sm, (left_x, 180), icon_sm)
+    banner.paste(icon_sm, (left_x, 155), icon_sm)
 
-    draw.text((left_x + 110, 185), "ROAD TO 100 SECTORS", font=font_title, fill=(255, 255, 255))
-    draw.text((left_x, 290), "MOBILE ARCADE MAJOR OVERHAUL", font=font_subtitle, fill=(0, 229, 255))
+    # Title: Two crisp stacked lines so it never crowds phone_2
+    draw.text((left_x + 105, 145), "ROAD TO", font=font_title, fill=(255, 255, 255))
+    draw.text((left_x + 105, 215), "100 SECTORS", font=font_title, fill=(255, 255, 255))
+    
+    draw.text((left_x, 305), "MOBILE ARCADE MAJOR OVERHAUL", font=font_subtitle, fill=(0, 229, 255))
 
     changelog = [
-        "✓ 100 Hand-Crafted Sectors across 10 Cyber Worlds",
-        "✓ C++ WASM Physics Engine with fluid touch response",
-        "✓ Mobile Level Designer Studio with cloud sharing",
-        "✓ Live Apex Arena with global mobile leaderboards",
-        "✓ Cyber Armory with customizable hulls, balls & trails"
+        "100 Hand-Crafted Sectors across 10 Cyber Worlds",
+        "C++ WASM Physics Engine with fluid touch response",
+        "Mobile Level Designer Studio with cloud sharing",
+        "Live Apex Arena with global mobile leaderboards",
+        "Cyber Armory with customizable hulls, balls & trails"
     ]
-    cy = 360
+    cy = 368
     for item in changelog:
-        draw.text((left_x, cy), item, font=font_body, fill=(203, 213, 225))
-        cy += 42
+        draw.ellipse([left_x, cy + 7, left_x + 10, cy + 17], fill=(0, 240, 255))
+        draw.text((left_x + 22, cy), item, font=font_body, fill=(203, 213, 225))
+        cy += 40
 
-    draw.rounded_rectangle([left_x, 600, left_x + 300, 650], radius=14,
+    pill_text = "LIVE ON ELSESOURAV.COM"
+    p_box = font_pill.getbbox(pill_text)
+    pw = p_box[2] - p_box[0] + 54
+    draw.rounded_rectangle([left_x, 595, left_x + pw, 642], radius=14,
                            fill=(15, 23, 42, 220), outline=(0, 229, 255), width=2)
-    draw.text((left_x + 24, 613), "🚀 Live on elsesourav.com", font=font_pill, fill=(0, 229, 255))
+    draw.ellipse([left_x + 18, 614, left_x + 26, 622], fill=(0, 229, 255))
+    draw.text((left_x + 36, 608), pill_text, font=font_pill, fill=(0, 229, 255))
 
     # RIGHT: Dual Mobile Smartphone Mockups (Mobile Studio + Mobile Arena)
-    # Primary Phone (Studio Designer): 400 x 680
-    studio_img_path = os.path.join(SCREENSHOTS_DIR, 'mobile-05-level-designer.png')
-    if os.path.exists(studio_img_path):
-        st_sc = Image.open(studio_img_path)
-        phone_1 = create_mobile_phone_mockup(st_sc, 400, 680, corner_radius=38, border_color=(244, 63, 94, 230))
-        p1_shadow = Image.new('RGBA', (440, 720), (0, 0, 0, 0))
-        p1_sdraw = ImageDraw.Draw(p1_shadow)
-        p1_sdraw.rounded_rectangle([20, 20, 420, 700], radius=38, fill=(0, 0, 0, 230))
-        p1_shadow = p1_shadow.filter(ImageFilter.GaussianBlur(radius=22))
-        banner.paste(p1_shadow, (1080, 90), p1_shadow)
-        banner.paste(phone_1, (1100, 110), phone_1)
-
     # Secondary Phone (Global Arena): 350 x 590
-    arena_img_path = os.path.join(SCREENSHOTS_DIR, 'mobile-04-global-arena.png')
-    if os.path.exists(arena_img_path):
-        ar_sc = Image.open(arena_img_path)
-        phone_2 = create_mobile_phone_mockup(ar_sc, 350, 590, corner_radius=34, border_color=(0, 240, 255, 210))
-        p2_shadow = Image.new('RGBA', (390, 630), (0, 0, 0, 0))
-        p2_sdraw = ImageDraw.Draw(p2_shadow)
-        p2_sdraw.rounded_rectangle([20, 20, 370, 610], radius=34, fill=(0, 0, 0, 210))
-        p2_shadow = p2_shadow.filter(ImageFilter.GaussianBlur(radius=20))
-        banner.paste(p2_shadow, (880, 170), p2_shadow)
-        banner.paste(phone_2, (900, 190), phone_2)
+    phone_2 = create_mobile_phone_mockup('raw_04_arena.png', 350, 590, corner_radius=34, border_color=(0, 240, 255, 210))
+    paste_phone_with_smooth_shadow(banner, phone_2, 900, 190, pad=90, blur_radius=22, opacity=200)
+
+    # Primary Phone (Studio Designer): 400 x 680
+    phone_1 = create_mobile_phone_mockup('raw_05_designer.png', 400, 680, corner_radius=38, border_color=(244, 63, 94, 230))
+    paste_phone_with_smooth_shadow(banner, phone_1, 1100, 110, pad=100, blur_radius=25, opacity=230)
 
     out_path = os.path.join(BANNERS_DIR, 'update-banner-v2-16x9.png')
     banner.save(out_path, 'PNG', optimize=True)

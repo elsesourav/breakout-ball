@@ -42,7 +42,7 @@ All required media assets have been generated to the exact aspect ratio, dimensi
 | **Landscape Cover** (`featuredImageUrl`) | [`showcase/banners/app-cover-landscape-16x9.png`](./showcase/banners/app-cover-landscape-16x9.png) | **16:9** | `1600 × 900` | PNG | ElseSourav `/apps/breakout-ball` cover (mobile smartphone mockup) |
 | **Portrait Cover** (`featuredImageMobileUrl`) | [`showcase/banners/app-cover-portrait-3x4.png`](./showcase/banners/app-cover-portrait-3x4.png) | **3:4** | `1200 × 1600` | PNG | ElseSourav mobile app details cover & catalog card |
 | **Devlog / Update Banner** (`coverImageUrl`) | [`showcase/banners/update-banner-v2-16x9.png`](./showcase/banners/update-banner-v2-16x9.png) | **16:9** | `1600 × 900` | PNG | ElseSourav `/updates` post banner (mobile studio & arena) |
-| **App Screenshots (3:4)** (`screenshots[]`) | [`showcase/screenshots/mobile-*.png`](./showcase/screenshots/) (7 screens) | **3:4** | `1200 × 1600` | PNG (Retina) | Mobile app gallery screenshots (exact 3:4 ratio) |
+| **App Screenshots (3:4)** (`screenshots[]`) | [`showcase/screenshots/mobile-*.png`](./showcase/screenshots/) (7 screens) | **3:4** | `1200 × 1600` | PNG (Retina) | Mobile app gallery screenshots (3:4 presentation canvas with 9:16 phone mockup & feature side highlights) |
 | **Animated Previews** | [`showcase/gifs/*.gif`](./showcase/gifs/) (3 files) | Dynamic | Optimized | GIF | Live mobile gameplay action, level studio, and map |
 
 ---
@@ -164,12 +164,13 @@ breakout-ball/
 │   ├── app-icons/              # 1:1 Icons (512x512 Transparent, Night, SVG)
 │   ├── banners/                # ElseSourav Banners (21:9 Slider, 16:9 Cover, 3:4 Portrait, Updates)
 │   ├── gifs/                   # Live Gameplay & Studio animated GIFs
-│   └── screenshots/            # 4K Desktop (16:9) & Retina Mobile (9:16) screenshots
+│   └── screenshots/            # Mobile (3:4) showcase slides with 9:16 phone mockup & side highlights
 ├── scripts/                    # Generation & Verification Automation
-│   ├── capture_live_screenshots.mjs # Headless Chrome screenshot automation
+│   ├── capture_916_screens.mjs # Headless Chrome 9:16 mobile capture automation
+│   ├── compose_34_showcase.py  # 3:4 showcase slide compositing with side typography
 │   ├── capture_live_gifs.mjs   # Headless Chrome frame capture automation
 │   ├── compile_gifs.py         # Pillow GIF compiler & optimizer
-│   └── generate_showcase_assets.py # ElseSourav banner compositing pipeline
+│   └── generate_showcase_assets.py # ElseSourav banners & icons compositing pipeline
 ├── server/                     # Fastify Cloud API server
 ├── src/                        # Game client (all files strictly < 500 lines)
 │   ├── audio/                  # Web Audio synthesizer & sound manager
@@ -227,14 +228,17 @@ npm run server
 
 ### Regenerating Showcase Assets
 ```bash
-# 1. Capture 4K desktop and retina mobile screenshots
-node scripts/capture_live_screenshots.mjs
+# 1. Capture pristine 9:16 native mobile screenshots
+node scripts/capture_916_screens.mjs
 
-# 2. Capture animated gameplay frames and compile GIFs
+# 2. Compose 3:4 presentation slides with 9:16 mobile mockups & side highlights
+python3 scripts/compose_34_showcase.py
+
+# 3. Capture animated gameplay frames and compile GIFs
 node scripts/capture_live_gifs.mjs
 python3 scripts/compile_gifs.py
 
-# 3. Generate all ElseSourav banners, covers, and app icons
+# 4. Generate all ElseSourav banners, covers, and app icons (all pure mobile mockups)
 python3 scripts/generate_showcase_assets.py
 ```
 
