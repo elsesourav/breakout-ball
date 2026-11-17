@@ -77,15 +77,6 @@ export const GameCanvas: React.FC = () => {
     coresEarned: 0, isFirstClear: false, starsEarned: 3, previousStars: 0,
     totalClaimedForLevel: 0, maxCoresForLevel: 0, remainingCoresForLevel: 0,
   });
-  const [debugPadW, setDebugPadW] = useState<number>(0);
-
-  useEffect(() => {
-    const iv = setInterval(() => {
-      const w = (window as any).__gameEngine?.tsPhysics?.paddle?.width;
-      if (w !== undefined) setDebugPadW(Math.round(w));
-    }, 100);
-    return () => clearInterval(iv);
-  }, []);
 
   // Key tracking
   const keysPressed = useRef<{ ArrowLeft: boolean; ArrowRight: boolean; KeyA: boolean; KeyD: boolean }>({
@@ -456,20 +447,6 @@ export const GameCanvas: React.FC = () => {
         maxCoresForLevel={rewards.maxCoresForLevel} remainingCoresForLevel={rewards.remainingCoresForLevel}
         totalCores={currencyService.getBalance()} isDailyMission={isDaily} gameMode={gameMode} isTestMode={isTestLevel}
       />
-      {process.env.NODE_ENV !== 'production' && (
-        <div className="absolute top-2 left-2 z-50 flex items-center gap-2 bg-black/80 px-2 py-1 rounded border border-cyan-500/40 text-xs">
-          <button id="debug-max-paddle" className="px-2 py-0.5 bg-cyan-700 hover:bg-cyan-600 text-white rounded font-mono" onClick={() => {
-            currencyService.setUpgradeLevel('paddle_width', 8);
-            currencyService.setUpgradeLevel('expand_power', 10);
-            const eng = (window as any).__gameEngine;
-            if (eng?.tsPhysics?.paddle) eng.tsPhysics.paddle.width = 399.36;
-          }}>Max Pad</button>
-          <button id="debug-expand-buff" className="px-2 py-0.5 bg-purple-700 hover:bg-purple-600 text-white rounded font-mono" onClick={() => {
-            (window as any).__gameEngine?.powerUps?.activateBuff('expand');
-          }}>Expand</button>
-          <span id="debug-paddle-width" className="text-cyan-300 font-mono">PadW:{debugPadW}</span>
-        </div>
-      )}
       <div
         className="relative flex-1 w-full flex flex-col items-center justify-center pointer-events-auto"
         style={{ paddingTop: `${displaySize.topPadding}px`, paddingBottom: `${displaySize.bottomPadding}px` }}
