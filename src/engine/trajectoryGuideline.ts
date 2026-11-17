@@ -139,13 +139,17 @@ export function calculateTrajectoryGuideline(
 
   // 4. Target Alpha Calculation
   // ALWAYS show the incoming predictive trajectory when descending!
-  const targetAlpha = 0.92;
+  const targetAlpha = 0.95;
 
-  // Smooth gradual fade-in (lerpSpeed 8.0 for responsive onset) and slow graceful fade-out dissolution (lerpSpeed 2.8)
-  const lerpSpeed = targetAlpha < currentFadeAlpha ? 2.8 : 8.0;
+  // Immediate onset on descent: if ball is descending and currentFadeAlpha is below baseline,
+  // initialize at a clear visible floor (0.50) so predictive beam appears as soon as ball descends into range
+  const baselineAlpha = currentFadeAlpha < 0.50 ? 0.50 : currentFadeAlpha;
+
+  // Smooth fade-in towards 0.95 (lerpSpeed 10.0 for quick arrival) and slow graceful fade-out dissolution (lerpSpeed 2.8)
+  const lerpSpeed = targetAlpha < baselineAlpha ? 2.8 : 10.0;
   const nextFadeAlpha = Math.max(
     0.0,
-    Math.min(1.0, currentFadeAlpha + (targetAlpha - currentFadeAlpha) * Math.min(1.0, dt * lerpSpeed))
+    Math.min(1.0, baselineAlpha + (targetAlpha - baselineAlpha) * Math.min(1.0, dt * lerpSpeed))
   );
 
   // If alpha is near 0, clear segments and return hidden

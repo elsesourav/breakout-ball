@@ -222,17 +222,28 @@ export class GameRenderer {
           ctx.stroke();
         }
 
-        // Impact Reticle (Emerald when paddle aligned, Cyan otherwise)
+        // Impact Reticle (Emerald when paddle aligned, Cyan otherwise - Double-ring target)
         ctx.setLineDash([]);
+        const reticleColor = guideline.isHit
+          ? `rgba(16, 185, 129, ${gAlpha * 0.95})`
+          : `rgba(0, 247, 255, ${gAlpha * 0.95})`;
+
         ctx.beginPath();
-        ctx.arc(guideline.hitX, guideline.hitY, 8, 0, Math.PI * 2);
-        ctx.fillStyle = guideline.isHit
-          ? `rgba(16, 185, 129, ${gAlpha * 0.9})`
-          : `rgba(0, 247, 255, ${gAlpha * 0.9})`;
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.5;
+        ctx.arc(guideline.hitX, guideline.hitY, 11, 0, Math.PI * 2);
+        ctx.strokeStyle = reticleColor;
+        ctx.lineWidth = 2.0;
         ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(guideline.hitX, guideline.hitY, 6, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(guideline.hitX, guideline.hitY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
 
         // Outgoing Reflected Ray (Emerald Green with Arrowhead, when paddle intercepts)
         if (guideline.isHit && guideline.outgoingSegments.length > 0) {

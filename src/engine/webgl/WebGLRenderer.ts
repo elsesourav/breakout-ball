@@ -324,14 +324,14 @@ export class WebGLRenderer {
         const inR = 0.0;
         const inG = 0.97;
         const inB = 1.0;
-        const inAlpha = gAlpha * 0.85;
+        const inAlpha = gAlpha * 0.95;
 
         // 1. Draw Incoming Predictive Dotted Segments (Vibrant Cyan)
         for (const seg of guideline.incomingSegments) {
           const dx = seg.x2 - seg.x1;
           const dy = seg.y2 - seg.y1;
           const len = Math.hypot(dx, dy);
-          const stepSize = 18;
+          const stepSize = 16;
           const count = Math.floor(len / stepSize);
           const nx = dx / len;
           const ny = dy / len;
@@ -339,13 +339,13 @@ export class WebGLRenderer {
           for (let s = 1; s <= count; s++) {
             const px = seg.x1 + nx * (s * stepSize);
             const py = seg.y1 + ny * (s * stepSize);
-            const dotSize = 8;
+            const dotSize = 9;
             this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, inR, inG, inB, inAlpha);
           }
         }
 
         // 2. Draw Target Impact Reticle on Paddle Horizon
-        const reticleSize = 24;
+        const reticleSize = 28;
         const reticleR = guideline.isHit ? 0.06 : inR;
         const reticleG = guideline.isHit ? 0.98 : inG;
         const reticleB = guideline.isHit ? 0.65 : inB;

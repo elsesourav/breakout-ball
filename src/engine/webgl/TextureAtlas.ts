@@ -261,15 +261,23 @@ export class TextureAtlas {
       c.fill();
     });
 
-    // 7.2. Impact target reticle ring on paddle
+    // 7.2. Impact target reticle ring on paddle (Concentric high-contrast landing marker)
     placeItem('guideline_reticle', 32, 32, (c, x, y) => {
+      // Outer targeting ring
       c.strokeStyle = '#ffffff';
-      c.lineWidth = 2.5;
+      c.lineWidth = 2.0;
       c.beginPath();
-      c.arc(x + 16, y + 16, 11, 0, Math.PI * 2);
+      c.arc(x + 16, y + 16, 12, 0, Math.PI * 2);
       c.stroke();
 
-      // Inner dot
+      // Middle inner ring
+      c.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+      c.lineWidth = 1.2;
+      c.beginPath();
+      c.arc(x + 16, y + 16, 6, 0, Math.PI * 2);
+      c.stroke();
+
+      // Center bullseye landing dot
       c.fillStyle = '#ffffff';
       c.beginPath();
       c.arc(x + 16, y + 16, 3, 0, Math.PI * 2);
