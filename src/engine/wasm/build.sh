@@ -12,6 +12,7 @@ em++ -std=c++17 -O3 -sSTANDALONE_WASM=1 --no-entry \
   -Wl,--export=engine_pair_portals \
   -Wl,--export=engine_reset_ball \
   -Wl,--export=engine_set_paddle_pos \
+  -Wl,--export=engine_set_paddle_width \
   -Wl,--export=engine_set_modifiers \
   -Wl,--export=engine_spawn_extra_balls \
   -Wl,--export=engine_update \

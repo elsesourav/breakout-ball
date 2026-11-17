@@ -201,16 +201,11 @@ export const LevelPreviewModal: React.FC = () => {
               title="Share Mission Link"
               style={{
                 borderRadius: '8px',
-                backgroundColor: 'rgba(6, 182, 212, 0.15)',
-                border: '1px solid rgba(0, 247, 255, 0.4)',
               }}
-              className="w-8 h-8 flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-300 active:scale-95 transition-all cursor-pointer shadow-[0_0_8px_rgba(0,247,255,0.2)]"
+              className="w-8 h-8 flex items-center justify-center text-cyan-300 hover:text-white hover:border-cyan-300 active:scale-95 transition-all cursor-pointer"
             >
               <Share2 className="w-3.5 h-3.5" />
             </button>
-            <span className="px-3 py-1 rounded-full text-[10px] font-tech font-bold uppercase tracking-wider bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 shadow-[0_0_10px_rgba(0,247,255,0.25)] flex-shrink-0">
-              {isCampaign ? 'Campaign' : 'Community'}
-            </span>
           </div>
         </div>
 

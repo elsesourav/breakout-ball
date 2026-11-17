@@ -77,6 +77,15 @@ export const GameCanvas: React.FC = () => {
     coresEarned: 0, isFirstClear: false, starsEarned: 3, previousStars: 0,
     totalClaimedForLevel: 0, maxCoresForLevel: 0, remainingCoresForLevel: 0,
   });
+  const [debugPadW, setDebugPadW] = useState<number>(0);
+
+  useEffect(() => {
+    const iv = setInterval(() => {
+      const w = (window as any).__gameEngine?.tsPhysics?.paddle?.width;
+      if (w !== undefined) setDebugPadW(Math.round(w));
+    }, 100);
+    return () => clearInterval(iv);
+  }, []);
 
   // Key tracking
   const keysPressed = useRef<{ ArrowLeft: boolean; ArrowRight: boolean; KeyA: boolean; KeyD: boolean }>({
@@ -368,41 +377,24 @@ export const GameCanvas: React.FC = () => {
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     updateCanvasBounds();
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      // Ignore fallback
-    }
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
     processPointerPosition(e.clientX);
-
-    // Tap to launch immediately if ball is resting on paddle after death, NOT during initial countdown
-    if (
-      engineRef.current &&
-      engineRef.current.state.status === 'paused'
-    ) {
+    if (engineRef.current && engineRef.current.state.status === 'paused') {
       engineRef.current.launchBall();
     }
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    // If coalesced events exist (high-frequency 120Hz touch sampling), use the latest sub-frame touch
     const native = e.nativeEvent as PointerEvent;
     if ('getCoalescedEvents' in native && typeof native.getCoalescedEvents === 'function') {
       const coalesced = native.getCoalescedEvents();
-      if (coalesced.length > 0) {
-        processPointerPosition(coalesced[coalesced.length - 1].clientX);
-        return;
-      }
+      if (coalesced.length > 0) { processPointerPosition(coalesced[coalesced.length - 1].clientX); return; }
     }
     processPointerPosition(e.clientX);
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      // Ignore
-    }
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
 
   // Replay Current Level
@@ -454,23 +446,30 @@ export const GameCanvas: React.FC = () => {
       }}
     >
       <GameHUD
-        lives={lives} timeUsed={timeUsed} countdown={countdownText}
-        score={score} combo={combo} activeBuffs={activeBuffs}
-        onExit={handleExit}
-        onPause={() => engineRef.current?.pause()}
-        onResume={() => engineRef.current?.resume()}
-        summaryState={summaryState}
-        onRetry={isDaily && summaryState?.status === 'win' ? undefined : handleRetry}
-        onNextLevel={handleNextLevel} hasNextLevel={hasNextLevel}
-        levelNumber={levelNumber}
-        totalBreakable={liveScoreState?.totalBreakable ?? 0}
-        blocksDestroyed={liveScoreState?.blocksDestroyed ?? 0}
-        coresEarned={rewards.coresEarned} isFirstClear={rewards.isFirstClear}
-        starsEarned={rewards.starsEarned} previousStars={rewards.previousStars}
-        totalClaimedForLevel={rewards.totalClaimedForLevel} maxCoresForLevel={rewards.maxCoresForLevel}
-        remainingCoresForLevel={rewards.remainingCoresForLevel} totalCores={currencyService.getBalance()}
-        isDailyMission={isDaily} gameMode={gameMode} isTestMode={isTestLevel}
+        lives={lives} timeUsed={timeUsed} countdown={countdownText} score={score} combo={combo} activeBuffs={activeBuffs}
+        onExit={handleExit} onPause={() => engineRef.current?.pause()} onResume={() => engineRef.current?.resume()}
+        summaryState={summaryState} onRetry={isDaily && summaryState?.status === 'win' ? undefined : handleRetry}
+        onNextLevel={handleNextLevel} hasNextLevel={hasNextLevel} levelNumber={levelNumber}
+        totalBreakable={liveScoreState?.totalBreakable ?? 0} blocksDestroyed={liveScoreState?.blocksDestroyed ?? 0}
+        coresEarned={rewards.coresEarned} isFirstClear={rewards.isFirstClear} starsEarned={rewards.starsEarned}
+        previousStars={rewards.previousStars} totalClaimedForLevel={rewards.totalClaimedForLevel}
+        maxCoresForLevel={rewards.maxCoresForLevel} remainingCoresForLevel={rewards.remainingCoresForLevel}
+        totalCores={currencyService.getBalance()} isDailyMission={isDaily} gameMode={gameMode} isTestMode={isTestLevel}
       />
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="absolute top-2 left-2 z-50 flex items-center gap-2 bg-black/80 px-2 py-1 rounded border border-cyan-500/40 text-xs">
+          <button id="debug-max-paddle" className="px-2 py-0.5 bg-cyan-700 hover:bg-cyan-600 text-white rounded font-mono" onClick={() => {
+            currencyService.setUpgradeLevel('paddle_width', 8);
+            currencyService.setUpgradeLevel('expand_power', 10);
+            const eng = (window as any).__gameEngine;
+            if (eng?.tsPhysics?.paddle) eng.tsPhysics.paddle.width = 399.36;
+          }}>Max Pad</button>
+          <button id="debug-expand-buff" className="px-2 py-0.5 bg-purple-700 hover:bg-purple-600 text-white rounded font-mono" onClick={() => {
+            (window as any).__gameEngine?.powerUps?.activateBuff('expand');
+          }}>Expand</button>
+          <span id="debug-paddle-width" className="text-cyan-300 font-mono">PadW:{debugPadW}</span>
+        </div>
+      )}
       <div
         className="relative flex-1 w-full flex flex-col items-center justify-center pointer-events-auto"
         style={{ paddingTop: `${displaySize.topPadding}px`, paddingBottom: `${displaySize.bottomPadding}px` }}

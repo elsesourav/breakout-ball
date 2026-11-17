@@ -210,6 +210,10 @@ void BreakoutEngine::setPaddleTarget(float targetX) {
     paddle.targetX = targetX;
 }
 
+void BreakoutEngine::setPaddleWidth(float w) {
+    if (w > 10.0f) paddle.width = w;
+}
+
 void BreakoutEngine::setModifiers(int shieldActive, int megaActive, int impactLvl, float maxPadSpeed) {
     hasShield = (shieldActive != 0);
     isMegaBall = (megaActive != 0);
@@ -700,6 +704,10 @@ void engine_reset_ball(float x, float y, float vx, float vy) {
 
 void engine_set_paddle_pos(float targetX) {
     g_engine.setPaddleTarget(targetX);
+}
+
+void engine_set_paddle_width(float width) {
+    g_engine.setPaddleWidth(width);
 }
 
 void engine_set_modifiers(int hasShield, int isMega, int impactLvl, float maxPaddleSpeed) {

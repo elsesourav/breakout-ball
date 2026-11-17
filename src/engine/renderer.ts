@@ -159,6 +159,7 @@ export class GameRenderer {
     // 6. 3D Paddle Rendering with Sub-Frame State Interpolation
     const hasLaser = !!powerUps && powerUps.buffs.laser > 0;
     const hasShield = !!powerUps && (powerUps.buffs.hasShield || powerUps.buffs.shieldCharges > 0);
+    const hasExpand = !!powerUps && powerUps.buffs.expand > 0;
     const widthLevel = currencyService.getUpgradeLevel('paddle_width');
     const speedLevel = currencyService.getUpgradeLevel('paddle_speed');
     const paddleFancyLvl = currencyService.getUpgradeLevel('paddle_fancy');
@@ -166,6 +167,7 @@ export class GameRenderer {
       animTick,
       hasLaser,
       hasShield,
+      hasExpand,
       widthLevel,
       speedLevel,
       fancyLevel: paddleFancyLvl,

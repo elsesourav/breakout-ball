@@ -334,27 +334,45 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               </span>
             </div>
           )}
+        </button>
 
-          {/* High-Tech Arcade PLAY Button Anchored Below Current Active Level Index */}
-          {isCurrent && (
-            <motion.div
+        {/* High-Tech Arcade PLAY Button Anchored Below Current Active Level Index (Centered & Clickable) */}
+        {isCurrent && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '-14px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 30,
+              pointerEvents: 'auto',
+            }}
+            className="flex items-center justify-center select-none"
+          >
+            <motion.button
+              type="button"
+              id={`roadmap-level-play-btn-${node.id}`}
+              disabled={disabled}
+              onClick={(e) => {
+                e.stopPropagation();
+                onLevelClick(node.id);
+              }}
+              aria-label={`Play Level ${node.id}`}
               animate={{ y: [0, -3, 0] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.94 }}
               style={{
-                position: 'absolute',
-                bottom: '-16px',
-                left: '50%',
-                transform: 'translateX(-50%)',
                 background: 'linear-gradient(180deg, #00f7ff 0%, #00b4d8 60%, #0077b6 100%)',
                 border: '1.5px solid #ffffff',
                 boxShadow:
                   '0 2.5px 0 #023e8a, 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 22px rgba(0, 247, 255, 0.95), 0 0 40px rgba(0, 180, 216, 0.55), inset 0 1px 2px #ffffff',
                 borderRadius: '9999px',
-                pointerEvents: 'none',
                 whiteSpace: 'nowrap',
-                zIndex: 20,
+                WebkitTapHighlightColor: 'transparent',
+                outline: 'none',
               }}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-1 font-display font-black text-xs uppercase tracking-widest shadow-lg select-none"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-1 font-display font-black text-xs uppercase tracking-widest shadow-lg select-none cursor-pointer"
             >
               <Play className="w-3.5 h-3.5 fill-white text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] shrink-0" />
               <span
@@ -369,9 +387,9 @@ export const RoadmapNodeItem = forwardRef<HTMLDivElement, RoadmapNodeItemProps>(
               >
                 PLAY
               </span>
-            </motion.div>
-          )}
-        </button>
+            </motion.button>
+          </div>
+        )}
       </div>
     );
   }

@@ -236,12 +236,10 @@ export class WebGLRenderer {
     const renderPaddleX = paddle.prevX !== undefined && alpha < 0.999 ? paddle.prevX + (paddle.x - paddle.prevX) * alpha : paddle.x;
     const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
     const padSpeedLvl = currencyService.getUpgradeLevel('paddle_speed');
-    const padTier = getPaddleTierFromUpgrades(padWidthLvl, padSpeedLvl);
-    const paddleUV = this.atlas.getUV(`paddle_t${padTier}`);
-    const dotUV = this.atlas.getUV('guideline_dot');
-    const padMargin = 16;
-    const padSlotW = paddle.width + padMargin * 2;
-    const padSlotH = paddle.height + padMargin * 2;
+    const isExpand = powerUps ? powerUps.buffs.expand > 0 : false;
+    const padTier = isExpand ? 3 : getPaddleTierFromUpgrades(padWidthLvl, padSpeedLvl);
+    const paddleUV = this.atlas.getUV(`paddle_t${padTier}`), dotUV = this.atlas.getUV('guideline_dot');
+    const padMargin = 16, padSlotW = paddle.width + padMargin * 2, padSlotH = paddle.height + padMargin * 2;
 
     // 5.0. Under-Chassis Mechanical Booster Nozzles & Flames (Speed Upgrade & Preset Booster)
     const isQuad = padSpeedLvl >= 7;
@@ -264,6 +262,11 @@ export class WebGLRenderer {
 
     // 5.1. Armored Paddle Hull
     this.batcher.pushSprite(renderPaddleX - paddle.width / 2 - padMargin, paddle.y - padMargin, padSlotW, padSlotH, paddleUV.u0, paddleUV.v0, paddleUV.u1, paddleUV.v1, 1.0, 1.0, 1.0, 1.0);
+    if (isExpand) {
+      const wUV = this.atlas.getUV('guideline_reticle'), wW = 16, wH = paddle.height - 2, wA = Math.sin(this.animTick * 8) * 0.25 + 0.75;
+      this.batcher.pushSprite(renderPaddleX - paddle.width / 2 - wW * 0.5, paddle.y + 1, wW, wH, wUV.u0, wUV.v0, wUV.u1, wUV.v1, 0, 0.97, 1.0, wA);
+      this.batcher.pushSprite(renderPaddleX + paddle.width / 2 - wW * 0.5, paddle.y + 1, wW, wH, wUV.u0, wUV.v0, wUV.u1, wUV.v1, 0, 0.97, 1.0, wA);
+    }
 
     // 5.2. Continuous Chassis Sparkle Particle Release (paddle_fancy Upgrade)
     const padFancyLvl = currencyService.getUpgradeLevel('paddle_fancy');

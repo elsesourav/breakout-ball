@@ -95,11 +95,12 @@ export const updatePageMetadata = (meta: PageMetadata): void => {
   setMetaTag('property', 'og:url', fullOgUrl);
   setMetaTag('property', 'og:image', fullOgImage);
   setMetaTag('property', 'og:image:secure_url', fullOgImage);
-  setMetaTag('property', 'og:image:type', og.imageType || 'image/jpeg');
+  setMetaTag('property', 'og:image:type', og.imageType || 'image/png');
   setMetaTag('property', 'og:image:width', String(og.imageWidth || 1200));
   setMetaTag('property', 'og:image:height', String(og.imageHeight || 630));
   setMetaTag('property', 'og:image:alt', og.imageAlt || og.title);
   setMetaTag('property', 'og:locale', og.locale || 'en_US');
+  setLinkTag('image_src', fullOgImage);
 
   // 5. Twitter Card Tags
   const tw = meta.twitter;

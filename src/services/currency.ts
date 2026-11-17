@@ -306,6 +306,12 @@ class CurrencyService {
     return true;
   }
 
+  /** Set an upgrade level directly (e.g. for testing / preset verification). */
+  public setUpgradeLevel(id: string, level: number): void {
+    this.upgrades[id] = level;
+    this.saveToLocal();
+  }
+
   /** Check if user can afford an upgrade. */
   public canAfford(upgradeId: string): boolean {
     const def = getUpgradeDef(upgradeId);

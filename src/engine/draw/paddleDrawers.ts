@@ -5,6 +5,7 @@ export interface PaddleRenderOptions {
   animTick?: number;
   hasLaser?: boolean;
   hasShield?: boolean;
+  hasExpand?: boolean;
   tier?: PaddleTier;
   widthLevel?: number;
   speedLevel?: number;
@@ -54,6 +55,8 @@ export function drawMechTitanPaddle(
   const tier: PaddleTier =
     options.tier !== undefined
       ? options.tier
+      : options.hasExpand
+      ? 3
       : options.widthLevel !== undefined || options.speedLevel !== undefined
       ? getPaddleTierFromUpgrades(options.widthLevel || 1, options.speedLevel || 1)
       : 2;
@@ -379,6 +382,26 @@ export function drawMechTitanPaddle(
 
       ctx.restore();
     }
+  }
+
+  // 7. TITAN PADDLE EXPAND OVERDRIVE WINGLETS (Preset Extension Flanks)
+  if (options.hasExpand) {
+    const wingW = 16, pulse = Math.sin(animTick * 8) * 0.2 + 0.8;
+    ctx.save();
+    ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+    ctx.strokeStyle = `rgba(0, 247, 255, ${pulse})`;
+    ctx.lineWidth = 1.8;
+    drawChamfer(ctx, px - wingW + 3, py + 3, wingW, ph - 6, 3);
+    ctx.fill(); ctx.stroke();
+    drawChamfer(ctx, px + pw - 3, py + 3, wingW, ph - 6, 3);
+    ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(px - wingW + 6, py + ph / 2); ctx.lineTo(px + 2, py + ph / 2);
+    ctx.moveTo(px + pw - 2, py + ph / 2); ctx.lineTo(px + pw + wingW - 6, py + ph / 2);
+    ctx.stroke();
+    ctx.restore();
   }
 
   ctx.restore();

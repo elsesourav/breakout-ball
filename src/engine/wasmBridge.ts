@@ -140,6 +140,12 @@ export class WasmPhysicsBridge {
     fn(targetX);
   }
 
+  public setPaddleWidth(width: number) {
+    if (!this.instance) return;
+    const fn = (this.instance.exports.engine_set_paddle_width || (this.instance.exports as any).engine_set_paddle_width) as ((w: number) => void) | undefined;
+    fn?.(width);
+  }
+
   public setModifiers(hasShield: boolean, isMega: boolean, impactLvl: number, maxPadSpeed: number) {
     if (!this.instance) return;
     const fn = this.instance.exports.engine_set_modifiers as (

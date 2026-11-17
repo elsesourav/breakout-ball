@@ -265,15 +265,15 @@ export class GameEngine {
     const isExpand = this.powerUps.buffs.expand > 0;
     const padWidthLvl = currencyService.getUpgradeLevel('paddle_width');
     const basePadW = PADDLE_WIDTH * (1 + (padWidthLvl - 1) * 0.08);
-    const expandMultiplier = 1.30 + (currencyService.getUpgradeLevel('expand_power') - 1) * 0.04;
-    this.tsPhysics.paddle.width = isExpand ? basePadW * expandMultiplier : basePadW;
+    const expandMultiplier = 1.35 + (currencyService.getUpgradeLevel('expand_power') - 1) * 0.05;
+    const targetPadW = isExpand ? basePadW * expandMultiplier : basePadW;
+    this.tsPhysics.paddle.width += (targetPadW - this.tsPhysics.paddle.width) * Math.min(1.0, dt * (isExpand ? 14 : 6));
     this.tsPhysics.paddle.maxSpeed = 800 + (currencyService.getUpgradeLevel('paddle_speed') - 1) * (800 / 7);
-    this.tsPhysics.isMegaBall = this.powerUps.buffs.megaBall > 0;
-    this.tsPhysics.hasShield = this.powerUps.hasActiveShield();
-    this.tsPhysics.ballImpactLevel = currencyService.getUpgradeLevel('ball_impact');
+    this.tsPhysics.isMegaBall = this.powerUps.buffs.megaBall > 0; this.tsPhysics.hasShield = this.powerUps.hasActiveShield(); this.tsPhysics.ballImpactLevel = currencyService.getUpgradeLevel('ball_impact');
 
     let events: CollisionEvent[];
     if (this.useWasm && this.wasmBridge.ready) {
+      this.wasmBridge.setPaddleWidth(this.tsPhysics.paddle.width);
       this.wasmBridge.setModifiers(this.tsPhysics.hasShield, this.tsPhysics.isMegaBall, this.tsPhysics.ballImpactLevel, this.tsPhysics.paddle.maxSpeed);
       this.wasmBridge.update(6);
       this.tsPhysics.balls = this.wasmBridge.syncBallStates(this.tsPhysics.balls);

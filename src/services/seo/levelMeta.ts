@@ -2,7 +2,7 @@ import { LevelData, ActiveTab, GameScreen } from '../../types/game';
 import { PageMetadata } from './types';
 import { calculateLevelHp } from '../../utils/helpers';
 
-const DEFAULT_BANNER = '/og-image.jpg';
+const DEFAULT_BANNER = 'https://breakout.elsesourav.com/og-image.png';
 const DEFAULT_TWITTER_CREATOR = '@elsesourav';
 
 /**
