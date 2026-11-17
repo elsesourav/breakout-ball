@@ -37,14 +37,13 @@ All required media assets have been generated to the exact aspect ratio, dimensi
 | **App Icon** (`iconUrl`) | [`showcase/app-icons/app-icon-512x512.png`](./showcase/app-icons/app-icon-512x512.png) | **1:1** | `512 × 512` | PNG (Alpha) | App Store icon, header badge, crisp retina branding |
 | **App Icon Night** | [`showcase/app-icons/app-icon-night-512x512.png`](./showcase/app-icons/app-icon-night-512x512.png) | **1:1** | `512 × 512` | PNG | Mobile PWA home screen icon, Android adaptive badge |
 | **Vector Mark** | [`showcase/app-icons/app-icon.svg`](./showcase/app-icons/app-icon.svg) | **1:1** | Scalable | SVG | Infinite resolution vector branding mark |
-| **Carousel Desktop** (`desktopImageUrl`) | [`showcase/banners/carousel-slider-desktop-21x9.png`](./showcase/banners/carousel-slider-desktop-21x9.png) | **21:9** | `2520 × 1080` | PNG | ElseSourav homepage featured hero carousel slider |
+| **Carousel Desktop** (`desktopImageUrl`) | [`showcase/banners/carousel-slider-desktop-21x9.png`](./showcase/banners/carousel-slider-desktop-21x9.png) | **21:9** | `2520 × 1080` | PNG | ElseSourav featured hero slider (pure mobile showcase) |
 | **Carousel Mobile** (`mobileImageUrl`) | [`showcase/banners/carousel-slider-mobile-3x4.png`](./showcase/banners/carousel-slider-mobile-3x4.png) | **3:4** | `1200 × 1600` | PNG | ElseSourav mobile hero carousel card |
-| **Landscape Cover** (`featuredImageUrl`) | [`showcase/banners/app-cover-landscape-16x9.png`](./showcase/banners/app-cover-landscape-16x9.png) | **16:9** | `1600 × 900` | PNG | ElseSourav `/apps/breakout-ball` main desktop cover |
-| **Portrait Cover** (`featuredImageMobileUrl`) | [`showcase/banners/app-cover-portrait-3x4.png`](./showcase/banners/app-cover-portrait-3x4.png) | **3:4** | `1200 × 1600` | PNG | ElseSourav mobile app details card & catalog preview |
-| **Devlog / Update Banner** (`coverImageUrl`) | [`showcase/banners/update-banner-v2-16x9.png`](./showcase/banners/update-banner-v2-16x9.png) | **16:9** | `1600 × 900` | PNG | ElseSourav `/updates` devlog post: *"Version 2.0 Overhaul"* |
-| **Desktop Screenshots** (`screenshots[]`) | [`showcase/screenshots/desktop-*.png`](./showcase/screenshots/) | **16:9** | `3840 × 2160` | PNG (4K) | High-definition app gallery previews (5 screens) |
-| **Mobile Screenshots** (`screenshots[]`) | [`showcase/screenshots/mobile-*.png`](./showcase/screenshots/) | **9:16** | `860 × 1864` | PNG (Retina) | Mobile experience showcase gallery (7 screens) |
-| **Animated Previews** | [`showcase/gifs/*.gif`](./showcase/gifs/) | Dynamic | Optimized | GIF | Live gameplay action, level studio, and map navigation |
+| **Landscape Cover** (`featuredImageUrl`) | [`showcase/banners/app-cover-landscape-16x9.png`](./showcase/banners/app-cover-landscape-16x9.png) | **16:9** | `1600 × 900` | PNG | ElseSourav `/apps/breakout-ball` cover (mobile smartphone mockup) |
+| **Portrait Cover** (`featuredImageMobileUrl`) | [`showcase/banners/app-cover-portrait-3x4.png`](./showcase/banners/app-cover-portrait-3x4.png) | **3:4** | `1200 × 1600` | PNG | ElseSourav mobile app details cover & catalog card |
+| **Devlog / Update Banner** (`coverImageUrl`) | [`showcase/banners/update-banner-v2-16x9.png`](./showcase/banners/update-banner-v2-16x9.png) | **16:9** | `1600 × 900` | PNG | ElseSourav `/updates` post banner (mobile studio & arena) |
+| **App Screenshots (3:4)** (`screenshots[]`) | [`showcase/screenshots/mobile-*.png`](./showcase/screenshots/) (7 screens) | **3:4** | `1200 × 1600` | PNG (Retina) | Mobile app gallery screenshots (exact 3:4 ratio) |
+| **Animated Previews** | [`showcase/gifs/*.gif`](./showcase/gifs/) (3 files) | Dynamic | Optimized | GIF | Live mobile gameplay action, level studio, and map |
 
 ---
 
@@ -72,56 +71,46 @@ All required media assets have been generated to the exact aspect ratio, dimensi
 
 ---
 
-## 📸 Desktop Showcase Gallery (16:9 4K)
+## 📱 Mobile App Showcase Gallery (3:4 Ratio — 1200 × 1600)
 
 <table width="100%">
   <tr>
-    <td width="50%">
-      <p align="center"><strong>Sector Campaign Map & Sector Selection</strong></p>
-      <img src="./showcase/screenshots/desktop-01-campaign-map.png" alt="Desktop Campaign Map" width="100%" />
+    <td width="33%" align="center">
+      <p><strong>01. Campaign Map (100 Sectors)</strong></p>
+      <img src="./showcase/screenshots/mobile-01-campaign-map.png" alt="Mobile Campaign Map" width="100%" />
     </td>
-    <td width="50%">
-      <p align="center"><strong>High-Octane Gameplay & WASM Physics</strong></p>
-      <img src="./showcase/screenshots/desktop-02-gameplay-action.png" alt="Desktop Gameplay Action" width="100%" />
+    <td width="33%" align="center">
+      <p><strong>02. Level Preview Modal</strong></p>
+      <img src="./showcase/screenshots/mobile-02-level-preview.png" alt="Mobile Level Preview" width="100%" />
     </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <p align="center"><strong>Level Studio & Block Matrix Forge</strong></p>
-      <img src="./showcase/screenshots/desktop-03-level-designer.png" alt="Desktop Level Designer" width="100%" />
-    </td>
-    <td width="50%">
-      <p align="center"><strong>Global Apex Leaderboard & Speedruns</strong></p>
-      <img src="./showcase/screenshots/desktop-04-global-arena.png" alt="Desktop Global Arena" width="100%" />
+    <td width="33%" align="center">
+      <p><strong>03. Touch Action Gameplay</strong></p>
+      <img src="./showcase/screenshots/mobile-03-gameplay-action.png" alt="Mobile Gameplay Action" width="100%" />
     </td>
   </tr>
   <tr>
-    <td colspan="2" align="center">
-      <p align="center"><strong>Cyber Armory & Cosmetics Depot</strong></p>
-      <img src="./showcase/screenshots/desktop-05-cyber-armory.png" alt="Desktop Cyber Armory" width="80%" />
+    <td width="33%" align="center">
+      <p><strong>04. Global Apex Arena</strong></p>
+      <img src="./showcase/screenshots/mobile-04-global-arena.png" alt="Mobile Global Arena" width="100%" />
+    </td>
+    <td width="33%" align="center">
+      <p><strong>05. Mobile Level Designer</strong></p>
+      <img src="./showcase/screenshots/mobile-05-level-designer.png" alt="Mobile Level Studio" width="100%" />
+    </td>
+    <td width="33%" align="center">
+      <p><strong>06. Cyber Armory & Hulls</strong></p>
+      <img src="./showcase/screenshots/mobile-06-cyber-armory.png" alt="Mobile Cyber Armory" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td colspan="3" align="center">
+      <div style="max-width: 380px; margin: 0 auto;">
+        <p><strong>07. Pilot Profile & Achievements</strong></p>
+        <img src="./showcase/screenshots/mobile-07-pilot-profile.png" alt="Mobile Pilot Profile" width="100%" />
+      </div>
     </td>
   </tr>
 </table>
-
----
-
-## 📱 Mobile Experience Showcase (9:16 Retina)
-
-<p align="center">
-  <img src="./showcase/screenshots/mobile-01-campaign-map.png" width="13.5%" alt="Mobile Map" />
-  &nbsp;
-  <img src="./showcase/screenshots/mobile-02-level-preview.png" width="13.5%" alt="Mobile Preview" />
-  &nbsp;
-  <img src="./showcase/screenshots/mobile-03-gameplay-action.png" width="13.5%" alt="Mobile Gameplay" />
-  &nbsp;
-  <img src="./showcase/screenshots/mobile-04-global-arena.png" width="13.5%" alt="Mobile Arena" />
-  &nbsp;
-  <img src="./showcase/screenshots/mobile-05-level-designer.png" width="13.5%" alt="Mobile Studio" />
-  &nbsp;
-  <img src="./showcase/screenshots/mobile-06-cyber-armory.png" width="13.5%" alt="Mobile Armory" />
-  &nbsp;
-  <img src="./showcase/screenshots/mobile-07-pilot-profile.png" width="13.5%" alt="Mobile Profile" />
-</p>
 
 ---
 

@@ -8,12 +8,12 @@ const OUT_DIR = path.resolve('showcase/screenshots');
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 async function captureAll() {
-  console.log('Starting Headless Chrome for live screenshot captures...');
+  console.log('Starting Headless Chrome for 3:4 Mobile Screenshot Captures...');
   const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
     '--headless=new',
-    '--remote-debugging-port=9305',
-    '--user-data-dir=/tmp/chrome_showcase_capture_' + Date.now(),
-    '--window-size=1920,1080',
+    '--remote-debugging-port=9310',
+    '--user-data-dir=/tmp/chrome_showcase_34_' + Date.now(),
+    '--window-size=1200,1600',
     '--no-first-run',
     '--no-default-browser-check',
     'about:blank'
@@ -23,13 +23,13 @@ async function captureAll() {
     let listRes = null;
     for (let i = 0; i < 30; i++) {
       try {
-        listRes = await fetch('http://127.0.0.1:9305/json/list');
+        listRes = await fetch('http://127.0.0.1:9310/json/list');
         if (listRes.ok) break;
       } catch (e) {
         await new Promise(r => setTimeout(r, 400));
       }
     }
-    if (!listRes) throw new Error('Could not connect to Chrome debugger on port 9305');
+    if (!listRes) throw new Error('Could not connect to Chrome debugger on port 9310');
 
     const pages = await listRes.json();
     const page = pages.find((p) => p.type === 'page');
@@ -57,100 +57,76 @@ async function captureAll() {
     await send('Runtime.enable');
     await send('Page.enable');
 
-    async function setViewport(width, height, isMobile = false) {
+    async function setViewport(width, height, scale = 2.5) {
       await send('Emulation.setDeviceMetricsOverride', {
         width,
         height,
-        deviceScaleFactor: 2,
-        mobile: isMobile,
+        deviceScaleFactor: scale,
+        mobile: true,
       });
     }
 
-    async function waitTime(ms) {
-      return new Promise(r => setTimeout(r, ms));
-    }
+    const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
     async function snap(filename) {
       const res = await send('Page.captureScreenshot', { format: 'png' });
       const dest = path.join(OUT_DIR, filename);
       fs.writeFileSync(dest, Buffer.from(res.data, 'base64'));
-      console.log(`Saved screenshot: ${filename}`);
+      console.log(`Saved screenshot (3:4 ratio - 1200x1600): ${filename}`);
     }
 
-    // ==========================================
-    // 1. MOBILE SCREENSHOTS (9:16 - 430 x 932 @ 2x = 860 x 1864)
-    // ==========================================
-    console.log('\n--- Capturing Mobile Screenshots (9:16) ---');
-    await setViewport(430, 932, true);
+    // ===============================================================
+    // MOBILE SCREENSHOTS IN 3:4 RATIO (480 x 640 @ 2.5x = 1200 x 1600)
+    // ===============================================================
+    console.log('\n--- Capturing 3:4 Mobile Screenshots (1200x1600) ---');
+    await setViewport(480, 640, 2.5);
 
-    // 1.1 Campaign Map
+    // 1. Campaign Map
     await send('Page.navigate', { url: `${BASE_URL}/` });
-    await waitTime(4000);
+    await wait(3800);
     await snap('mobile-01-campaign-map.png');
 
-    // 1.2 Level 3 Preview Modal
+    // 2. Level 3 Preview Modal
     await send('Page.navigate', { url: `${BASE_URL}/level/3` });
-    await waitTime(3000);
+    await wait(3000);
     await snap('mobile-02-level-preview.png');
 
-    // 1.3 Active Gameplay Action
+    // 3. Active Gameplay Action
     await send('Page.navigate', { url: `${BASE_URL}/play/3` });
-    await waitTime(3800);
+    await wait(3900); // Allow countdown to finish and ball to launch
     await snap('mobile-03-gameplay-action.png');
 
-    // 1.4 Global Arena
+    // 4. Global Arena
     await send('Page.navigate', { url: `${BASE_URL}/arena` });
-    await waitTime(3500);
+    await wait(3500);
     await snap('mobile-04-global-arena.png');
 
-    // 1.5 Level Studio (Designer)
+    // 5. Level Studio (Mobile Designer)
     await send('Page.navigate', { url: `${BASE_URL}/studio` });
-    await waitTime(3000);
+    await wait(3000);
     await snap('mobile-05-level-designer.png');
 
-    // 1.6 Cyber Armory
+    // 6. Cyber Armory
     await send('Page.navigate', { url: `${BASE_URL}/armory` });
-    await waitTime(3000);
+    await wait(3000);
     await snap('mobile-06-cyber-armory.png');
 
-    // 1.7 Pilot Profile
+    // 7. Pilot Profile & Achievements
     await send('Page.navigate', { url: `${BASE_URL}/profile` });
-    await waitTime(3000);
+    await wait(3000);
     await snap('mobile-07-pilot-profile.png');
 
-    // ==========================================
-    // 2. DESKTOP SCREENSHOTS (16:9 - 1920 x 1080 @ 1x)
-    // ==========================================
-    console.log('\n--- Capturing Desktop Screenshots (16:9) ---');
-    await setViewport(1920, 1080, false);
-
-    // 2.1 Desktop Map & Arena
-    await send('Page.navigate', { url: `${BASE_URL}/` });
-    await waitTime(3500);
-    await snap('desktop-01-campaign-map.png');
-
-    // 2.2 Desktop Gameplay
-    await send('Page.navigate', { url: `${BASE_URL}/play/16` });
-    await waitTime(3800);
-    await snap('desktop-02-gameplay-action.png');
-
-    // 2.3 Desktop Level Designer
-    await send('Page.navigate', { url: `${BASE_URL}/studio` });
-    await waitTime(3000);
-    await snap('desktop-03-level-designer.png');
-
-    // 2.4 Desktop Global Arena
-    await send('Page.navigate', { url: `${BASE_URL}/arena` });
-    await waitTime(3500);
-    await snap('desktop-04-global-arena.png');
-
-    // 2.5 Desktop Cyber Armory
-    await send('Page.navigate', { url: `${BASE_URL}/armory` });
-    await waitTime(3000);
-    await snap('desktop-05-cyber-armory.png');
+    // Clean up any remaining desktop screenshots from showcase/screenshots
+    const files = fs.readdirSync(OUT_DIR);
+    for (const f of files) {
+      if (f.startsWith('desktop-')) {
+        fs.unlinkSync(path.join(OUT_DIR, f));
+        console.log(`Removed desktop screenshot: ${f}`);
+      }
+    }
 
     ws.close();
-    console.log('\nAll live screenshots captured successfully!');
+    console.log('\nAll 3:4 mobile screenshots captured successfully!');
   } catch (err) {
     console.error('Error during screenshot capture:', err);
   } finally {
