@@ -444,16 +444,10 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
               {statusMsg && (
                 <div
                   className={`flex items-center gap-1.5 text-xs font-tech p-2 rounded-md ${
-                    status === 'success'
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                      : 'bg-red-500/20 text-red-400 border border-red-500/40'
+                    status === 'success' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-red-500/20 text-red-400 border border-red-500/40'
                   }`}
                 >
-                  {status === 'success' ? (
-                    <CheckCircle className="w-4 h-4 shrink-0" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                  )}
+                  {status === 'success' ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
                   <span>{statusMsg}</span>
                 </div>
               )}
@@ -461,27 +455,16 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
               <button
                 type="submit"
                 disabled={status === 'loading' || !couponCode.trim()}
-                style={{
-                  backgroundImage: selectedMeta.btnGradient,
-                  boxShadow: selectedMeta.btnShadow,
-                }}
+                style={{ backgroundImage: selectedMeta.btnGradient, boxShadow: selectedMeta.btnShadow }}
                 className={`w-full py-2.5 rounded-xl ${selectedMeta.btnTextColor} font-tech font-black text-xs uppercase tracking-wider transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5 mt-1`}
               >
-                {status === 'loading' ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <span className="tracking-widest">CLAIM IN SHOP</span>
-                )}
+                {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <span className="tracking-widest">CLAIM IN SHOP</span>}
               </button>
 
               {isUserAdmin(authService.getCurrentUser()) && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedPack(null);
-                    setAdminTab('coupons');
-                    setIsAdminOpen(true);
-                  }}
+                  onClick={() => { setSelectedPack(null); setAdminTab('coupons'); setIsAdminOpen(true); }}
                   className="w-full py-1.5 px-2 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 hover:bg-amber-500/25 font-mono text-[10px] flex items-center justify-center gap-1.5 transition-all cursor-pointer mt-0.5"
                 >
                   <Ticket className="w-3 h-3 text-amber-300" />
