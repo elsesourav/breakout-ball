@@ -84,56 +84,41 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                 onClick={handleOpenProfile}
                 whileHover={{ y: -0.5, scale: 1.04 }}
                 whileTap={{ y: 3, scale: 0.96 }}
-                animate={
-                  hasUnclaimedAch
-                    ? {
-                        boxShadow: [
-                          '0 0 10px rgba(255, 215, 0, 0.6), 0 0 20px rgba(0, 247, 255, 0.4), inset 0 0 8px rgba(255, 215, 0, 0.3)',
-                          '0 0 22px rgba(255, 215, 0, 0.95), 0 0 38px rgba(0, 247, 255, 0.75), inset 0 0 14px rgba(255, 215, 0, 0.5)',
-                          '0 0 10px rgba(255, 215, 0, 0.6), 0 0 20px rgba(0, 247, 255, 0.4), inset 0 0 8px rgba(255, 215, 0, 0.3)',
-                        ],
-                        borderColor: [
-                          'rgba(255, 215, 0, 0.9)',
-                          'rgba(0, 247, 255, 0.9)',
-                          'rgba(255, 215, 0, 0.9)',
-                        ],
-                      }
-                    : undefined
-                }
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                 style={{
-                  background: hasUnclaimedAch
-                    ? 'linear-gradient(180deg, rgba(32, 28, 10, 0.96) 0%, rgba(14, 18, 36, 0.98) 100%)'
-                    : 'linear-gradient(180deg, rgba(20, 35, 70, 0.96) 0%, rgba(10, 18, 42, 0.98) 100%)',
-                  border: hasUnclaimedAch ? '2px solid #ffd700' : '1.8px solid rgba(0, 247, 255, 0.8)',
-                  boxShadow: hasUnclaimedAch
-                    ? '0 0 16px rgba(255, 215, 0, 0.8), 0 0 28px rgba(0, 247, 255, 0.5), inset 0 0 10px rgba(255, 215, 0, 0.4)'
-                    : 'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 247, 255, 0.25)',
+                  background:
+                    'linear-gradient(180deg, rgba(20, 35, 70, 0.96) 0%, rgba(10, 18, 42, 0.98) 100%)',
+                  border: '1.8px solid rgba(0, 247, 255, 0.8)',
+                  boxShadow:
+                    'inset 0 1.5px 0.5px rgba(255, 255, 255, 0.35), inset 0 -1.5px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 247, 255, 0.25)',
                 }}
-                className="relative w-full h-full rounded-lg flex items-center justify-center cursor-pointer overflow-hidden pointer-events-auto"
+                className="relative w-full h-full rounded-lg flex items-center justify-center cursor-pointer pointer-events-auto"
                 title={hasUnclaimedAch ? `Pilot Profile • ${unclaimedCount} Achievements to Claim!` : 'Pilot Profile'}
               >
-                {user.isLoggedIn && user.avatarUrl && !avatarErr ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.fullName || 'Pilot'}
-                    referrerPolicy="no-referrer"
-                    onError={() => setAvatarErr(true)}
-                    className="w-full h-full object-cover rounded-md"
-                  />
-                ) : user.isLoggedIn ? (
-                  <span className="text-xs font-tech font-bold text-cyan-300">
-                    {(user.fullName || user.username || 'P').slice(0, 2).toUpperCase()}
-                  </span>
-                ) : (
-                  <CyberPilotIcon className="w-6 h-6" />
-                )}
+                {/* Avatar Content clipped to rounded shape */}
+                <div className="w-full h-full rounded-md overflow-hidden flex items-center justify-center pointer-events-none">
+                  {user.isLoggedIn && user.avatarUrl && !avatarErr ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.fullName || 'Pilot'}
+                      referrerPolicy="no-referrer"
+                      onError={() => setAvatarErr(true)}
+                      className="w-full h-full object-cover rounded-md"
+                    />
+                  ) : user.isLoggedIn ? (
+                    <span className="text-xs font-tech font-bold text-cyan-300">
+                      {(user.fullName || user.username || 'P').slice(0, 2).toUpperCase()}
+                    </span>
+                  ) : (
+                    <CyberPilotIcon className="w-6 h-6" />
+                  )}
+                </div>
 
                 {/* Sweeping Radiant Light Shine when completed achievements are uncollected */}
                 {hasUnclaimedAch && (
                   <div className="absolute inset-0 rounded-lg overflow-hidden pointer-events-none z-10">
                     <motion.div
-                      className="w-[200%] h-full bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent skew-x-[-25deg]"
+                      className="w-[200%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-25deg]"
                       animate={{ x: ['-100%', '150%'] }}
                       transition={{
                         duration: 2.8,
@@ -148,7 +133,7 @@ export const LevelMapHeader: React.FC<LevelMapHeaderProps> = ({
                 {/* Uncollected Achievements Indicator Badge */}
                 {hasUnclaimedAch && (
                   <span
-                    className="absolute -top-1.5 -right-1.5 px-1.5 py-0.2 rounded-full font-tech font-black text-[8px] bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 border border-yellow-200 shadow-[0_0_8px_rgba(255,215,0,0.8)] leading-tight z-20 pointer-events-none"
+                    className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full font-tech font-black text-[9px] flex items-center justify-center bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 border border-yellow-100 shadow-[0_2px_5px_rgba(0,0,0,0.6)] leading-none z-20 pointer-events-none"
                   >
                     {unclaimedCount > 0 ? unclaimedCount : '!'}
                   </span>

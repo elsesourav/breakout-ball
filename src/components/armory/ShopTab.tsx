@@ -161,7 +161,10 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
       // Close modal quickly so it does not obstruct the flying cores flight!
       setTimeout(() => {
         handleCloseModal();
-        onClaimSuccess(res.coresGranted);
+        onClaimSuccess(res.coresGranted, {
+          x: typeof window !== 'undefined' ? window.innerWidth / 2 : 200,
+          y: typeof window !== 'undefined' ? window.innerHeight * 0.45 : 300,
+        });
       }, 350);
     } else {
       soundManager.playInsufficientFunds();

@@ -18,6 +18,15 @@ export const AchievementsList: React.FC<AchievementsListProps> = ({ onClaimSucce
     achievementManager.loadForUser(user.username);
     return achievementManager.getAll();
   });
+  const [isClaiming, setIsClaiming] = useState(false);
+  const lastClaimTimeRef = React.useRef(0);
+  const claimTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (claimTimerRef.current) clearTimeout(claimTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const refresh = () => {
@@ -41,6 +50,14 @@ export const AchievementsList: React.FC<AchievementsListProps> = ({ onClaimSucce
   const progressPercent = Math.round((unlockedCount / Math.max(1, achievements.length)) * 100);
 
   const handleClaim = (id: string, e?: React.MouseEvent<HTMLButtonElement>) => {
+    const now = Date.now();
+    // Stop rapid multiple collections within 500ms so animation completes cleanly
+    if (isClaiming || now - lastClaimTimeRef.current < 600) {
+      return;
+    }
+    lastClaimTimeRef.current = now;
+    setIsClaiming(true);
+
     soundManager.playClick();
     const rect = e?.currentTarget?.getBoundingClientRect();
     const origin = rect
@@ -54,6 +71,11 @@ export const AchievementsList: React.FC<AchievementsListProps> = ({ onClaimSucce
       setAchievements(achievementManager.getAll());
       onClaimSuccess?.(res.reward, origin);
     }
+
+    if (claimTimerRef.current) clearTimeout(claimTimerRef.current);
+    claimTimerRef.current = setTimeout(() => {
+      setIsClaiming(false);
+    }, 600);
   };
 
   return (
@@ -157,20 +179,28 @@ export const AchievementsList: React.FC<AchievementsListProps> = ({ onClaimSucce
                 {ach.unlocked && !ach.claimed ? (
                   <motion.button
                     type="button"
-                    whileHover={{ scale: 1.06 }}
-                    whileTap={{ scale: 0.94 }}
+                    disabled={isClaiming}
+                    whileHover={isClaiming ? undefined : { scale: 1.06 }}
+                    whileTap={isClaiming ? undefined : { scale: 0.94 }}
                     onClick={(e) => handleClaim(ach.id, e)}
-                    animate={{
-                      boxShadow: [
-                        '0 0 8px rgba(0, 247, 255, 0.4)',
-                        '0 0 18px rgba(0, 247, 255, 0.9)',
-                        '0 0 8px rgba(0, 247, 255, 0.4)',
-                      ],
-                    }}
+                    animate={
+                      isClaiming
+                        ? undefined
+                        : {
+                            boxShadow: [
+                              '0 0 8px rgba(0, 247, 255, 0.4)',
+                              '0 0 18px rgba(0, 247, 255, 0.9)',
+                              '0 0 8px rgba(0, 247, 255, 0.4)',
+                            ],
+                          }
+                    }
                     transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
                     style={{
                       background: 'linear-gradient(135deg, #00f7ff 0%, #0284c7 100%)',
                       border: '1.2px solid #7dd3fc',
+                      opacity: isClaiming ? 0.6 : 1,
+                      cursor: isClaiming ? 'not-allowed' : 'pointer',
+                      pointerEvents: isClaiming ? 'none' : 'auto',
                     }}
                     className="relative overflow-hidden h-7 px-2.5 rounded-lg flex items-center gap-1 cursor-pointer select-none text-slate-950 font-tech font-black text-xs shadow-md"
                     title={`Collect ${rewardAmount} Cores!`}

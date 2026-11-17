@@ -47,7 +47,7 @@ export const TopCoresBadge: React.FC<TopCoresBadgeProps> = ({
           ? '0 0 22px rgba(0, 247, 255, 0.85), inset 0 0 10px rgba(0, 247, 255, 0.4)'
           : '0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 247, 255, 0.2)',
       }}
-      className={`h-8 w-[90px] sm:w-[100px] px-2 md:px-2.5 rounded-full flex items-center justify-between cursor-pointer select-none transition-colors duration-200 group pointer-events-auto flex-shrink-0 ${
+      className={`h-8 min-w-[92px] sm:min-w-[100px] px-2 md:px-2.5 rounded-full flex items-center justify-between cursor-pointer select-none transition-colors duration-200 group pointer-events-auto flex-shrink-0 ${
         isPulsing ? 'core-counter-bump-active' : 'hover:scale-105 active:scale-95'
       } ${className}`}
     >

@@ -8,6 +8,7 @@ interface FlyingCoresAnimationProps {
   amount?: number;
   origin?: { x: number; y: number } | null;
   onComplete: () => void;
+  triggerKey?: number | string;
 }
 
 interface Particle {
@@ -22,8 +23,10 @@ interface Particle {
 
 export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
   active,
+  amount,
   origin,
   onComplete,
+  triggerKey,
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [targetPos, setTargetPos] = useState({ x: 320, y: 28 });
@@ -78,14 +81,14 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
     setTargetPos(foundTarget);
 
     // 2. Spawn sleek glowing core crystals across source burst radius (source part preserved)
-    const count = 9;
+    const count = amount && amount >= 5000 ? 14 : amount && amount >= 1000 ? 11 : 9;
     const items: Particle[] = Array.from({ length: count }).map((_, i) => {
       // Big random radial distribution inside radius ~36px around click origin
       const randAngle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.45;
       const randDist = 12 + Math.random() * 26;
       return {
         id: i,
-        delay: 0.02 + i * 0.05,
+        delay: 0.02 + i * 0.045,
         duration: 0.88 + (i % 3) * 0.06,
         offsetX: Math.cos(randAngle) * randDist,
         offsetY: Math.sin(randAngle) * randDist,
@@ -103,7 +106,7 @@ export const FlyingCoresAnimation: React.FC<FlyingCoresAnimationProps> = ({
     return () => {
       clearTimeout(completeTimer);
     };
-  }, [active]);
+  }, [active, triggerKey, amount]);
 
   if (!active || particles.length === 0) return null;
 

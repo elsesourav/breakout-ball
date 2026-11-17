@@ -7,6 +7,15 @@ import { TopCoresBadge } from '../common/TopCoresBadge';
 import { FlyingCoresAnimation } from '../armory/FlyingCoresAnimation';
 import { soundManager } from '../../audio';
 
+// Calculate adaptive count-up duration based on the increment value
+const getCountUpDuration = (diff: number): number => {
+  if (diff <= 50) return 800;
+  if (diff <= 250) return 950;
+  if (diff <= 1000) return 1200;
+  if (diff <= 5000) return 1500;
+  return 1850; // for 10,000+ cores
+};
+
 export const ShopView: React.FC = () => {
   const { user, setActiveTab } = useGame();
   const [cores, setCores] = useState<number>(() => currencyService.getBalance());
@@ -19,10 +28,15 @@ export const ShopView: React.FC = () => {
   // Flying cores particle state
   const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
   const [flyOrigin, setFlyOrigin] = useState<{ x: number; y: number } | undefined>(undefined);
+  const [flyTriggerKey, setFlyTriggerKey] = useState<number>(0);
   const [claimAmount, setClaimAmount] = useState<number>(100);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const countUpRef = useRef<number | null>(null);
+  const landingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pulseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const displayCoresRef = useRef(displayCores);
+  displayCoresRef.current = displayCores;
   const isCollectingRef = useRef(false);
   isCollectingRef.current = isPulsing || isFlyingCores;
 
@@ -59,32 +73,41 @@ export const ShopView: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Cancel count-up, timers, and stop audio on component unmount
   useEffect(() => {
     return () => {
       soundManager.stopCollectSequence();
       if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
+      if (landingTimerRef.current) clearTimeout(landingTimerRef.current);
+      if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
     };
   }, []);
 
   const startCountUp = useCallback(
-    (target: number, fromVal?: number) => {
+    (target: number, fromVal?: number, customDuration?: number) => {
       if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
-      const startVal = fromVal !== undefined ? fromVal : displayCores;
+      const startVal = fromVal !== undefined ? fromVal : displayCoresRef.current;
       const diff = target - startVal;
       if (diff <= 0) {
         setDisplayCores(target);
         soundManager.stopCollectSequence();
         return;
       }
-      const duration = 950;
+      const duration = customDuration ?? getCountUpDuration(diff);
       const startTime = performance.now();
 
       const tick = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(1, elapsed / duration);
-        const ease = 1 - Math.pow(1 - progress, 2);
-        const current = Math.round(startVal + diff * ease);
+        // For large increments (> 500, like 10,000 cores), easeInOutCubic gives a smooth ramp-up, fast rolling middle, and gentle settle
+        const ease =
+          diff > 500
+            ? progress < 0.5
+              ? 4 * progress * progress * progress
+              : 1 - Math.pow(-2 * progress + 2, 3) / 2
+            : 1 - Math.pow(1 - progress, 2);
 
+        const current = Math.round(startVal + diff * ease);
         setDisplayCores(current);
 
         if (progress < 1) {
@@ -93,44 +116,52 @@ export const ShopView: React.FC = () => {
           setDisplayCores(target);
           countUpRef.current = null;
           soundManager.stopCollectSequence();
+          if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
+          pulseTimerRef.current = setTimeout(() => {
+            setIsPulsing(false);
+          }, 200);
         }
       };
 
       countUpRef.current = requestAnimationFrame(tick);
     },
-    [displayCores]
+    []
   );
 
   const handleShopClaim = useCallback(
     (amount: number, origin?: { x: number; y: number }) => {
+      if (landingTimerRef.current) clearTimeout(landingTimerRef.current);
+      if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
+
       const newBalance = currencyService.getBalance();
       const prevBalance = Math.max(0, newBalance - amount);
-      setDisplayCores(prevBalance);
+      const fromVal = Math.min(displayCoresRef.current, prevBalance);
+
+      setDisplayCores(fromVal);
       setCores(newBalance);
       setClaimAmount(amount);
       if (origin) {
         setFlyOrigin(origin);
       } else {
-        setFlyOrigin({ x: window.innerWidth / 2, y: window.innerHeight * 0.5 });
+        setFlyOrigin({ x: window.innerWidth / 2, y: window.innerHeight * 0.45 });
       }
       setIsFlyingCores(true);
+      setFlyTriggerKey(Date.now());
       setDailyStatus(currencyService.getDailyCollectStatus());
 
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      // Landing time: trigger bump-up, slowly increase counter, and play collect sound
-      setTimeout(() => {
-        setIsPulsing(true);
-        soundManager.startCollectSequence(950);
-        startCountUp(newBalance, prevBalance);
-      }, 650);
+      const diff = newBalance - fromVal;
+      const duration = getCountUpDuration(diff);
 
-      setTimeout(() => {
-        setIsPulsing(false);
-        soundManager.stopCollectSequence();
-      }, 1650);
+      // Landing time: trigger bump-up, slowly increase counter, and play collect sound
+      landingTimerRef.current = setTimeout(() => {
+        setIsPulsing(true);
+        soundManager.startCollectSequence(duration);
+        startCountUp(newBalance, fromVal, duration);
+      }, 650);
     },
     [startCountUp]
   );
@@ -153,6 +184,7 @@ export const ShopView: React.FC = () => {
         active={isFlyingCores}
         amount={claimAmount}
         origin={flyOrigin}
+        triggerKey={flyTriggerKey}
         onComplete={handleAnimationComplete}
       />
 

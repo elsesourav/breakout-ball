@@ -10,6 +10,15 @@ import { TopCoresBadge } from '../common/TopCoresBadge';
 import { FlyingCoresAnimation } from '../armory/FlyingCoresAnimation';
 import { currencyService } from '../../services/currency';
 
+// Calculate adaptive count-up duration based on the increment value
+const getCountUpDuration = (diff: number): number => {
+  if (diff <= 50) return 800;
+  if (diff <= 250) return 950;
+  if (diff <= 1000) return 1200;
+  if (diff <= 5000) return 1500;
+  return 1850; // for 10,000+ cores
+};
+
 export const ProfileView: React.FC = () => {
   const {
     user,
@@ -26,10 +35,16 @@ export const ProfileView: React.FC = () => {
   const [displayCores, setDisplayCores] = useState<number>(cores);
   const [isPulsing, setIsPulsing] = useState<boolean>(false);
   const countUpRef = useRef<number | null>(null);
+  const landingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pulseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const displayCoresRef = useRef(displayCores);
+  displayCoresRef.current = displayCores;
 
   // Flying cores particle state for achievement claiming
   const [isFlyingCores, setIsFlyingCores] = useState<boolean>(false);
   const [flyOrigin, setFlyOrigin] = useState<{ x: number; y: number } | undefined>(undefined);
+  const [flyTriggerKey, setFlyTriggerKey] = useState<number>(0);
+  const [claimAmount, setClaimAmount] = useState<number>(25);
 
   useEffect(() => {
     currencyService.load(user.username).then(() => {
@@ -43,11 +58,13 @@ export const ProfileView: React.FC = () => {
   const isCollectingRef = useRef(false);
   isCollectingRef.current = isPulsing || isFlyingCores;
 
-  // Cancel count-up and stop audio on component unmount ONLY
+  // Cancel count-up, timers, and stop audio on component unmount
   useEffect(() => {
     return () => {
       soundManager.stopCollectSequence();
       if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
+      if (landingTimerRef.current) clearTimeout(landingTimerRef.current);
+      if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
     };
   }, []);
 
@@ -105,24 +122,30 @@ export const ProfileView: React.FC = () => {
   }, [user.username]);
 
   const startCountUp = useCallback(
-    (target: number, fromVal?: number) => {
+    (target: number, fromVal?: number, customDuration?: number) => {
       if (countUpRef.current) cancelAnimationFrame(countUpRef.current);
-      const startVal = fromVal !== undefined ? fromVal : displayCores;
+      const startVal = fromVal !== undefined ? fromVal : displayCoresRef.current;
       const diff = target - startVal;
       if (diff <= 0) {
         setDisplayCores(target);
         soundManager.stopCollectSequence();
         return;
       }
-      const duration = 950;
+      const duration = customDuration ?? getCountUpDuration(diff);
       const startTime = performance.now();
 
       const tick = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(1, elapsed / duration);
-        const ease = 1 - Math.pow(1 - progress, 2);
-        const current = Math.round(startVal + diff * ease);
+        // For large increments (> 500), easeInOutCubic gives a smooth start, rolling middle, and gentle settle
+        const ease =
+          diff > 500
+            ? progress < 0.5
+              ? 4 * progress * progress * progress
+              : 1 - Math.pow(-2 * progress + 2, 3) / 2
+            : 1 - Math.pow(1 - progress, 2);
 
+        const current = Math.round(startVal + diff * ease);
         setDisplayCores(current);
 
         if (progress < 1) {
@@ -131,12 +154,16 @@ export const ProfileView: React.FC = () => {
           setDisplayCores(target);
           countUpRef.current = null;
           soundManager.stopCollectSequence();
+          if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
+          pulseTimerRef.current = setTimeout(() => {
+            setIsPulsing(false);
+          }, 200);
         }
       };
 
       countUpRef.current = requestAnimationFrame(tick);
     },
-    [displayCores]
+    []
   );
 
   const handleSignIn = () => {
@@ -168,28 +195,34 @@ export const ProfileView: React.FC = () => {
       : 'ElseSourav ID';
 
   const handleClaimSuccess = (reward: number, origin?: { x: number; y: number }) => {
+    // Clear any previous scheduled landing or pulse stop timers
+    if (landingTimerRef.current) clearTimeout(landingTimerRef.current);
+    if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
+
     const newBalance = currencyService.getBalance();
     const prevBalance = Math.max(0, newBalance - reward);
-    setDisplayCores(prevBalance);
+    const fromVal = Math.min(displayCoresRef.current, prevBalance);
+
+    setDisplayCores(fromVal);
     setCores(newBalance);
+    setClaimAmount(reward);
     if (origin) {
       setFlyOrigin(origin);
     } else {
       setFlyOrigin({ x: window.innerWidth / 2, y: window.innerHeight * 0.55 });
     }
     setIsFlyingCores(true);
+    setFlyTriggerKey(Date.now());
+
+    const diff = newBalance - fromVal;
+    const duration = getCountUpDuration(diff);
 
     // Landing time: trigger bump-up, slowly increase counter, and play collect sound
-    setTimeout(() => {
+    landingTimerRef.current = setTimeout(() => {
       setIsPulsing(true);
-      soundManager.startCollectSequence(950);
-      startCountUp(newBalance, prevBalance);
+      soundManager.startCollectSequence(duration);
+      startCountUp(newBalance, fromVal, duration);
     }, 650);
-
-    setTimeout(() => {
-      setIsPulsing(false);
-      soundManager.stopCollectSequence();
-    }, 1650);
   };
 
   return (
@@ -250,7 +283,9 @@ export const ProfileView: React.FC = () => {
       {/* Flying Cores Animation from Achievement Claim to Top Core Counter */}
       <FlyingCoresAnimation
         active={isFlyingCores}
+        amount={claimAmount}
         origin={flyOrigin}
+        triggerKey={flyTriggerKey}
         onComplete={() => setIsFlyingCores(false)}
       />
     </div>
