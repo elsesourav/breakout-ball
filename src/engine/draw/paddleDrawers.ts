@@ -9,6 +9,7 @@ export interface PaddleRenderOptions {
   widthLevel?: number;
   speedLevel?: number;
   weaponVariant?: number;
+  fancyLevel?: number;
 }
 
 /**
@@ -259,6 +260,35 @@ export function drawMechTitanPaddle(
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(cx - 1.5, casingY - 5, 3, 3);
     });
+  }
+
+  // 6. Fancy Plasma Thruster Emitter Particles (Cosmetic Prestige Sparks)
+  const fancyLevel = options.fancyLevel || 1;
+  if (fancyLevel >= 2) {
+    const fancyParticleCount = fancyLevel === 2 ? 6 : fancyLevel === 3 ? 10 : fancyLevel === 4 ? 14 : 20;
+    const baseColor =
+      fancyLevel === 2 ? '#38bdf8' : fancyLevel === 3 ? '#818cf8' : fancyLevel === 4 ? '#c084fc' : '';
+
+    for (let i = 0; i < fancyParticleCount; i++) {
+      const isLeft = i % 2 === 0;
+      const xSpread = pw * (0.28 + (i % 4) * 0.05);
+      const px = paddle.x + (isLeft ? -xSpread : xSpread) + Math.sin(animTick * 4 + i) * 6;
+      const py = paddle.y + ph + 2 + ((animTick * 25 + i * 14) % 36);
+      const pAlpha = Math.max(0, 1 - ((animTick * 25 + i * 14) % 36) / 36);
+      const pColor = fancyLevel === 5 ? (i % 2 === 0 ? '#ffd700' : '#ff0055') : baseColor;
+
+      ctx.fillStyle = pColor;
+      ctx.globalAlpha = pAlpha * 0.45;
+      ctx.beginPath();
+      ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalAlpha = pAlpha * 0.9;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1.0;
   }
 
   ctx.restore();

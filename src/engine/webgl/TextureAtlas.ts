@@ -248,8 +248,8 @@ export class TextureAtlas {
       c.stroke();
     });
 
-    // 7. Trajectory Matrix Guideline Sprites (8-Ball Pool Style)
-    // 7.1. Antialiased high-visibility glowing guideline laser dot
+    // 7. Trajectory Matrix Guideline Sprites (V-Type Matrix)
+    // 7.1. Antialiased high-visibility glowing guideline laser dot (pure white base for dynamic color tinting)
     placeItem('guideline_dot', 32, 32, (c, x, y) => {
       // Solid white center core (guaranteed visibility at all display scales)
       c.fillStyle = '#ffffff';
@@ -257,12 +257,12 @@ export class TextureAtlas {
       c.arc(x + 16, y + 16, 7, 0, Math.PI * 2);
       c.fill();
 
-      // Intense glowing neon aura
+      // Intense glowing radial aura (pure white with alpha for exact shader tinting)
       const grad = c.createRadialGradient(x + 16, y + 16, 6, x + 16, y + 16, 15);
       grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-      grad.addColorStop(0.35, 'rgba(0, 247, 255, 0.85)');
-      grad.addColorStop(0.7, 'rgba(0, 247, 255, 0.45)');
-      grad.addColorStop(1, 'rgba(0, 247, 255, 0)');
+      grad.addColorStop(0.35, 'rgba(255, 255, 255, 0.85)');
+      grad.addColorStop(0.7, 'rgba(255, 255, 255, 0.45)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
       c.fillStyle = grad;
       c.beginPath();
       c.arc(x + 16, y + 16, 15, 0, Math.PI * 2);

@@ -50,7 +50,8 @@ console.log('✅ Trajectory Matrix: Default 600px, Max 1800px (3x default).\n');
 // 3. VERIFY TRAJECTORY GUIDELINE FADE BEHAVIOR (slowly visible, slowly disappear)
 console.log('--- 3. Trajectory Guideline Smooth Fade ---');
 const paddle = { x: 576, y: 1843, width: 140, height: 24, vx: 0 };
-const ballDescending = { isActive: true, x: 576, y: 1400, vx: 100, vy: 600, radius: 10, speed: 720 };
+// Test with actual game speed (BALL_SPEED = 15, vy ~ 14)
+const ballDescending = { isActive: true, x: 576, y: 1400, vx: 2, vy: 14, radius: 10, speed: 15 };
 
 // Step 1: Start at alpha 0, descending into 600px range (distToPaddle = 1843 - 10 - 1400 = 433px < 600px)
 const step1 = calculateTrajectoryGuideline(ballDescending, paddle, 1152, 2048, 1, 0.0, 1/60);
@@ -66,8 +67,8 @@ if (step2.nextFadeAlpha <= step1.nextFadeAlpha) {
   throw new Error('Alpha should increase as ball approaches');
 }
 
-// Step 3: Ball moving away from paddle (vy = -600): should slowly dissolve
-const ballAscending = { isActive: true, x: 576, y: 1400, vx: 100, vy: -600, radius: 10, speed: 720 };
+// Step 3: Ball moving away from paddle (vy = -14): should slowly dissolve
+const ballAscending = { isActive: true, x: 576, y: 1400, vx: 2, vy: -14, radius: 10, speed: 15 };
 const fadeOut1 = calculateTrajectoryGuideline(ballAscending, paddle, 1152, 2048, 1, 0.8, 1/60);
 console.log('Fade Out Step 1 Alpha (from 0.8):', fadeOut1.nextFadeAlpha.toFixed(4));
 if (fadeOut1.nextFadeAlpha >= 0.8 || fadeOut1.nextFadeAlpha <= 0.0) {
@@ -174,10 +175,11 @@ console.log('✅ WebAssembly physics binary compiled and all native C-ABI export
 // 6. VERIFY MULTIBALL & NO-HORIZONTAL-RED-LINE GUIDELINE INTEGRITY
 console.log('--- 6. Multiball Guidelines & Horizontal Red Line Prevention ---');
 const testPaddle = { x: 576, y: 1843, width: 140, height: 24, vx: 0 };
-const ball1 = { isActive: true, x: 550, y: 1400, vx: 10, vy: 500, radius: 10, speed: 720 };
-const ball2 = { isActive: true, x: 600, y: 1500, vx: -10, vy: 480, radius: 10, speed: 720 };
-const ball3Ascending = { isActive: true, x: 576, y: 1400, vx: 100, vy: -500, radius: 10, speed: 720 };
-const ball4Missing = { isActive: true, x: 100, y: 1400, vx: 0, vy: 500, radius: 10, speed: 720 };
+// Real game velocities (speed: 15)
+const ball1 = { isActive: true, x: 550, y: 1400, vx: 0.5, vy: 14.5, radius: 10, speed: 15 };
+const ball2 = { isActive: true, x: 600, y: 1500, vx: -0.5, vy: 14.5, radius: 10, speed: 15 };
+const ball3Ascending = { isActive: true, x: 576, y: 1400, vx: 2, vy: -14.5, radius: 10, speed: 15 };
+const ball4Missing = { isActive: true, x: 100, y: 1400, vx: 0, vy: 14.5, radius: 10, speed: 15 };
 
 // Ball 1 (descending, aligned): should show incoming & outgoing segments
 const res1 = calculateTrajectoryGuideline(ball1, testPaddle, 1152, 2048, 1, 0.8, 1/60);

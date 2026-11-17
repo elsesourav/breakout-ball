@@ -159,12 +159,14 @@ export class GameRenderer {
     const hasShield = !!powerUps && (powerUps.buffs.hasShield || powerUps.buffs.shieldCharges > 0);
     const widthLevel = currencyService.getUpgradeLevel('paddle_width');
     const speedLevel = currencyService.getUpgradeLevel('paddle_speed');
+    const paddleFancyLvl = currencyService.getUpgradeLevel('paddle_fancy');
     drawPaddleWithPreset(ctx, interpolatedPaddle, 1, {
       animTick,
       hasLaser,
       hasShield,
       widthLevel,
       speedLevel,
+      fancyLevel: paddleFancyLvl,
       tier: designConfig.paddleTierOverride,
     });
 
@@ -184,7 +186,7 @@ export class GameRenderer {
 
     for (let i = 0; i < ballList.length; i++) {
       const b = ballList[i];
-      if (!b || !b.isActive || b.vy <= 15) continue;
+      if (!b || !b.isActive || b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = interpolatedPaddle.y - bRad;
       const closestPadX = Math.max(interpolatedPaddle.x - halfPadW, Math.min(interpolatedPaddle.x + halfPadW, b.x));
@@ -328,11 +330,13 @@ export class GameRenderer {
         y: renderBallY,
       };
 
+      const ballFancyLvl = currencyService.getUpgradeLevel('ball_fancy');
       drawBallWithPreset(ctx, interpolatedBall, designConfig.ballPreset || 1, {
         animTick,
         tier: ballTier,
         palette,
         isMega: b.isMega,
+        fancyLevel: ballFancyLvl,
       });
     }
     ctx.restore();

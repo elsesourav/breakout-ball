@@ -88,8 +88,8 @@ export function calculateTrajectoryGuideline(
   // 1. Guard against non-gameplay states: ball resting on paddle or inactive before launch
   const isRestingOnPaddle =
     !ball.isActive ||
-    (Math.abs(ball.vy) < 15 && Math.abs(ball.vx) < 15) ||
-    ball.y >= targetY - 4;
+    Math.hypot(ball.vx, ball.vy) < 0.1 ||
+    (ball.y >= targetY - 4 && ball.vy < 0.1);
 
   if (isRestingOnPaddle) {
     return {
@@ -111,7 +111,7 @@ export function calculateTrajectoryGuideline(
   }
 
   // 2. Velocity direction check: ball must be actively descending towards paddle plane
-  const isDescending = ball.vy > 15;
+  const isDescending = ball.vy > 0.1;
   const closestPadX = Math.max(padLeft, Math.min(padRight, ball.x));
   const distToPaddle = Math.hypot(ball.x - closestPadX, targetY - ball.y);
 

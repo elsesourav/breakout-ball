@@ -102,7 +102,7 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
     name: 'Paddle Width',
     category: 'paddle',
     maxLevel: 8,
-    baseCost: 70,
+    baseCost: 220,
     accentColor: '#06b6d4',
     glowColor: 'rgba(6, 182, 212, 0.4)',
     symbol: '',
@@ -114,12 +114,40 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
     name: 'Paddle Speed',
     category: 'paddle',
     maxLevel: 8,
-    baseCost: 70,
+    baseCost: 220,
     accentColor: '#fbbf24',
     glowColor: 'rgba(251, 191, 36, 0.4)',
     symbol: '⚡',
     statLabel: (lvl) => `${Math.round(800 + (lvl - 1) * (800 / 7))} px/s (${Math.round((lvl - 1) * 14.3)}% Boost)`,
     nextLabel: (lvl) => `${Math.round(800 + lvl * (800 / 7))} px/s (+14.3%)`,
+  },
+  {
+    id: 'paddle_fancy',
+    name: 'Plasma Thrusters',
+    category: 'paddle',
+    maxLevel: 5,
+    baseCost: 1500,
+    accentColor: '#38bdf8',
+    glowColor: 'rgba(56, 189, 248, 0.45)',
+    symbol: '💠',
+    statLabel: (lvl) =>
+      lvl === 1
+        ? 'Standard (Clean Chassis)'
+        : lvl === 2
+        ? 'Tier 1: Cyan Spark Jets (6 P)'
+        : lvl === 3
+        ? 'Tier 2: Electric Indigo (10 P)'
+        : lvl === 4
+        ? 'Tier 3: Violet Warp Trail (14 P)'
+        : 'Tier 4: Solar Apex Drive (20 P)',
+    nextLabel: (lvl) =>
+      lvl <= 1
+        ? 'Tier 1: Cyan Spark Jets (6 P)'
+        : lvl === 2
+        ? 'Tier 2: Electric Indigo (10 P)'
+        : lvl === 3
+        ? 'Tier 3: Violet Warp Trail (14 P)'
+        : 'Tier 4: Solar Apex Drive (20 P)',
   },
 ];
 
@@ -130,7 +158,7 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     name: 'Ball Size',
     category: 'ball',
     maxLevel: 6,
-    baseCost: 60,
+    baseCost: 190,
     accentColor: '#a78bfa',
     glowColor: 'rgba(167, 139, 250, 0.4)',
     symbol: '',
@@ -142,7 +170,7 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     name: 'Ball Speed',
     category: 'ball',
     maxLevel: 10,
-    baseCost: 80,
+    baseCost: 250,
     accentColor: '#00f7ff',
     glowColor: 'rgba(0, 247, 255, 0.4)',
     symbol: '',
@@ -154,7 +182,7 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     name: 'Impact Power',
     category: 'ball',
     maxLevel: 8,
-    baseCost: 90,
+    baseCost: 280,
     accentColor: '#f43f5e',
     glowColor: 'rgba(244, 63, 94, 0.4)',
     symbol: '',
@@ -166,12 +194,40 @@ export const BALL_UPGRADES: UpgradeDef[] = [
     name: 'Trajectory Matrix',
     category: 'ball',
     maxLevel: 8,
-    baseCost: 75,
+    baseCost: 240,
     accentColor: '#10b981',
     glowColor: 'rgba(16, 185, 129, 0.4)',
     symbol: '☵',
     statLabel: (lvl) => `${Math.round(600 + (lvl - 1) * (1200 / 7))}px Range`,
     nextLabel: (lvl) => `${Math.round(600 + lvl * (1200 / 7))}px Range`,
+  },
+  {
+    id: 'ball_fancy',
+    name: 'Stardust Aura',
+    category: 'ball',
+    maxLevel: 5,
+    baseCost: 1500,
+    accentColor: '#ec4899',
+    glowColor: 'rgba(236, 72, 153, 0.45)',
+    symbol: '✨',
+    statLabel: (lvl) =>
+      lvl === 1
+        ? 'Standard (Zero Aura)'
+        : lvl === 2
+        ? 'Tier 1: Cyan Orbitals (4 P)'
+        : lvl === 3
+        ? 'Tier 2: Gold Solar (7 P)'
+        : lvl === 4
+        ? 'Tier 3: Magenta Void (10 P)'
+        : 'Tier 4: Prismatic Apex (14 P)',
+    nextLabel: (lvl) =>
+      lvl <= 1
+        ? 'Tier 1: Cyan Orbitals (4 P)'
+        : lvl === 2
+        ? 'Tier 2: Gold Solar (7 P)'
+        : lvl === 3
+        ? 'Tier 3: Magenta Void (10 P)'
+        : 'Tier 4: Prismatic Apex (14 P)',
   },
 ];
 
@@ -182,7 +238,7 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     name: 'Titan Paddle',
     category: 'power',
     maxLevel: 10,
-    baseCost: 50,
+    baseCost: 160,
     accentColor: '#06b6d4',
     glowColor: 'rgba(6, 182, 212, 0.4)',
     symbol: '◀▶',
@@ -194,7 +250,7 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     name: 'Chronos Warp',
     category: 'power',
     maxLevel: 8,
-    baseCost: 70,
+    baseCost: 220,
     accentColor: '#b773ff',
     glowColor: 'rgba(183, 115, 255, 0.4)',
     symbol: '⏱',
@@ -206,7 +262,7 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     name: 'Plasma Cannon',
     category: 'power',
     maxLevel: 8,
-    baseCost: 95,
+    baseCost: 300,
     accentColor: '#ff0055',
     glowColor: 'rgba(255, 0, 85, 0.4)',
     symbol: '▲',
@@ -218,7 +274,7 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     name: 'Mega Core',
     category: 'power',
     maxLevel: 6,
-    baseCost: 130,
+    baseCost: 410,
     accentColor: '#ffd700',
     glowColor: 'rgba(255, 215, 0, 0.4)',
     symbol: '✹',
@@ -230,7 +286,7 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     name: 'Multi-Ball',
     category: 'power',
     maxLevel: 5,
-    baseCost: 160,
+    baseCost: 500,
     accentColor: '#00f7ff',
     glowColor: 'rgba(0, 247, 255, 0.4)',
     symbol: '●●',
@@ -242,7 +298,7 @@ export const POWER_UPGRADES: UpgradeDef[] = [
     name: 'Forcefield',
     category: 'power',
     maxLevel: 4,
-    baseCost: 220,
+    baseCost: 700,
     accentColor: '#10b981',
     glowColor: 'rgba(16, 185, 129, 0.4)',
     symbol: '🛡',

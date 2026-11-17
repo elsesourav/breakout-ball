@@ -152,69 +152,92 @@ export function drawLevelPreviewOnCanvas(
   const h = height || canvas.height;
   ctx.clearRect(0, 0, w, h);
 
-  // 1. Arcade Cyber Backdrop with grid pattern
-  ctx.fillStyle = '#050716';
+  // 1. Arcade Cyber Backdrop
+  ctx.fillStyle = '#030514';
   ctx.fillRect(0, 0, w, h);
 
+  // 2. Outer bounding subtle border
+  ctx.strokeStyle = 'rgba(0, 247, 255, 0.12)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(2, 2, w - 4, h - 4);
+
+  const reservedBottom = options?.reservedBottom || 0;
+  const margin = Math.max(4, Math.floor(w * 0.02));
+  const availW = Math.max(20, w - margin * 2);
+  const availH = Math.max(20, h - reservedBottom - margin * 2);
+
+  // Accurate 9x11 Grid Matrix Geometry:
+  // GRID_ROWS = 9 columns (x: 0..8), GRID_COLS = 11 rows (y: 0..10)
+  // Standard block aspect ratio is 128x96 (4:3)
+  const scale = Math.min(availW / (GRID_ROWS * 128), availH / (GRID_COLS * 96));
+  const cellW = 128 * scale;
+  const cellH = 96 * scale;
+  const matrixW = GRID_ROWS * cellW;
+  const matrixH = GRID_COLS * cellH;
+
+  const startX = Math.round((w - matrixW) / 2);
+  const startY = Math.round((availH - matrixH) / 2) + margin;
+
+  // 3. Playfield Matrix Grid & Cyber Frame (Matches Matrix Forge editor)
   if (options?.showGrid !== false) {
-    // Subtle gridlines
-    ctx.strokeStyle = 'rgba(0, 247, 255, 0.04)';
+    ctx.fillStyle = '#05071c';
+    ctx.fillRect(startX, startY, matrixW, matrixH);
+
+    // Subtle 9x11 gridlines
+    ctx.strokeStyle = 'rgba(0, 247, 255, 0.08)';
     ctx.lineWidth = 1;
-    const gridSize = Math.floor(w / 12);
-    for (let x = 0; x < w; x += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
-      ctx.stroke();
+    ctx.beginPath();
+    for (let c = 0; c <= GRID_ROWS; c++) {
+      const gx = Math.round(startX + c * cellW);
+      ctx.moveTo(gx, startY);
+      ctx.lineTo(gx, startY + matrixH);
     }
-    for (let y = 0; y < h; y += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-      ctx.stroke();
+    for (let r = 0; r <= GRID_COLS; r++) {
+      const gy = Math.round(startY + r * cellH);
+      ctx.moveTo(startX, gy);
+      ctx.lineTo(startX + matrixW, gy);
     }
+    ctx.stroke();
+
+    // Matrix Outer Frame
+    ctx.strokeStyle = 'rgba(0, 247, 255, 0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(startX, startY, matrixW, matrixH);
+
+    // High-tech Cyber Corner Accents
+    const bracketSize = Math.max(4, Math.min(10, cellW * 0.28));
+    ctx.strokeStyle = '#00f7ff';
+    ctx.lineWidth = 2;
+    // Top-Left
+    ctx.beginPath();
+    ctx.moveTo(startX, startY + bracketSize);
+    ctx.lineTo(startX, startY);
+    ctx.lineTo(startX + bracketSize, startY);
+    ctx.stroke();
+    // Top-Right
+    ctx.beginPath();
+    ctx.moveTo(startX + matrixW - bracketSize, startY);
+    ctx.lineTo(startX + matrixW, startY);
+    ctx.lineTo(startX + matrixW, startY + bracketSize);
+    ctx.stroke();
+    // Bottom-Left
+    ctx.beginPath();
+    ctx.moveTo(startX, startY + matrixH - bracketSize);
+    ctx.lineTo(startX, startY + matrixH);
+    ctx.lineTo(startX + bracketSize, startY + matrixH);
+    ctx.stroke();
+    // Bottom-Right
+    ctx.beginPath();
+    ctx.moveTo(startX + matrixW - bracketSize, startY + matrixH);
+    ctx.lineTo(startX + matrixW, startY + matrixH);
+    ctx.lineTo(startX + matrixW, startY + matrixH - bracketSize);
+    ctx.stroke();
   }
 
-  // 2. Playfield side rails / borders
-  ctx.strokeStyle = 'rgba(0, 247, 255, 0.15)';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(3, 3, w - 6, h - 6);
-
-  const validBlocks = blocks.filter((b) => b.h > 0);
+  const validBlocks = blocks.filter((b) => b && b.h > 0);
   if (validBlocks.length === 0) return;
 
-  // 3. Auto calculate bounding box and exact centering
-  const reservedBottom = options?.reservedBottom || 0;
-  const availH = Math.max(30, h - reservedBottom);
-
-  const minY = Math.min(...validBlocks.map((b) => b.y));
-  const maxY = Math.max(...validBlocks.map((b) => b.y));
-  const spanY = maxY - minY + 1;
-
-  const marginX = 8;
-  const playW = w - marginX * 2;
-  let cellW = playW / GRID_ROWS;
-  let cellH = cellW * 0.7; // Match game block ratio (128x90)
-
-  // Ensure tall patterns do not exceed available height with padding
-  const totalClusterH = spanY * cellH;
-  if (totalClusterH > availH - 16) {
-    const scale = (availH - 16) / totalClusterH;
-    cellW *= scale;
-    cellH *= scale;
-  }
-
-  const padding = Math.max(1, cellW * 0.05);
-
-  // Symmetrical Vertical Centering in the visible available preview area
-  const clusterH = spanY * cellH;
-  const startY = Math.round((availH - clusterH) / 2) - minY * cellH;
-
-  // Symmetrical Horizontal Centering
-  const gridW = GRID_ROWS * cellW;
-  const startX = Math.round((w - gridW) / 2);
-
-  // Draw connecting dashed lines between complete portal pairs in preview
+  // 4. Draw connecting dashed lines between complete portal pairs in preview
   const portalPairs = new Map<number, { x: number; y: number }[]>();
   validBlocks.forEach((b) => {
     if (b.h === 7 && b.portalPairId) {
@@ -243,8 +266,9 @@ export function drawLevelPreviewOnCanvas(
     }
   });
 
-  blocks.forEach((block) => {
-    if (block.h <= 0) return;
+  // 5. Draw 3D blocks in their exact matrix grid coordinates
+  const padding = Math.max(1, cellW * 0.05);
+  validBlocks.forEach((block) => {
     const bx = startX + block.x * cellW + padding;
     const by = startY + block.y * cellH + padding;
     const bw = cellW - padding * 2;

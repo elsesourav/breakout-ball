@@ -87,7 +87,7 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
           border: '1.5px solid rgba(0, 247, 255, 0.45)',
           boxShadow: '0 0 35px rgba(0, 247, 255, 0.25), inset 0 0 20px rgba(0, 247, 255, 0.08)',
         }}
-        className="w-full max-w-sm rounded-2xl flex flex-col gap-3 p-4 text-slate-200"
+        className="w-full max-w-sm rounded-2xl flex flex-col gap-3 p-4 text-slate-200 max-h-[92vh] overflow-y-auto"
       >
         <h3 className="font-display font-black text-sm text-[#00f7ff] tracking-wider text-center">
           {isEditing ? 'UPDATE ARENA MATRIX' : 'SAVE ARENA MATRIX'}
@@ -129,9 +129,9 @@ export const DesignerSaveModal: React.FC<DesignerSaveModalProps> = ({
           </div>
         </div>
 
-        {/* Canvas Thumbnail Preview */}
-        <div className="w-full flex flex-col items-center gap-1">
-          <div className="w-full h-32 rounded-xl bg-[#030514] border border-cyan-500/30 overflow-hidden flex items-center justify-center shadow-inner">
+        {/* Canvas Thumbnail Preview (Centered Tactical Matrix Screen) */}
+        <div className="w-full flex flex-col items-center justify-center py-0.5">
+          <div className="relative w-44 sm:w-48 aspect-[1152/1056] rounded-xl bg-[#030514] border border-cyan-500/40 overflow-hidden shadow-[0_0_20px_rgba(0,247,255,0.18)] flex items-center justify-center">
             <canvas
               ref={savePreviewCanvasRef}
               className="w-full h-full block rounded-xl"

@@ -298,7 +298,7 @@ export class WebGLRenderer {
 
     for (let i = 0; i < ballList.length; i++) {
       const b = ballList[i];
-      if (!b || !b.isActive || b.vy <= 15) continue;
+      if (!b || !b.isActive || b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = paddle.y - bRad;
       const closestPadX = Math.max(paddle.x - halfPadW, Math.min(paddle.x + halfPadW, b.x));
@@ -341,14 +341,14 @@ export class WebGLRenderer {
           const dx = seg.x2 - seg.x1;
           const dy = seg.y2 - seg.y1;
           const len = Math.hypot(dx, dy);
-          const stepSize = 34;
-          const count = Math.floor(len / stepSize);
-          const nx = dx / len, ny = dy / len;
+          const stepSize = 28;
+          const count = Math.max(1, Math.floor(len / stepSize));
 
-          for (let s = 1; s <= count; s++) {
-            const px = seg.x1 + nx * (s * stepSize);
-            const py = seg.y1 + ny * (s * stepSize);
-            const dotSize = 24;
+          for (let s = 0; s <= count; s++) {
+            const t = s / count;
+            const px = seg.x1 + dx * t;
+            const py = seg.y1 + dy * t;
+            const dotSize = 22;
             this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, inR, inG, inB, inAlpha);
           }
         }
@@ -370,15 +370,15 @@ export class WebGLRenderer {
             const dx = seg.x2 - seg.x1;
             const dy = seg.y2 - seg.y1;
             const len = Math.hypot(dx, dy);
-            const stepSize = 34;
-            const count = Math.floor(len / stepSize);
-            const nx = dx / len, ny = dy / len;
+            const stepSize = 28;
+            const count = Math.max(1, Math.floor(len / stepSize));
 
-            for (let s = 1; s <= count; s++) {
-              const px = seg.x1 + nx * (s * stepSize);
-              const py = seg.y1 + ny * (s * stepSize);
-              const dotSize = 24;
-              this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, outR, outG, outB, outAlpha * (1.0 - (s / (count + 1)) * 0.3));
+            for (let s = 0; s <= count; s++) {
+              const t = s / count;
+              const px = seg.x1 + dx * t;
+              const py = seg.y1 + dy * t;
+              const dotSize = 22;
+              this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, outR, outG, outB, outAlpha * (1.0 - t * 0.35));
             }
           }
 
@@ -386,6 +386,10 @@ export class WebGLRenderer {
           const outAngle = Math.atan2(guideline.outVx, -guideline.outVy);
           const arrowSize = 30;
           this.batcher.pushSprite(lastSeg.x2 - arrowSize / 2, lastSeg.y2 - arrowSize / 2, arrowSize, arrowSize, arrowUV.u0, arrowUV.v0, arrowUV.u1, arrowUV.v1, outR, outG, outB, outAlpha, outAngle);
+        }
+
+        if (this.animTick % 3 < 0.06) {
+          console.log(`[Trajectory V-Beam] dist=${Math.round(minDescDist)}px vy=${b.vy.toFixed(1)} isHit=${guideline.isHit} alpha=${guideline.alpha.toFixed(2)}`);
         }
       }
     }

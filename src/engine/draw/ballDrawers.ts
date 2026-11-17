@@ -10,6 +10,7 @@ export interface BallRenderOptions {
     c3: string;
   };
   isMega?: boolean;
+  fancyLevel?: number;
 }
 
 export interface BallStateLike {
@@ -146,6 +147,36 @@ export function draw3DStardustCoreBall(
   ctx.beginPath();
   ctx.arc(bx, by, br, 0, Math.PI * 2);
   ctx.stroke();
+
+  // 6. Fancy Stardust Aura (Cosmetic Prestige Particles orbiting just outside ball)
+  const fancyLevel = options.fancyLevel || 1;
+  if (fancyLevel >= 2) {
+    const fancyParticleCount = fancyLevel === 2 ? 4 : fancyLevel === 3 ? 7 : fancyLevel === 4 ? 10 : 14;
+    const baseColor =
+      fancyLevel === 2 ? '#00f7ff' : fancyLevel === 3 ? '#ffd700' : fancyLevel === 4 ? '#ec4899' : '';
+
+    for (let i = 0; i < fancyParticleCount; i++) {
+      const angle = animTick * (1.2 + (i % 3) * 0.25) + (i * (Math.PI * 2 / fancyParticleCount));
+      const dist = br * (1.18 + 0.12 * Math.sin(animTick * 3 + i * 2));
+      const px = bx + Math.cos(angle) * dist;
+      const py = by + Math.sin(angle) * (dist * 0.88);
+      const pColor = fancyLevel === 5 ? `hsl(${(animTick * 80 + i * 28) % 360}, 100%, 70%)` : baseColor;
+
+      // Glow halo
+      ctx.fillStyle = pColor;
+      ctx.globalAlpha = 0.35;
+      ctx.beginPath();
+      ctx.arc(px, py, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sharp core
+      ctx.globalAlpha = 0.95;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1.0;
+  }
 
   ctx.restore();
 }
