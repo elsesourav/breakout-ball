@@ -134,7 +134,7 @@ class AccountMigrationService {
     }
 
     // Ensure stage following the highest completed level is unlocked
-    if (highestUnlocked <= 50 && !mergedProgress[String(highestUnlocked)]) {
+    if (highestUnlocked <= 100 && !mergedProgress[String(highestUnlocked)]) {
       mergedProgress[String(highestUnlocked)] = {
         levelNumber: highestUnlocked,
         completed: false,

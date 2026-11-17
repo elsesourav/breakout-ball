@@ -10,6 +10,8 @@ import {
   BOTTOM_OFFSET,
   TOTAL_HEIGHT,
   SECTOR_CONFIG,
+  SECTOR_PALETTES,
+  getRoadmapObstacles,
   RoadmapNode,
   FloatingBrick,
   Obstacle,
@@ -92,11 +94,7 @@ export const ArcadeView: React.FC = () => {
       const y = TOTAL_HEIGHT - BOTTOM_OFFSET - (i - 1) * SPACING;
       const angle = (i - 1) * 1.05;
       const x = 230 + Math.sin(angle) * 74;
-      let zone = 1;
-      if (i > 40) zone = 5;
-      else if (i > 30) zone = 4;
-      else if (i > 20) zone = 3;
-      else if (i > 10) zone = 2;
+      const zone = getSectorIndex(i);
       list.push({ id: i, x: Math.round(x), y: Math.round(y), zone, sector: SECTOR_CONFIG[i] });
     }
     return list;
@@ -122,34 +120,11 @@ export const ArcadeView: React.FC = () => {
   // ── Ambient floating bricks (Sector-Themed Palette Progression) ─────────────
   const floatingBricks: FloatingBrick[] = useMemo(() => {
     const bricks: FloatingBrick[] = [];
-    const sectorPalettes: Record<number, Array<{ color: string; glow: string }>> = {
-      1: [
-        { color: '#00f7ff', glow: 'rgba(0, 247, 255, 0.65)' },
-        { color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.55)' },
-      ],
-      2: [
-        { color: '#818cf8', glow: 'rgba(129, 140, 248, 0.65)' },
-        { color: '#6366f1', glow: 'rgba(99, 102, 241, 0.55)' },
-      ],
-      3: [
-        { color: '#c084fc', glow: 'rgba(192, 132, 252, 0.65)' },
-        { color: '#e879f9', glow: 'rgba(232, 121, 249, 0.55)' },
-      ],
-      4: [
-        { color: '#f43f5e', glow: 'rgba(244, 63, 94, 0.65)' },
-        { color: '#fb7185', glow: 'rgba(251, 113, 133, 0.55)' },
-      ],
-      5: [
-        { color: '#ffd700', glow: 'rgba(255, 215, 0, 0.70)' },
-        { color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.60)' },
-      ],
-    };
-
-    for (let i = 0; i < 30; i++) {
-      const y = (TOTAL_HEIGHT / 30) * i + ((i * 47) % 55);
-      const approxLevel = Math.max(1, Math.min(50, Math.round(((TOTAL_HEIGHT - y - BOTTOM_OFFSET) / SPACING) + 1)));
+    for (let i = 0; i < 45; i++) {
+      const y = (TOTAL_HEIGHT / 45) * i + ((i * 47) % 55);
+      const approxLevel = Math.max(1, Math.min(TOTAL_LEVELS, Math.round(((TOTAL_HEIGHT - y - BOTTOM_OFFSET) / SPACING) + 1)));
       const sectorId = getSectorIndex(approxLevel);
-      const palette = sectorPalettes[sectorId] || sectorPalettes[1];
+      const palette = SECTOR_PALETTES[sectorId] || SECTOR_PALETTES[1];
       const p = palette[i % palette.length];
 
       const iL = i % 2 === 0;
@@ -165,18 +140,10 @@ export const ArcadeView: React.FC = () => {
   }, []);
 
   // ── Kinetic hazards (flanking the shifted path with Sector-Themed Obstacles) ──
-  const obstacles: Obstacle[] = useMemo(() => ([
-    { id: 'hazard-1-1', type: 'ion_cell', sector: 1, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 3.5  * SPACING },
-    { id: 'hazard-1-2', type: 'cyan_vortex', sector: 1, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 7.5  * SPACING },
-    { id: 'hazard-2-1', type: 'sonic_prism', sector: 2, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 13.5 * SPACING },
-    { id: 'hazard-2-2', type: 'pulse_core', sector: 2, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 17.5 * SPACING },
-    { id: 'hazard-3-1', type: 'quantum_monolith', sector: 3, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 23.5 * SPACING },
-    { id: 'hazard-3-2', type: 'void_singularity', sector: 3, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 27.5 * SPACING },
-    { id: 'hazard-4-1', type: 'bastion_turret', sector: 4, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 33.5 * SPACING },
-    { id: 'hazard-4-2', type: 'molten_core', sector: 4, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 37.5 * SPACING },
-    { id: 'hazard-5-1', type: 'solar_relic', sector: 5, x: 115, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 43.5 * SPACING },
-    { id: 'hazard-5-2', type: 'hyper_singularity', sector: 5, x: 345, y: TOTAL_HEIGHT - BOTTOM_OFFSET - 47.5 * SPACING },
-  ]), []);
+  const obstacles: Obstacle[] = useMemo(
+    () => getRoadmapObstacles(TOTAL_HEIGHT, BOTTOM_OFFSET, SPACING),
+    []
+  );
 
   // ── Route blockers with Sector Assignment ────────────────────────────────────
   const routeBlockers: RouteBlocker[] = useMemo(() => {

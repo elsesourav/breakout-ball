@@ -57,7 +57,7 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
         boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 247, 255, 0.08)',
       }}
     >
-      <div className="w-full max-w-sm px-2 py-2 relative flex items-center justify-between">
+      <div className="w-full max-w-sm px-1 md:px-2 py-2 relative flex items-center justify-between">
         {/* Left: Back Button */}
         <motion.button
           type="button"
@@ -95,7 +95,7 @@ export const PageHeaderWithBack: React.FC<PageHeaderWithBackProps> = ({
         </div>
 
         {/* Right: Cores Badge fixed to the right side */}
-        <div className="flex-shrink-0 flex items-center justify-end min-w-[80px] z-10">
+        <div className="flex-shrink-0 flex items-center justify-end min-w-[90px] z-10">
           {rightSlot ? (
             rightSlot
           ) : showCores ? (

@@ -6,7 +6,7 @@ const DEFAULT_BANNER = '/og-image.jpg';
 const DEFAULT_TWITTER_CREATOR = '@elsesourav';
 
 /**
- * Get sector information based on campaign level number (1 - 50)
+ * Get sector information based on campaign level number (1 - 100)
  */
 export const getCampaignSector = (levelNum: number): {
   number: string;
@@ -15,43 +15,33 @@ export const getCampaignSector = (levelNum: number): {
   themeColor: string;
 } => {
   if (levelNum <= 10) {
-    return {
-      number: '01',
-      name: 'Neon Alley',
-      subtitle: 'Classic Energy Matrix',
-      themeColor: '#00f7ff',
-    };
+    return { number: '01', name: 'Neon Alley', subtitle: 'Classic Energy Matrix', themeColor: '#00f7ff' };
   }
   if (levelNum <= 20) {
-    return {
-      number: '02',
-      name: 'Pulse Grid',
-      subtitle: 'Synthwave Multi-Strike',
-      themeColor: '#818cf8',
-    };
+    return { number: '02', name: 'Data Foundry', subtitle: 'Synthwave Multi-Strike', themeColor: '#38bdf8' };
   }
   if (levelNum <= 30) {
-    return {
-      number: '03',
-      name: 'Quantum Void',
-      subtitle: 'Portal Wormhole Nexus',
-      themeColor: '#b773ff',
-    };
+    return { number: '03', name: 'Quantum Core', subtitle: 'Portal Wormhole Nexus', themeColor: '#a855f7' };
   }
   if (levelNum <= 40) {
-    return {
-      number: '04',
-      name: 'Cyber Bastion',
-      subtitle: 'Heavy Armor Fortress',
-      themeColor: '#f43f5e',
-    };
+    return { number: '04', name: 'Cyber Citadel', subtitle: 'Heavy Armor Fortress', themeColor: '#f43f5e' };
   }
-  return {
-    number: '05',
-    name: 'Hyper Core Overdrive',
-    subtitle: 'Master Apex Reactors',
-    themeColor: '#f59e0b',
-  };
+  if (levelNum <= 50) {
+    return { number: '05', name: 'Orbital Apex', subtitle: 'High-Orbit Platform', themeColor: '#fbbf24' };
+  }
+  if (levelNum <= 60) {
+    return { number: '06', name: 'Chrome Skyline', subtitle: 'Neo-Tokyo Megastructure', themeColor: '#2dd4bf' };
+  }
+  if (levelNum <= 70) {
+    return { number: '07', name: 'Void Reactor', subtitle: 'Sub-Atomic Fission Lab', themeColor: '#ec4899' };
+  }
+  if (levelNum <= 80) {
+    return { number: '08', name: 'Hyperion Grid', subtitle: 'Quantum Supercomputer', themeColor: '#6366f1' };
+  }
+  if (levelNum <= 90) {
+    return { number: '09', name: 'Singularity Depths', subtitle: 'Event Horizon Gateway', themeColor: '#8b5cf6' };
+  }
+  return { number: '10', name: 'Omega Throne', subtitle: 'Final Transcendence Apex', themeColor: '#ff0055' };
 };
 
 /**
@@ -62,7 +52,7 @@ export const buildLevelMetadata = (
   mode: 'preview' | 'playing' = 'preview'
 ): PageMetadata => {
   const levelNum = parseInt(level.id, 10);
-  const isCampaign = !isNaN(levelNum) && levelNum >= 1 && levelNum <= 50;
+  const isCampaign = !isNaN(levelNum) && levelNum >= 1 && levelNum <= 100;
   const stats = calculateLevelHp(level.blocks);
 
   if (isCampaign) {
@@ -267,7 +257,7 @@ export const buildTabMetadata = (tab: ActiveTab): PageMetadata => {
     default:
       return {
         title: 'Breakout Ball // Cyberpunk Neon Arcade',
-        description: 'Next-generation cyberpunk breakout ball arcade game featuring 50 campaign sectors, route firewalls, community level studio, global arena, and live leaderboards.',
+        description: 'Next-generation cyberpunk breakout ball arcade game featuring 100 campaign levels across 10 sectors, route firewalls, community level studio, global arena, and live leaderboards.',
         keywords: ['breakout', 'arcade', 'breakout ball', 'cyberpunk', 'neon', 'brick breaker', 'retro arcade', 'level editor', 'arena'],
         canonicalUrl: '/',
         themeColor: '#00f7ff',

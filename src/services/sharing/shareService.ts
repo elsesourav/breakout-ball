@@ -22,7 +22,7 @@ export const getLevelShareUrl = (levelId: string): string => {
 export const shareLevel = async (level: LevelData): Promise<{ success: boolean; method: 'native' | 'clipboard' }> => {
   soundManager.playClick('cyber');
   const levelNum = parseInt(level.id, 10);
-  const isCampaign = !isNaN(levelNum) && levelNum >= 1 && levelNum <= 50;
+  const isCampaign = !isNaN(levelNum) && levelNum >= 1 && levelNum <= 100;
 
   const url = getLevelShareUrl(level.id);
   const title = isCampaign

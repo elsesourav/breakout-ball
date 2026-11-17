@@ -1,14 +1,17 @@
 /**
- * Ball Trajectory Matrix Power-Up / Guideline Calculator
+ * Ball Trajectory Matrix Power-Up / V-Type Guideline Calculator
  * 
- * Provides 8-ball pool-style predictive trajectory guidance:
- * - Accurately raycasts incoming ball trajectory towards the paddle, including wall reflections
- * - Detects paddle collision feasibility at projected intercept point
- * - Computes outgoing deflection angle using the exact paddle angular deflection physics
- * - Scales preview distance from 600px (Level 1 base) to 1800px (Level 8 max, 3x default)
- * - Smoothly fades in when descending into range and slowly dissolves when moving away
- * - ONLY displays when paddle collision is feasible (NO horizontal red lines, NO miss clutter)
- * - Supports multi-ball seamlessly with independent per-ball trajectory tracking
+ * Accurately implements V-Type incoming & outgoing trajectory guidance:
+ * - Only active in active gameplay (strictly disabled before launch / at rest on paddle)
+ * - Detection radius scaled by power upgrade level (Level 1: 550px -> Level 8: 1650px, 3x)
+ * - Checks ball position and velocity vector (x, y, vx, vy)
+ * - Verifies velocity direction is aimed to collide with the paddle
+ * - When under the radius AND feasible to collide with paddle, renders the complete V-type line:
+ *   1. Incoming ray from ball down to paddle contact point (including wall bounces)
+ *   2. Impact reticle / vertex on the paddle
+ *   3. Outgoing deflection ray bouncing off paddle back up into arena
+ * - As the power is upgraded, both the incoming radius and outgoing line length expand ("more big")
+ * - Smoothly fades out when ball moves away or trajectory misses the paddle
  */
 
 import { BallState, PaddleState } from './types';
@@ -24,31 +27,43 @@ export interface TrajectoryGuideline {
   visible: boolean;
   alpha: number;
   isHit: boolean;
-  isLaunchAim?: boolean;
   hitX: number;
   hitY: number;
   incomingSegments: TrajectorySegment[];
   outgoingSegments: TrajectorySegment[];
   outVx: number;
   outVy: number;
-  maxDistance: number;
+  detectionRadius: number;
+  outgoingLength: number;
 }
 
 /**
- * Calculates max trajectory preview distance based on ball_trajectory upgrade level (1-8)
- * Default (Level 1): 600px (generous slide distance)
+ * Calculates detection radius based on ball_trajectory upgrade level (1-8)
+ * Default (Level 1): 600px
  * Max (Level 8): 1800px (exactly 3x default distance across top blocks)
  */
-export function getTrajectoryMaxDistance(level: number): number {
+export function getTrajectoryDetectionRadius(level: number): number {
   const lvlClamped = Math.max(1, Math.min(8, level));
   return 600 + (lvlClamped - 1) * (1200 / 7);
 }
 
 /**
- * Computes complete predictive incoming and outgoing trajectory for a ball.
- * Supports:
- * 1. Launch Aiming Trajectory (when ball is on paddle before launch)
- * 2. In-Flight Trajectory (when ball is descending towards paddle)
+ * Calculates outgoing deflection ray length based on upgrade level (1-8)
+ * Default (Level 1): 360px
+ * Max (Level 8): 1080px (exactly 3x default line length)
+ */
+export function getTrajectoryOutgoingLength(level: number): number {
+  const lvlClamped = Math.max(1, Math.min(8, level));
+  return 360 + (lvlClamped - 1) * (720 / 7);
+}
+
+// Backwards compatibility alias
+export const getTrajectoryMaxDistance = getTrajectoryDetectionRadius;
+
+/**
+ * Computes complete V-type predictive trajectory (incoming + outgoing).
+ * Strictly requires active in-flight gameplay, descent towards paddle,
+ * position under detection radius, and velocity direction aligned to collide with paddle.
  */
 export function calculateTrajectoryGuideline(
   ball: BallState,
@@ -59,99 +74,52 @@ export function calculateTrajectoryGuideline(
   currentFadeAlpha: number = 0,
   dt: number = 1 / 60
 ): { guideline: TrajectoryGuideline; nextFadeAlpha: number } {
-  const maxDistance = getTrajectoryMaxDistance(upgradeLevel);
+  const detectionRadius = getTrajectoryDetectionRadius(upgradeLevel);
+  const outgoingLength = getTrajectoryOutgoingLength(upgradeLevel);
   const halfPadW = paddle.width / 2;
+  const padLeft = paddle.x - halfPadW;
+  const padRight = paddle.x + halfPadW;
   const padTop = paddle.y;
   const ballR = ball.radius || 10;
   const minX = ballR;
   const maxX = arenaW - ballR;
   const targetY = padTop - ballR;
 
-  // 1. Check if Ball is Resting on Paddle (Launch / Ready State)
-  const isBallOnPaddle =
+  // 1. Guard against non-gameplay states: ball resting on paddle or inactive before launch
+  const isRestingOnPaddle =
     !ball.isActive ||
-    (Math.abs(ball.vy) < 0.01 && Math.abs(ball.vx) < 0.01) ||
-    (ball.y >= padTop - ballR * 3 && Math.abs(ball.vy) < 30);
+    (Math.abs(ball.vy) < 15 && Math.abs(ball.vx) < 15) ||
+    ball.y >= targetY - 4;
 
-  if (isBallOnPaddle) {
-    // Launch Aiming Guideline: raycast upward from ball on paddle into arena
-    const ballX = paddle.x;
-    const ballY = padTop - ballR - 4;
-    const maxSpeed = paddle.maxSpeed || 1600;
-    const paddleVelRatio = Math.max(-1, Math.min(1, (paddle.vx || 0) / maxSpeed));
-    const boardCenter = arenaW / 2;
-    const paddlePosRatio = (paddle.x - boardCenter) / boardCenter;
-
-    let throwAngle = Math.abs(paddle.vx || 0) > 30
-      ? -Math.PI / 2 + paddleVelRatio * 0.55
-      : -Math.PI / 2 + (-paddlePosRatio * 0.25);
-
-    throwAngle = Math.max((-150 * Math.PI) / 180, Math.min((-30 * Math.PI) / 180, throwAngle));
-    const aimSpeed = ball.baseSpeed || 720;
-    const outVx = Math.cos(throwAngle) * aimSpeed;
-    const outVy = Math.sin(throwAngle) * aimSpeed;
-
-    const outgoingSegments: TrajectorySegment[] = [];
-    const outgoingLength = Math.min(1100, 500 + (upgradeLevel - 1) * 80);
-    const dirLen = Math.hypot(outVx, outVy) || 1;
-    let outCurNx = outVx / dirLen;
-    let outCurNy = outVy / dirLen;
-    let outCurX = ballX;
-    let outCurY = ballY;
-    let remainingDist = outgoingLength;
-
-    let outSafety = 5;
-    while (outSafety-- > 0 && remainingDist > 0) {
-      let distToWall = Infinity;
-      let nextWallX = outCurX;
-
-      if (outCurNx > 0.001) {
-        const t = (maxX - outCurX) / outCurNx;
-        if (t > 0) { distToWall = t; nextWallX = maxX; }
-      } else if (outCurNx < -0.001) {
-        const t = (minX - outCurX) / outCurNx;
-        if (t > 0) { distToWall = t; nextWallX = minX; }
-      }
-
-      if (distToWall < remainingDist) {
-        const segY = outCurY + outCurNy * distToWall;
-        outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: nextWallX, y2: segY });
-        remainingDist -= distToWall;
-        outCurX = nextWallX;
-        outCurY = segY;
-        outCurNx = -outCurNx; // Wall bounce
-      } else {
-        const segX = outCurX + outCurNx * remainingDist;
-        const segY = outCurY + outCurNy * remainingDist;
-        outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: segX, y2: segY });
-        break;
-      }
-    }
-
+  if (isRestingOnPaddle) {
     return {
       guideline: {
-        visible: true,
-        alpha: 1.0,
-        isHit: true,
-        isLaunchAim: true,
-        hitX: ballX,
-        hitY: ballY,
+        visible: false,
+        alpha: 0,
+        isHit: false,
+        hitX: paddle.x,
+        hitY: targetY,
         incomingSegments: [],
-        outgoingSegments,
-        outVx,
-        outVy,
-        maxDistance,
+        outgoingSegments: [],
+        outVx: 0,
+        outVy: 0,
+        detectionRadius,
+        outgoingLength,
       },
-      nextFadeAlpha: 1.0,
+      nextFadeAlpha: 0,
     };
   }
 
-  // 2. Guard against non-descending balls or balls already past paddle
-  const distToPaddle = targetY - ball.y;
-  const isDescending = ball.isActive && ball.vy > 15 && distToPaddle > 0;
+  // 2. Velocity direction check: ball must be actively descending towards paddle plane
+  const isDescending = ball.vy > 15;
+  const closestPadX = Math.max(padLeft, Math.min(padRight, ball.x));
+  const distToPaddle = Math.hypot(ball.x - closestPadX, targetY - ball.y);
 
-  if (!isDescending) {
-    const lerpSpeed = 2.8;
+  // 3. Radius check: ball must be under the upgrade level's detection radius
+  const isUnderRadius = ball.y < targetY && distToPaddle <= detectionRadius;
+
+  if (!isDescending || !isUnderRadius) {
+    const lerpSpeed = 4.0;
     const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * lerpSpeed);
     return {
       guideline: {
@@ -164,13 +132,14 @@ export function calculateTrajectoryGuideline(
         outgoingSegments: [],
         outVx: 0,
         outVy: 0,
-        maxDistance,
+        detectionRadius,
+        outgoingLength,
       },
       nextFadeAlpha,
     };
   }
 
-  // 2. Raycast Incoming Ball Trajectory downwards towards targetY
+  // 4. Raycast Incoming Path from (ball.x, ball.y) to paddle plane targetY
   const curVy = ball.vy;
   let curX = ball.x;
   let curY = ball.y;
@@ -193,14 +162,12 @@ export function calculateTrajectoryGuideline(
     }
 
     if (timeToWall < timeToTarget) {
-      // Wall collision first
       const nextY = curY + curVy * timeToWall;
       incomingSegments.push({ x1: curX, y1: curY, x2: wallX, y2: nextY });
       curX = wallX;
       curY = nextY;
-      curVx = -curVx; // Wall bounce
+      curVx = -curVx; // Wall reflection
     } else {
-      // Arrives at paddle plane
       const finalX = curX + curVx * timeToTarget;
       incomingSegments.push({ x1: curX, y1: curY, x2: finalX, y2: targetY });
       curX = finalX;
@@ -212,125 +179,111 @@ export function calculateTrajectoryGuideline(
   const hitX = curX;
   const hitY = targetY;
 
-  // 3. Collision feasibility check on paddle
-  const padLeft = paddle.x - halfPadW;
-  const padRight = paddle.x + halfPadW;
-  const isHit = hitX >= padLeft - ballR && hitX <= padRight + ballR;
+  // 5. Paddle Collision Feasibility Check: velocity direction must collide with paddle
+  const isHit = hitX >= padLeft - ballR * 0.4 && hitX <= padRight + ballR * 0.4;
 
-  // 4. Target Alpha Calculation
-  // ALWAYS show the incoming predictive trajectory when descending!
-  const targetAlpha = 1.0;
-
-  // Immediate onset on descent: if ball is descending and currentFadeAlpha is below baseline,
-  // initialize at a clear visible floor (0.65) so predictive beam appears instantly with high clarity
-  const baselineAlpha = currentFadeAlpha < 0.65 ? 0.65 : currentFadeAlpha;
-
-  // Smooth fade-in towards 0.95 (lerpSpeed 10.0 for quick arrival) and slow graceful fade-out dissolution (lerpSpeed 2.8)
-  const lerpSpeed = targetAlpha < baselineAlpha ? 2.8 : 10.0;
-  const nextFadeAlpha = Math.max(
-    0.0,
-    Math.min(1.0, baselineAlpha + (targetAlpha - baselineAlpha) * Math.min(1.0, dt * lerpSpeed))
-  );
-
-  // If alpha is near 0, clear segments and return hidden
-  if (nextFadeAlpha < 0.01) {
+  // Only draw the V-type line when velocity direction correctly intercepts the paddle
+  if (!isHit) {
+    const lerpSpeed = 4.0;
+    const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * lerpSpeed);
     return {
       guideline: {
         visible: false,
-        alpha: nextFadeAlpha,
-        isHit,
+        alpha: 0,
+        isHit: false,
         hitX,
         hitY,
         incomingSegments: [],
         outgoingSegments: [],
         outVx: 0,
         outVy: 0,
-        maxDistance,
+        detectionRadius,
+        outgoingLength,
       },
       nextFadeAlpha,
     };
   }
 
-  // 5. Compute Outgoing Reflected Trajectory ONLY if paddle intercepts the ball
+  // 6. Alpha Calculation: instant high-visibility onset (0.80) when collision aligns, smoothly reaching 1.0
+  const targetAlpha = 1.0;
+  const baselineAlpha = currentFadeAlpha < 0.80 ? 0.80 : currentFadeAlpha;
+  const lerpSpeed = 12.0;
+  const nextFadeAlpha = Math.max(
+    0.0,
+    Math.min(1.0, baselineAlpha + (targetAlpha - baselineAlpha) * Math.min(1.0, dt * lerpSpeed))
+  );
+
+  // 7. Compute Outgoing Deflected Ray (the 2nd arm of the V)
   const outgoingSegments: TrajectorySegment[] = [];
-  let outVx = 0;
-  let outVy = -Math.abs(ball.vy);
+  const hitOffset = Math.max(-1, Math.min(1, (hitX - paddle.x) / halfPadW));
+  const currentSpeed = ball.speed || Math.hypot(ball.vx, ball.vy) || 720;
 
-  if (isHit) {
-    const hitOffset = Math.max(-1, Math.min(1, (hitX - paddle.x) / halfPadW));
-    const currentSpeed = ball.speed || Math.hypot(ball.vx, ball.vy) || 720;
+  const MIN_BOUNCE_ANGLE = (15 * Math.PI) / 180;
+  const MAX_BASE_ANGLE = (68 * Math.PI) / 180;
+  const MAX_ALLOWED_ANGLE = (75 * Math.PI) / 180;
 
-    const MIN_BOUNCE_ANGLE = (15 * Math.PI) / 180;
-    const MAX_BASE_ANGLE = (68 * Math.PI) / 180;
-    const MAX_ALLOWED_ANGLE = (75 * Math.PI) / 180;
+  const deflectDir =
+    hitOffset !== 0
+      ? Math.sign(hitOffset)
+      : Math.sign(paddle.vx) || Math.sign(curVx) || 1;
 
-    const deflectDir =
-      hitOffset !== 0
-        ? Math.sign(hitOffset)
-        : Math.sign(paddle.vx) || Math.sign(curVx) || 1;
+  const baseAngleMag = MIN_BOUNCE_ANGLE + Math.abs(hitOffset) * (MAX_BASE_ANGLE - MIN_BOUNCE_ANGLE);
+  const bounceAngle = deflectDir * baseAngleMag;
 
-    const baseAngleMag = MIN_BOUNCE_ANGLE + Math.abs(hitOffset) * (MAX_BASE_ANGLE - MIN_BOUNCE_ANGLE);
-    const bounceAngle = deflectDir * baseAngleMag;
+  const spin = (paddle.vx || 0) * 0.28;
+  const rawVx = currentSpeed * Math.sin(bounceAngle) + spin;
+  const rawVy = -currentSpeed * Math.cos(bounceAngle);
 
-    const spin = paddle.vx * 0.28;
-    const rawVx = currentSpeed * Math.sin(bounceAngle) + spin;
-    const rawVy = -currentSpeed * Math.cos(bounceAngle);
+  const angleFromVertical = Math.atan2(rawVx, -rawVy);
+  let finalAngleMag = Math.abs(angleFromVertical);
+  const finalAngleSign = Math.sign(angleFromVertical) || deflectDir;
 
-    const angleFromVertical = Math.atan2(rawVx, -rawVy);
-    let finalAngleMag = Math.abs(angleFromVertical);
-    const finalAngleSign = Math.sign(angleFromVertical) || deflectDir;
+  if (finalAngleMag < MIN_BOUNCE_ANGLE) {
+    finalAngleMag = MIN_BOUNCE_ANGLE;
+  } else if (finalAngleMag > MAX_ALLOWED_ANGLE) {
+    finalAngleMag = MAX_ALLOWED_ANGLE;
+  }
 
-    if (finalAngleMag < MIN_BOUNCE_ANGLE) {
-      finalAngleMag = MIN_BOUNCE_ANGLE;
-    } else if (finalAngleMag > MAX_ALLOWED_ANGLE) {
-      finalAngleMag = MAX_ALLOWED_ANGLE;
+  const finalAngle = finalAngleSign * finalAngleMag;
+  const outVx = currentSpeed * Math.sin(finalAngle);
+  const outVy = -currentSpeed * Math.cos(finalAngle);
+
+  // Raycast Outgoing Path (upward into arena, expanding with upgrade level)
+  const dirLen = Math.hypot(outVx, outVy) || 1;
+  const outNx = outVx / dirLen;
+  const outNy = outVy / dirLen;
+
+  let outCurX = hitX;
+  let outCurY = hitY;
+  let outCurNx = outNx;
+  let outCurNy = outNy;
+  let remainingDist = outgoingLength;
+
+  let outSafety = 5;
+  while (outSafety-- > 0 && remainingDist > 0) {
+    let distToWall = Infinity;
+    let nextWallX = outCurX;
+
+    if (outCurNx > 0.001) {
+      const t = (maxX - outCurX) / outCurNx;
+      if (t > 0) { distToWall = t; nextWallX = maxX; }
+    } else if (outCurNx < -0.001) {
+      const t = (minX - outCurX) / outCurNx;
+      if (t > 0) { distToWall = t; nextWallX = minX; }
     }
 
-    const finalAngle = finalAngleSign * finalAngleMag;
-    outVx = currentSpeed * Math.sin(finalAngle);
-    outVy = -currentSpeed * Math.cos(finalAngle);
-
-    // Raycast Outgoing Path (upwards into arena)
-    const outgoingLength = Math.min(700, 240 + (upgradeLevel - 1) * 60);
-    const dirLen = Math.hypot(outVx, outVy);
-    const nx = outVx / dirLen;
-    const ny = outVy / dirLen;
-
-    let outCurX = hitX;
-    let outCurY = hitY;
-    let outCurNx = nx;
-    let outCurNy = ny;
-    let remainingDist = outgoingLength;
-
-    let outSafety = 4;
-    while (outSafety-- > 0 && remainingDist > 0) {
-      // Check wall intersection
-      let distToWall = Infinity;
-      let nextWallX = outCurX;
-
-      if (outCurNx > 0.001) {
-        const t = (maxX - outCurX) / outCurNx;
-        if (t > 0) { distToWall = t; nextWallX = maxX; }
-      } else if (outCurNx < -0.001) {
-        const t = (minX - outCurX) / outCurNx;
-        if (t > 0) { distToWall = t; nextWallX = minX; }
-      }
-
-      if (distToWall < remainingDist) {
-        // Wall bounce on outgoing line
-        const segY = outCurY + outCurNy * distToWall;
-        outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: nextWallX, y2: segY });
-        remainingDist -= distToWall;
-        outCurX = nextWallX;
-        outCurY = segY;
-        outCurNx = -outCurNx; // Wall bounce
-      } else {
-        // Terminate outgoing ray
-        const segX = outCurX + outCurNx * remainingDist;
-        const segY = outCurY + outCurNy * remainingDist;
-        outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: segX, y2: segY });
-        break;
-      }
+    if (distToWall < remainingDist) {
+      const segY = outCurY + outCurNy * distToWall;
+      outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: nextWallX, y2: segY });
+      remainingDist -= distToWall;
+      outCurX = nextWallX;
+      outCurY = segY;
+      outCurNx = -outCurNx; // Wall reflection
+    } else {
+      const segX = outCurX + outCurNx * remainingDist;
+      const segY = outCurY + outCurNy * remainingDist;
+      outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: segX, y2: segY });
+      break;
     }
   }
 
@@ -338,14 +291,15 @@ export function calculateTrajectoryGuideline(
     guideline: {
       visible: true,
       alpha: nextFadeAlpha,
-      isHit,
+      isHit: true,
       hitX,
       hitY,
       incomingSegments,
       outgoingSegments,
       outVx,
       outVy,
-      maxDistance,
+      detectionRadius,
+      outgoingLength,
     },
     nextFadeAlpha,
   };

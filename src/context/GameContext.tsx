@@ -373,6 +373,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const totalCompleted = Object.values(updatedProgress).filter((p) => p.completed).length;
           if (totalCompleted >= 10) achievementManager.unlock('campaign_10');
           if (totalCompleted >= 50) achievementManager.unlock('apex_champion');
+          if (totalCompleted >= 100) achievementManager.unlock('omega_sovereign');
           dbService.saveProgress(updatedProgress, user.username);
           return updatedProgress;
         });

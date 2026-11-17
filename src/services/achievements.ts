@@ -73,11 +73,20 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   {
     id: 'apex_champion',
     title: 'Apex Legend',
-    description: 'Conquer all 50 arcade campaign stages',
+    description: 'Conquer 50 arcade campaign stages',
     icon: 'crown',
     category: 'mastery',
     unlocked: false,
     coreReward: 200,
+  },
+  {
+    id: 'omega_sovereign',
+    title: 'Omega Sovereign',
+    description: 'Conquer all 100 arcade campaign stages',
+    icon: 'crown',
+    category: 'mastery',
+    unlocked: false,
+    coreReward: 500,
   },
   {
     id: 'level_architect',

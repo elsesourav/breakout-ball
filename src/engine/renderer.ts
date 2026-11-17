@@ -168,8 +168,8 @@ export class GameRenderer {
       tier: designConfig.paddleTierOverride,
     });
 
-    // 6.1. Trajectory Matrix Guideline (8-Ball Pool Style Predictive Beam)
-    // Supports all active balls simultaneously (especially during Multiball)
+    // 6.1. V-Type Trajectory Matrix Guideline (Incoming + Outgoing Deflection Ray)
+    // Selects the single priority descending ball nearest to the paddle under detection radius
     const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
     
     // Clean up fade alphas for balls that no longer exist
@@ -177,20 +177,19 @@ export class GameRenderer {
       if (key >= ballList.length) this.ballFadeAlphas.delete(key);
     }
 
-    // Select single priority ball: ball on paddle (launch state) or nearest descending ball to paddle
     let targetIdx = -1;
     let minDescDist = Infinity;
+    const detectionRadius = 600 + (trajLvl - 1) * (1200 / 7);
+    const halfPadW = interpolatedPaddle.width / 2;
+
     for (let i = 0; i < ballList.length; i++) {
       const b = ballList[i];
-      if (!b) continue;
+      if (!b || !b.isActive || b.vy <= 15) continue;
       const bRad = b.radius || 10;
-      const onPad = !b.isActive || (Math.abs(b.vy) < 0.01 && Math.abs(b.vx) < 0.01) || (b.y >= interpolatedPaddle.y - bRad * 3 && Math.abs(b.vy) < 30);
-      if (onPad) {
-        targetIdx = i;
-        break;
-      }
-      const dist = (interpolatedPaddle.y - bRad) - b.y;
-      if (b.isActive && b.vy > 15 && dist > 0 && dist < minDescDist) {
+      const targetY = interpolatedPaddle.y - bRad;
+      const closestPadX = Math.max(interpolatedPaddle.x - halfPadW, Math.min(interpolatedPaddle.x + halfPadW, b.x));
+      const dist = Math.hypot(b.x - closestPadX, targetY - b.y);
+      if (b.y < targetY && dist <= detectionRadius && dist < minDescDist) {
         minDescDist = dist;
         targetIdx = i;
       }
@@ -201,7 +200,7 @@ export class GameRenderer {
       const prevAlpha = this.ballFadeAlphas.get(idx) || 0;
 
       if (!b || idx !== targetIdx) {
-        if (prevAlpha > 0.01) this.ballFadeAlphas.set(idx, Math.max(0, prevAlpha - 1/60 * 3.5));
+        if (prevAlpha > 0.01) this.ballFadeAlphas.set(idx, Math.max(0, prevAlpha - 1/60 * 4.0));
         else this.ballFadeAlphas.delete(idx);
         continue;
       }
@@ -217,12 +216,12 @@ export class GameRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // Display incoming / launch aiming guideline
-      if (guideline.visible && guideline.alpha > 0.01) {
+      // ONLY display when under radius AND velocity trajectory collides with paddle (V-type)
+      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
         ctx.save();
         const gAlpha = guideline.alpha;
 
-        // 1. Incoming Predictive Dotted Line (Vibrant Cyan, NEVER Red)
+        // 1. Incoming Arm of the V (Cyan laser dashes from ball to paddle)
         ctx.lineWidth = 5.5;
         ctx.setLineDash([16, 14]);
         ctx.strokeStyle = `rgba(0, 247, 255, ${gAlpha * 0.95})`;
@@ -236,15 +235,14 @@ export class GameRenderer {
           ctx.stroke();
         }
 
-        // 2. Impact Target Reticle (Emerald when locked, Cyan otherwise - Triple-ring concentric marker)
+        // 2. Apex of the V: Concentric Landing Target Reticle on Paddle Face
         ctx.setLineDash([]);
-        const retColor = guideline.isHit ? `rgba(16, 185, 129, ${gAlpha * 0.95})` : `rgba(0, 247, 255, ${gAlpha * 0.95})`;
-        ctx.shadowColor = guideline.isHit ? '#10b981' : '#00f7ff';
+        ctx.shadowColor = '#10b981';
         ctx.shadowBlur = 10;
 
         ctx.beginPath();
         ctx.arc(guideline.hitX, guideline.hitY, 18, 0, Math.PI * 2);
-        ctx.strokeStyle = retColor;
+        ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.95})`;
         ctx.lineWidth = 3.5;
         ctx.stroke();
 
@@ -259,28 +257,21 @@ export class GameRenderer {
         ctx.fillStyle = '#ffffff';
         ctx.fill();
 
-        // 3. Paddle Face Beam
+        // 3. Paddle Lock-on Beam along paddle face
         const halfPadW = interpolatedPaddle.width / 2;
-        if (guideline.isHit) {
+        ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.95})`;
+        ctx.shadowColor = '#10b981';
+        ctx.shadowBlur = 14;
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(interpolatedPaddle.x - halfPadW, interpolatedPaddle.y);
+        ctx.lineTo(interpolatedPaddle.x + halfPadW, interpolatedPaddle.y);
+        ctx.stroke();
+
+        // 4. Outgoing Arm of the V (Emerald Green deflection ray with Arrowhead)
+        if (guideline.outgoingSegments.length > 0) {
           ctx.strokeStyle = `rgba(16, 185, 129, ${gAlpha * 0.95})`;
           ctx.shadowColor = '#10b981';
-          ctx.shadowBlur = 14;
-          ctx.lineWidth = 5;
-          ctx.beginPath();
-          ctx.moveTo(interpolatedPaddle.x - halfPadW, interpolatedPaddle.y);
-          ctx.lineTo(interpolatedPaddle.x + halfPadW, interpolatedPaddle.y);
-          ctx.stroke();
-        } else {
-          const guideX = Math.max(interpolatedPaddle.x - halfPadW, Math.min(interpolatedPaddle.x + halfPadW, guideline.hitX));
-          ctx.fillStyle = `rgba(0, 247, 255, ${gAlpha * 0.9})`;
-          ctx.fillRect(guideX - 8, interpolatedPaddle.y - 4, 16, 6);
-        }
-
-        // 4. Outgoing / Launch Aiming Deflected Guideline
-        if (guideline.outgoingSegments.length > 0) {
-          const outCol = guideline.isLaunchAim ? `rgba(0, 247, 255, ${gAlpha * 0.95})` : `rgba(16, 185, 129, ${gAlpha * 0.95})`;
-          ctx.strokeStyle = outCol;
-          ctx.shadowColor = guideline.isLaunchAim ? '#00f7ff' : '#10b981';
           ctx.shadowBlur = 12;
           ctx.lineWidth = 5.5;
           ctx.setLineDash([16, 14]);
@@ -292,14 +283,14 @@ export class GameRenderer {
             ctx.stroke();
           }
 
-          // Directional Arrowhead
+          // Directional Arrowhead at end of deflection ray
           const lastSeg = guideline.outgoingSegments[guideline.outgoingSegments.length - 1];
           const outAngle = Math.atan2(guideline.outVx, -guideline.outVy);
           ctx.setLineDash([]);
           ctx.save();
           ctx.translate(lastSeg.x2, lastSeg.y2);
           ctx.rotate(outAngle);
-          ctx.fillStyle = guideline.isLaunchAim ? `rgba(0, 247, 255, ${gAlpha})` : `rgba(52, 211, 153, ${gAlpha})`;
+          ctx.fillStyle = `rgba(52, 211, 153, ${gAlpha})`;
           ctx.beginPath();
           ctx.moveTo(0, -14);
           ctx.lineTo(11, 10);

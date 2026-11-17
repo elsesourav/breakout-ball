@@ -220,6 +220,7 @@ export const ACHIEVEMENT_CUSTOM_ICONS: Record<string, React.FC<AchievementIconPr
   speed_demon: IconSupersonic,
   campaign_10: IconSectorVeteran,
   apex_champion: IconApexLegend,
+  omega_sovereign: IconApexLegend,
   level_architect: IconMasterArchitect,
   arena_challenger: IconGlobalContender,
   laser_barrage: IconPhotonStriker,
