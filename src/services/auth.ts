@@ -1,12 +1,5 @@
 /**
  * Master Authentication & Single Sign-On (SSO) Ecosystem Service
- * Conforms to ElseSourav Universal Authentication Specification:
- * - Direct connection with ElseSourav Platform Identity (Supabase)
- * - Cloud Firestore profile sync
- * - Email & @Username login identifier resolution
- * - 2-Step progressive registration
- * - 6-Digit OTP password recovery
- * - Iframe & Canvas SSO postMessage protocol (ELSESOURAV_AUTH_REQUEST <-> ELSESOURAV_AUTH_SUCCESS)
  */
 
 import { supabase } from './supabase';
@@ -73,6 +66,13 @@ class AuthService {
         event.origin.includes('localhost') ||
         event.origin.includes('127.0.0.1')
       ) {
+        if (event.data?.type === 'BREAKOUT_AUTH_SUCCESS' && event.data?.user) {
+          const authUser = event.data.user;
+          this.setCurrentUser(authUser);
+          this.notifySubscribers(authUser);
+          accountMigrationService.migrateAnonymousDataToUser(authUser).catch(() => {});
+          return;
+        }
         if (event.data?.type === 'ELSESOURAV_AUTH_SUCCESS' && event.data?.payload) {
           const payload = event.data.payload;
           const ssoUser: AuthUser = {
@@ -124,8 +124,20 @@ class AuthService {
         this.setCurrentUser(user);
         this.notifySubscribers(user);
         accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
-        this.notifySubscribers(user);
-        accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
+
+        // Auto close popup if this window was opened as an OAuth popup
+        if (typeof window !== 'undefined') {
+          if (window.opener && window.opener !== window) {
+            try {
+              window.opener.postMessage({ type: 'BREAKOUT_AUTH_SUCCESS', user }, window.location.origin);
+            } catch {}
+            window.close();
+            return;
+          }
+          if (window.location.hash.includes('access_token')) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem(this.userKey);
         localStorage.removeItem(this.tokenKey);
@@ -380,10 +392,9 @@ class AuthService {
     provider: 'google' | 'github'
   ): Promise<{ success: boolean; user?: AuthUser; message?: string }> {
     try {
-      const returnTarget = typeof window !== 'undefined'
-        ? window.location.origin + window.location.pathname
+      const redirectTo = typeof window !== 'undefined'
+        ? window.location.origin
         : 'https://elsesourav.com/apps/breakout-ball';
-      const redirectTo = `https://elsesourav.com/api/auth/callback?next=${encodeURIComponent(returnTarget)}&mode=popup`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -412,16 +423,16 @@ class AuthService {
             const timer = setInterval(async () => {
               if (popup.closed) {
                 clearInterval(timer);
-                await new Promise((r) => setTimeout(r, 400));
-                const current = this.getCurrentUser();
-                if (current.isLoggedIn && current.username !== 'anonymous') {
-                  accountMigrationService.migrateAnonymousDataToUser(current).catch(() => {});
-                  resolve({ success: true, user: current });
+                await new Promise((r) => setTimeout(r, 300));
+                const cur = this.getCurrentUser();
+                if (cur.isLoggedIn && cur.username !== 'anonymous') {
+                  accountMigrationService.migrateAnonymousDataToUser(cur).catch(() => {});
+                  resolve({ success: true, user: cur });
                 } else {
                   resolve({ success: false, message: 'OAuth sign-in cancelled or window closed' });
                 }
               }
-            }, 600);
+            }, 500);
           });
         }
       }
@@ -467,14 +478,9 @@ class AuthService {
 
   public async logout(): Promise<void> {
     try {
-      await Promise.allSettled([
-        supabase.auth.signOut(),
-        fbSignOut(firebaseAuth),
-      ]);
+      await Promise.allSettled([supabase.auth.signOut(), fbSignOut(firebaseAuth)]);
     } catch {}
-    localStorage.removeItem(this.userKey);
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem('breakout_admin_token');
+    ['breakout_auth_user', 'breakout_auth_token', 'breakout_admin_token'].forEach((k) => localStorage.removeItem(k));
   }
 }
 

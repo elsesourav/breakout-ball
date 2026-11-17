@@ -111,44 +111,26 @@ export function calculateTrajectoryGuideline(
   }
 
   // 2. Velocity direction check: ball must be actively descending towards paddle plane
-  const isDescending = ball.vy > 0.1;
-  const distToPaddlePlane = targetY - ball.y;
-
-  // 3. Radius check: ball must be within the upgrade level's detection radius of paddle plane
-  const isUnderRadius = ball.y < targetY && distToPaddlePlane <= detectionRadius;
-
-  if (!isDescending || !isUnderRadius) {
-    const lerpSpeed = 4.0;
-    const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * lerpSpeed);
+  const isDescending = ball.vy > 0.1 && ball.y < targetY;
+  if (!isDescending) {
+    const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * 4.0);
     return {
-      guideline: {
-        visible: false,
-        alpha: 0,
-        isHit: false,
-        hitX: paddle.x,
-        hitY: targetY,
-        incomingSegments: [],
-        outgoingSegments: [],
-        outVx: 0,
-        outVy: 0,
-        detectionRadius,
-        outgoingLength,
-      },
+      guideline: { visible: false, alpha: 0, isHit: false, hitX: paddle.x, hitY: targetY, incomingSegments: [], outgoingSegments: [], outVx: 0, outVy: 0, detectionRadius, outgoingLength },
       nextFadeAlpha,
     };
   }
 
-  // 4. Raycast Incoming Path from (ball.x, ball.y) to paddle plane targetY
+  // 3. Raycast Incoming Path from (ball.x, ball.y) to paddle plane targetY
   const curVy = ball.vy;
   let curX = ball.x;
   let curY = ball.y;
   let curVx = ball.vx;
   const incomingSegments: TrajectorySegment[] = [];
+  let totalIncomingPath = 0;
 
   let safety = 6;
   while (safety-- > 0 && curY < targetY) {
     const timeToTarget = (targetY - curY) / curVy;
-
     let timeToWall = Infinity;
     let wallX = curX;
 
@@ -163,12 +145,14 @@ export function calculateTrajectoryGuideline(
     if (timeToWall < timeToTarget) {
       const nextY = curY + curVy * timeToWall;
       incomingSegments.push({ x1: curX, y1: curY, x2: wallX, y2: nextY });
+      totalIncomingPath += Math.hypot(wallX - curX, nextY - curY);
       curX = wallX;
       curY = nextY;
       curVx = -curVx; // Wall reflection
     } else {
       const finalX = curX + curVx * timeToTarget;
       incomingSegments.push({ x1: curX, y1: curY, x2: finalX, y2: targetY });
+      totalIncomingPath += Math.hypot(finalX - curX, targetY - curY);
       curX = finalX;
       curY = targetY;
       break;
@@ -178,29 +162,19 @@ export function calculateTrajectoryGuideline(
   const hitX = curX;
   const hitY = targetY;
 
+  // 4. Radius check by VELOCITY DISTANCE: distance traveled along velocity path to paddle plane
+  const isUnderRadius = totalIncomingPath <= detectionRadius;
+
   // 5. Paddle Collision Feasibility Check: whether velocity trajectory or ball position intercepts paddle
   const isHit =
     (hitX >= padLeft - ballR * 1.5 && hitX <= padRight + ballR * 1.5) ||
-    (ball.x >= padLeft - ballR * 0.5 && ball.x <= padRight + ballR * 0.5 && distToPaddlePlane <= 350);
+    (ball.x >= padLeft - ballR * 0.5 && ball.x <= padRight + ballR * 0.5 && totalIncomingPath <= 350);
 
-  // Strictly do NOT render guideline when trajectory misses the paddle
-  if (!isHit) {
-    const lerpSpeed = 4.0;
-    const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * lerpSpeed);
+  // Strictly do NOT render guideline when velocity distance is out of range or misses the paddle
+  if (!isUnderRadius || !isHit) {
+    const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * 4.0);
     return {
-      guideline: {
-        visible: false,
-        alpha: 0,
-        isHit: false,
-        hitX,
-        hitY,
-        incomingSegments: [],
-        outgoingSegments: [],
-        outVx: 0,
-        outVy: 0,
-        detectionRadius,
-        outgoingLength,
-      },
+      guideline: { visible: false, alpha: 0, isHit: false, hitX, hitY, incomingSegments: [], outgoingSegments: [], outVx: 0, outVy: 0, detectionRadius, outgoingLength },
       nextFadeAlpha,
     };
   }

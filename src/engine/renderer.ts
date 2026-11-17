@@ -189,9 +189,10 @@ export class GameRenderer {
       if (!b || !b.isActive || b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = interpolatedPaddle.y - bRad;
-      const dist = targetY - b.y;
-      if (b.y < targetY && dist <= detectionRadius && dist < minDescDist) {
-        minDescDist = dist;
+      const speed = Math.hypot(b.vx, b.vy);
+      const velDist = (speed * (targetY - b.y)) / b.vy;
+      if (b.y < targetY && velDist <= detectionRadius && velDist < minDescDist) {
+        minDescDist = velDist;
         targetIdx = i;
       }
     }

@@ -391,7 +391,11 @@ export class GameEngine {
         this.triggerCameraShake((isEmpSource ? 5.5 : isDestroy ? 4.0 : isCrit ? 3.5 : 1.5) * impactShakeMult);
         let pts = isCrit ? 100 * (1 + Math.floor(ev.combo / 2)) : isDestroy ? 100 * (1 + ev.combo) : 50 * (1 + Math.floor(ev.combo / 3));
         let text = isCrit ? `💥 CRIT +${pts}` : isDestroy ? (ev.combo > 1 ? `+${pts} (${ev.combo}x)` : `+${pts}`) : `+${pts}`;
-        if (isDestroy) { this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.32); this.state.blocksDestroyed++; }
+        if (isDestroy) {
+          const drop = this.powerUps.spawnDrop(ev.hitX, ev.hitY, 0.38);
+          if (drop) this.particles.spawnLaserMuzzleFlash(ev.hitX, ev.hitY);
+          this.state.blocksDestroyed++;
+        }
         this.particles.addFloatingText(text, ev.hitX, ev.hitY, isCrit ? '#fbbf24' : color);
         this.recordScore(ev.combo, pts);
         if (isDestroy && this.tsPhysics.remainingBreakable <= 0 && this.state.status === 'playing') { this.handleWin(); return; }

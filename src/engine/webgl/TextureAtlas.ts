@@ -3,7 +3,7 @@ import { drawBlockWithPreset } from '../draw/blockDrawers';
 import { drawPaddleWithPreset } from '../draw/paddleDrawers';
 import { drawBallWithPreset } from '../draw/ballDrawers';
 import { renderCustomPowerUpIcon } from '../draw/powerUpIconDrawers';
-import { PowerUpType } from '../powerUpTypes';
+import { PowerUpType, POWER_UP_CONFIGS } from '../powerUpTypes';
 
 export interface UVRect {
   u0: number;
@@ -222,13 +222,45 @@ export class TextureAtlas {
       c.restore();
     });
 
-    // 4. Bake Power-Up Drop Icons
+    // 4. Bake High-Fidelity Cyber Power-Up Drop Badges (64x64)
     const puTypes: PowerUpType[] = ['multiball', 'megaball', 'laser', 'slowmo', 'shield', 'expand'];
     for (const pt of puTypes) {
-      placeItem(`pu_${pt}`, 32, 32, (c, x, y) => {
+      const meta = POWER_UP_CONFIGS[pt];
+      const color = meta?.color || '#00f7ff';
+      placeItem(`pu_${pt}`, 64, 64, (c, x, y) => {
         c.save();
-        c.translate(x + 16, y + 16);
-        renderCustomPowerUpIcon(c, pt, 14, '#ffffff');
+        c.translate(x + 32, y + 32);
+
+        // Soft outer glowing aura
+        const haloGrad = c.createRadialGradient(0, 0, 14, 0, 0, 31);
+        haloGrad.addColorStop(0, color);
+        haloGrad.addColorStop(0.65, color + '66');
+        haloGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = haloGrad;
+        c.beginPath();
+        c.arc(0, 0, 31, 0, Math.PI * 2);
+        c.fill();
+
+        // High-contrast dark cyber glass orb
+        c.fillStyle = '#060c18';
+        c.beginPath();
+        c.arc(0, 0, 24, 0, Math.PI * 2);
+        c.fill();
+
+        // Vibrant neon rim
+        c.strokeStyle = color;
+        c.lineWidth = 3.2;
+        c.stroke();
+
+        // Inner white highlight rim
+        c.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+        c.lineWidth = 1.2;
+        c.beginPath();
+        c.arc(0, 0, 20.5, 0, Math.PI * 2);
+        c.stroke();
+
+        // Centered crisp vector icon
+        renderCustomPowerUpIcon(c, pt, 32, color);
         c.restore();
       });
     }

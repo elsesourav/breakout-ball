@@ -237,10 +237,7 @@ export class WebGLRenderer {
       // Recharging portal: draw an inner pulsing cooldown energy line across the bottom of the portal with theme color
       if (b.health === 7 && (b.portalRechargeTimer ?? 0) > 0) {
         const pairId = b.portalPairId || 1;
-        let barR = 0.0, barG = 0.97, barB = 1.0;
-        if (pairId === 2) { barR = 0.94; barG = 0.47; barB = 0.98; }
-        else if (pairId === 3) { barR = 0.98; barG = 0.75; barB = 0.14; }
-        else if (pairId === 4) { barR = 0.20; barG = 0.83; barB = 0.60; }
+        const [barR, barG, barB] = pairId === 2 ? [0.94, 0.47, 0.98] : pairId === 3 ? [0.98, 0.75, 0.14] : pairId === 4 ? [0.20, 0.83, 0.60] : [0.0, 0.97, 1.0];
         const progress = Math.max(0, 1.0 - (b.portalRechargeTimer! / 180));
         const barW = (b.w - 16) * progress;
         this.batcher.pushSprite(b.x + 8, b.y + b.h - 8, barW, 3, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, barR, barG, barB, 0.85);
@@ -250,12 +247,8 @@ export class WebGLRenderer {
     // 4.4. Draw Destroying Blocks (Shrinking Inward & Black Hole Suction Animation)
     if (particles.destroyingBlocks.length > 0) {
       for (const db of particles.destroyingBlocks) {
-        const dbKey = db.initialHealth === 7 ? 'block_7_p1' : `block_${db.initialHealth}`;
-        const uv = this.atlas.getUV(dbKey);
-        const cx = db.x + db.w / 2;
-        const cy = db.y + db.h / 2;
-        const curW = db.w * db.scale;
-        const curH = db.h * db.scale;
+        const uv = this.atlas.getUV(db.initialHealth === 7 ? 'block_7_p1' : `block_${db.initialHealth}`);
+        const cx = db.x + db.w / 2, cy = db.y + db.h / 2, curW = db.w * db.scale, curH = db.h * db.scale;
         this.batcher.pushSprite(cx - curW / 2, cy - curH / 2, curW, curH, uv.u0, uv.v0, uv.u1, uv.v1, 1.25, 1.25, 1.25, db.alpha);
       }
     }
@@ -308,9 +301,10 @@ export class WebGLRenderer {
       if (!b || !b.isActive || b.vy <= 0.1) continue;
       const bRad = b.radius || 10;
       const targetY = paddle.y - bRad;
-      const dist = targetY - b.y;
-      if (b.y < targetY && dist <= detectionRadius && dist < minDescDist) {
-        minDescDist = dist;
+      const speed = Math.hypot(b.vx, b.vy);
+      const velDist = (speed * (targetY - b.y)) / b.vy;
+      if (b.y < targetY && velDist <= detectionRadius && velDist < minDescDist) {
+        minDescDist = velDist;
         targetIdx = i;
       }
     }
@@ -401,11 +395,19 @@ export class WebGLRenderer {
       }
     }
 
-    // 6. Draw Falling Power-Up Shards
+    // 6. Draw Falling Power-Up Shards (Vibrant 56px Cyber Crystal Badges + Orbiting Satellites)
     if (powerUps && powerUps.drops.length > 0) {
       for (const drop of powerUps.drops) {
         const puUV = this.atlas.getUV(`pu_${drop.meta.type}`);
-        this.batcher.pushSprite(drop.x - 14, drop.y - 14, 28, 28, puUV.u0, puUV.v0, puUV.u1, puUV.v1, 1.0, 1.0, 1.0, 1.0);
+        const pulse = Math.sin(this.animTick * 4 + drop.id) * 2.5;
+        const dSize = 56 + pulse;
+        this.batcher.pushSprite(drop.x - dSize / 2, drop.y - dSize / 2, dSize, dSize, puUV.u0, puUV.v0, puUV.u1, puUV.v1, 1.0, 1.0, 1.0, 1.0);
+        const [dr, dg, db] = drop.meta.type === 'multiball' ? [0.0, 0.97, 1.0] : drop.meta.type === 'megaball' ? [1.0, 0.84, 0.0] : drop.meta.type === 'laser' ? [1.0, 0.0, 0.33] : drop.meta.type === 'shield' ? [0.06, 0.73, 0.51] : drop.meta.type === 'slowmo' ? [0.72, 0.45, 1.0] : [0.22, 0.74, 0.97];
+        for (let m = 0; m < 3; m++) {
+          const ma = this.animTick * 3.5 + (m * Math.PI * 2) / 3;
+          const mx = drop.x + Math.cos(ma) * 32, my = drop.y + Math.sin(ma) * 32;
+          this.batcher.pushSprite(mx - 3.5, my - 3.5, 7, 7, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, dr, dg, db, 0.95);
+        }
       }
     }
 
