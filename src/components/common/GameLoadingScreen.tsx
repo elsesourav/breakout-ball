@@ -53,12 +53,12 @@ export const GameLoadingScreen: React.FC<GameLoadingScreenProps> = ({
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#030408] select-none"
     >
       <div className="flex flex-col items-center max-w-xs w-full px-6">
-        {/* Simple Clean Icon */}
-        <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shadow-2xl mb-5 flex-shrink-0">
+        {/* Transparent Icon without Background */}
+        <div className="w-20 h-20 sm:w-24 sm:h-24 mb-4 flex items-center justify-center flex-shrink-0">
           <img
-            src="/logo.png"
+            src="/icon-breakout-clean.png"
             alt="Breakout Ball"
-            className="w-full h-full object-cover pointer-events-none select-none"
+            className="w-full h-full object-contain pointer-events-none select-none drop-shadow-[0_0_18px_rgba(255,100,0,0.45)]"
           />
         </div>
 
