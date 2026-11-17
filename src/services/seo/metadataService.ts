@@ -7,7 +7,7 @@ import { PageMetadata } from './types';
  */
 
 const SITE_NAME = 'Breakout Ball';
-const DEFAULT_THEME_COLOR = '#060713';
+const DEFAULT_THEME_COLOR = '#03040c';
 
 /**
  * Helper to get or create a <meta> element in document.head
@@ -70,7 +70,8 @@ export const updatePageMetadata = (meta: PageMetadata): void => {
   if (meta.keywords && meta.keywords.length > 0) {
     setMetaTag('name', 'keywords', meta.keywords.join(', '));
   }
-  setMetaTag('name', 'theme-color', meta.themeColor || DEFAULT_THEME_COLOR);
+  // Lock mobile status bar / top notch permanently to dark theme so it never flashes or turns neon blue across tabs
+  setMetaTag('name', 'theme-color', DEFAULT_THEME_COLOR);
 
   // 3. Canonical Link
   const fullCanonicalUrl = meta.canonicalUrl.startsWith('http')

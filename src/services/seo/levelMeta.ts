@@ -124,7 +124,7 @@ export const buildLevelMetadata = (
       'custom brick breaker',
     ],
     canonicalUrl,
-    themeColor: '#00f7ff',
+    themeColor: '#03040c',
     openGraph: {
       title: `${level.name} by ${creatorTag} | Breakout Ball Arena`,
       description: `Challenge custom level "${level.name}" by ${creatorTag} in Breakout Ball! Instant play in browser.`,
@@ -167,7 +167,7 @@ export const buildTabMetadata = (tab: ActiveTab): PageMetadata => {
         description: 'Compete in the Daily Apex mission, play top community-created levels, and battle for the #1 rank on global live leaderboards in Breakout Ball.',
         keywords: ['breakout arena', 'daily apex', 'community levels', 'live leaderboards', 'breakout ball', 'cyberpunk games'],
         canonicalUrl: '/arena',
-        themeColor: '#818cf8',
+        themeColor: '#03040c',
         openGraph: {
           title: 'Global Arena - Daily Apex & Community Missions | Breakout Ball',
           description: 'Compete on the Daily Apex mission and community levels. Free live multiplayer leaderboard battles in Breakout Ball.',
@@ -190,7 +190,7 @@ export const buildTabMetadata = (tab: ActiveTab): PageMetadata => {
         description: 'Upgrade ball velocity, paddle laser width, kinetic shields, and magnet thrusters in the Breakout Ball Cyber Armory.',
         keywords: ['breakout upgrades', 'cyber armory', 'core shop', 'ball cosmetics', 'paddle upgrades', 'breakout ball'],
         canonicalUrl: '/armory',
-        themeColor: '#00f7ff',
+        themeColor: '#03040c',
         openGraph: {
           title: 'Cyber Armory - Ball & Paddle Upgrades | Breakout Ball',
           description: 'Unlock quantum balls, reinforced neon paddles, and tactical core power-ups in Breakout Ball.',
@@ -213,7 +213,7 @@ export const buildTabMetadata = (tab: ActiveTab): PageMetadata => {
         description: 'Design, test, and publish custom cyberpunk breakout levels with quantum portals, titanium barriers, EMP shockwaves, and crystal matrices.',
         keywords: ['level designer', 'level editor', 'create breakout levels', 'custom arcade games', 'level studio', 'breakout ball'],
         canonicalUrl: '/studio',
-        themeColor: '#b773ff',
+        themeColor: '#03040c',
         openGraph: {
           title: 'Level Studio - Create & Share Custom Stages | Breakout Ball',
           description: 'Craft your own breakout levels with intuitive visual tools and share them with the global community.',
@@ -236,7 +236,7 @@ export const buildTabMetadata = (tab: ActiveTab): PageMetadata => {
         description: 'View your pilot clearance rank, stars collected, campaign cores, and unlocked cyberpunk achievements in Breakout Ball.',
         keywords: ['pilot profile', 'player stats', 'achievements', 'breakout ranking', 'breakout ball'],
         canonicalUrl: '/profile',
-        themeColor: '#f59e0b',
+        themeColor: '#03040c',
         openGraph: {
           title: 'Pilot Profile - Player Stats & Achievements | Breakout Ball',
           description: 'Inspect player clearance, star mastery, and live leaderboards in Breakout Ball.',
@@ -260,7 +260,7 @@ export const buildTabMetadata = (tab: ActiveTab): PageMetadata => {
         description: 'Next-generation cyberpunk breakout ball arcade game featuring 100 campaign levels across 10 sectors, route firewalls, community level studio, global arena, and live leaderboards.',
         keywords: ['breakout', 'arcade', 'breakout ball', 'cyberpunk', 'neon', 'brick breaker', 'retro arcade', 'level editor', 'arena'],
         canonicalUrl: '/',
-        themeColor: '#00f7ff',
+        themeColor: '#03040c',
         openGraph: {
           title: 'Breakout Ball // Cyberpunk Neon Arcade',
           description: 'Shatter plasma cores, breach route firewalls, and conquer custom community levels in Breakout Ball.',

@@ -1,12 +1,12 @@
 {
   "name": "Breakout Ball // Cyberpunk Neon Arcade",
   "short_name": "Breakout Ball",
-  "description": "Next-generation cyberpunk breakout ball arcade game featuring 50 campaign sectors, route firewalls, community level studio, global arena, and live leaderboards.",
+  "description": "Next-generation cyberpunk breakout ball arcade game featuring 100 campaign levels across 10 sectors, route firewalls, community level studio, global arena, and live leaderboards.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#030408",
-  "theme_color": "#060713",
+  "background_color": "#03040c",
+  "theme_color": "#03040c",
   "categories": ["games", "arcade"],
   "icons": [
     {

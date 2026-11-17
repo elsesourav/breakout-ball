@@ -8,7 +8,16 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as 
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { handleRequestPasswordOtp, handleVerifyOtpAndResetPassword } from './authRecoveryHelper';
 import { backendApi } from './backendApi';
-import { AuthUser, isUserAdmin, getAnonymousUserId } from './authHelper';
+import {
+  AuthUser,
+  isUserAdmin,
+  getAnonymousUserId,
+  getOAuthRedirectUrl,
+  isMobileOrPwa,
+  openOAuthPopup,
+  cleanOAuthUrl,
+  resolveIdentifierToEmail,
+} from './authHelper';
 import { accountMigrationService } from './accountMigration';
 
 export type { AuthUser };
@@ -139,9 +148,7 @@ class AuthService {
             window.close();
             return;
           }
-          if (window.location.hash.includes('access_token')) {
-            window.history.replaceState(null, '', window.location.pathname);
-          }
+          cleanOAuthUrl();
         }
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem(this.userKey);
@@ -197,28 +204,8 @@ class AuthService {
     }
 
     try {
-      let targetEmail = cleanIdentifier;
-
-      // 1. Resolve @username to email using ElseSourav Platform API
-      if (!cleanIdentifier.includes('@')) {
-        try {
-          const resRes = await fetch('https://elsesourav.com/api/auth/resolve-identifier', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ identifier: cleanIdentifier }),
-            signal: AbortSignal.timeout(3500),
-          });
-          if (resRes.ok) {
-            const resData = await resRes.json();
-            if (resData.email) targetEmail = resData.email;
-          }
-        } catch {}
-
-        if (!targetEmail.includes('@')) {
-          const pRes = await backendApi.fetchUserProfile(cleanIdentifier);
-          if (pRes.profile?.email) targetEmail = pRes.profile.email;
-        }
-      }
+      // 1. Resolve @username to email
+      const targetEmail = await resolveIdentifierToEmail(cleanIdentifier);
 
       // 2. Attempt authentication via ElseSourav Supabase
       const { data: sbData, error: sbError } = await supabase.auth.signInWithPassword({
@@ -397,10 +384,26 @@ class AuthService {
     provider: 'google' | 'github'
   ): Promise<{ success: boolean; user?: AuthUser; message?: string }> {
     try {
-      const redirectTo = typeof window !== 'undefined'
-        ? window.location.origin
-        : 'https://elsesourav.com/apps/breakout-ball';
+      const redirectTo = getOAuthRedirectUrl();
+      const isMobile = isMobileOrPwa();
 
+      // On mobile / standalone PWA: redirect full page directly to avoid blocked/orphaned popups
+      if (isMobile) {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo,
+            skipBrowserRedirect: false,
+          },
+        });
+        if (error) return { success: false, message: error.message };
+        if (data?.url) {
+          window.location.href = data.url;
+          return { success: true };
+        }
+      }
+
+      // Desktop flow: attempt centered popup so player remains in active game view
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -412,34 +415,23 @@ class AuthService {
       if (error) return { success: false, message: error.message };
       if (!data?.url) return { success: false, message: `No authorization URL returned for ${provider}` };
 
-      // Attempt to open centered popup so player remains in game context
-      if (typeof window !== 'undefined') {
-        const w = 520, h = 660;
-        const left = window.screenX + (window.outerWidth - w) / 2;
-        const top = window.screenY + (window.outerHeight - h) / 2;
-        const popup = window.open(
-          data.url,
-          `ElseSourav_${provider}`,
-          `width=${w},height=${h},left=${left},top=${top},status=no,resizable=yes`
-        );
-
-        if (popup && !popup.closed) {
-          return new Promise((resolve) => {
-            const timer = setInterval(async () => {
-              if (popup.closed) {
-                clearInterval(timer);
-                await new Promise((r) => setTimeout(r, 300));
-                const cur = this.getCurrentUser();
-                if (cur.isLoggedIn && cur.username !== 'anonymous') {
-                  accountMigrationService.migrateAnonymousDataToUser(cur).catch(() => {});
-                  resolve({ success: true, user: cur });
-                } else {
-                  resolve({ success: false, message: 'OAuth sign-in cancelled or window closed' });
-                }
+      const popup = openOAuthPopup(data.url, provider);
+      if (popup && !popup.closed) {
+        return new Promise((resolve) => {
+          const timer = setInterval(async () => {
+            if (popup.closed) {
+              clearInterval(timer);
+              await new Promise((r) => setTimeout(r, 300));
+              const cur = this.getCurrentUser();
+              if (cur.isLoggedIn && cur.username !== 'anonymous') {
+                accountMigrationService.migrateAnonymousDataToUser(cur).catch(() => {});
+                resolve({ success: true, user: cur });
+              } else {
+                resolve({ success: false, message: 'OAuth sign-in cancelled or window closed' });
               }
-            }, 500);
-          });
-        }
+            }
+          }, 500);
+        });
       }
 
       window.location.href = data.url;
