@@ -58,9 +58,8 @@ export const LevelPreviewModal: React.FC = () => {
       const displayH = canvas.clientHeight || 160;
       canvas.width = Math.round(displayW * dpr);
       canvas.height = Math.round(displayH * dpr);
-      const reservedBottom = Math.round(36 * dpr);
       drawLevelPreviewOnCanvas(canvas, cleanSelectedLevel.blocks, canvas.width, canvas.height, {
-        reservedBottom,
+        showGrid: true,
       });
     }
   }, [cleanSelectedLevel]);

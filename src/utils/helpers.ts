@@ -152,92 +152,91 @@ export function drawLevelPreviewOnCanvas(
   const h = height || canvas.height;
   ctx.clearRect(0, 0, w, h);
 
-  // 1. Arcade Cyber Backdrop
+  // 1. Full-Bleed Arcade Cyber Backdrop
   ctx.fillStyle = '#030514';
   ctx.fillRect(0, 0, w, h);
 
-  // 2. Outer bounding subtle border
-  ctx.strokeStyle = 'rgba(0, 247, 255, 0.12)';
+  // 2. Subtle Outer Perimeter Border (Fits entire preview canvas)
+  ctx.strokeStyle = 'rgba(0, 247, 255, 0.18)';
   ctx.lineWidth = 1;
-  ctx.strokeRect(2, 2, w - 4, h - 4);
+  ctx.strokeRect(1, 1, w - 2, h - 2);
 
   const reservedBottom = options?.reservedBottom || 0;
-  const margin = Math.max(4, Math.floor(w * 0.02));
+  const margin = Math.max(6, Math.floor(w * 0.025));
   const availW = Math.max(20, w - margin * 2);
   const availH = Math.max(20, h - reservedBottom - margin * 2);
 
-  // Accurate 9x11 Grid Matrix Geometry:
-  // GRID_ROWS = 9 columns (x: 0..8), GRID_COLS = 11 rows (y: 0..10)
+  const validBlocks = blocks.filter((b) => b && b.h > 0);
+  if (validBlocks.length === 0) {
+    if (options?.showGrid !== false) {
+      const cellW = w / 9;
+      const cellH = cellW * 0.75;
+      ctx.strokeStyle = 'rgba(0, 247, 255, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let gx = 0; gx <= w; gx += cellW) {
+        ctx.moveTo(Math.round(gx) + 0.5, 0);
+        ctx.lineTo(Math.round(gx) + 0.5, h);
+      }
+      for (let gy = 0; gy <= h; gy += cellH) {
+        ctx.moveTo(0, Math.round(gy) + 0.5);
+        ctx.lineTo(w, Math.round(gy) + 0.5);
+      }
+      ctx.stroke();
+    }
+    return;
+  }
+
+  // 3. Auto-detect block cluster bounds to remove extra empty space
+  const minX = Math.min(...validBlocks.map((b) => b.x));
+  const maxX = Math.max(...validBlocks.map((b) => b.x));
+  const minY = Math.min(...validBlocks.map((b) => b.y));
+  const maxY = Math.max(...validBlocks.map((b) => b.y));
+
+  const spanX = maxX - minX + 1;
+  const spanY = maxY - minY + 1;
+
+  // Maximize to fit: frame based on active level blocks with balanced minimum bounds
+  const fitCols = Math.max(7, spanX);
+  const fitRows = Math.max(3, spanY);
+
   // Standard block aspect ratio is 128x96 (4:3)
-  const scale = Math.min(availW / (GRID_ROWS * 128), availH / (GRID_COLS * 96));
+  const scale = Math.min(availW / (fitCols * 128), availH / (fitRows * 96));
   const cellW = 128 * scale;
   const cellH = 96 * scale;
-  const matrixW = GRID_ROWS * cellW;
-  const matrixH = GRID_COLS * cellH;
 
-  const startX = Math.round((w - matrixW) / 2);
-  const startY = Math.round((availH - matrixH) / 2) + margin;
+  const clusterW = spanX * cellW;
+  const clusterH = spanY * cellH;
 
-  // 3. Playfield Matrix Grid & Cyber Frame (Matches Matrix Forge editor)
+  // Symmetrical horizontal and vertical centering
+  const startX = Math.round((w - clusterW) / 2) - minX * cellW;
+  const startY = Math.round((availH - clusterH) / 2) + margin - minY * cellH;
+
+  // 4. Draw seamless cyber grid lines covering the ENTIRE preview section
   if (options?.showGrid !== false) {
-    ctx.fillStyle = '#04071c';
-    ctx.fillRect(startX, startY, matrixW, matrixH);
-
-    // Crisp 9x11 gridlines matching Matrix Forge
-    ctx.strokeStyle = 'rgba(0, 247, 255, 0.14)';
+    ctx.strokeStyle = 'rgba(0, 247, 255, 0.08)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (let c = 0; c <= GRID_ROWS; c++) {
-      const gx = Math.round(startX + c * cellW);
-      ctx.moveTo(gx, startY);
-      ctx.lineTo(gx, startY + matrixH);
-    }
-    for (let r = 0; r <= GRID_COLS; r++) {
-      const gy = Math.round(startY + r * cellH);
-      ctx.moveTo(startX, gy);
-      ctx.lineTo(startX + matrixW, gy);
-    }
-    ctx.stroke();
 
-    // Matrix Outer Frame
-    ctx.strokeStyle = 'rgba(0, 247, 255, 0.45)';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(startX, startY, matrixW, matrixH);
+    // Vertical grid lines across entire canvas aligned with block columns
+    const firstColX = ((startX + minX * cellW) % cellW + cellW) % cellW;
+    for (let gx = firstColX; gx <= w; gx += cellW) {
+      const rx = Math.round(gx) + 0.5;
+      ctx.moveTo(rx, 0);
+      ctx.lineTo(rx, h);
+    }
 
-    // High-tech Cyber Corner Accents
-    const bracketSize = Math.max(4, Math.min(10, cellW * 0.28));
-    ctx.strokeStyle = '#00f7ff';
-    ctx.lineWidth = 2;
-    // Top-Left
-    ctx.beginPath();
-    ctx.moveTo(startX, startY + bracketSize);
-    ctx.lineTo(startX, startY);
-    ctx.lineTo(startX + bracketSize, startY);
-    ctx.stroke();
-    // Top-Right
-    ctx.beginPath();
-    ctx.moveTo(startX + matrixW - bracketSize, startY);
-    ctx.lineTo(startX + matrixW, startY);
-    ctx.lineTo(startX + matrixW, startY + bracketSize);
-    ctx.stroke();
-    // Bottom-Left
-    ctx.beginPath();
-    ctx.moveTo(startX, startY + matrixH - bracketSize);
-    ctx.lineTo(startX, startY + matrixH);
-    ctx.lineTo(startX + bracketSize, startY + matrixH);
-    ctx.stroke();
-    // Bottom-Right
-    ctx.beginPath();
-    ctx.moveTo(startX + matrixW - bracketSize, startY + matrixH);
-    ctx.lineTo(startX + matrixW, startY + matrixH);
-    ctx.lineTo(startX + matrixW, startY + matrixH - bracketSize);
+    // Horizontal grid lines across entire canvas aligned with block rows
+    const firstRowY = ((startY + minY * cellH) % cellH + cellH) % cellH;
+    for (let gy = firstRowY; gy <= h; gy += cellH) {
+      const ry = Math.round(gy) + 0.5;
+      ctx.moveTo(0, ry);
+      ctx.lineTo(w, ry);
+    }
     ctx.stroke();
   }
 
-  const validBlocks = blocks.filter((b) => b && b.h > 0);
-  if (validBlocks.length === 0) return;
-
-  // 4. Draw connecting dashed lines between complete portal pairs in preview
+  // 5. Draw connecting dashed lines between complete portal pairs
   const portalPairs = new Map<number, { x: number; y: number }[]>();
   validBlocks.forEach((b) => {
     if (b.h === 7 && b.portalPairId) {
@@ -266,8 +265,8 @@ export function drawLevelPreviewOnCanvas(
     }
   });
 
-  // 5. Draw 3D blocks in their exact matrix grid coordinates
-  const padding = Math.max(1, cellW * 0.05);
+  // 6. Draw 3D blocks maximized to fit in the preview section
+  const padding = Math.max(1.5, Math.round(cellW * 0.04));
   validBlocks.forEach((block) => {
     const bx = startX + block.x * cellW + padding;
     const by = startY + block.y * cellH + padding;
