@@ -38,25 +38,25 @@ export const SECTOR_THEMES: Record<number, SectorThemeConfig> = {
   },
   2: {
     sector: 2,
-    name: 'PULSE GRID',
-    glow: 'rgba(129, 140, 248, 0.45)',
-    laser: '#818cf8',
+    name: 'DATA FOUNDRY',
+    glow: 'rgba(56, 189, 248, 0.45)',
+    laser: '#38bdf8',
     core: '#ffffff',
-    balls: '#a5b4fc',
-    aim: 'rgba(129, 140, 248, 0.45)',
+    balls: '#7dd3fc',
+    aim: 'rgba(56, 189, 248, 0.45)',
   },
   3: {
     sector: 3,
-    name: 'QUANTUM VOID',
-    glow: 'rgba(192, 132, 252, 0.45)',
-    laser: '#c084fc',
+    name: 'QUANTUM CORE',
+    glow: 'rgba(168, 85, 247, 0.45)',
+    laser: '#a855f7',
     core: '#ffffff',
-    balls: '#f0abfc',
-    aim: 'rgba(192, 132, 252, 0.45)',
+    balls: '#d8b4fe',
+    aim: 'rgba(168, 85, 247, 0.45)',
   },
   4: {
     sector: 4,
-    name: 'CYBER BASTION',
+    name: 'CYBER CITADEL',
     glow: 'rgba(244, 63, 94, 0.45)',
     laser: '#f43f5e',
     core: '#ffffff',
@@ -65,12 +65,57 @@ export const SECTOR_THEMES: Record<number, SectorThemeConfig> = {
   },
   5: {
     sector: 5,
-    name: 'HYPER CORE',
-    glow: 'rgba(255, 215, 0, 0.50)',
-    laser: '#ffd700',
+    name: 'ORBITAL APEX',
+    glow: 'rgba(251, 191, 36, 0.50)',
+    laser: '#fbbf24',
     core: '#ffffff',
     balls: '#fde047',
-    aim: 'rgba(255, 215, 0, 0.50)',
+    aim: 'rgba(251, 191, 36, 0.50)',
+  },
+  6: {
+    sector: 6,
+    name: 'CHROME SKYLINE',
+    glow: 'rgba(45, 212, 191, 0.45)',
+    laser: '#2dd4bf',
+    core: '#ffffff',
+    balls: '#5eead4',
+    aim: 'rgba(45, 212, 191, 0.45)',
+  },
+  7: {
+    sector: 7,
+    name: 'VOID REACTOR',
+    glow: 'rgba(236, 72, 153, 0.45)',
+    laser: '#ec4899',
+    core: '#ffffff',
+    balls: '#f472b6',
+    aim: 'rgba(236, 72, 153, 0.45)',
+  },
+  8: {
+    sector: 8,
+    name: 'HYPERION GRID',
+    glow: 'rgba(99, 102, 241, 0.45)',
+    laser: '#6366f1',
+    core: '#ffffff',
+    balls: '#818cf8',
+    aim: 'rgba(99, 102, 241, 0.45)',
+  },
+  9: {
+    sector: 9,
+    name: 'SINGULARITY DEPTHS',
+    glow: 'rgba(139, 92, 246, 0.45)',
+    laser: '#8b5cf6',
+    core: '#ffffff',
+    balls: '#a78bfa',
+    aim: 'rgba(139, 92, 246, 0.45)',
+  },
+  10: {
+    sector: 10,
+    name: 'OMEGA THRONE',
+    glow: 'rgba(255, 0, 85, 0.55)',
+    laser: '#ff0055',
+    core: '#ffffff',
+    balls: '#ff4d88',
+    aim: 'rgba(255, 0, 85, 0.55)',
   },
 };
 
@@ -140,40 +185,23 @@ export const LevelPathSvg: React.FC<LevelPathSvgProps> = ({
           <stop offset="100%" stopColor="#ffd700" stopOpacity="0.20" />
         </linearGradient>
 
-        {/* Sector Boundary Transition Gradients (Every 10 levels) */}
-        <linearGradient id="sectorTrans-1-2" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="#00f7ff" />
-          <stop offset="100%" stopColor="#818cf8" />
-        </linearGradient>
-        <linearGradient id="sectorTrans-2-3" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="#818cf8" />
-          <stop offset="100%" stopColor="#c084fc" />
-        </linearGradient>
-        <linearGradient id="sectorTrans-3-4" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="#c084fc" />
-          <stop offset="100%" stopColor="#f43f5e" />
-        </linearGradient>
-        <linearGradient id="sectorTrans-4-5" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="#f43f5e" />
-          <stop offset="100%" stopColor="#ffd700" />
-        </linearGradient>
-
-        <linearGradient id="sectorGlowTrans-1-2" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="rgba(0, 247, 255, 0.45)" />
-          <stop offset="100%" stopColor="rgba(129, 140, 248, 0.45)" />
-        </linearGradient>
-        <linearGradient id="sectorGlowTrans-2-3" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="rgba(129, 140, 248, 0.45)" />
-          <stop offset="100%" stopColor="rgba(192, 132, 252, 0.45)" />
-        </linearGradient>
-        <linearGradient id="sectorGlowTrans-3-4" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="rgba(192, 132, 252, 0.45)" />
-          <stop offset="100%" stopColor="rgba(244, 63, 94, 0.45)" />
-        </linearGradient>
-        <linearGradient id="sectorGlowTrans-4-5" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor="rgba(244, 63, 94, 0.45)" />
-          <stop offset="100%" stopColor="rgba(255, 215, 0, 0.50)" />
-        </linearGradient>
+        {/* Sector Boundary Transition Gradients (Every 10 levels across 10 sectors) */}
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((s) => {
+          const t1 = SECTOR_THEMES[s] || SECTOR_THEMES[1];
+          const t2 = SECTOR_THEMES[s + 1] || SECTOR_THEMES[1];
+          return (
+            <React.Fragment key={`trans-grad-${s}`}>
+              <linearGradient id={`sectorTrans-${s}-${s + 1}`} x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor={t1.laser} />
+                <stop offset="100%" stopColor={t2.laser} />
+              </linearGradient>
+              <linearGradient id={`sectorGlowTrans-${s}-${s + 1}`} x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor={t1.glow} />
+                <stop offset="100%" stopColor={t2.glow} />
+              </linearGradient>
+            </React.Fragment>
+          );
+        })}
 
         {/* Futuristic Cyber Honeycomb Grid Matrix */}
         <pattern
@@ -190,35 +218,17 @@ export const LevelPathSvg: React.FC<LevelPathSvgProps> = ({
           />
         </pattern>
 
-        {/* Continuous 50-Level Sector Atmospheric Progression Gradient */}
+        {/* Continuous 100-Level Sector Atmospheric Progression Gradient */}
         <linearGradient id="sectorContinuousAtmosphere" x1="0%" y1="100%" x2="0%" y2="0%">
-          {/* Sector 1: Neon Alley (Levels 1 - 10) */}
-          <stop offset="0%" stopColor="#00f7ff" stopOpacity="0.14" />
-          <stop offset="16%" stopColor="#00f7ff" stopOpacity="0.10" />
-          {/* Transition 1 -> 2 */}
-          <stop offset="20%" stopColor="#00f7ff" stopOpacity="0.08" />
-          <stop offset="24%" stopColor="#818cf8" stopOpacity="0.08" />
-          {/* Sector 2: Pulse Grid (Levels 11 - 20) */}
-          <stop offset="28%" stopColor="#818cf8" stopOpacity="0.10" />
-          <stop offset="36%" stopColor="#818cf8" stopOpacity="0.10" />
-          {/* Transition 2 -> 3 */}
-          <stop offset="40%" stopColor="#818cf8" stopOpacity="0.08" />
-          <stop offset="44%" stopColor="#c084fc" stopOpacity="0.08" />
-          {/* Sector 3: Quantum Void (Levels 21 - 30) */}
-          <stop offset="48%" stopColor="#c084fc" stopOpacity="0.10" />
-          <stop offset="56%" stopColor="#c084fc" stopOpacity="0.10" />
-          {/* Transition 3 -> 4 */}
-          <stop offset="60%" stopColor="#c084fc" stopOpacity="0.08" />
-          <stop offset="64%" stopColor="#f43f5e" stopOpacity="0.08" />
-          {/* Sector 4: Cyber Bastion (Levels 31 - 40) */}
-          <stop offset="68%" stopColor="#f43f5e" stopOpacity="0.10" />
-          <stop offset="76%" stopColor="#f43f5e" stopOpacity="0.10" />
-          {/* Transition 4 -> 5 */}
-          <stop offset="80%" stopColor="#f43f5e" stopOpacity="0.08" />
-          <stop offset="84%" stopColor="#ffd700" stopOpacity="0.09" />
-          {/* Sector 5: Hyper Core Apex (Levels 41 - 50) */}
-          <stop offset="88%" stopColor="#ffd700" stopOpacity="0.13" />
-          <stop offset="100%" stopColor="#ffd700" stopOpacity="0.16" />
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((s, idx) => {
+            const t = SECTOR_THEMES[s] || SECTOR_THEMES[1];
+            return (
+              <React.Fragment key={`atm-${s}`}>
+                <stop offset={`${idx * 10}%`} stopColor={t.laser} stopOpacity={0.12} />
+                <stop offset={`${Math.min(100, idx * 10 + 9)}%`} stopColor={t.laser} stopOpacity={0.08} />
+              </React.Fragment>
+            );
+          })}
         </linearGradient>
 
         {/* Scoped CSS for Breakout Ball Trajectory Animations & Perspective Stroke Scaling */}
@@ -281,7 +291,7 @@ export const LevelPathSvg: React.FC<LevelPathSvgProps> = ({
         const sectorId = getSectorIndex(seg.levelId);
         const nextSectorId = getSectorIndex(seg.levelId + 1);
         const isBoundary = sectorId !== nextSectorId;
-        const theme = SECTOR_THEMES[sectorId];
+        const theme = SECTOR_THEMES[sectorId] || SECTOR_THEMES[1];
         const laserStroke = isBoundary ? `url(#sectorTrans-${sectorId}-${nextSectorId})` : theme.laser;
         const glowStroke = isBoundary ? `url(#sectorGlowTrans-${sectorId}-${nextSectorId})` : theme.glow;
 
