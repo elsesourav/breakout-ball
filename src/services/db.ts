@@ -7,7 +7,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc, increment, query, orderBy, limit
 } from 'firebase/firestore';
 
-import { sanitizePortals, getOverallLeaderboard } from './dbHelpers';
+import { sanitizePortals, getOverallLeaderboard, seedDbLocalCache } from './dbHelpers';
 export { sanitizePortals, getOverallLeaderboard };
 
 class CloudDatabaseService {
@@ -18,72 +18,8 @@ class CloudDatabaseService {
   private progressKey = 'breakout_db_progress';
 
   constructor() {
-    this.seedLocalCache();
+    seedDbLocalCache(this.localLevelsKey, this.onlineLevelsKey, this.userLevelsKey, this.leaderboardsKey);
     this.syncInitialLevelsToCloud().catch(() => {});
-  }
-
-  private seedLocalCache() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(this.localLevelsKey) || '[]');
-      if (!Array.isArray(parsed) || parsed.length < INITIAL_LOCAL_LEVELS.length) {
-        localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
-      }
-    } catch {
-      localStorage.setItem(this.localLevelsKey, JSON.stringify(INITIAL_LOCAL_LEVELS));
-    }
-    const rawOnline = localStorage.getItem(this.onlineLevelsKey);
-    const curatedMap = new Map(INITIAL_ONLINE_LEVELS.map((l) => [l.id, l]));
-    if (!rawOnline) {
-      localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
-    } else {
-      try {
-        const parsed: LevelData[] = JSON.parse(rawOnline);
-        const updatedOnline = parsed.map((l) => {
-          const curated = curatedMap.get(l.id);
-          return curated ? { ...curated, playCount: Math.max(curated.playCount || 0, l.playCount || 0) } : sanitizePortals(l);
-        });
-        INITIAL_ONLINE_LEVELS.forEach((curated) => {
-          if (!updatedOnline.some((l) => l.id === curated.id)) updatedOnline.push(curated);
-        });
-        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(updatedOnline));
-      } catch {
-        localStorage.setItem(this.onlineLevelsKey, JSON.stringify(INITIAL_ONLINE_LEVELS));
-      }
-    }
-    const rawLeaderboards = localStorage.getItem(this.leaderboardsKey);
-    if (!rawLeaderboards) {
-      localStorage.setItem(this.leaderboardsKey, JSON.stringify(MOCK_LEADERBOARDS));
-    } else {
-      try {
-        const parsed = JSON.parse(rawLeaderboards);
-        if (parsed && parsed.default) delete parsed.default;
-        let modified = false;
-        for (const [k, v] of Object.entries(MOCK_LEADERBOARDS)) {
-          if (!parsed[k]) { parsed[k] = v; modified = true; }
-        }
-        if (modified) localStorage.setItem(this.leaderboardsKey, JSON.stringify(parsed));
-      } catch {}
-    }
-
-    // Ensure locally created levels on this device are attached to this device's unique anonymous ID
-    const rawUser = localStorage.getItem(this.userLevelsKey);
-    if (rawUser) {
-      try {
-        const parsed: LevelData[] = JSON.parse(rawUser);
-        let modified = false;
-        const anonId = authService.getAnonymousUserId();
-        const updated = parsed.map((lvl) => {
-          if (!lvl.creatorId && (!lvl.creator || lvl.creator.toLowerCase() === 'anonymous')) {
-            modified = true;
-            return { ...lvl, creatorId: anonId };
-          }
-          return lvl;
-        });
-        if (modified) {
-          localStorage.setItem(this.userLevelsKey, JSON.stringify(updated));
-        }
-      } catch {}
-    }
   }
 
   /** Background sync of curated initial stages to Cloud Firestore */
@@ -470,6 +406,17 @@ class CloudDatabaseService {
         }
       }
     } catch {}
+
+    // Never wipe progress: If account has 0 completions, preserve active anonymous progress
+    if (!Object.values(progress).some((p) => p.completed)) {
+      try {
+        const rawLocal = localStorage.getItem(this.progressKey);
+        if (rawLocal) {
+          const localParsed: Record<string, LocalLevelProgress> = JSON.parse(rawLocal);
+          if (Object.values(localParsed).some((p) => p.completed)) progress = { ...localParsed };
+        }
+      } catch {}
+    }
 
     try {
       localStorage.setItem(`breakout_db_progress_${userKey}`, JSON.stringify(progress));

@@ -249,51 +249,59 @@ export class TextureAtlas {
     });
 
     // 7. Trajectory Matrix Guideline Sprites (8-Ball Pool Style)
-    // 7.1. Antialiased glowing guideline dot
-    placeItem('guideline_dot', 16, 16, (c, x, y) => {
-      const grad = c.createRadialGradient(x + 8, y + 8, 1, x + 8, y + 8, 7);
-      grad.addColorStop(0, '#ffffff');
-      grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)');
-      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    // 7.1. Antialiased high-visibility glowing guideline laser dot
+    placeItem('guideline_dot', 32, 32, (c, x, y) => {
+      // Solid white center core (guaranteed visibility at all display scales)
+      c.fillStyle = '#ffffff';
+      c.beginPath();
+      c.arc(x + 16, y + 16, 7, 0, Math.PI * 2);
+      c.fill();
+
+      // Intense glowing neon aura
+      const grad = c.createRadialGradient(x + 16, y + 16, 6, x + 16, y + 16, 15);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      grad.addColorStop(0.35, 'rgba(0, 247, 255, 0.85)');
+      grad.addColorStop(0.7, 'rgba(0, 247, 255, 0.45)');
+      grad.addColorStop(1, 'rgba(0, 247, 255, 0)');
       c.fillStyle = grad;
       c.beginPath();
-      c.arc(x + 8, y + 8, 7, 0, Math.PI * 2);
+      c.arc(x + 16, y + 16, 15, 0, Math.PI * 2);
       c.fill();
     });
 
     // 7.2. Impact target reticle ring on paddle (Concentric high-contrast landing marker)
-    placeItem('guideline_reticle', 32, 32, (c, x, y) => {
+    placeItem('guideline_reticle', 48, 48, (c, x, y) => {
       // Outer targeting ring
       c.strokeStyle = '#ffffff';
-      c.lineWidth = 2.0;
+      c.lineWidth = 3.5;
       c.beginPath();
-      c.arc(x + 16, y + 16, 12, 0, Math.PI * 2);
+      c.arc(x + 24, y + 24, 19, 0, Math.PI * 2);
       c.stroke();
 
       // Middle inner ring
-      c.strokeStyle = 'rgba(255, 255, 255, 0.65)';
-      c.lineWidth = 1.2;
+      c.strokeStyle = 'rgba(255, 255, 255, 0.80)';
+      c.lineWidth = 2.0;
       c.beginPath();
-      c.arc(x + 16, y + 16, 6, 0, Math.PI * 2);
+      c.arc(x + 24, y + 24, 11, 0, Math.PI * 2);
       c.stroke();
 
-      // Center bullseye landing dot
+      // Center solid bullseye dot
       c.fillStyle = '#ffffff';
       c.beginPath();
-      c.arc(x + 16, y + 16, 3, 0, Math.PI * 2);
+      c.arc(x + 24, y + 24, 5, 0, Math.PI * 2);
       c.fill();
     });
 
     // 7.3. Directional arrow pointer for outgoing deflection
-    placeItem('guideline_arrow', 24, 24, (c, x, y) => {
+    placeItem('guideline_arrow', 36, 36, (c, x, y) => {
       c.save();
-      c.translate(x + 12, y + 12);
+      c.translate(x + 18, y + 18);
       c.fillStyle = '#ffffff';
       c.beginPath();
-      c.moveTo(0, -9);
-      c.lineTo(7, 6);
-      c.lineTo(0, 3);
-      c.lineTo(-7, 6);
+      c.moveTo(0, -14);
+      c.lineTo(11, 10);
+      c.lineTo(0, 5);
+      c.lineTo(-11, 10);
       c.closePath();
       c.fill();
       c.restore();

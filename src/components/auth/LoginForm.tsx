@@ -71,7 +71,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       </div>
 
       {/* OAuth Social Buttons */}
-      <OAuthButtons onSuccess={onSuccess} />
+      <OAuthButtons onSuccess={onSuccess} onError={setError} />
 
       {error && (
         <div className="p-2 mb-2 rounded-xl bg-rose-950/70 border border-rose-500/40 text-rose-300 font-tech text-xs flex items-center gap-2">

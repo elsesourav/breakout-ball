@@ -280,17 +280,35 @@ export class WebGLRenderer {
     );
 
     // 5.1. Trajectory Matrix Guideline (8-Ball Pool Style Predictive Beam)
-    // Supports all active balls simultaneously (especially during Multiball)
+    // Targets the single nearest descending ball (or ball resting on paddle for launch aim)
     const ballList = Array.isArray(balls) ? balls : [balls];
     const trajLvl = currencyService.getUpgradeLevel('ball_trajectory');
     const dotUV = this.atlas.getUV('guideline_dot');
     const reticleUV = this.atlas.getUV('guideline_reticle');
     const arrowUV = this.atlas.getUV('guideline_arrow');
 
-    // Clean up fade alphas for balls that no longer exist
     for (const key of this.ballFadeAlphas.keys()) {
-      if (key >= ballList.length) {
-        this.ballFadeAlphas.delete(key);
+      if (key >= ballList.length) this.ballFadeAlphas.delete(key);
+    }
+
+    // Select single priority ball: ball on paddle (launch state) or nearest descending ball to paddle
+    let targetIdx = -1;
+    let minDescDist = Infinity;
+    const targetY = paddle.y - 12;
+
+    for (let i = 0; i < ballList.length; i++) {
+      const b = ballList[i];
+      if (!b) continue;
+      const bRad = b.radius || 10;
+      const onPad = !b.isActive || (Math.abs(b.vy) < 0.01 && Math.abs(b.vx) < 0.01) || (b.y >= paddle.y - bRad * 3 && Math.abs(b.vy) < 30);
+      if (onPad) {
+        targetIdx = i;
+        break;
+      }
+      const dist = (paddle.y - bRad) - b.y;
+      if (b.isActive && b.vy > 15 && dist > 0 && dist < minDescDist) {
+        minDescDist = dist;
+        targetIdx = i;
       }
     }
 
@@ -298,12 +316,9 @@ export class WebGLRenderer {
       const b = ballList[idx];
       const prevAlpha = this.ballFadeAlphas.get(idx) || 0;
 
-      if (!b || !b.isActive) {
-        if (prevAlpha > 0.01) {
-          this.ballFadeAlphas.set(idx, Math.max(0, prevAlpha - 1/60 * 2.2));
-        } else {
-          this.ballFadeAlphas.delete(idx);
-        }
+      if (!b || idx !== targetIdx) {
+        if (prevAlpha > 0.01) this.ballFadeAlphas.set(idx, Math.max(0, prevAlpha - 1/60 * 3.5));
+        else this.ballFadeAlphas.delete(idx);
         continue;
       }
 
@@ -318,67 +333,70 @@ export class WebGLRenderer {
       );
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // ALWAYS display incoming path when descending in range
       if (guideline.visible && guideline.alpha > 0.01) {
         const gAlpha = guideline.alpha;
-        const inR = 0.0;
-        const inG = 0.97;
-        const inB = 1.0;
-        const inAlpha = gAlpha * 0.95;
+        const inR = 0.0, inG = 0.97, inB = 1.0;
+        const inAlpha = gAlpha * 1.0;
 
         // 1. Draw Incoming Predictive Dotted Segments (Vibrant Cyan)
         for (const seg of guideline.incomingSegments) {
           const dx = seg.x2 - seg.x1;
           const dy = seg.y2 - seg.y1;
           const len = Math.hypot(dx, dy);
-          const stepSize = 16;
+          const stepSize = 34;
           const count = Math.floor(len / stepSize);
-          const nx = dx / len;
-          const ny = dy / len;
+          const nx = dx / len, ny = dy / len;
 
           for (let s = 1; s <= count; s++) {
             const px = seg.x1 + nx * (s * stepSize);
             const py = seg.y1 + ny * (s * stepSize);
-            const dotSize = 9;
+            const dotSize = 24;
             this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, inR, inG, inB, inAlpha);
           }
         }
 
-        // 2. Draw Target Impact Reticle on Paddle Horizon
-        const reticleSize = 28;
-        const reticleR = guideline.isHit ? 0.06 : inR;
-        const reticleG = guideline.isHit ? 0.98 : inG;
-        const reticleB = guideline.isHit ? 0.65 : inB;
-        this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, reticleR, reticleG, reticleB, gAlpha * 0.95);
+        // 2. Draw Target Impact Reticle on Paddle Horizon (Emerald when locked, Cyan when seeking)
+        const reticleSize = 40;
+        const retR = guideline.isHit ? 0.06 : inR;
+        const retG = guideline.isHit ? 0.98 : inG;
+        const retB = guideline.isHit ? 0.65 : inB;
+        this.batcher.pushSprite(guideline.hitX - reticleSize / 2, guideline.hitY - reticleSize / 2, reticleSize, reticleSize, reticleUV.u0, reticleUV.v0, reticleUV.u1, reticleUV.v1, retR, retG, retB, gAlpha * 1.0);
 
-        // 3. Draw Outgoing Deflected Guideline (Emerald Green with Arrowhead)
-        if (guideline.isHit && guideline.outgoingSegments.length > 0) {
-          const outR = 0.06;
-          const outG = 0.98;
-          const outB = 0.65;
-          const outAlpha = gAlpha * 0.9;
+        // 3. Draw Paddle Lock-on Beam (Emerald when targeted, Cyan indicator when seeking)
+        const halfPadW = paddle.width / 2;
+        if (guideline.isHit) {
+          this.batcher.pushSprite(paddle.x - halfPadW, paddle.y, paddle.width, 5, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, 0.06, 0.98, 0.65, gAlpha * 0.9);
+        } else {
+          const guideX = Math.max(paddle.x - halfPadW, Math.min(paddle.x + halfPadW, guideline.hitX));
+          this.batcher.pushSprite(guideX - 8, paddle.y - 4, 16, 6, whiteUV.u0, whiteUV.v0, whiteUV.u1, whiteUV.v1, inR, inG, inB, gAlpha * 0.85);
+        }
+
+        // 4. Draw Outgoing / Launch Aiming Deflected Guideline
+        if (guideline.outgoingSegments.length > 0) {
+          const outR = guideline.isLaunchAim ? 0.0 : 0.06;
+          const outG = guideline.isLaunchAim ? 0.97 : 0.98;
+          const outB = guideline.isLaunchAim ? 1.0 : 0.65;
+          const outAlpha = gAlpha * 0.95;
 
           for (const seg of guideline.outgoingSegments) {
             const dx = seg.x2 - seg.x1;
             const dy = seg.y2 - seg.y1;
             const len = Math.hypot(dx, dy);
-            const stepSize = 16;
+            const stepSize = 34;
             const count = Math.floor(len / stepSize);
-            const nx = dx / len;
-            const ny = dy / len;
+            const nx = dx / len, ny = dy / len;
 
             for (let s = 1; s <= count; s++) {
               const px = seg.x1 + nx * (s * stepSize);
               const py = seg.y1 + ny * (s * stepSize);
-              const dotSize = 9;
-              this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, outR, outG, outB, outAlpha * (1.0 - (s / (count + 1)) * 0.35));
+              const dotSize = 24;
+              this.batcher.pushSprite(px - dotSize / 2, py - dotSize / 2, dotSize, dotSize, dotUV.u0, dotUV.v0, dotUV.u1, dotUV.v1, outR, outG, outB, outAlpha * (1.0 - (s / (count + 1)) * 0.3));
             }
           }
 
-          // Directional arrowhead at tip of final outgoing segment
           const lastSeg = guideline.outgoingSegments[guideline.outgoingSegments.length - 1];
           const outAngle = Math.atan2(guideline.outVx, -guideline.outVy);
-          const arrowSize = 20;
+          const arrowSize = 30;
           this.batcher.pushSprite(lastSeg.x2 - arrowSize / 2, lastSeg.y2 - arrowSize / 2, arrowSize, arrowSize, arrowUV.u0, arrowUV.v0, arrowUV.u1, arrowUV.v1, outR, outG, outB, outAlpha, outAngle);
         }
       }

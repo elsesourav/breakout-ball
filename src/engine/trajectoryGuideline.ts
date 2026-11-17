@@ -24,6 +24,7 @@ export interface TrajectoryGuideline {
   visible: boolean;
   alpha: number;
   isHit: boolean;
+  isLaunchAim?: boolean;
   hitX: number;
   hitY: number;
   incomingSegments: TrajectorySegment[];
@@ -45,7 +46,9 @@ export function getTrajectoryMaxDistance(level: number): number {
 
 /**
  * Computes complete predictive incoming and outgoing trajectory for a ball.
- * Strictly verifies downward descent and paddle collision feasibility.
+ * Supports:
+ * 1. Launch Aiming Trajectory (when ball is on paddle before launch)
+ * 2. In-Flight Trajectory (when ball is descending towards paddle)
  */
 export function calculateTrajectoryGuideline(
   ball: BallState,
@@ -64,13 +67,90 @@ export function calculateTrajectoryGuideline(
   const maxX = arenaW - ballR;
   const targetY = padTop - ballR;
 
-  // 1. Guard against non-descending balls or balls already past the paddle horizon
-  // "1 Always show the incoming path": strictly active whenever ball is descending downwards (vy > 15) and located above paddle top
+  // 1. Check if Ball is Resting on Paddle (Launch / Ready State)
+  const isBallOnPaddle =
+    !ball.isActive ||
+    (Math.abs(ball.vy) < 0.01 && Math.abs(ball.vx) < 0.01) ||
+    (ball.y >= padTop - ballR * 3 && Math.abs(ball.vy) < 30);
+
+  if (isBallOnPaddle) {
+    // Launch Aiming Guideline: raycast upward from ball on paddle into arena
+    const ballX = paddle.x;
+    const ballY = padTop - ballR - 4;
+    const maxSpeed = paddle.maxSpeed || 1600;
+    const paddleVelRatio = Math.max(-1, Math.min(1, (paddle.vx || 0) / maxSpeed));
+    const boardCenter = arenaW / 2;
+    const paddlePosRatio = (paddle.x - boardCenter) / boardCenter;
+
+    let throwAngle = Math.abs(paddle.vx || 0) > 30
+      ? -Math.PI / 2 + paddleVelRatio * 0.55
+      : -Math.PI / 2 + (-paddlePosRatio * 0.25);
+
+    throwAngle = Math.max((-150 * Math.PI) / 180, Math.min((-30 * Math.PI) / 180, throwAngle));
+    const aimSpeed = ball.baseSpeed || 720;
+    const outVx = Math.cos(throwAngle) * aimSpeed;
+    const outVy = Math.sin(throwAngle) * aimSpeed;
+
+    const outgoingSegments: TrajectorySegment[] = [];
+    const outgoingLength = Math.min(1100, 500 + (upgradeLevel - 1) * 80);
+    const dirLen = Math.hypot(outVx, outVy) || 1;
+    let outCurNx = outVx / dirLen;
+    let outCurNy = outVy / dirLen;
+    let outCurX = ballX;
+    let outCurY = ballY;
+    let remainingDist = outgoingLength;
+
+    let outSafety = 5;
+    while (outSafety-- > 0 && remainingDist > 0) {
+      let distToWall = Infinity;
+      let nextWallX = outCurX;
+
+      if (outCurNx > 0.001) {
+        const t = (maxX - outCurX) / outCurNx;
+        if (t > 0) { distToWall = t; nextWallX = maxX; }
+      } else if (outCurNx < -0.001) {
+        const t = (minX - outCurX) / outCurNx;
+        if (t > 0) { distToWall = t; nextWallX = minX; }
+      }
+
+      if (distToWall < remainingDist) {
+        const segY = outCurY + outCurNy * distToWall;
+        outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: nextWallX, y2: segY });
+        remainingDist -= distToWall;
+        outCurX = nextWallX;
+        outCurY = segY;
+        outCurNx = -outCurNx; // Wall bounce
+      } else {
+        const segX = outCurX + outCurNx * remainingDist;
+        const segY = outCurY + outCurNy * remainingDist;
+        outgoingSegments.push({ x1: outCurX, y1: outCurY, x2: segX, y2: segY });
+        break;
+      }
+    }
+
+    return {
+      guideline: {
+        visible: true,
+        alpha: 1.0,
+        isHit: true,
+        isLaunchAim: true,
+        hitX: ballX,
+        hitY: ballY,
+        incomingSegments: [],
+        outgoingSegments,
+        outVx,
+        outVy,
+        maxDistance,
+      },
+      nextFadeAlpha: 1.0,
+    };
+  }
+
+  // 2. Guard against non-descending balls or balls already past paddle
   const distToPaddle = targetY - ball.y;
   const isDescending = ball.isActive && ball.vy > 15 && distToPaddle > 0;
 
   if (!isDescending) {
-    // When ball is moving upwards or past the paddle horizon, smoothly dissolve alpha to 0
     const lerpSpeed = 2.8;
     const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * lerpSpeed);
     return {
@@ -139,11 +219,11 @@ export function calculateTrajectoryGuideline(
 
   // 4. Target Alpha Calculation
   // ALWAYS show the incoming predictive trajectory when descending!
-  const targetAlpha = 0.95;
+  const targetAlpha = 1.0;
 
   // Immediate onset on descent: if ball is descending and currentFadeAlpha is below baseline,
-  // initialize at a clear visible floor (0.50) so predictive beam appears as soon as ball descends into range
-  const baselineAlpha = currentFadeAlpha < 0.50 ? 0.50 : currentFadeAlpha;
+  // initialize at a clear visible floor (0.65) so predictive beam appears instantly with high clarity
+  const baselineAlpha = currentFadeAlpha < 0.65 ? 0.65 : currentFadeAlpha;
 
   // Smooth fade-in towards 0.95 (lerpSpeed 10.0 for quick arrival) and slow graceful fade-out dissolution (lerpSpeed 2.8)
   const lerpSpeed = targetAlpha < baselineAlpha ? 2.8 : 10.0;

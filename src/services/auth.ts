@@ -15,26 +15,11 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as 
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { handleRequestPasswordOtp, handleVerifyOtpAndResetPassword } from './authRecoveryHelper';
 import { backendApi } from './backendApi';
+import { AuthUser, isUserAdmin, getAnonymousUserId } from './authHelper';
+import { accountMigrationService } from './accountMigration';
 
-export interface AuthUser {
-  id: string;
-  fullName: string;
-  username: string;
-  email: string;
-  avatarUrl?: string;
-  provider: 'credentials' | 'google' | 'github' | 'sso';
-  isLoggedIn: boolean;
-  isAdmin?: boolean;
-  token?: string;
-}
-
-export function isUserAdmin(user?: { username?: string; email?: string; isAdmin?: boolean } | null): boolean {
-  if (!user) return false;
-  if (user.isAdmin) return true;
-  const uname = (user.username || '').toLowerCase();
-  const email = (user.email || '').toLowerCase();
-  return uname === 'elsesourav' || email === 'elsesourav@gmail.com';
-}
+export type { AuthUser };
+export { isUserAdmin, getAnonymousUserId };
 
 export interface AuthState {
   user: AuthUser;
@@ -46,17 +31,21 @@ class AuthService {
   private userKey = 'breakout_auth_user';
   private tokenKey = 'breakout_auth_token';
   private anonUserKey = 'breakout_anon_user_id';
+  private subscribers: Set<(user: AuthUser) => void> = new Set();
+
+  public onAuthStateChange(cb: (user: AuthUser) => void): () => void {
+    this.subscribers.add(cb);
+    return () => this.subscribers.delete(cb);
+  }
+
+  private notifySubscribers(user: AuthUser) {
+    this.subscribers.forEach((cb) => {
+      try { cb(user); } catch {}
+    });
+  }
 
   public getAnonymousUserId(): string {
-    let anonId = localStorage.getItem(this.anonUserKey);
-    if (!anonId) {
-      const rand = typeof crypto !== 'undefined' && crypto.randomUUID
-        ? crypto.randomUUID().replace(/-/g, '').slice(0, 12)
-        : Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-      anonId = `anon_${rand}`;
-      localStorage.setItem(this.anonUserKey, anonId);
-    }
-    return anonId;
+    return getAnonymousUserId();
   }
 
   public getEffectiveUserId(): string {
@@ -81,7 +70,8 @@ class AuthService {
     window.addEventListener('message', async (event) => {
       if (
         event.origin.includes('elsesourav.com') ||
-        event.origin.includes('localhost')
+        event.origin.includes('localhost') ||
+        event.origin.includes('127.0.0.1')
       ) {
         if (event.data?.type === 'ELSESOURAV_AUTH_SUCCESS' && event.data?.payload) {
           const payload = event.data.payload;
@@ -93,9 +83,12 @@ class AuthService {
             avatarUrl: payload.avatarUrl,
             provider: 'sso',
             isLoggedIn: true,
+            isAdmin: isUserAdmin({ username: payload.username, email: payload.email }),
             token: payload.token,
           };
           this.setCurrentUser(ssoUser);
+          this.notifySubscribers(ssoUser);
+          accountMigrationService.migrateAnonymousDataToUser(ssoUser).catch(() => {});
         }
       }
     });
@@ -116,18 +109,23 @@ class AuthService {
         const username = meta.username || meta.user_name || u.email?.split('@')[0] || 'player';
         const fullName = meta.full_name || meta.name || username;
         const isAdmin = isUserAdmin({ username, email: u.email || '' });
+        const prov = (session.user.app_metadata?.provider || 'credentials') as any;
         const user: AuthUser = {
           id: u.id,
           fullName,
           username,
           email: u.email || '',
           avatarUrl: meta.avatar_url || meta.picture || meta.photoUrl,
-          provider: 'credentials',
+          provider: prov === 'google' || prov === 'github' ? prov : 'credentials',
           isLoggedIn: true,
           isAdmin,
           token: session.access_token,
         };
         this.setCurrentUser(user);
+        this.notifySubscribers(user);
+        accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
+        this.notifySubscribers(user);
+        accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
       } else if (event === 'SIGNED_OUT') {
         localStorage.removeItem(this.userKey);
         localStorage.removeItem(this.tokenKey);
@@ -243,19 +241,13 @@ class AuthService {
         };
 
         this.setCurrentUser(user);
+        this.notifySubscribers(user);
+        accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
 
         // Sync Firestore profile document in background
-        setDoc(
-          doc(firestoreDb, 'users', username),
-          {
-            uid: sbData.user.id,
-            fullName,
-            username,
-            email: user.email,
-            lastLoginAt: new Date().toISOString(),
-          },
-          { merge: true }
-        ).catch(() => {});
+        setDoc(doc(firestoreDb, 'users', username), {
+          uid: sbData.user.id, fullName, username, email: user.email, lastLoginAt: new Date().toISOString(),
+        }, { merge: true }).catch(() => {});
 
         return { success: true, user };
       }
@@ -279,6 +271,8 @@ class AuthService {
             token: await fbCred.user.getIdToken(),
           };
           this.setCurrentUser(user);
+        this.notifySubscribers(user);
+        accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
           return { success: true, user };
         }
       } catch {}
@@ -345,32 +339,16 @@ class AuthService {
 
       // 3. Register user profile in ElseSourav User directory table
       try {
-        await supabase.from('User').insert([
-          {
-            id: userId,
-            supabaseAuthId: userId,
-            email: cleanEmail,
-            displayName: cleanFullName,
-            username: cleanUsername,
-            createdAt: new Date().toISOString(),
-          },
-        ]);
+        await supabase.from('User').insert([{
+          id: userId, supabaseAuthId: userId, email: cleanEmail, displayName: cleanFullName, username: cleanUsername, createdAt: new Date().toISOString(),
+        }]);
       } catch {}
 
       // 4. Also register and mirror in Cloud Firestore database
       try {
-        await setDoc(
-          doc(firestoreDb, 'users', cleanUsername),
-          {
-            uid: userId,
-            fullName: cleanFullName,
-            username: cleanUsername,
-            email: cleanEmail,
-            createdAt: new Date().toISOString(),
-            levelsRecord: {},
-          },
-          { merge: true }
-        );
+        await setDoc(doc(firestoreDb, 'users', cleanUsername), {
+          uid: userId, fullName: cleanFullName, username: cleanUsername, email: cleanEmail, createdAt: new Date().toISOString(), levelsRecord: {},
+        }, { merge: true });
       } catch {}
 
       // 5. Also create Firebase Auth account in background for dual-compatibility
@@ -402,22 +380,53 @@ class AuthService {
     provider: 'google' | 'github'
   ): Promise<{ success: boolean; user?: AuthUser; message?: string }> {
     try {
+      const returnTarget = typeof window !== 'undefined'
+        ? window.location.origin + window.location.pathname
+        : 'https://elsesourav.com/apps/breakout-ball';
+      const redirectTo = `https://elsesourav.com/api/auth/callback?next=${encodeURIComponent(returnTarget)}&mode=popup`;
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: typeof window !== 'undefined' ? window.location.origin + '/' : undefined,
+          redirectTo,
+          skipBrowserRedirect: true,
         },
       });
 
-      if (error) {
-        return { success: false, message: error.message };
+      if (error) return { success: false, message: error.message };
+      if (!data?.url) return { success: false, message: `No authorization URL returned for ${provider}` };
+
+      // Attempt to open centered popup so player remains in game context
+      if (typeof window !== 'undefined') {
+        const w = 520, h = 660;
+        const left = window.screenX + (window.outerWidth - w) / 2;
+        const top = window.screenY + (window.outerHeight - h) / 2;
+        const popup = window.open(
+          data.url,
+          `ElseSourav_${provider}`,
+          `width=${w},height=${h},left=${left},top=${top},status=no,resizable=yes`
+        );
+
+        if (popup && !popup.closed) {
+          return new Promise((resolve) => {
+            const timer = setInterval(async () => {
+              if (popup.closed) {
+                clearInterval(timer);
+                await new Promise((r) => setTimeout(r, 400));
+                const current = this.getCurrentUser();
+                if (current.isLoggedIn && current.username !== 'anonymous') {
+                  accountMigrationService.migrateAnonymousDataToUser(current).catch(() => {});
+                  resolve({ success: true, user: current });
+                } else {
+                  resolve({ success: false, message: 'OAuth sign-in cancelled or window closed' });
+                }
+              }
+            }, 600);
+          });
+        }
       }
 
-      if (data?.url) {
-        window.location.href = data.url;
-        return { success: true };
-      }
-
+      window.location.href = data.url;
       return { success: true };
     } catch (err: any) {
       return { success: false, message: err?.message || `OAuth with ${provider} failed` };

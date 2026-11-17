@@ -1,13 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import {
-  ActiveTab,
-  GameScreen,
-  LevelData,
-  LocalLevelProgress,
-  LeaderboardEntry,
-  GameSettings,
-  UserProfile,
-  AlertConfig,
+  ActiveTab, GameScreen, LevelData, LocalLevelProgress, LeaderboardEntry, GameSettings, UserProfile, AlertConfig,
 } from '../types/game';
 import { DEFAULT_SETTINGS } from '../constants/game';
 import { soundManager } from '../audio';
@@ -15,34 +8,21 @@ import { achievementManager } from '../services/achievements';
 import { dbService } from '../services/db';
 import { authService } from '../services/auth';
 import { currencyService } from '../services/currency';
-import {
-  parseCurrentRoute,
-  getRoutePath,
-  pushAppRoute,
-  replaceAppRoute,
-  scrubUrlParams,
-} from '../services/router';
+import { accountMigrationService } from '../services/accountMigration';
+import { parseCurrentRoute, getRoutePath, pushAppRoute, replaceAppRoute, scrubUrlParams } from '../services/router';
 import { processLevelCompletion } from './gameCompletionHelper';
 import { INITIAL_LOCAL_LEVELS } from '../constants/levels';
 import { INITIAL_ONLINE_LEVELS } from '../constants/onlineLevels';
 
 interface GameContextType {
-  activeTab: ActiveTab;
-  setActiveTab: (tab: ActiveTab) => void;
-  screen: GameScreen;
-  setScreen: (screen: GameScreen) => void;
-  selectedLevel: LevelData | null;
-  setSelectedLevel: (level: LevelData | null) => void;
-  editingLevel: LevelData | null;
-  setEditingLevel: (level: LevelData | null) => void;
-  localLevels: LevelData[];
-  localProgress: Record<string, LocalLevelProgress>;
-  onlineLevels: LevelData[];
-  userCreatedLevels: LevelData[];
-  settings: GameSettings;
-  updateSettings: (newSettings: Partial<GameSettings>) => void;
-  user: UserProfile;
-  updateUser: (user: Partial<UserProfile>) => void;
+  activeTab: ActiveTab; setActiveTab: (tab: ActiveTab) => void;
+  screen: GameScreen; setScreen: (screen: GameScreen) => void;
+  selectedLevel: LevelData | null; setSelectedLevel: (level: LevelData | null) => void;
+  editingLevel: LevelData | null; setEditingLevel: (level: LevelData | null) => void;
+  localLevels: LevelData[]; localProgress: Record<string, LocalLevelProgress>;
+  onlineLevels: LevelData[]; userCreatedLevels: LevelData[];
+  settings: GameSettings; updateSettings: (newSettings: Partial<GameSettings>) => void;
+  user: UserProfile; updateUser: (user: Partial<UserProfile>) => void;
   leaderboards: Record<string, LeaderboardEntry[]>;
   alertConfig: AlertConfig | null; showAlert: (config: AlertConfig) => void; hideAlert: () => void;
   isAuthModalOpen: boolean; setIsAuthModalOpen: (open: boolean) => void;
@@ -74,14 +54,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [selectedLevel, setSelectedLevel] = useState<LevelData | null>(() => {
     if (initialRoute.levelId) {
-      const allDefaults = [...INITIAL_LOCAL_LEVELS, ...INITIAL_ONLINE_LEVELS];
-      const match = allDefaults.find((l) => l.id === initialRoute.levelId);
+      const match = [...INITIAL_LOCAL_LEVELS, ...INITIAL_ONLINE_LEVELS].find((l) => l.id === initialRoute.levelId);
       if (match) return match;
     }
     return INITIAL_LOCAL_LEVELS[0] || null;
   });
   const [editingLevel, setEditingLevel] = useState<LevelData | null>(null);
-
   const [localLevels, setLocalLevels] = useState<LevelData[]>(() => INITIAL_LOCAL_LEVELS);
   const [onlineLevels, setOnlineLevels] = useState<LevelData[]>(() => INITIAL_ONLINE_LEVELS);
   const [userCreatedLevels, setUserCreatedLevels] = useState<LevelData[]>([]);
@@ -89,25 +67,17 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [leaderboards, setLeaderboards] = useState<Record<string, LeaderboardEntry[]>>({});
 
   const [settings, setSettings] = useState<GameSettings>(() => {
-    const saved = localStorage.getItem('breakout_settings');
-    if (!saved) return DEFAULT_SETTINGS;
     try {
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
-    } catch {
-      return DEFAULT_SETTINGS;
-    }
+      const saved = localStorage.getItem('breakout_settings');
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
+    } catch { return DEFAULT_SETTINGS; }
   });
 
   const [user, setUser] = useState<UserProfile>(() => {
     const authUser = authService.getCurrentUser();
     return {
-      id: authUser.id,
-      fullName: authUser.fullName || 'Anonymous',
-      username: authUser.username || 'anonymous',
-      email: authUser.email || '',
-      avatarUrl: authUser.avatarUrl,
-      provider: authUser.provider,
-      isLoggedIn: authUser.isLoggedIn,
+      id: authUser.id, fullName: authUser.fullName || 'Anonymous', username: authUser.username || 'anonymous',
+      email: authUser.email || '', avatarUrl: authUser.avatarUrl, provider: authUser.provider, isLoggedIn: authUser.isLoggedIn,
     };
   });
 
@@ -128,26 +98,19 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         scrubUrlParams();
         const [locals, onlines, userProgress] = await Promise.all([
-          dbService.getLocalLevels(),
-          dbService.getOnlineLevels(),
-          dbService.getProgress(user.username),
-          currencyService.load(user.username),
+          dbService.getLocalLevels(), dbService.getOnlineLevels(),
+          dbService.getProgress(user.username), currencyService.load(user.username),
         ]);
-
         if (isDisposed) return;
-
         const effectiveId = user.id || authService.getEffectiveUserId();
         const userLevels = await dbService.getUserCreatedLevels(effectiveId);
         if (isDisposed) return;
 
-        setLocalLevels(locals);
-        setOnlineLevels(onlines);
-        setLocalProgress(userProgress);
-        setUserCreatedLevels(userLevels);
+        setLocalLevels(locals); setOnlineLevels(onlines);
+        setLocalProgress(userProgress); setUserCreatedLevels(userLevels);
 
         const allLevels = [...locals, ...onlines, ...userLevels];
         const route = parseCurrentRoute();
-
         if (route.type === 'level' && route.levelId) {
           const found = allLevels.find((lvl) => lvl.id === route.levelId);
           if (found) {
@@ -155,120 +118,112 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const board = await dbService.getLeaderboard(found.id);
             setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
             setScreenState('preview');
-            const isNumeric = !isNaN(Number(found.id));
-            setActiveTabState(isNumeric ? 'local' : 'online');
+            setActiveTabState(!isNaN(Number(found.id)) ? 'local' : 'online');
             replaceAppRoute(`/level/${encodeURIComponent(found.id)}`);
             return;
           }
         } else if (route.type === 'play' && route.levelId) {
           const found = allLevels.find((lvl) => lvl.id === route.levelId);
           if (found) {
-            setSelectedLevel(found);
-            setScreenState('playing');
-            soundManager.startBgMusic();
+            setSelectedLevel(found); setScreenState('playing'); soundManager.startBgMusic();
             const isRestricted = isLevelSelfMadeOrTest(found);
             achievementManager.setRestrictedContext(isRestricted);
-            if (!isRestricted) {
-              dbService.incrementPlayCount(found.id);
-            }
+            if (!isRestricted) dbService.incrementPlayCount(found.id);
             replaceAppRoute(`/play/${encodeURIComponent(found.id)}`);
             return;
           }
         }
-
-        // Canonicalize tab route cleanly
-        const canonicalPath = getRoutePath(route.tab, 'menu');
-        replaceAppRoute(canonicalPath);
+        replaceAppRoute(getRoutePath(route.tab, 'menu'));
         setSelectedLevel(locals[0] || null);
       } catch (err) {
         console.error('Error during initial data load:', err);
       } finally {
         if (!isDisposed) {
           const elapsed = performance.now() - startTime;
-          const minDisplay = 1500; // Minimum 1.5s so user can enjoy the loading scene
-          const remaining = Math.max(0, minDisplay - elapsed);
-          setTimeout(() => {
-            if (!isDisposed) {
-              setIsInitialLoading(false);
-            }
-          }, remaining);
+          setTimeout(() => { if (!isDisposed) setIsInitialLoading(false); }, Math.max(0, 1500 - elapsed));
         }
       }
     };
-
     loadInitialData();
-    return () => {
-      isDisposed = true;
-    };
+    return () => { isDisposed = true; };
   }, [user.username]);
 
-  // Synchronize browser Back / Forward (popstate) navigation
+  // Synchronize browser popstate navigation
   useEffect(() => {
     const handlePopState = async () => {
       scrubUrlParams();
       const route = parseCurrentRoute();
       const allLevels = [...localLevels, ...onlineLevels, ...userCreatedLevels];
-
       if (route.type === 'tab') {
-        setActiveTabState(route.tab);
-        setScreenState('menu');
-      } else if (route.type === 'level' && route.levelId) {
+        setActiveTabState(route.tab); setScreenState('menu');
+      } else if (route.levelId) {
         const found = allLevels.find((lvl) => lvl.id === route.levelId);
         if (found) {
           setSelectedLevel(found);
-          const board = await dbService.getLeaderboard(found.id);
-          setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
-          setScreenState('preview');
-        }
-      } else if (route.type === 'play' && route.levelId) {
-        const found = allLevels.find((lvl) => lvl.id === route.levelId);
-        if (found) {
-          setSelectedLevel(found);
-          setScreenState('playing');
+          if (route.type === 'level') {
+            const board = await dbService.getLeaderboard(found.id);
+            setLeaderboards((prev) => ({ ...prev, [found.id]: board }));
+            setScreenState('preview');
+          } else if (route.type === 'play') {
+            setScreenState('playing');
+          }
         }
       }
     };
-
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [localLevels, onlineLevels, userCreatedLevels]);
 
+  // Listen to external/OAuth auth changes & preserve anonymous progression
+  useEffect(() => {
+    const unsubscribe = authService.onAuthStateChange(async (authUser) => {
+      if (authUser.isLoggedIn && authUser.username && authUser.username !== 'anonymous') {
+        const effectiveId = authUser.id || authUser.username;
+        setUser({
+          id: effectiveId, fullName: authUser.fullName || authUser.username, username: authUser.username,
+          email: authUser.email, avatarUrl: authUser.avatarUrl, provider: authUser.provider, isLoggedIn: true,
+        });
+        const summary = await accountMigrationService.migrateAnonymousDataToUser(authUser);
+        const [freshProg, freshLevels] = await Promise.all([
+          dbService.getProgress(authUser.username),
+          dbService.getUserCreatedLevels(effectiveId),
+        ]);
+        setLocalProgress(freshProg);
+        setUserCreatedLevels(freshLevels);
+        if (summary.migrated && summary.levelsPreserved > 0) {
+          showAlert({
+            title: 'PROGRESS PRESERVED',
+            message: `Welcome @${authUser.username}! Your previous ${summary.levelsPreserved} stage progress and custom arenas are safely linked.`,
+            singleBtn: true,
+            btn1Text: 'PROCEED',
+          });
+        }
+      }
+    });
+    return unsubscribe;
+  }, []);
+
   // Sync settings with audio manager
   useEffect(() => {
-    soundManager.setSoundEnabled(settings.soundEnabled);
-    soundManager.setVolume(settings.volume);
-    soundManager.setMusicEnabled(settings.musicEnabled);
-    soundManager.setSfxEnabled(settings.sfxEnabled);
-    soundManager.setClickSoundEnabled(settings.clickSoundEnabled);
-    soundManager.setVibrate(settings.vibrate);
+    soundManager.setSoundEnabled(settings.soundEnabled); soundManager.setVolume(settings.volume);
+    soundManager.setMusicEnabled(settings.musicEnabled); soundManager.setSfxEnabled(settings.sfxEnabled);
+    soundManager.setClickSoundEnabled(settings.clickSoundEnabled); soundManager.setVibrate(settings.vibrate);
     localStorage.setItem('breakout_settings', JSON.stringify(settings));
   }, [settings]);
 
-  const setActiveTab = useCallback(
-    (tab: ActiveTab) => {
-      soundManager.playClick('tab');
-      setActiveTabState(tab);
-      setScreenState('menu');
-      pushAppRoute(getRoutePath(tab, 'menu'));
-    },
-    []
-  );
+  const setActiveTab = useCallback((tab: ActiveTab) => {
+    soundManager.playClick('tab'); setActiveTabState(tab); setScreenState('menu');
+    pushAppRoute(getRoutePath(tab, 'menu'));
+  }, []);
 
-  const setScreen = useCallback(
-    (newScreen: GameScreen) => {
-      if (newScreen !== 'playing') {
-        achievementManager.setRestrictedContext(false);
-      }
-      setScreenState(newScreen);
-      if (newScreen === 'menu') {
-        isOpeningLevelRef.current = false;
-        setIsOpeningLevel(false);
-        setLoadingLeaderboardLevelId(null);
-        pushAppRoute(getRoutePath(activeTab, 'menu'));
-      }
-    },
-    [activeTab]
-  );
+  const setScreen = useCallback((newScreen: GameScreen) => {
+    if (newScreen !== 'playing') achievementManager.setRestrictedContext(false);
+    setScreenState(newScreen);
+    if (newScreen === 'menu') {
+      isOpeningLevelRef.current = false; setIsOpeningLevel(false); setLoadingLeaderboardLevelId(null);
+      pushAppRoute(getRoutePath(activeTab, 'menu'));
+    }
+  }, [activeTab]);
 
   const updateSettings = (newSettings: Partial<GameSettings>) => setSettings((prev) => ({ ...prev, ...newSettings }));
   const showAlert = (config: AlertConfig) => setAlertConfig(config);
@@ -277,25 +232,42 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const openModifier = (lvl: LevelData) => { soundManager.playClick(); setEditingLevel(lvl); };
   const closeModifier = () => { soundManager.playClick(); setEditingLevel(null); };
 
-  const updateUser = (newUser: Partial<UserProfile>) => {
+  const updateUser = useCallback(async (newUser: Partial<UserProfile>) => {
     setUser((prev) => {
       const updated = { ...prev, ...newUser };
       const effectiveId = updated.id || updated.username;
       authService.setCurrentUser({
-        id: effectiveId,
-        fullName: updated.fullName,
-        username: updated.username,
-        email: updated.email,
-        avatarUrl: updated.avatarUrl,
-        provider: updated.provider || 'credentials',
+        id: effectiveId, fullName: updated.fullName, username: updated.username,
+        email: updated.email, avatarUrl: updated.avatarUrl, provider: updated.provider || 'credentials',
         isLoggedIn: updated.isLoggedIn,
       });
-      dbService.getUserCreatedLevels(effectiveId).then((levels) => {
-        setUserCreatedLevels(levels);
-      });
+
+      if (updated.isLoggedIn && updated.username && updated.username !== 'anonymous') {
+        accountMigrationService.migrateAnonymousDataToUser({
+          id: effectiveId, fullName: updated.fullName, username: updated.username, email: updated.email,
+          avatarUrl: updated.avatarUrl, provider: updated.provider || 'credentials', isLoggedIn: true,
+        }).then(async (summary) => {
+          const [freshProg, freshLevels] = await Promise.all([
+            dbService.getProgress(updated.username),
+            dbService.getUserCreatedLevels(effectiveId),
+          ]);
+          setLocalProgress(freshProg);
+          setUserCreatedLevels(freshLevels);
+          if (summary.migrated && summary.levelsPreserved > 0) {
+            showAlert({
+              title: 'PROGRESS SAVED',
+              message: `Welcome @${updated.username}! Your previous stage progress and custom arenas are safely preserved.`,
+              singleBtn: true,
+              btn1Text: 'PROCEED',
+            });
+          }
+        });
+      } else {
+        dbService.getUserCreatedLevels(effectiveId).then(setUserCreatedLevels);
+      }
       return updated;
     });
-  };
+  }, []);
 
   const logoutUser = useCallback(async () => {
     soundManager.playClick();
@@ -307,98 +279,59 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLocalProgress({ '1': { levelNumber: 1, completed: false, rank: null, bestTime: null } });
     setSelectedLevel(localLevels[0] || null);
     const anonId = authService.getAnonymousUserId();
-    setUser({
-      id: anonId,
-      fullName: 'Anonymous',
-      username: 'anonymous',
-      email: '',
-      avatarUrl: undefined,
-      provider: undefined,
-      isLoggedIn: false,
-    });
+    setUser({ id: anonId, fullName: 'Anonymous', username: 'anonymous', email: '', isLoggedIn: false });
     const anonLevels = await dbService.getUserCreatedLevels(anonId);
     setUserCreatedLevels(anonLevels);
   }, [user.username, localLevels]);
 
-  const isLevelSelfMadeOrTest = useCallback(
-    (level: LevelData | null): boolean => {
-      if (!level) return false;
-      if (level.id === 'TEST' || level.id.startsWith('test_') || level.id.startsWith('test-')) return true;
-      const effectiveUserId = user?.id || authService.getEffectiveUserId();
-      if (level.creatorId && effectiveUserId) {
-        return level.creatorId.trim().toLowerCase() === effectiveUserId.trim().toLowerCase();
-      }
-      return !!(
-        level.creator &&
-        user?.username &&
-        level.creator.trim().toLowerCase() !== 'anonymous' &&
-        level.creator.trim().toLowerCase() === user.username.trim().toLowerCase()
-      );
-    },
-    [user?.id, user?.username]
-  );
+  const isLevelSelfMadeOrTest = useCallback((level: LevelData | null): boolean => {
+    if (!level) return false;
+    if (level.id === 'TEST' || level.id.startsWith('test_') || level.id.startsWith('test-')) return true;
+    const effectiveUserId = user?.id || authService.getEffectiveUserId();
+    if (level.creatorId && effectiveUserId) return level.creatorId.trim().toLowerCase() === effectiveUserId.trim().toLowerCase();
+    return !!(level.creator && user?.username && level.creator.toLowerCase() !== 'anonymous' && level.creator.toLowerCase() === user.username.toLowerCase());
+  }, [user?.id, user?.username]);
 
-  const startPlayLevel = useCallback(
-    (level: LevelData) => {
-      soundManager.playClick();
-      setSelectedLevel(level);
-      setScreenState('playing');
-      soundManager.startBgMusic();
-      const isRestricted = isLevelSelfMadeOrTest(level);
-      achievementManager.setRestrictedContext(isRestricted);
-      if (!isRestricted) {
-        dbService.incrementPlayCount(level.id);
-        setOnlineLevels((prev) => prev.map((lvl) => (lvl.id === level.id ? { ...lvl, playCount: (lvl.playCount || 0) + 1 } : lvl)));
-        setSelectedLevel((curr) => (curr && curr.id === level.id ? { ...curr, playCount: (curr.playCount || 0) + 1 } : curr));
-        if (level.isPublic || isNaN(parseInt(level.id, 10))) achievementManager.unlock('arena_challenger');
-      }
-      pushAppRoute(getRoutePath(activeTab, 'playing', level.id));
-    },
-    [activeTab, isLevelSelfMadeOrTest]
-  );
+  const startPlayLevel = useCallback((level: LevelData) => {
+    soundManager.playClick(); setSelectedLevel(level); setScreenState('playing'); soundManager.startBgMusic();
+    const isRestricted = isLevelSelfMadeOrTest(level);
+    achievementManager.setRestrictedContext(isRestricted);
+    if (!isRestricted) {
+      dbService.incrementPlayCount(level.id);
+      setOnlineLevels((prev) => prev.map((l) => (l.id === level.id ? { ...l, playCount: (l.playCount || 0) + 1 } : l)));
+      setSelectedLevel((curr) => (curr && curr.id === level.id ? { ...curr, playCount: (curr.playCount || 0) + 1 } : curr));
+      if (level.isPublic || isNaN(parseInt(level.id, 10))) achievementManager.unlock('arena_challenger');
+    }
+    pushAppRoute(getRoutePath(activeTab, 'playing', level.id));
+  }, [activeTab, isLevelSelfMadeOrTest]);
 
-  const openPreview = useCallback(
-    async (level: LevelData) => {
-      if (isOpeningLevelRef.current) return;
-      isOpeningLevelRef.current = true;
-      setIsOpeningLevel(true);
-      soundManager.playClick();
-      setSelectedLevel(level);
-      setScreenState('preview');
-      pushAppRoute(getRoutePath(activeTab, 'preview', level.id));
-      setLoadingLeaderboardLevelId(level.id);
-
-      try {
-        const [board] = await Promise.all([
-          dbService.getLeaderboard(level.id),
-          new Promise((resolve) => setTimeout(resolve, 350)),
-        ]);
-        setLeaderboards((prev) => ({ ...prev, [level.id]: board }));
-      } catch (err) {
-        console.warn('Leaderboard fetch error:', err);
-      } finally {
-        setLoadingLeaderboardLevelId((curr) => (curr === level.id ? null : curr));
-        isOpeningLevelRef.current = false;
-        setIsOpeningLevel(false);
-      }
-    },
-    [activeTab]
-  );
+  const openPreview = useCallback(async (level: LevelData) => {
+    if (isOpeningLevelRef.current) return;
+    isOpeningLevelRef.current = true; setIsOpeningLevel(true); soundManager.playClick();
+    setSelectedLevel(level); setScreenState('preview');
+    pushAppRoute(getRoutePath(activeTab, 'preview', level.id));
+    setLoadingLeaderboardLevelId(level.id);
+    try {
+      const [board] = await Promise.all([dbService.getLeaderboard(level.id), new Promise((r) => setTimeout(r, 350))]);
+      setLeaderboards((prev) => ({ ...prev, [level.id]: board }));
+    } catch (err) {
+      console.warn('Leaderboard fetch error:', err);
+    } finally {
+      setLoadingLeaderboardLevelId((curr) => (curr === level.id ? null : curr));
+      isOpeningLevelRef.current = false; setIsOpeningLevel(false);
+    }
+  }, [activeTab]);
 
   const syncUserAndOnlineLevels = async () => {
     const effectiveId = user.id || authService.getEffectiveUserId();
     const [userLvls, onlines] = await Promise.all([dbService.getUserCreatedLevels(effectiveId), dbService.getOnlineLevels()]);
-    setUserCreatedLevels(userLvls);
-    setOnlineLevels(onlines);
+    setUserCreatedLevels(userLvls); setOnlineLevels(onlines);
   };
 
   const saveUserLevel = async (newLevel: LevelData): Promise<boolean> => {
     const effectiveId = user.id || authService.getEffectiveUserId();
     const success = await dbService.saveLevel({ ...newLevel, creatorId: newLevel.creatorId || effectiveId });
-    if (success) {
-      achievementManager.unlock('level_architect');
-      await syncUserAndOnlineLevels();
-    }
+    if (success) { achievementManager.unlock('level_architect'); await syncUserAndOnlineLevels(); }
     return success;
   };
 
@@ -410,23 +343,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateLevelPrivacy = async (id: string, isPublic: boolean): Promise<void> => {
-    await dbService.updateLevelPrivacy(id, isPublic);
-    await syncUserAndOnlineLevels();
+    await dbService.updateLevelPrivacy(id, isPublic); await syncUserAndOnlineLevels();
   };
 
   const recordLevelCompletion = useCallback(
     async (levelId: string, time: number, livesRemaining: number = 3) => {
       const isRestricted = isLevelSelfMadeOrTest(selectedLevel);
       const outcome = await processLevelCompletion(
-        levelId,
-        time,
-        livesRemaining,
-        user.username,
-        onlineLevels,
-        isRestricted,
+        levelId, time, livesRemaining, user.username, onlineLevels, isRestricted,
         (lvlId, board) => setLeaderboards((prev) => ({ ...prev, [lvlId]: board }))
       );
-
       const levelNum = parseInt(levelId, 10);
       if (!isNaN(levelNum) && !isRestricted) {
         setLocalProgress((prev) => {
@@ -434,38 +360,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const isBetter = !current?.bestTime || time < current.bestTime;
           const nextLevelId = String(levelNum + 1);
           const nextUnlocked = prev[nextLevelId] || {
-            levelNumber: levelNum + 1,
-            completed: false,
-            rank: null,
-            bestTime: null,
-            stars: 0,
-            claimedCores: 0,
-            maxCores: outcome.maxCoresForLevel,
+            levelNumber: levelNum + 1, completed: false, rank: null, bestTime: null, stars: 0, claimedCores: 0, maxCores: outcome.maxCoresForLevel,
           };
-
           const updatedProgress = {
             ...prev,
             [levelId]: {
-              levelNumber: levelNum,
-              completed: true,
-              bestTime: isBetter ? time : current.bestTime,
-              rank: outcome.rank,
-              stars: outcome.newBestStars,
-              claimedCores: outcome.totalClaimedForLevel,
-              maxCores: outcome.maxCoresForLevel,
+              levelNumber: levelNum, completed: true, bestTime: isBetter ? time : current.bestTime, rank: outcome.rank,
+              stars: outcome.newBestStars, claimedCores: outcome.totalClaimedForLevel, maxCores: outcome.maxCoresForLevel,
             },
             [nextLevelId]: nextUnlocked,
           };
-
           const totalCompleted = Object.values(updatedProgress).filter((p) => p.completed).length;
           if (totalCompleted >= 10) achievementManager.unlock('campaign_10');
           if (totalCompleted >= 50) achievementManager.unlock('apex_champion');
-
           dbService.saveProgress(updatedProgress, user.username);
           return updatedProgress;
         });
       }
-
       return outcome;
     },
     [user.username, selectedLevel, isLevelSelfMadeOrTest, onlineLevels]

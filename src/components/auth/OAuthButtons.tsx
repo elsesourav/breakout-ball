@@ -6,9 +6,10 @@ import { soundManager } from '../../audio';
 
 interface OAuthButtonsProps {
   onSuccess?: () => void;
+  onError?: (message: string) => void;
 }
 
-export const OAuthButtons: React.FC<OAuthButtonsProps> = ({ onSuccess }) => {
+export const OAuthButtons: React.FC<OAuthButtonsProps> = ({ onSuccess, onError }) => {
   const { updateUser } = useGame();
   const [loadingProvider, setLoadingProvider] = useState<'google' | 'github' | null>(null);
 
@@ -28,6 +29,8 @@ export const OAuthButtons: React.FC<OAuthButtonsProps> = ({ onSuccess }) => {
           isLoggedIn: true,
         });
         onSuccess?.();
+      } else if (!res.success && res.message && !res.message.includes('cancelled')) {
+        onError?.(res.message);
       }
     } finally {
       setLoadingProvider(null);
