@@ -31,7 +31,12 @@ class AuthService {
     return () => this.subscribers.delete(cb);
   }
 
+  private lastNotifiedUserKey: string | null = null;
+
   private notifySubscribers(user: AuthUser) {
+    const key = `${user.id}_${user.isLoggedIn}_${user.token || ''}`;
+    if (this.lastNotifiedUserKey === key) return;
+    this.lastNotifiedUserKey = key;
     this.subscribers.forEach((cb) => {
       try { cb(user); } catch {}
     });
@@ -477,6 +482,7 @@ class AuthService {
   }
 
   public async logout(): Promise<void> {
+    this.lastNotifiedUserKey = null;
     try {
       await Promise.allSettled([supabase.auth.signOut(), fbSignOut(firebaseAuth)]);
     } catch {}

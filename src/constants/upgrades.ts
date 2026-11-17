@@ -118,12 +118,18 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
     accentColor: '#fbbf24',
     glowColor: 'rgba(251, 191, 36, 0.4)',
     symbol: '⚡',
-    statLabel: (lvl) => `${Math.round(800 + (lvl - 1) * (800 / 7))} px/s (${Math.round((lvl - 1) * 14.3)}% Boost)`,
-    nextLabel: (lvl) => `${Math.round(800 + lvl * (800 / 7))} px/s (+14.3%)`,
+    statLabel: (lvl) =>
+      lvl >= 8
+        ? '1600 px/s (MAX OVERDRIVE BOOSTER)'
+        : `${Math.round(800 + (lvl - 1) * (800 / 7))} px/s (${Math.round((lvl - 1) * 14.3)}% Boost)`,
+    nextLabel: (lvl) =>
+      lvl >= 7
+        ? '1600 px/s (MAX OVERDRIVE BOOSTER)'
+        : `${Math.round(800 + lvl * (800 / 7))} px/s (+14.3%)`,
   },
   {
     id: 'paddle_fancy',
-    name: 'Plasma Thrusters',
+    name: 'Chassis Thruster Aura',
     category: 'paddle',
     maxLevel: 5,
     baseCost: 1500,
@@ -134,20 +140,20 @@ export const PADDLE_UPGRADES: UpgradeDef[] = [
       lvl === 1
         ? 'Standard (Clean Chassis)'
         : lvl === 2
-        ? 'Tier 1: Cyan Spark Jets (6 P)'
+        ? 'Tier 1: Cyan Ion Halo (6 Aura Motes)'
         : lvl === 3
-        ? 'Tier 2: Electric Indigo (10 P)'
+        ? 'Tier 2: Electric Indigo Field (10 Aura Motes)'
         : lvl === 4
-        ? 'Tier 3: Violet Warp Trail (14 P)'
-        : 'Tier 4: Solar Apex Drive (20 P)',
+        ? 'Tier 3: Violet Warp Pulse (14 Aura Motes)'
+        : 'Tier 4: Prismatic Solar Corona (20 Celestial Motes)',
     nextLabel: (lvl) =>
       lvl <= 1
-        ? 'Tier 1: Cyan Spark Jets (6 P)'
+        ? 'Tier 1: Cyan Ion Halo (6 Aura Motes)'
         : lvl === 2
-        ? 'Tier 2: Electric Indigo (10 P)'
+        ? 'Tier 2: Electric Indigo Field (10 Aura Motes)'
         : lvl === 3
-        ? 'Tier 3: Violet Warp Trail (14 P)'
-        : 'Tier 4: Solar Apex Drive (20 P)',
+        ? 'Tier 3: Violet Warp Pulse (14 Aura Motes)'
+        : 'Tier 4: Prismatic Solar Corona (20 Celestial Motes)',
   },
 ];
 

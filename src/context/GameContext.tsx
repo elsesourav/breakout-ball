@@ -89,6 +89,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isOpeningLevel, setIsOpeningLevel] = useState<boolean>(false);
   const [loadingLeaderboardLevelId, setLoadingLeaderboardLevelId] = useState<string | null>(null);
   const isOpeningLevelRef = useRef<boolean>(false);
+  const shownMigrationAlertRef = useRef<Set<string>>(new Set());
 
   // Load from database on mount & synchronize initial URL route
   useEffect(() => {
@@ -190,7 +191,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ]);
         setLocalProgress(freshProg);
         setUserCreatedLevels(freshLevels);
-        if (summary.migrated && summary.levelsPreserved > 0) {
+
+        const uKey = authUser.username.toLowerCase();
+        const alertSessionKey = `breakout_migration_shown_${uKey}`;
+        const alreadyShown =
+          shownMigrationAlertRef.current.has(uKey) ||
+          Boolean(sessionStorage.getItem(alertSessionKey));
+
+        if (summary.migrated && summary.levelsPreserved > 0 && !alreadyShown) {
+          shownMigrationAlertRef.current.add(uKey);
+          sessionStorage.setItem(alertSessionKey, 'true');
           showAlert({
             title: 'PROGRESS PRESERVED',
             message: `Welcome @${authUser.username}! Your previous ${summary.levelsPreserved} stage progress and custom arenas are safely linked.`,

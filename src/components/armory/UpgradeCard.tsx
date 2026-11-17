@@ -53,9 +53,9 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
       };
     case 'paddle_speed':
       return {
-        statName: 'SPEED',
-        current: `${Math.round(800 + (level - 1) * (800 / 7))} px/s`,
-        delta: '+114 px/s',
+        statName: 'THRUST SPEED',
+        current: level >= 8 ? 'MAX BOOSTER' : `${Math.round(800 + (level - 1) * (800 / 7))} px/s`,
+        delta: level >= 8 ? null : level >= 7 ? 'MAX BOOSTER' : '+114 px/s',
       };
     case 'expand_power':
       return {
@@ -119,27 +119,27 @@ function getStatBreakdown(upgrade: UpgradeDef, level: number): {
       };
     case 'paddle_fancy':
       return {
-        statName: 'THRUSTER SPARKS',
+        statName: 'CHASSIS AURA',
         current:
           level === 1
             ? 'OFF'
             : level === 2
-            ? '6 PLASMA'
+            ? 'CYAN HALO'
             : level === 3
-            ? '10 INDIGO'
+            ? 'INDIGO FIELD'
             : level === 4
-            ? '14 VIOLET'
-            : '20 HYPERION',
+            ? 'WARP PULSE'
+            : 'SOLAR CORONA',
         delta:
           level >= 5
             ? null
             : level === 1
-            ? '6 PLASMA'
+            ? 'CYAN HALO'
             : level === 2
-            ? '10 INDIGO'
+            ? 'INDIGO FIELD'
             : level === 3
-            ? '14 VIOLET'
-            : '20 HYPERION',
+            ? 'WARP PULSE'
+            : 'SOLAR CORONA',
       };
     default:
       return {

@@ -49,6 +49,12 @@ class AccountMigrationService {
     const userId = authenticatedUser.id;
     const anonId = getAnonymousUserId();
 
+    // Prevent redundant repeated migrations for the same anonymous session & user
+    const migrationSessionKey = `breakout_anon_migrated_${anonId}_to_${username}`;
+    if (localStorage.getItem(migrationSessionKey)) {
+      return { migrated: false, levelsPreserved: 0, customArenasTransferred: 0, coresBalance: currencyService.getBalance() };
+    }
+
     // 1. Gather anonymous level progress from local storage
     let anonProgress: Record<string, LocalLevelProgress> = {};
     try {
@@ -208,9 +214,14 @@ class AccountMigrationService {
     } catch {}
 
     const finalCompleted = Object.values(mergedProgress).filter((p) => p.completed).length;
+    const wasMigrated = anonCompletedCount > 0 || customArenasTransferred > 0;
+    if (wasMigrated) {
+      localStorage.setItem(migrationSessionKey, 'true');
+      localStorage.removeItem(this.progressKey);
+    }
 
     return {
-      migrated: anonCompletedCount > 0 || customArenasTransferred > 0,
+      migrated: wasMigrated,
       levelsPreserved: finalCompleted,
       customArenasTransferred,
       coresBalance: currencyService.getBalance(),
