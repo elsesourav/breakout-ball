@@ -180,11 +180,11 @@ export function drawLevelPreviewOnCanvas(
 
   // 3. Playfield Matrix Grid & Cyber Frame (Matches Matrix Forge editor)
   if (options?.showGrid !== false) {
-    ctx.fillStyle = '#05071c';
+    ctx.fillStyle = '#04071c';
     ctx.fillRect(startX, startY, matrixW, matrixH);
 
-    // Subtle 9x11 gridlines
-    ctx.strokeStyle = 'rgba(0, 247, 255, 0.08)';
+    // Crisp 9x11 gridlines matching Matrix Forge
+    ctx.strokeStyle = 'rgba(0, 247, 255, 0.14)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let c = 0; c <= GRID_ROWS; c++) {
@@ -200,7 +200,7 @@ export function drawLevelPreviewOnCanvas(
     ctx.stroke();
 
     // Matrix Outer Frame
-    ctx.strokeStyle = 'rgba(0, 247, 255, 0.35)';
+    ctx.strokeStyle = 'rgba(0, 247, 255, 0.45)';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(startX, startY, matrixW, matrixH);
 

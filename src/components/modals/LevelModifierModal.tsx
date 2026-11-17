@@ -156,12 +156,14 @@ export const LevelModifierModal: React.FC = () => {
       </div>
 
       <div className="inner">
-        <div className="cvs">
-          <canvas
-            ref={canvasRef}
-            id="cvsModifier"
-            className="w-full h-full block rounded"
-          />
+        <div className="w-full flex flex-col items-center justify-center py-1">
+          <div className="relative w-44 sm:w-48 aspect-[1152/1056] rounded-xl bg-[#030514] border border-cyan-500/40 overflow-hidden shadow-[0_0_20px_rgba(0,247,255,0.18)] flex items-center justify-center">
+            <canvas
+              ref={canvasRef}
+              id="cvsModifier"
+              className="w-full h-full block rounded-xl"
+            />
+          </div>
         </div>
 
         {/* Level Name Input Field */}
