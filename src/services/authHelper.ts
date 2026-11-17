@@ -1,4 +1,5 @@
 import { backendApi } from './backendApi';
+import { supabase } from './supabase';
 
 export interface AuthUser {
   id: string;
@@ -45,17 +46,14 @@ export function getOAuthRedirectUrl(): string {
 }
 
 /**
- * Detects mobile browsers or standalone PWA mode.
- * On mobile/PWA, popup windows fail, get blocked, or open external unlinked browser tabs.
+ * Detects standalone PWA mode.
  */
 export function isMobileOrPwa(): boolean {
   if (typeof window === 'undefined') return false;
-  const ua = navigator.userAgent || '';
-  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  const isSmallScreen = window.innerWidth <= 768;
-  const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-    Boolean((navigator as any).standalone);
-  return isMobileUA || isSmallScreen || isStandalone;
+  return Boolean(
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    (navigator as any).standalone
+  );
 }
 
 export function openOAuthPopup(url: string, provider: string): Window | null {
@@ -63,17 +61,100 @@ export function openOAuthPopup(url: string, provider: string): Window | null {
   const w = 520, h = 660;
   const left = window.screenX + (window.outerWidth - w) / 2;
   const top = window.screenY + (window.outerHeight - h) / 2;
-  return window.open(
-    url,
-    `ElseSourav_${provider}`,
-    `width=${w},height=${h},left=${left},top=${top},status=no,resizable=yes`
-  );
+  try {
+    return window.open(
+      url || 'about:blank',
+      `ElseSourav_${provider}`,
+      `width=${w},height=${h},left=${left},top=${top},status=no,resizable=yes`
+    );
+  } catch {
+    return null;
+  }
 }
 
 export function cleanOAuthUrl(): void {
   if (typeof window === 'undefined') return;
   if (window.location.hash.includes('access_token') || window.location.search.includes('code=')) {
     window.history.replaceState(null, '', window.location.pathname);
+  }
+}
+
+/**
+ * Handles cross-platform OAuth popup and multi-tab synchronization.
+ * Opens popup synchronously during click event to satisfy popup blockers.
+ */
+export async function startOAuthFlow(
+  provider: 'google' | 'github',
+  onUserResolved: (user: AuthUser) => void,
+  getCurrentUser: () => AuthUser,
+  onAuthStateChange: (cb: (user: AuthUser) => void) => () => void
+): Promise<{ success: boolean; user?: AuthUser; message?: string }> {
+  try {
+    const redirectTo = getOAuthRedirectUrl();
+    const isPwa = isMobileOrPwa();
+
+    if (isPwa) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo, skipBrowserRedirect: false },
+      });
+      if (error) return { success: false, message: error.message };
+      if (data?.url) {
+        window.location.href = data.url;
+        return { success: true };
+      }
+    }
+
+    // Synchronously open popup window on click before any async await
+    const popup = openOAuthPopup('', provider);
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo, skipBrowserRedirect: true },
+    });
+
+    if (error || !data?.url) {
+      try { if (popup && !popup.closed) popup.close(); } catch {}
+      return { success: false, message: error?.message || `Failed to start ${provider} login` };
+    }
+
+    if (popup && !popup.closed) {
+      popup.location.href = data.url;
+      return new Promise((resolve) => {
+        let resolved = false;
+
+        const unsubscribe = onAuthStateChange((u) => {
+          if (u.isLoggedIn && !resolved) {
+            resolved = true;
+            unsubscribe();
+            try { if (popup && !popup.closed) popup.close(); } catch {}
+            onUserResolved(u);
+            resolve({ success: true, user: u });
+          }
+        });
+
+        const timer = setInterval(async () => {
+          if (popup.closed) {
+            clearInterval(timer);
+            unsubscribe();
+            if (resolved) return;
+            await new Promise((r) => setTimeout(r, 400));
+            const cur = getCurrentUser();
+            if (cur.isLoggedIn && cur.username !== 'anonymous') {
+              onUserResolved(cur);
+              resolve({ success: true, user: cur });
+            } else {
+              resolve({ success: false, message: 'OAuth sign-in cancelled or window closed' });
+            }
+          }
+        }, 500);
+      });
+    }
+
+    window.location.href = data.url;
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, message: err?.message || `OAuth with ${provider} failed` };
   }
 }
 

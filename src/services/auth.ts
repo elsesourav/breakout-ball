@@ -17,6 +17,7 @@ import {
   openOAuthPopup,
   cleanOAuthUrl,
   resolveIdentifierToEmail,
+  startOAuthFlow,
 } from './authHelper';
 import { accountMigrationService } from './accountMigration';
 
@@ -74,6 +75,35 @@ class AuthService {
   private setupSsoPostMessageListener() {
     if (typeof window === 'undefined') return;
 
+    // 1. Cross-tab BroadcastChannel sync for multi-tab/mobile OAuth
+    if ('BroadcastChannel' in window) {
+      try {
+        const ch = new BroadcastChannel('breakout_oauth_channel');
+        ch.onmessage = (e) => {
+          if (e.data?.type === 'BREAKOUT_AUTH_SUCCESS' && e.data?.user) {
+            this.setCurrentUser(e.data.user);
+            this.notifySubscribers(e.data.user);
+            accountMigrationService.migrateAnonymousDataToUser(e.data.user).catch(() => {});
+          }
+        };
+      } catch {}
+    }
+
+    // 2. Storage event listener fallback across tabs
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'breakout_oauth_sync' && e.newValue) {
+        try {
+          const { user } = JSON.parse(e.newValue);
+          if (user?.isLoggedIn) {
+            this.setCurrentUser(user);
+            this.notifySubscribers(user);
+            accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
+          }
+        } catch {}
+      }
+    });
+
+    // 3. PostMessage for iframe & popup communication
     window.addEventListener('message', async (event) => {
       if (
         event.origin.includes('elsesourav.com') ||
@@ -115,7 +145,6 @@ class AuthService {
   }
 
   private listenToAuthStateChanges() {
-    // Keep local session in sync with Supabase auth state
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const u = session.user;
@@ -139,8 +168,17 @@ class AuthService {
         this.notifySubscribers(user);
         accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
 
-        // Auto close popup if this window was opened as an OAuth popup
+        // Broadcast to other open tabs/windows
         if (typeof window !== 'undefined') {
+          try {
+            if ('BroadcastChannel' in window) {
+              const ch = new BroadcastChannel('breakout_oauth_channel');
+              ch.postMessage({ type: 'BREAKOUT_AUTH_SUCCESS', user });
+              ch.close();
+            }
+            localStorage.setItem('breakout_oauth_sync', JSON.stringify({ user, ts: Date.now() }));
+          } catch {}
+
           if (window.opener && window.opener !== window) {
             try {
               window.opener.postMessage({ type: 'BREAKOUT_AUTH_SUCCESS', user }, window.location.origin);
@@ -383,62 +421,16 @@ class AuthService {
   public async loginWithOAuth(
     provider: 'google' | 'github'
   ): Promise<{ success: boolean; user?: AuthUser; message?: string }> {
-    try {
-      const redirectTo = getOAuthRedirectUrl();
-      const isMobile = isMobileOrPwa();
-
-      // On mobile / standalone PWA: redirect full page directly to avoid blocked/orphaned popups
-      if (isMobile) {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo,
-            skipBrowserRedirect: false,
-          },
-        });
-        if (error) return { success: false, message: error.message };
-        if (data?.url) {
-          window.location.href = data.url;
-          return { success: true };
-        }
-      }
-
-      // Desktop flow: attempt centered popup so player remains in active game view
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo,
-          skipBrowserRedirect: true,
-        },
-      });
-
-      if (error) return { success: false, message: error.message };
-      if (!data?.url) return { success: false, message: `No authorization URL returned for ${provider}` };
-
-      const popup = openOAuthPopup(data.url, provider);
-      if (popup && !popup.closed) {
-        return new Promise((resolve) => {
-          const timer = setInterval(async () => {
-            if (popup.closed) {
-              clearInterval(timer);
-              await new Promise((r) => setTimeout(r, 300));
-              const cur = this.getCurrentUser();
-              if (cur.isLoggedIn && cur.username !== 'anonymous') {
-                accountMigrationService.migrateAnonymousDataToUser(cur).catch(() => {});
-                resolve({ success: true, user: cur });
-              } else {
-                resolve({ success: false, message: 'OAuth sign-in cancelled or window closed' });
-              }
-            }
-          }, 500);
-        });
-      }
-
-      window.location.href = data.url;
-      return { success: true };
-    } catch (err: any) {
-      return { success: false, message: err?.message || `OAuth with ${provider} failed` };
-    }
+    return startOAuthFlow(
+      provider,
+      (user) => {
+        this.setCurrentUser(user);
+        this.notifySubscribers(user);
+        accountMigrationService.migrateAnonymousDataToUser(user).catch(() => {});
+      },
+      () => this.getCurrentUser(),
+      (cb) => this.onAuthStateChange(cb)
+    );
   }
 
   // ==========================================
