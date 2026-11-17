@@ -165,22 +165,19 @@ export function calculateTrajectoryGuideline(
   // 4. Radius check by VELOCITY DISTANCE: distance traveled along velocity path to paddle plane
   const isUnderRadius = totalIncomingPath <= detectionRadius;
 
-  // 5. Feasibility check: whether ball landing point intercepts playable paddle plane
-  const isWithinArena = hitX >= -ballR && hitX <= arenaW + ballR;
+  // 5. Paddle Target Velocity Check: strictly verify paddle is currently positioned on the target landing location
+  const isPaddleOnTarget = hitX >= padLeft - ballR * 0.8 && hitX <= padRight + ballR * 0.8;
 
-  // 6. Paddle Collision / Lock-On Feasibility Check: whether paddle is aligned to intercept ball
-  const isHit =
-    (hitX >= padLeft - ballR * 1.5 && hitX <= padRight + ballR * 1.5) ||
-    (ball.x >= padLeft - ballR * 0.5 && ball.x <= padRight + ballR * 0.5 && totalIncomingPath <= 350);
-
-  // Strictly do NOT render guideline when velocity distance is out of range or off-screen
-  if (!isUnderRadius || !isWithinArena) {
-    const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * 4.0);
+  // Strictly do NOT render guideline unless ball is under radius AND paddle is on the target velocity location
+  if (!isUnderRadius || !isPaddleOnTarget) {
+    const nextFadeAlpha = Math.max(0.0, currentFadeAlpha - dt * 6.0);
     return {
       guideline: { visible: false, alpha: 0, isHit: false, hitX, hitY, incomingSegments: [], outgoingSegments: [], outVx: 0, outVy: 0, detectionRadius, outgoingLength },
       nextFadeAlpha,
     };
   }
+
+  const isHit = true;
 
   // 6. Alpha Calculation: high-visibility onset (0.80) when descending into range, reaching 1.0
   const targetAlpha = 1.0;

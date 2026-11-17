@@ -324,19 +324,12 @@ export class WebGLRenderer {
         continue;
       }
 
-      const { guideline, nextFadeAlpha } = calculateTrajectoryGuideline(
-        b,
-        paddle,
-        w,
-        h,
-        trajLvl,
-        prevAlpha,
-        1 / 60
-      );
+      const padState = renderPaddleX !== paddle.x ? { ...paddle, x: renderPaddleX } : paddle;
+      const { guideline, nextFadeAlpha } = calculateTrajectoryGuideline(b, padState, w, h, trajLvl, prevAlpha, 1 / 60);
       this.ballFadeAlphas.set(idx, nextFadeAlpha);
 
-      // Display V-type guideline when under radius and descending towards paddle
-      if (guideline.visible && guideline.alpha > 0.01) {
+      // Display V-type guideline ONLY when under radius AND paddle intercepts target velocity location
+      if (guideline.visible && guideline.alpha > 0.01 && guideline.isHit) {
         const gAlpha = guideline.alpha;
         const inR = 0.0, inG = 0.97, inB = 1.0;
         const inAlpha = gAlpha * 1.0;
