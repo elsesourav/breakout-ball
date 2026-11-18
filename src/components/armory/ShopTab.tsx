@@ -150,7 +150,11 @@ export const ShopTab: React.FC<ShopTabProps> = ({ username, onClaimSuccess }) =>
     const res = await couponService.redeemCoupon(couponCode, username, selectedPack.cores);
 
     if (res.success) {
-      soundManager.playUpgradeSuccess();
+      if (res.coresGranted >= 0) {
+        soundManager.playUpgradeSuccess();
+      } else {
+        soundManager.playClick('cyber');
+      }
       setStatus('success');
       setStatusMsg(res.message);
 

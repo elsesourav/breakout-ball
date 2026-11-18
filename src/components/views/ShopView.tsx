@@ -141,6 +141,15 @@ export const ShopView: React.FC = () => {
       if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
 
       const newBalance = currencyService.getBalance();
+
+      // Negative adjustment (admin test deduction / coupon)
+      if (amount < 0) {
+        setDisplayCores(newBalance);
+        setCores(newBalance);
+        setDailyStatus(currencyService.getDailyCollectStatus());
+        return;
+      }
+
       const prevBalance = Math.max(0, newBalance - amount);
       const fromVal = Math.min(displayCoresRef.current, prevBalance);
 

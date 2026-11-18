@@ -21,8 +21,8 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
 
   // New coupon form state
   const [newCode, setNewCode] = useState('');
-  const [newReward, setNewReward] = useState('250');
-  const [newPack, setNewPack] = useState('250');
+  const [newReward, setNewReward] = useState('5000');
+  const [newPack, setNewPack] = useState('0');
   const [newMaxUses, setNewMaxUses] = useState('1000');
   const [perUserRule, setPerUserRule] = useState<'1' | 'multi' | 'unlimited'>('1');
   const [customUserLimit, setCustomUserLimit] = useState('3');
@@ -59,11 +59,16 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
     e.preventDefault();
     if (!newCode.trim()) return;
     setStatusMsg(null);
+    const parsedReward = parseInt(newReward, 10);
+    if (isNaN(parsedReward)) {
+      setStatusMsg({ text: 'Reward cores must be a valid number (e.g. 5000 or -5000)', type: 'error' });
+      return;
+    }
     const perUserLimit = perUserRule === '1' ? 1 : perUserRule === 'unlimited' ? 0 : (parseInt(customUserLimit, 10) || 3);
     const res = await backendApi.createCoupon({
       code: newCode.trim().toUpperCase(),
-      rewardCores: parseInt(newReward, 10) || 100,
-      packCores: parseInt(newPack, 10) || 100,
+      rewardCores: parsedReward,
+      packCores: parseInt(newPack, 10) || 0,
       maxUses: isUnlimitedTotal ? 0 : (parseInt(newMaxUses, 10) || 1000),
       perUserLimit,
       isUnlimited: isUnlimitedTotal,
@@ -79,19 +84,13 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
 
   const handleToggleCoupon = async (code: string, currentActive: boolean) => {
     const res = await backendApi.toggleCoupon(code, !currentActive);
-    if (res.success) {
-      setStatusMsg({ text: `Coupon ${code} set to ${!currentActive ? 'ACTIVE' : 'OFF'}`, type: 'success' });
-      fetchAll();
-    }
+    if (res.success) { setStatusMsg({ text: `Coupon ${code} set to ${!currentActive ? 'ACTIVE' : 'OFF'}`, type: 'success' }); fetchAll(); }
   };
 
   const handleDeleteCoupon = async (code: string) => {
     if (!window.confirm(`Permanently remove coupon ${code}?`)) return;
     const res = await backendApi.deleteCoupon(code);
-    if (res.success) {
-      setStatusMsg({ text: `Coupon ${code} removed successfully`, type: 'success' });
-      fetchAll();
-    }
+    if (res.success) { setStatusMsg({ text: `Coupon ${code} removed successfully`, type: 'success' }); fetchAll(); }
   };
 
   if (!isOpen) return null;
@@ -99,11 +98,11 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
   if (!isUserAdmin(authService.getCurrentUser())) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div className="w-full max-w-md rounded-2xl bg-[#080c24] border-2 border-red-500/50 p-6 flex flex-col items-center gap-3 text-center text-white font-tech shadow-[0_0_35px_rgba(239,68,68,0.3)]">
+        <div className="w-full max-w-md rounded-2xl bg-[#080c24] border-2 border-red-500/50 p-6 flex flex-col items-center gap-3 text-center text-white font-tech">
           <ShieldAlert className="w-10 h-10 text-red-400" />
           <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider font-display">ACCESS RESTRICTED // ADMIN ONLY</h3>
           <p className="text-xs text-slate-300">This terminal requires authorization with your elsesourav.com administrator account.</p>
-          <button onClick={onClose} className="mt-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition-all cursor-pointer">DISMISS</button>
+          <button onClick={onClose} className="mt-2 px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold text-white cursor-pointer">DISMISS</button>
         </div>
       </div>
     );
@@ -248,37 +247,43 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
               </h3>
               
               {/* Row 1: Code, Reward Cores, Pack Cores */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div>
                   <label className="text-[10px] text-slate-400 block mb-0.5">CODE</label>
                   <input
                     type="text"
                     value={newCode}
                     onChange={(e) => setNewCode(e.target.value.toUpperCase())}
-                    placeholder="E.g. VIP2026"
+                    placeholder="E.g. VIP5000"
                     className="w-full px-2 py-1 bg-black/60 border border-cyan-500/40 rounded text-xs text-white uppercase focus:border-cyan-300 outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-400 block mb-0.5">REWARD CORES</label>
+                  <label className="text-[10px] text-slate-400 block mb-0.5">REWARD CORES (+ / -)</label>
                   <input
                     type="number"
                     value={newReward}
                     onChange={(e) => setNewReward(e.target.value)}
+                    placeholder="e.g. 5000 or -5000"
                     className="w-full px-2 py-1 bg-black/60 border border-cyan-500/40 rounded text-xs text-white focus:border-cyan-300 outline-none"
                     required
                   />
                 </div>
                 <div>
                   <label className="text-[10px] text-slate-400 block mb-0.5">TARGET PACK</label>
-                  <input
-                    type="number"
+                  <select
                     value={newPack}
                     onChange={(e) => setNewPack(e.target.value)}
-                    className="w-full px-2 py-1 bg-black/60 border border-cyan-500/40 rounded text-xs text-white focus:border-cyan-300 outline-none"
-                    required
-                  />
+                    className="w-full px-2 py-1 bg-black/80 border border-cyan-500/40 rounded text-xs text-white focus:border-cyan-300 outline-none cursor-pointer"
+                  >
+                    <option value="0">Universal (Any Pack)</option>
+                    <option value="500">500 Cores (Starter)</option>
+                    <option value="1000">1,000 Cores (Power)</option>
+                    <option value="2500">2,500 Cores (Mega)</option>
+                    <option value="5000">5,000 Cores (Ultra)</option>
+                    <option value="10000">10,000 Cores (Titan)</option>
+                  </select>
                 </div>
               </div>
 
@@ -407,8 +412,10 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
                             <Copy className="w-3 h-3" />
                           </button>
                         </div>
-                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">
-                          +{c.reward_cores} Cores (Pack {c.pack_cores})
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          c.reward_cores < 0 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-cyan-500/20 text-cyan-300'
+                        }`}>
+                          {c.reward_cores >= 0 ? `+${c.reward_cores}` : c.reward_cores} Cores ({c.pack_cores === 0 ? 'Universal' : `Pack ${c.pack_cores}`})
                         </span>
                         <span
                           className={`px-1.5 py-0.5 rounded text-[9px] font-bold font-mono ${
@@ -462,12 +469,12 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {[
-                { label: 'Real Pre-Players', val: dashboard?.metrics?.totalUsers ?? 50, note: 'Seeded with 30-level history', color: 'text-cyan-300' },
-                { label: 'Level Completions', val: dashboard?.metrics?.totalCompletions ?? 1139, note: 'Across 30 campaign stages', color: 'text-cyan-300' },
-                { label: 'Trophies Earned', val: dashboard?.metrics?.totalTrophies ?? 350, note: 'Individual achievements', color: 'text-amber-300' },
-                { label: 'Promo Coupons', val: dashboard?.metrics?.totalCoupons ?? 5, note: 'Active redemption codes', color: 'text-emerald-300' },
-                { label: 'Coupon Redemptions', val: dashboard?.metrics?.totalRedemptions ?? 13, note: 'Single-use server enforced', color: 'text-emerald-300' },
-                { label: 'Cores Granted', val: (dashboard?.metrics?.totalCoresDistributed ?? 4100).toLocaleString(), note: 'Total cyber balance', color: 'text-cyan-200' },
+                { label: 'Real Pre-Players', val: dashboard?.metrics?.totalUsers ?? 50, note: 'Seeded history', color: 'text-cyan-300' },
+                { label: 'Level Completions', val: dashboard?.metrics?.totalCompletions ?? 1139, note: '30 stages', color: 'text-cyan-300' },
+                { label: 'Trophies Earned', val: dashboard?.metrics?.totalTrophies ?? 350, note: 'Achievements', color: 'text-amber-300' },
+                { label: 'Promo Coupons', val: dashboard?.metrics?.totalCoupons ?? 5, note: 'Redemption codes', color: 'text-emerald-300' },
+                { label: 'Coupon Redemptions', val: dashboard?.metrics?.totalRedemptions ?? 13, note: 'Server enforced', color: 'text-emerald-300' },
+                { label: 'Cores Granted', val: (dashboard?.metrics?.totalCoresDistributed ?? 4100).toLocaleString(), note: 'Cyber balance', color: 'text-cyan-200' },
               ].map((m) => (
                 <div key={m.label} className="p-3 rounded-xl bg-black/40 border border-cyan-500/30">
                   <span className="text-[10px] text-slate-400 block uppercase">{m.label}</span>
@@ -479,9 +486,7 @@ export const BackendAdminModal: React.FC<BackendAdminModalProps> = ({ isOpen, on
 
             <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-slate-300 leading-relaxed">
               <div className="text-cyan-400 font-bold mb-1">// SYSTEM ARCHITECTURE</div>
-              <p>• Storage Engine: SQLite (Native WAL mode, zero external compilation)</p>
-              <p>• Cloud Synchronization: Dual-Write (Local SQLite + Cloud Firestore)</p>
-              <p>• Production Host: VM3 Azure / PM2 Daemon (api.elsesourav.com:4000)</p>
+              <p>• Storage: SQLite (Native WAL) | Cloud Sync: Dual-Write (Firestore) | Host: api.elsesourav.com</p>
             </div>
           </div>
         )}

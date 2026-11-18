@@ -260,9 +260,9 @@ class CurrencyService {
     return reward;
   }
 
-  /** Add bonus cores (e.g., from coupon redemption). */
+  /** Add bonus cores (e.g., from coupon redemption). Clamps balance to minimum 0. */
   public addCores(amount: number, username?: string): void {
-    this.balance += amount;
+    this.balance = Math.max(0, this.balance + amount);
     this.saveToLocal();
     this.syncToCloud(username).catch(() => {});
   }

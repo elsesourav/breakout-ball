@@ -19,24 +19,8 @@ export interface CouponRedeemResult {
   message: string;
 }
 
-// Cryptographic SHA-256 digest of master override authorization key
-// Kept as a one-way hash so plain authorization keys are never exposed in client bundles or UI
-const MASTER_KEY_DIGEST = '4290052b68aaed1bfc5808a104d3162047e1c5c20ae9f295cb81aab73837fd67';
 const MULTI_REDEEM_STORAGE_KEY = '_bb_core_priv_mode';
 const USER_REDEMPTIONS_KEY = 'breakout_user_redemptions';
-
-/** Fast asynchronous SHA-256 digest computation using Web Crypto API */
-async function computeSha256(value: string): Promise<string> {
-  try {
-    if (typeof crypto !== 'undefined' && crypto.subtle) {
-      const msgBuffer = new TextEncoder().encode(value);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-    }
-  } catch {}
-  return '';
-}
 
 class CouponService {
   private multiUseActive = false;
@@ -137,38 +121,7 @@ class CouponService {
 
     const isMultiUse = this.isMultiUseActive();
 
-    // ── 1. Cryptographic Master Override Code Verification ──
-    const codeDigest = await computeSha256(code);
-    const isMasterCode = codeDigest === MASTER_KEY_DIGEST;
-
-    if (isMasterCode) {
-      // Unlock unlimited multi-use for all valid coupons
-      this.setMultiUseActive(true, username);
-
-      // Reward amount matches selected pack (or 10,000 if not specified)
-      const grantCores = expectedCores || 10000;
-      currencyService.addCores(grantCores, username);
-
-      // Also register or touch in Firestore if connected
-      try {
-        const masterRef = doc(firestoreDb, 'redemption_codes', code);
-        await setDoc(masterRef, {
-          isMasterCode: true,
-          multiUse: true,
-          lastRedeemedBy: username || 'anonymous',
-          lastRedeemedAt: new Date().toISOString(),
-          redeemCount: increment(1),
-        }, { merge: true });
-      } catch {}
-
-      return {
-        success: true,
-        coresGranted: grantCores,
-        message: `Override Accepted! +${grantCores.toLocaleString()} Cores granted`,
-      };
-    }
-
-    // ── 2. Local One-Time Enforcement ──
+    // ── 1. Local One-Time Enforcement ──
     if (!isMultiUse) {
       const redeemed = this.getRedeemedCodes();
       if (redeemed.has(code)) {
@@ -176,18 +129,21 @@ class CouponService {
       }
     }
 
-    // ── 2.5. Dedicated Backend Microservice Validation & Redemption ──
+    // ── 2. Dedicated Backend Microservice Validation & Redemption ──
     try {
       const apiRes = await backendApi.redeemCoupon(code, username || 'player', expectedCores || 0);
-      if (apiRes.success && apiRes.coresGranted) {
-        currencyService.addCores(apiRes.coresGranted, 'shop_coupon');
+      if (apiRes.success && apiRes.coresGranted !== undefined) {
+        currencyService.addCores(apiRes.coresGranted, username);
         if (!isMultiUse) {
           this.markCodeRedeemed(code);
         }
+        const displayMsg = apiRes.message || (apiRes.coresGranted >= 0
+          ? `Coupon Claimed! +${apiRes.coresGranted.toLocaleString()} Cores`
+          : `Balance Adjusted: ${apiRes.coresGranted.toLocaleString()} Cores`);
         return {
           success: true,
           coresGranted: apiRes.coresGranted,
-          message: apiRes.message || `Coupon Claimed! +${apiRes.coresGranted.toLocaleString()} Cores`,
+          message: displayMsg,
         };
       } else if (!apiRes.success && apiRes.message && !apiRes.message.includes('Server unavailable') && !apiRes.message.includes('Network error')) {
         return {
@@ -218,7 +174,7 @@ class CouponService {
         }
 
         // Determine reward cores from doc
-        let prospectiveCores = data.cores || data.rewardCores || data.amount || data.value || expectedCores || 500;
+        let prospectiveCores = Number(data.cores ?? data.rewardCores ?? data.amount ?? data.value ?? expectedCores ?? 500);
         if (data.couponId) {
           try {
             const parentCoupon = await getDoc(doc(firestoreDb, 'coupons', data.couponId));
@@ -226,25 +182,30 @@ class CouponService {
               if (parentCoupon.data().isActive === false) {
                 return { success: false, coresGranted: 0, message: 'Promotion has ended' };
               }
-              if (parentCoupon.data().rewardCores) {
-                prospectiveCores = parentCoupon.data().rewardCores;
+              if (parentCoupon.data().rewardCores !== undefined) {
+                prospectiveCores = Number(parentCoupon.data().rewardCores);
               }
             }
           } catch {}
         }
 
-        // Pack tier validation: Must match the pack currently being claimed
-        if (expectedCores && prospectiveCores !== expectedCores) {
+        // Pack tier validation: If calibrated for a specific pack (>0), must match
+        const couponPack = Number(data.packCores ?? data.pack_cores ?? 0);
+        if (couponPack > 0 && expectedCores && couponPack !== expectedCores) {
           return {
             success: false,
             coresGranted: 0,
-            message: `This coupon is for ${prospectiveCores.toLocaleString()} Cores, not this pack.`,
+            message: `This coupon is calibrated for ${couponPack.toLocaleString()} Cores packs.`,
           };
         }
 
+        const successMsg = prospectiveCores >= 0
+          ? `Coupon Claimed! +${prospectiveCores.toLocaleString()} Cores`
+          : `Balance Adjusted: ${prospectiveCores.toLocaleString()} Cores`;
+
         // ── Single-Use vs Multi-Use Logic ──
         if (isMultiUse || data.multiUse === true || data.allowMultiple === true) {
-          // Multi-use mode active: Grant cores and allow repeated redemptions
+          // Multi-use mode active: Grant or adjust cores
           currencyService.addCores(prospectiveCores, username);
 
           // Update telemetry in Firestore
@@ -257,7 +218,7 @@ class CouponService {
           return {
             success: true,
             coresGranted: prospectiveCores,
-            message: `Coupon Claimed! +${prospectiveCores.toLocaleString()} Cores`,
+            message: successMsg,
           };
         } else {
           // Normal 1-time enforcement: Check if already redeemed in Firestore
@@ -288,7 +249,7 @@ class CouponService {
           return {
             success: true,
             coresGranted: reward,
-            message: `Success! Granted +${reward.toLocaleString()} Cores`,
+            message: successMsg,
           };
         }
       }

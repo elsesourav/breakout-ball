@@ -246,11 +246,15 @@ app.post('/api/coupons/validate', (req, res) => {
       }
     }
 
+    const msg = coupon.reward_cores >= 0
+      ? `Valid coupon for +${coupon.reward_cores.toLocaleString()} Cores!`
+      : `Valid coupon for ${coupon.reward_cores.toLocaleString()} Cores adjustment!`;
+
     res.json({
       valid: true,
       rewardCores: coupon.reward_cores,
       packCores: coupon.pack_cores,
-      message: `Valid coupon for +${coupon.reward_cores.toLocaleString()} Cores!`
+      message: msg
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -389,14 +393,19 @@ app.get('/api/admin/coupons', requireAdminAuth, (_req, res) => {
 app.post('/api/admin/coupons', requireAdminAuth, (req, res) => {
   try {
     const { code, rewardCores, packCores, maxUses, perUserLimit, isUnlimited, expiresAt } = req.body;
-    if (!code || !rewardCores || !packCores) {
-      return res.status(400).json({ error: 'Missing code, rewardCores, or packCores' });
+    if (!code || rewardCores === undefined || rewardCores === null || String(rewardCores).trim() === '') {
+      return res.status(400).json({ error: 'Missing code or rewardCores' });
     }
+    const numReward = Number(rewardCores);
+    if (isNaN(numReward)) {
+      return res.status(400).json({ error: 'Reward cores must be a valid number' });
+    }
+    const numPack = packCores !== undefined && packCores !== null && packCores !== '' ? Number(packCores) : 0;
     const created = couponRepository.create({
       code,
-      rewardCores: Number(rewardCores),
-      packCores: Number(packCores),
-      maxUses: Number(maxUses || 1000),
+      rewardCores: numReward,
+      packCores: numPack,
+      maxUses: isUnlimited ? 0 : Number(maxUses || 1000),
       perUserLimit: perUserLimit !== undefined ? Number(perUserLimit) : 1,
       isUnlimited: Boolean(isUnlimited),
       expiresAt: expiresAt || null

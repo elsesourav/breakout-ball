@@ -169,7 +169,7 @@ export const userRepository = {
     const stmt = db.prepare(`
       UPDATE users 
       SET total_score = total_score + ?,
-          cores_balance = cores_balance + ?,
+          cores_balance = MAX(0, cores_balance + ?),
           trophy_count = trophy_count + ?,
           levels_completed = levels_completed + ?,
           last_active_at = ?
@@ -289,11 +289,13 @@ export const couponRepository = {
     return stmt.get(code);
   },
 
-  create({ code, rewardCores, packCores, maxUses = 1000, perUserLimit = 1, isUnlimited = false, expiresAt = null }) {
+  create({ code, rewardCores, packCores = 0, maxUses = 1000, perUserLimit = 1, isUnlimited = false, expiresAt = null }) {
     const upperCode = code.trim().toUpperCase();
     const now = new Date().toISOString();
     const unlimitedVal = isUnlimited ? 1 : 0;
     const perUserVal = Number.isInteger(Number(perUserLimit)) ? Number(perUserLimit) : 1;
+    const packVal = Number.isInteger(Number(packCores)) ? Number(packCores) : 0;
+    const rewardVal = Number(rewardCores) || 0;
     const stmt = db.prepare(`
       INSERT INTO coupons (code, reward_cores, pack_cores, is_active, max_uses, used_count, per_user_limit, is_unlimited, expires_at, created_at)
       VALUES (?, ?, ?, 1, ?, 0, ?, ?, ?, ?)
@@ -305,10 +307,11 @@ export const couponRepository = {
         per_user_limit = excluded.per_user_limit,
         is_unlimited = excluded.is_unlimited
     `);
-    stmt.run(upperCode, rewardCores, packCores, maxUses, perUserVal, unlimitedVal, expiresAt, now);
+    stmt.run(upperCode, rewardVal, packVal, maxUses, perUserVal, unlimitedVal, expiresAt, now);
     const ruleDesc = perUserVal === 0 ? 'Unlimited/user' : `${perUserVal}x/user`;
     const capDesc = unlimitedVal ? '∞ Total' : `${maxUses} max`;
-    activityRepository.log('coupon_created', 'admin', `Created coupon ${upperCode} (+${rewardCores} Cores for ${packCores} pack, [${ruleDesc}, ${capDesc}])`);
+    const packDesc = packVal === 0 ? 'Universal' : `${packVal} pack`;
+    activityRepository.log('coupon_created', 'admin', `Created coupon ${upperCode} (${rewardVal >= 0 ? '+' : ''}${rewardVal} Cores for ${packDesc}, [${ruleDesc}, ${capDesc}])`);
     return this.get(upperCode);
   },
 
@@ -370,7 +373,11 @@ export const couponRepository = {
     userRepository.upsert({ username });
     userRepository.updateStats(username, { coresDelta: coupon.reward_cores });
 
-    activityRepository.log('coupon_redeemed', username, `Redeemed ${upperCode} for +${coupon.reward_cores} Cores`, {
+    const balanceMsg = coupon.reward_cores >= 0
+      ? `Coupon Claimed! +${coupon.reward_cores.toLocaleString()} Cores`
+      : `Coupon Applied: ${coupon.reward_cores.toLocaleString()} Cores (Balance Adjusted)`;
+
+    activityRepository.log('coupon_redeemed', username, `Redeemed ${upperCode} for ${coupon.reward_cores >= 0 ? '+' : ''}${coupon.reward_cores} Cores`, {
       code: upperCode,
       rewardCores: coupon.reward_cores
     });
@@ -378,7 +385,7 @@ export const couponRepository = {
     return {
       success: true,
       coresGranted: coupon.reward_cores,
-      message: `Coupon Claimed! +${coupon.reward_cores} Cores`
+      message: balanceMsg
     };
   }
 };
